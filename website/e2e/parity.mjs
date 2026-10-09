@@ -9,7 +9,7 @@ import { templateRoutes } from "./templates.mjs";
 const here = path.dirname(fileURLToPath(import.meta.url));
 const repoRoot = path.resolve(here, "..", "..");
 const siteDir = path.resolve(process.env.SITE_DIR ?? path.join(repoRoot, "website", "dist"));
-const dataDir = path.resolve(process.env.EXPLORER_DATA_DIR ?? path.join(repoRoot, "results-explorer", "test-fixtures", ".generated", "data"));
+const dataDir = path.resolve(process.env.EXPLORER_DATA_DIR ?? path.join(process.env.SITE_INPUTS ?? path.join(repoRoot, ".site-inputs"), "explorer", "fixtures"));
 const outFile = process.env.PARITY_E2E_REPORT;
 
 const failures = [];

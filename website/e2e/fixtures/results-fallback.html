@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Page Not Found - BenchBox</title>
+  <script>
+    var redirectKey = 'benchbox.results.redirect';
+
+    if (window.location.pathname.startsWith('/results/')) {
+      var originalPath = window.location.pathname + window.location.search + window.location.hash;
+
+      try {
+        window.sessionStorage.setItem(redirectKey, originalPath);
+      } catch (error) {
+      }
+
+      window.location.replace('/results/');
+    }
+  </script>
+</head>
+<body>
+  <p>Page not found. <a href="/">Return to documentation</a>.</p>
+</body>
+</html>

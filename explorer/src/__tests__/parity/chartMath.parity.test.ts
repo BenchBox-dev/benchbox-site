@@ -15,8 +15,9 @@ import {
   computeECDFPoints,
   computeRankTable,
 } from "@/lib/chartMath";
+import { siteInputsPath } from "@/test/siteInputs";
 
-const FIXTURES_DIR = path.resolve(process.cwd(), "../tests/parity/fixtures");
+const FIXTURES_DIR = siteInputsPath("explorer", "parity");
 
 interface FixtureCase {
   id: string;

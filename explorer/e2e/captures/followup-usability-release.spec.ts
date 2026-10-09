@@ -8,8 +8,7 @@ const HERE = path.dirname(fileURLToPath(import.meta.url));
 const REPO_ROOT = path.resolve(HERE, "../../..");
 const SHOT_DIR = path.join(
   REPO_ROOT,
-  "_project",
-  "audits",
+  "captures",
   "results-explorer-followup-usability-release-2026-05-08-screenshots",
 );
 const SHOULD_CAPTURE = process.env.FOLLOWUP_USABILITY_CAPTURE === "1";

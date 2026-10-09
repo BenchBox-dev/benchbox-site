@@ -8,7 +8,7 @@ import { firstTagRoute, startSiteServer } from "./site-server.mjs";
 const here = path.dirname(fileURLToPath(import.meta.url));
 const repoRoot = path.resolve(here, "..", "..");
 const siteDir = path.resolve(process.env.SITE_DIR ?? path.join(repoRoot, "website", "dist"));
-const dataDir = path.resolve(process.env.EXPLORER_DATA_DIR ?? path.join(repoRoot, "results-explorer", "test-fixtures", ".generated", "data"));
+const dataDir = path.resolve(process.env.EXPLORER_DATA_DIR ?? path.join(process.env.SITE_INPUTS ?? path.join(repoRoot, ".site-inputs"), "explorer", "fixtures"));
 const ids = JSON.parse(readFileSync(path.join(dataDir, "fixture-ids.json"), "utf-8"));
 
 const explorerAsset = /^\/results\/|duckdb|\.wasm$/i;

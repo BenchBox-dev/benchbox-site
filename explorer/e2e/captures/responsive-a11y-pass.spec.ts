@@ -8,8 +8,7 @@ const REPO_ROOT = path.resolve(HERE, "../../..");
 const TODAY = new Date().toISOString().slice(0, 10);
 const OUT = path.join(
   REPO_ROOT,
-  "_project",
-  "audits",
+  "captures",
   "screenshots",
   `results-retheme-responsive-a11y-${TODAY}`,
 );
