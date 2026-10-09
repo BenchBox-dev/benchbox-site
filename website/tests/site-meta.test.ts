@@ -82,7 +82,8 @@ function content(markup: string, attribute: "name" | "property", value: string):
 
 describe.skipIf(!dist)("built site", () => {
   const site = dist as string;
-  const pages = dist ? inventoryPages(site).filter((file) => !Object.hasOwn(REDIRECT_PAGES, file)) : [];
+  const isRedirect = (file: string) => Object.hasOwn(REDIRECT_PAGES, file.replace(/^docs\/dev\//, "docs/"));
+  const pages = dist ? inventoryPages(site).filter((file) => !isRedirect(file)) : [];
 
   it("gives every html page canonical, description, Open Graph and Twitter tags", () => {
     const missing: string[] = [];
@@ -110,9 +111,9 @@ describe.skipIf(!dist)("built site", () => {
     expect(missing).toEqual([]);
   });
 
-  it("lists exactly the inventory html pages except 404.html in sitemap.xml", () => {
+  it("lists exactly the inventory html pages except 404.html and the /docs/dev/ mirror in sitemap.xml", () => {
     const listed = [...readFileSync(path.join(site, "sitemap.xml"), "utf-8").matchAll(/<loc>([^<]*)<\/loc>/g)].map((match) => match[1]);
-    const expected = pages.filter((file) => file !== "404.html").map((file) => `${origin}${sitemapPathForFile(file)}`);
+    const expected = pages.filter((file) => file !== "404.html" && !file.startsWith("docs/dev/")).map((file) => `${origin}${sitemapPathForFile(file)}`);
     expect(new Set(listed).size).toBe(listed.length);
     expect([...listed].sort()).toEqual([...expected].sort());
   });
