@@ -12,9 +12,10 @@ function write(file, body) {
   writeFileSync(file, body);
 }
 
-test("schema 2 and schema 1 bundles both verify", () => {
+test("schema 3 and schema 2 bundles verify and schema 1 is no longer supported", () => {
   assert.deepEqual(verifyBundle(fixtureBundle()).errors, []);
-  assert.deepEqual(verifyBundle(fixtureBundle({ schema: 1 })).errors, []);
+  assert.deepEqual(verifyBundle(fixtureBundle({ schema: 2 })).errors, []);
+  assert.ok(verifyBundle(fixtureBundle({ schema: 1 })).errors.some((error) => error.startsWith("schema 1")));
 });
 
 test("a changed member fails its digest", () => {
@@ -22,7 +23,7 @@ test("a changed member fails its digest", () => {
 });
 
 test("an unsupported schema fails", () => {
-  assert.ok(verifyBundle(fixtureBundle({ schema: 3 })).errors.some((error) => error.startsWith("schema 3")));
+  assert.ok(verifyBundle(fixtureBundle({ schema: 4 })).errors.some((error) => error.startsWith("schema 4")));
 });
 
 test("a failed or skipped required attestation fails", () => {
