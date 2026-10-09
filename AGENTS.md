@@ -28,6 +28,31 @@ itself plus one versioned core bundle; it reads nothing else from core.
 - Never read core files by any other route. A guard test fails the build on
   any path outside the repository other than `$SITE_INPUTS`.
 
+## Deploys
+
+- `.github/workflows/deploy.yml` runs on a push to `main`, on a
+  `core-bundle` dispatch from core, and by hand with `mode` set to
+  `deploy`, `redeploy` (the same bundle again) or `rollback` (restore the
+  artifact of the receipt run named in `receipt_run_id`).
+- The repository variable `SITE_DEPLOY_TARGET` decides what a run does.
+  Unset, it resolves, builds and gates, then stops. `rehearsal` deploys to
+  `SITE_ORIGIN` with every page marked `noindex`. `production` deploys
+  benchbox.dev. Only the owner decides to set `production`.
+- Nothing deploys unless every gate passes: privacy, Explorer
+  compatibility, snapshot digest, links (within
+  `inventory/known-broken-links.json`) and origin.
+- Each deploy writes a receipt, uploads it with the artifact, and records
+  its digest on the GitHub Pages deployment. `npm run deploy -- deployed`
+  prints the current one. If the probes fail after a deploy, the run
+  dispatches at most one rollback to the last known good receipt.
+- A failed run opens or updates an issue.
+- `npm run shadow:compare -- <core tree> website/dist
+  inventory/shadow-allowlist.json` compares a build with core's build of
+  the same bundle. Every allowed difference in that file carries a reason.
+- The Visual comparison workflow screenshots a PR's build and the deployed
+  artifact and reports the differences. It is advisory: it is not part of
+  `ci` and never fails on a difference.
+
 ## Changes
 
 - Work on a named branch and open a pull request to `main`. `main` accepts
