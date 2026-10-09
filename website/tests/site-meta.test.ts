@@ -6,6 +6,7 @@ import { builtSite } from "./built-site.ts";
 import { REDIRECT_PAGES } from "../src/lib/legacy-assets.ts";
 import { canonicalPath, pageMeta, renderRobots, renderSitemap, sitemapPathForFile } from "../src/lib/page-meta.ts";
 import { siteHost, siteOrigin } from "../src/lib/site-origin.ts";
+import { siteInputsPath } from "../src/lib/site-inputs.ts";
 
 const here = path.dirname(fileURLToPath(import.meta.url));
 const repoRoot = path.resolve(here, "..", "..");
@@ -131,6 +132,12 @@ describe.skipIf(!dist)("built site", () => {
     const source = readFileSync(path.join(repoRoot, "explorer", "index.html"), "utf-8");
     expect(published).toContain('<link rel="canonical" href="https://benchbox.dev/results/" />');
     expect(source).toContain('href="https://benchbox.dev/results/"');
+  });
+
+  it("publishes the core bundle's Explorer snapshot unchanged", () => {
+    const published = readFileSync(path.join(site, "results", "data", "results.duckdb"));
+    const bundled = readFileSync(siteInputsPath("explorer", "results.duckdb"));
+    expect(published.equals(bundled)).toBe(true);
   });
 
   it("keeps the results redirect and noindex in the 404 page", () => {
