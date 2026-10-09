@@ -1,6 +1,7 @@
+import { siteOrigin } from "./site-origin.ts";
 import { atomTimestamp, BLOG_BASE_URL, BLOG_TITLE, feedCategory, FEED_LENGTH, newestFirst, slugify, type BlogPost } from "./blog.ts";
 
-const SITE_ORIGIN = "https://benchbox.dev";
+const SITE_ORIGIN = siteOrigin();
 const GENERATOR = { uri: "https://astro.build/", name: "Astro" };
 
 export function feedEntryUrl(post: Pick<BlogPost, "slug">): string {

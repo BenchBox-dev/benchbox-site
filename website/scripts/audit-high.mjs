@@ -2,7 +2,7 @@ import { spawnSync } from "node:child_process";
 import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
 import { fileURLToPath } from "node:url";
-import { main } from "../../results-explorer/scripts/audit-high.mjs";
+import { main } from "../../explorer/scripts/audit-high.mjs";
 
 const websiteRoot = resolve(fileURLToPath(new URL(".", import.meta.url)), "..");
 

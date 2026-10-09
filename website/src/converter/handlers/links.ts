@@ -1,5 +1,6 @@
 import { statSync, type Stats } from "node:fs";
 import path from "node:path";
+import { loadRepoFiles } from "../../lib/repo-files.ts";
 import { cloneTitle, type TitleNode } from "../../lib/smartypants.ts";
 import { routeFor } from "../docs-index.ts";
 import { UnresolvedReferenceError } from "../errors.ts";
@@ -10,7 +11,11 @@ import type { ConvertContext, SyntaxHandler } from "../types.ts";
 const SCHEME = /^[a-z][a-z0-9+.-]*:/i;
 const DOC_SUFFIX = /\.(md|rst)$/;
 const REPOSITORY_URL = "https://github.com/BenchBox-dev/BenchBox";
-const REPOSITORY_REF = "develop";
+const FALLBACK_REF = "develop";
+
+function repositoryRef(): string {
+  return loadRepoFiles()?.coreSha ?? FALLBACK_REF;
+}
 
 function decode(target: string): string {
   try {
@@ -32,12 +37,26 @@ function withFragment(url: string, fragment: string): string {
   return fragment === "" ? url : `${url}#${fragment}`;
 }
 
+function repositoryKind(relative: string, absolute: string): "file" | "tree" | undefined {
+  if (relative === "") return "tree";
+  const listed = loadRepoFiles()?.kinds.get(relative);
+  if (listed) return listed;
+  const stats = statOf(absolute);
+  if (stats === undefined) return undefined;
+  return stats.isDirectory() ? "tree" : "file";
+}
+
 function repositoryTarget(absolute: string, docsRoot: string, fragment: string, unresolved: (detail: string) => UnresolvedReferenceError): string {
   const relative = path.relative(path.dirname(docsRoot), absolute).split(path.sep).join("/");
-  const stats = statOf(absolute);
-  if (relative.startsWith("..") || stats === undefined) throw unresolved("does not match a file in the repository");
-  const kind = stats.isDirectory() ? "tree" : "blob";
-  return withFragment(relative === "" ? `${REPOSITORY_URL}/tree/${REPOSITORY_REF}` : `${REPOSITORY_URL}/${kind}/${REPOSITORY_REF}/${relative}`, fragment);
+  const kind = relative.startsWith("..") ? undefined : repositoryKind(relative, absolute);
+  if (kind === undefined) throw unresolved("does not match a file in the repository");
+  const ref = repositoryRef();
+  return withFragment(relative === "" ? `${REPOSITORY_URL}/tree/${ref}` : `${REPOSITORY_URL}/${kind === "tree" ? "tree" : "blob"}/${ref}/${relative}`, fragment);
+}
+
+function isRepositoryFile(absolute: string, docsRoot: string): boolean {
+  const relative = path.relative(path.dirname(docsRoot), absolute).split(path.sep).join("/");
+  return !relative.startsWith("..") && repositoryKind(relative, absolute) === "file";
 }
 
 export const BLOG_PAGES: Readonly<Record<string, string>> = {
@@ -54,7 +73,7 @@ function resolveTarget(target: string, context: ConvertContext, at: SourcePositi
   const insideDocs = path.relative(context.docsRoot, absolute);
   if (insideDocs.startsWith("..") || path.isAbsolute(insideDocs)) {
     const url = repositoryTarget(absolute, context.docsRoot, fragment, unresolved);
-    return DOC_SUFFIX.test(target) || !statOf(absolute)?.isFile() ? { url } : { url, download: insideDocs.split(path.sep).join("/") };
+    return DOC_SUFFIX.test(target) || !isRepositoryFile(absolute, context.docsRoot) ? { url } : { url, download: insideDocs.split(path.sep).join("/") };
   }
   const relative = insideDocs.split(path.sep).join("/");
   if (Object.hasOwn(BLOG_PAGES, relative)) {

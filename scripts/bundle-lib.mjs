@@ -2,8 +2,8 @@ import { createHash } from "node:crypto";
 import { readFileSync, readdirSync, statSync, existsSync } from "node:fs";
 import path from "node:path";
 
-export const SUPPORTED_SCHEMAS = [1];
-export const REQUIRED_MEMBERS = [
+export const SUPPORTED_SCHEMAS = [1, 2];
+const SCHEMA_1_MEMBERS = [
   "docs",
   "repo-files.json",
   "explorer/results.duckdb",
@@ -14,6 +14,12 @@ export const REQUIRED_MEMBERS = [
   "api-public-symbols.json",
   "attestations.json",
 ];
+const MEMBERS_BY_SCHEMA = { 1: SCHEMA_1_MEMBERS, 2: [...SCHEMA_1_MEMBERS, "downloads"] };
+export const REQUIRED_MEMBERS = MEMBERS_BY_SCHEMA[2];
+
+export function membersFor(schema) {
+  return MEMBERS_BY_SCHEMA[schema] ?? REQUIRED_MEMBERS;
+}
 export const REQUIRED_ATTESTATIONS = ["privacy", "explorer_compat", "snapshot_invariants", "corpus_bijection"];
 export const OPTIONAL_ATTESTATIONS = ["validator_parity"];
 export const PARENT_SOURCES = ["bundle", "dispatch", "local"];
@@ -78,7 +84,7 @@ export function checkManifest(dir, { supportedSchemas = SUPPORTED_SCHEMAS } = {}
   }
   const members = manifest.members ?? {};
   const names = Object.keys(members).sort();
-  if (JSON.stringify(names) !== JSON.stringify([...REQUIRED_MEMBERS].sort())) {
+  if (JSON.stringify(names) !== JSON.stringify([...membersFor(manifest.schema)].sort())) {
     errors.push(`member set mismatch: ${names.join(", ")}`);
   }
   for (const name of names) {

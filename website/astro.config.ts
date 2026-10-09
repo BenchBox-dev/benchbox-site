@@ -14,6 +14,7 @@ import { publishLegacyFiles, renderObjectsInventory, REDIRECT_PAGES, type Invent
 import { docutilsQuotes, SMARTYPANTS } from "./src/lib/smartypants.ts";
 import { treeDigest } from "./src/lib/tree-digest.ts";
 import { headingIds } from "./src/plugins/heading-ids.ts";
+import { bundleManifest, siteHost, siteOrigin } from "./src/lib/site-inputs.ts";
 
 const repoRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 
@@ -56,32 +57,32 @@ const publishStatic = (): AstroIntegration => ({
   hooks: {
     "astro:build:done": ({ dir }) => {
       const out = fileURLToPath(dir);
-      const explorerDist = path.join(repoRoot, "results-explorer", "dist");
+      const explorerDist = path.join(repoRoot, "explorer", "dist");
       if (!existsSync(explorerDist)) throw new Error(`Results Explorer build is missing: ${explorerDist}`);
       const sourceDigest = treeDigest(explorerDist);
       cpSync(explorerDist, path.join(out, "results"), { recursive: true });
       const mountedDigest = treeDigest(path.join(out, "results")).sha256;
       if (mountedDigest !== sourceDigest.sha256) throw new Error(`Results Explorer was altered while mounting: ${sourceDigest.sha256} became ${mountedDigest}`);
       cpSync(path.join(repoRoot, "landing", "hero.png"), path.join(out, "hero.png"));
-      const images = path.join(repoRoot, "docs", "blog", "images");
+      const images = path.join(repoRoot, "blog", "images");
       mkdirSync(path.join(out, "_images"), { recursive: true });
-      cpSync(path.join(repoRoot, "docs", "CNAME"), path.join(out, "CNAME"));
+      writeFileSync(path.join(out, "CNAME"), `${siteHost()}\n`);
       writeFileSync(path.join(out, ".nojekyll"), "");
       writeFileSync(path.join(out, "robots.txt"), renderRobots());
       const pages = htmlFiles(out).filter((file) => file !== "404.html" && !Object.hasOwn(REDIRECT_PAGES, file));
       writeFileSync(path.join(out, "sitemap.xml"), renderSitemap(pages.map(sitemapPathForFile)));
       const legacy = JSON.parse(readFileSync(path.join(repoRoot, "website", ".generated", "manifest", "legacy-files.json"), "utf-8")) as LegacyFiles;
       for (const name of legacy.images) cpSync(path.join(images, name), path.join(out, "_images", name));
-      publishLegacyFiles(legacy, path.join(repoRoot, "docs"), out);
+      publishLegacyFiles(legacy, path.join(repoRoot, "website", ".core-source", "docs"), out);
       const entries = JSON.parse(readFileSync(path.join(repoRoot, "website", ".generated", "manifest", "inventory-entries.json"), "utf-8")) as InventoryEntry[];
-      const version = /^version = "([^"]+)"/m.exec(readFileSync(path.join(repoRoot, "pyproject.toml"), "utf-8"))?.[1] ?? "";
+      const version = bundleManifest().package_version;
       writeFileSync(path.join(out, "docs", "objects.inv"), renderObjectsInventory(entries, "BenchBox", version));
     },
   },
 });
 
 export default defineConfig({
-  site: "https://benchbox.dev",
+  site: siteOrigin(),
   trailingSlash: "ignore",
   build: { format: "file" },
   markdown: { processor: unified({ remarkPlugins: [headingIds, docutilsQuotes], smartypants: SMARTYPANTS }) },

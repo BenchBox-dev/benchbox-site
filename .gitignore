@@ -8,3 +8,5 @@ explorer/test-fixtures/.generated/
 playwright-report/
 test-results/
 .DS_Store
+website/.core-source/
+website/.generated/

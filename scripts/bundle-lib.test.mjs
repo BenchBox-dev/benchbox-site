@@ -3,7 +3,7 @@ import assert from "node:assert/strict";
 import { mkdtempSync, mkdirSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import path from "node:path";
-import { memberDigest, verifyBundle, REQUIRED_MEMBERS } from "./bundle-lib.mjs";
+import { memberDigest, membersFor, verifyBundle } from "./bundle-lib.mjs";
 import { certificationErrors } from "./bundle-verify.mjs";
 
 const CORE = "a".repeat(40);
@@ -14,9 +14,10 @@ function write(file, body) {
   writeFileSync(file, body);
 }
 
-function fixtureBundle({ schema = 1, attestationResult = "pass", tamper = false } = {}) {
+function fixtureBundle({ schema = 2, attestationResult = "pass", tamper = false } = {}) {
   const dir = mkdtempSync(path.join(tmpdir(), "bundle-test-"));
-  for (const member of REQUIRED_MEMBERS) {
+  const required = membersFor(schema);
+  for (const member of required) {
     if (member === "attestations.json") continue;
     if (member.endsWith(".json") || member.endsWith(".duckdb")) write(path.join(dir, member), `${member}\n`);
     else write(path.join(dir, member, "item.txt"), `${member}\n`);
@@ -30,7 +31,7 @@ function fixtureBundle({ schema = 1, attestationResult = "pass", tamper = false 
     { name: "validator_parity", result: "skip", reason: "corpus unchanged", compared: { base: PARENT, head: CORE } },
   ];
   write(path.join(dir, "attestations.json"), `${JSON.stringify(attestations)}\n`);
-  const members = Object.fromEntries(REQUIRED_MEMBERS.map((member) => [member, memberDigest(path.join(dir, member))]));
+  const members = Object.fromEntries(required.map((member) => [member, memberDigest(path.join(dir, member))]));
   write(
     path.join(dir, "manifest.json"),
     JSON.stringify({
@@ -48,9 +49,9 @@ function fixtureBundle({ schema = 1, attestationResult = "pass", tamper = false 
   return dir;
 }
 
-test("a consistent bundle verifies", () => {
-  const result = verifyBundle(fixtureBundle());
-  assert.deepEqual(result.errors, []);
+test("schema 2 and schema 1 bundles both verify", () => {
+  assert.deepEqual(verifyBundle(fixtureBundle()).errors, []);
+  assert.deepEqual(verifyBundle(fixtureBundle({ schema: 1 })).errors, []);
 });
 
 test("a changed member fails its digest", () => {

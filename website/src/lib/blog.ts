@@ -1,5 +1,6 @@
+import { siteOrigin } from "./site-origin.ts";
 export const BLOG_TITLE = "BenchBox Blog";
-export const BLOG_BASE_URL = "https://benchbox.dev/blog/";
+export const BLOG_BASE_URL = `${siteOrigin()}/blog/`;
 export const FEED_LENGTH = 10;
 export const DEFAULT_AUTHOR = "Joe Harris";
 
