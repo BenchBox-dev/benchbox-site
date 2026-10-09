@@ -18,6 +18,13 @@ export async function newestBundle(env = process.env) {
     if (!artifact) throw new Error(`run ${env.SITE_INPUTS_RUN_ID} has no unexpired site-inputs artifact`);
     return { runId: env.SITE_INPUTS_RUN_ID, artifact };
   }
+  if (env.SITE_INPUTS_CORE_SHA) {
+    const name = `${ARTIFACT_PREFIX}${env.SITE_INPUTS_CORE_SHA}`;
+    const { artifacts } = await githubJson(`repos/${CORE_REPO}/actions/artifacts?name=${name}&per_page=10`, env);
+    const artifact = artifacts.find((item) => !item.expired && item.workflow_run?.head_branch === "develop");
+    if (!artifact) throw new Error(`no unexpired develop bundle is named ${name}`);
+    return { runId: String(artifact.workflow_run.id), artifact };
+  }
   const { workflow_runs: runs } = await githubJson(
     `repos/${CORE_REPO}/actions/workflows/site-inputs.yml/runs?branch=develop&status=success&per_page=10`,
     env,
