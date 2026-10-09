@@ -1,4 +1,6 @@
-import { SITE_ORIGIN } from "./header-links.ts";
+import { siteOrigin } from "./site-origin.ts";
+
+const SITE_ORIGIN = siteOrigin();
 
 export const SITE_NAME = "BenchBox";
 export const SITE_DESCRIPTION = "BenchBox makes database benchmarking easy: CLI, Python library, or MCP for AI assistants.";
