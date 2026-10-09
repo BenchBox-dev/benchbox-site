@@ -248,7 +248,21 @@ async function recordStatus(): Promise<void> {
   console.log(`record: ${statusDescription(value)}`);
 }
 
+async function deployedRun(): Promise<void> {
+  const current = await currentDeployed();
+  if (!current) {
+    console.log("deployed: no receipt is recorded on any deployment");
+    output("run_id", "");
+    return;
+  }
+  output("run_id", current.receipt.run_id);
+  output("core_sha", current.receipt.core_sha);
+  output("bundle_digest", current.receipt.bundle_digest);
+  output("site_sha", current.receipt.site_sha);
+}
+
 const commands: Record<string, () => void | Promise<void>> = {
+  deployed: deployedRun,
   "deployment-id": deploymentId,
   record: recordStatus,
   resolve,

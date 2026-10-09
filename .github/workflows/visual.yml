@@ -1,0 +1,84 @@
+name: Visual comparison
+
+# Advisory: screenshots the public pages of this PR's build and of the
+# deployed artifact, and reports the differences. It is not part of the `ci`
+# aggregate, and a difference never fails the job.
+
+on:
+  pull_request:
+
+permissions:
+  contents: read
+  actions: read
+  deployments: read
+
+concurrency:
+  group: visual-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  CORE_REPO: ${{ vars.CORE_REPO || 'BenchBox-dev/BenchBox' }}
+  GH_TOKEN: ${{ github.token }}
+
+jobs:
+  visual:
+    name: visual comparison (advisory)
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09
+      - uses: actions/setup-node@a0853c24544627f65ddf259abe73b1d18a591444
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+      - run: npm ci --ignore-scripts
+      - name: Find the deployed artifact
+        id: deployed
+        run: npm run -s deploy -- deployed
+      - name: Report that nothing is deployed yet
+        if: steps.deployed.outputs.run_id == ''
+        run: echo "No deploy receipt is recorded yet, so there is nothing to compare with." >> "$GITHUB_STEP_SUMMARY"
+      - name: Download the deployed artifact
+        if: steps.deployed.outputs.run_id != ''
+        env:
+          RUN: ${{ steps.deployed.outputs.run_id }}
+        run: gh run download "$RUN" -R "$GITHUB_REPOSITORY" -n "site-artifact-$RUN" -D "$RUNNER_TEMP/deployed-site"
+      - name: Build this PR from the deployed bundle
+        if: steps.deployed.outputs.run_id != ''
+        env:
+          SITE_INPUTS_CORE_SHA: ${{ steps.deployed.outputs.core_sha }}
+          SITE_INPUTS_DIGEST: ${{ steps.deployed.outputs.bundle_digest }}
+        run: |
+          npm run bundle:fetch
+          npm run build
+      - if: steps.deployed.outputs.run_id != ''
+        run: npx playwright install --with-deps chromium
+      - name: Capture the deployed site
+        if: steps.deployed.outputs.run_id != ''
+        env:
+          E2E_PAGES_SHAPED: "1"
+          E2E_SITE_DIR: ${{ runner.temp }}/deployed-site
+          PUBLIC_SITE_VISUAL_PHASE: capture
+          PUBLIC_SITE_VISUAL_RENDERER: astro
+          PUBLIC_SITE_VISUAL_OUTPUT: ${{ runner.temp }}/captures/deployed
+        run: npm run test:e2e:public-site -w explorer
+      - name: Capture this PR
+        if: steps.deployed.outputs.run_id != ''
+        env:
+          E2E_PAGES_SHAPED: "1"
+          E2E_SITE_DIR: ${{ github.workspace }}/website/dist
+          PUBLIC_SITE_VISUAL_PHASE: capture
+          PUBLIC_SITE_VISUAL_RENDERER: astro
+          PUBLIC_SITE_VISUAL_OUTPUT: ${{ runner.temp }}/captures/pr
+        run: npm run test:e2e:public-site -w explorer
+      - name: Compare the captures
+        if: steps.deployed.outputs.run_id != ''
+        env:
+          RUN: ${{ steps.deployed.outputs.run_id }}
+        run: node scripts/visual-diff.mjs "$RUNNER_TEMP/captures/deployed" "$RUNNER_TEMP/captures/pr" "$RUNNER_TEMP/visual-diff" "$RUN"
+      - if: steps.deployed.outputs.run_id != ''
+        uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f
+        with:
+          name: visual-diff
+          path: ${{ runner.temp }}/visual-diff
+          retention-days: 14

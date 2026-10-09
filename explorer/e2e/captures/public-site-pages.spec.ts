@@ -115,7 +115,7 @@ async function captureManifest(browser: Browser): Promise<CapturedManifest> {
       }
       await page.addStyleTag({
         content: `
-          .feature-card, .benchmark-card, .install-step {
+          .feature-card, .benchmark-card, .install-step, .ticker__track {
             transition: none !important;
             animation: none !important;
           }
