@@ -1,0 +1,235 @@
+name: Deploy
+
+on:
+  push:
+    branches: [main]
+  repository_dispatch:
+    types: [core-bundle]
+  workflow_dispatch:
+    inputs:
+      mode:
+        description: "deploy (newest certified bundle), redeploy (same bundle again) or rollback (restore a receipt's artifact)"
+        type: choice
+        options: [deploy, redeploy, rollback]
+        default: deploy
+      receipt_run_id:
+        description: "For rollback: the run id of the receipt to restore"
+        required: false
+        default: ""
+
+permissions:
+  contents: read
+
+concurrency:
+  group: pages-deploy
+  cancel-in-progress: false
+
+env:
+  CORE_REPO: ${{ vars.CORE_REPO || 'BenchBox-dev/BenchBox' }}
+  SITE_INPUTS: ${{ github.workspace }}/.site-inputs
+  DEPLOY_WORK: ${{ github.workspace }}/deploy-work
+  SITE_DEPLOY_TARGET: ${{ vars.SITE_DEPLOY_TARGET }}
+  DEPLOY_MODE: ${{ inputs.mode || 'deploy' }}
+
+jobs:
+  build:
+    name: resolve, build and gate
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    permissions:
+      contents: read
+      actions: read
+      deployments: read
+    outputs:
+      core_sha: ${{ steps.resolve.outputs.core_sha }}
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09
+      - uses: actions/setup-node@a0853c24544627f65ddf259abe73b1d18a591444
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+      - run: npm ci --ignore-scripts
+      - name: Resolve the bundle and the deployed generation
+        id: resolve
+        env:
+          GH_TOKEN: ${{ github.token }}
+          ROLLBACK_RUN_ID: ${{ inputs.receipt_run_id }}
+          SITE_INPUTS_RUN_ID: ${{ github.event.client_payload.run_id }}
+          SITE_INPUTS_DIGEST: ${{ github.event.client_payload.digest }}
+        run: npm run -s deploy -- resolve
+      - name: Build from the bundle
+        if: env.DEPLOY_MODE != 'rollback'
+        env:
+          SITE_ORIGIN: ${{ vars.SITE_ORIGIN }}
+          SITE_HOST: ${{ vars.SITE_HOST }}
+        run: npm run build
+      - name: Restore the receipt's artifact
+        if: env.DEPLOY_MODE == 'rollback'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RUN: ${{ inputs.receipt_run_id }}
+        run: |
+          rm -rf website/dist
+          gh run download "$RUN" -R "$GITHUB_REPOSITORY" -n "site-artifact-$RUN" -D website/dist
+      - name: Mark a rehearsal artifact noindex
+        if: env.SITE_DEPLOY_TARGET == 'rehearsal' && env.DEPLOY_MODE != 'rollback'
+        run: npm run -s deploy -- rehearsal
+      - name: Gate the artifact
+        env:
+          SITE_HOST: ${{ vars.SITE_HOST }}
+        run: npm run -s deploy -- gates
+      - uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f
+        with:
+          name: site-artifact-${{ github.run_id }}
+          path: website/dist
+          include-hidden-files: true
+          retention-days: 90
+          if-no-files-found: error
+      - uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f
+        with:
+          name: deploy-work-${{ github.run_id }}
+          path: deploy-work
+          retention-days: 90
+          if-no-files-found: error
+      - name: Stop before deploy when no target is set
+        if: env.SITE_DEPLOY_TARGET != 'rehearsal' && env.SITE_DEPLOY_TARGET != 'production'
+        run: |
+          {
+            echo "SITE_DEPLOY_TARGET is '${SITE_DEPLOY_TARGET}': the bundle resolved, the site built and every gate ran; nothing was deployed.";
+          } >> "$GITHUB_STEP_SUMMARY"
+
+  deploy:
+    name: deploy, probe and record
+    needs: build
+    if: vars.SITE_DEPLOY_TARGET == 'rehearsal' || vars.SITE_DEPLOY_TARGET == 'production'
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    environment:
+      name: github-pages
+      url: ${{ vars.SITE_ORIGIN }}
+    permissions:
+      contents: read
+      actions: write
+      deployments: write
+      pages: write
+      id-token: write
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09
+      - uses: actions/setup-node@a0853c24544627f65ddf259abe73b1d18a591444
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+      - run: npm ci --ignore-scripts
+      - uses: actions/download-artifact@37930b1c2abaa49bbe596cd826c3c89aef350131
+        with:
+          name: site-artifact-${{ github.run_id }}
+          path: website/dist
+      - uses: actions/download-artifact@37930b1c2abaa49bbe596cd826c3c89aef350131
+        with:
+          name: deploy-work-${{ github.run_id }}
+          path: deploy-work
+      - name: Recheck the deployed generation
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: npm run -s deploy -- recheck
+      - uses: actions/upload-pages-artifact@fc324d3547104276b827a68afc52ff2a11cc49c9
+        with:
+          path: website/dist
+      - name: Deploy to GitHub Pages
+        id: pages
+        uses: actions/deploy-pages@368f82528645a54fb793d4d04e342629a3f51346
+      - name: Find this run's deployment
+        id: deployment
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: npm run -s deploy -- deployment-id
+      - name: Probe every route class
+        id: probe
+        env:
+          PROBE_BASE_URL: ${{ vars.SITE_ORIGIN }}
+        run: npm run -s deploy -- probe
+      - name: Write the receipt
+        id: receipt
+        env:
+          GH_TOKEN: ${{ github.token }}
+          DEPLOYMENT_ID: ${{ steps.deployment.outputs.deployment_id }}
+        run: npm run -s deploy -- receipt
+      - uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f
+        with:
+          name: site-deploy-receipt-${{ github.run_id }}
+          path: deploy-work/receipt.json
+          retention-days: 90
+          if-no-files-found: error
+      - name: Record the receipt on the deployment
+        env:
+          GH_TOKEN: ${{ github.token }}
+          SITE_ORIGIN: ${{ vars.SITE_ORIGIN }}
+        run: npm run -s deploy -- record
+      - name: Decide on an automatic rollback
+        id: rollback
+        if: steps.probe.outputs.probes_ok != 'true'
+        run: npm run -s deploy -- rollback-decision
+      - name: Dispatch the rollback
+        if: steps.rollback.outputs.dispatch == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TARGET: ${{ steps.rollback.outputs.target_run_id }}
+        run: gh workflow run deploy.yml -R "$GITHUB_REPOSITORY" --ref main -f mode=rollback -f receipt_run_id="$TARGET"
+      - name: Fail the run when probes failed
+        if: steps.probe.outputs.probes_ok != 'true'
+        run: |
+          echo "probes failed after deploy; see the receipt and the rollback decision above" >&2
+          exit 1
+
+  report-failure:
+    name: report failure
+    needs: [build, deploy]
+    if: failure()
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      issues: write
+    env:
+      HAS_BRIDGE_APP: ${{ secrets.SITE_BRIDGE_APP_ID != '' }}
+    steps:
+      - name: Open or update the site-deploy-failed issue
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+          EVENT: ${{ github.event_name }}
+          CORE_SHA: ${{ needs.build.outputs.core_sha || github.event.client_payload.core_sha }}
+        run: |
+          set -euo pipefail
+          BODY="$(printf 'The %s deploy run failed (core commit %s).\n\nRun: %s\n\nNothing deploys unless every gate passes; a probe failure after deploy dispatches at most one rollback to the last known good receipt.\n' "$EVENT" "${CORE_SHA:-unknown}" "$RUN_URL")"
+          NUMBER="$(gh issue list --repo "$REPO" --label site-deploy-failed --state open --json number --jq '.[0].number // empty')"
+          if [ -n "$NUMBER" ]; then
+            gh issue comment "$NUMBER" --repo "$REPO" --body "$BODY"
+          else
+            gh label create site-deploy-failed --repo "$REPO" --color B60205 --description "A site deploy run failed" --force
+            gh issue create --repo "$REPO" --title "Site deploy failed" --label site-deploy-failed --body "$BODY"
+          fi
+      - name: Mint a core-scoped token
+        id: app
+        if: github.event_name == 'repository_dispatch' && env.HAS_BRIDGE_APP == 'true'
+        uses: actions/create-github-app-token@bcd2ba49218906704ab6c1aa796996da409d3eb1
+        with:
+          app-id: ${{ secrets.SITE_BRIDGE_APP_ID }}
+          private-key: ${{ secrets.SITE_BRIDGE_PRIVATE_KEY }}
+          owner: BenchBox-dev
+          repositories: BenchBox
+      - name: Open or update the core site-bundle-failed issue
+        if: steps.app.outputs.token != ''
+        env:
+          GH_TOKEN: ${{ steps.app.outputs.token }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+          CORE_SHA: ${{ github.event.client_payload.core_sha }}
+        run: |
+          set -euo pipefail
+          BODY="$(printf 'The site could not deploy the bundle for core commit %s.\n\nSite run: %s\n' "$CORE_SHA" "$RUN_URL")"
+          NUMBER="$(gh issue list --repo "$CORE_REPO" --label site-bundle-failed --state open --json number --jq '.[0].number // empty')"
+          if [ -n "$NUMBER" ]; then
+            gh issue comment "$NUMBER" --repo "$CORE_REPO" --body "$BODY"
+          else
+            gh issue create --repo "$CORE_REPO" --title "Site-inputs bundle build failed" --label site-bundle-failed --body "$BODY"
+          fi

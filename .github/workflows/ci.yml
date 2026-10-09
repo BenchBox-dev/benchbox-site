@@ -69,6 +69,8 @@ jobs:
           name: site-inputs
           path: .site-inputs
       - run: node --test scripts/*.test.mjs
+      - run: npm run test:deploy
+      - run: npx tsc -p deploy
       - run: npm run lint:comments
       - run: npm run lint:guard
       - run: npm run bundle:verify -- --offline
