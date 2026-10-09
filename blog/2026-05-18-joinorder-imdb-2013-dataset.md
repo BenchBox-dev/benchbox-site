@@ -142,7 +142,7 @@ The implementation adds more than the initial report requested, especially aroun
 
 ## References
 
-- GitHub issue: [#289, "[JOB] Uniformly random data generation undermines the benchmark's core motivation - real-world data correlations matter"](https://github.com/joeharris76/BenchBox/issues/289)
+- GitHub issue: [#289, "[JOB] Uniformly random data generation undermines the benchmark's core motivation - real-world data correlations matter"](https://github.com/BenchBox-dev/BenchBox/issues/289)
 - JoinOrder paper: [How Good Are Query Optimizers, Really?](https://www.vldb.org/pvldb/vol9/p204-leis.pdf)
 - JoinOrder follow-up paper: [Query Optimization Through the Looking Glass, and What We Found Running the Join Order Benchmark](https://db.in.tum.de/~leis/papers/lookingglass.pdf)
 - Query corpus: [gregrahn/join-order-benchmark](https://github.com/gregrahn/join-order-benchmark)
