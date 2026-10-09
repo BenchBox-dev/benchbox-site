@@ -1,0 +1,156 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+env:
+  SITE_INPUTS: ${{ github.workspace }}/.site-inputs
+  CORE_REPO: ${{ vars.CORE_REPO || 'BenchBox-dev/BenchBox' }}
+
+jobs:
+  bundle:
+    name: core bundle
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      HAS_BRIDGE_APP: ${{ secrets.SITE_BRIDGE_APP_ID != '' }}
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09
+      - uses: actions/setup-node@a0853c24544627f65ddf259abe73b1d18a591444
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+      - run: npm ci --ignore-scripts
+      - name: Mint a core-scoped token
+        id: app
+        if: env.HAS_BRIDGE_APP == 'true'
+        uses: actions/create-github-app-token@bcd2ba49218906704ab6c1aa796996da409d3eb1
+        with:
+          app-id: ${{ secrets.SITE_BRIDGE_APP_ID }}
+          private-key: ${{ secrets.SITE_BRIDGE_PRIVATE_KEY }}
+          owner: BenchBox-dev
+          repositories: BenchBox
+      - name: Fetch and verify the newest certified bundle
+        env:
+          GH_TOKEN: ${{ steps.app.outputs.token || github.token }}
+        run: npm run bundle:fetch
+      - uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f
+        with:
+          name: site-inputs
+          path: .site-inputs
+          include-hidden-files: true
+          retention-days: 3
+          if-no-files-found: error
+
+  checks:
+    name: lint, types, unit tests and build
+    needs: bundle
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09
+      - uses: actions/setup-node@a0853c24544627f65ddf259abe73b1d18a591444
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+      - run: npm ci --ignore-scripts
+      - uses: actions/download-artifact@37930b1c2abaa49bbe596cd826c3c89aef350131
+        with:
+          name: site-inputs
+          path: .site-inputs
+      - run: node --test scripts/*.test.mjs
+      - run: npm run lint:comments
+      - run: npm run lint:guard
+      - run: npm run bundle:verify -- --offline
+      - run: npm run typecheck -w explorer
+      - run: npm run typecheck:e2e -w explorer
+      - run: npm run check -w website
+      - run: npm test -w explorer
+      - run: npm run build
+      - run: npm test -w website
+
+  e2e:
+    name: Explorer browser suite
+    needs: bundle
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09
+      - uses: actions/setup-node@a0853c24544627f65ddf259abe73b1d18a591444
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+      - run: npm ci --ignore-scripts
+      - uses: actions/download-artifact@37930b1c2abaa49bbe596cd826c3c89aef350131
+        with:
+          name: site-inputs
+          path: .site-inputs
+      - run: npx playwright install --with-deps chromium
+      - run: npm run test:e2e:chromium -w explorer
+      - name: Upload failure artifacts
+        if: failure()
+        uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f
+        with:
+          name: playwright-report-chromium
+          path: |
+            explorer/playwright-report
+            explorer/test-results
+          retention-days: 7
+
+  audit:
+    name: dependency audit
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09
+      - uses: actions/setup-node@a0853c24544627f65ddf259abe73b1d18a591444
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+      - run: npm ci --ignore-scripts
+      - run: npm run audit:high -w explorer
+      - run: npm run audit:high -w website
+
+  bundle-schema:
+    name: bundle schema ${{ matrix.schema }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    strategy:
+      matrix:
+        schema: [1, 2]
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09
+      - uses: actions/setup-node@a0853c24544627f65ddf259abe73b1d18a591444
+        with:
+          node-version-file: .nvmrc
+      - name: Verify a schema ${{ matrix.schema }} fixture bundle
+        env:
+          SCHEMA: ${{ matrix.schema }}
+        run: |
+          dir="$(mktemp -d)"
+          node scripts/fixture-bundle.mjs "$SCHEMA" "$dir"
+          node scripts/bundle-verify.mjs --offline "$dir"
+
+  ci:
+    name: ci
+    if: always()
+    needs: [bundle, checks, e2e, audit, bundle-schema]
+    runs-on: ubuntu-latest
+    timeout-minutes: 2
+    steps:
+      - name: Require every job
+        env:
+          RESULTS: ${{ toJSON(needs) }}
+        run: |
+          echo "$RESULTS" | jq -r 'to_entries[] | "\(.key): \(.value.result)"'
+          echo "$RESULTS" | jq -e 'all(.[]; .result == "success")' > /dev/null

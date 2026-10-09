@@ -3,50 +3,13 @@ import assert from "node:assert/strict";
 import { mkdtempSync, mkdirSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import path from "node:path";
-import { memberDigest, membersFor, verifyBundle } from "./bundle-lib.mjs";
+import { memberDigest, verifyBundle } from "./bundle-lib.mjs";
 import { certificationErrors } from "./bundle-verify.mjs";
-
-const CORE = "a".repeat(40);
-const PARENT = "b".repeat(40);
+import { fixtureBundle, FIXTURE_CORE as CORE, FIXTURE_PARENT as PARENT } from "./fixture-bundle.mjs";
 
 function write(file, body) {
   mkdirSync(path.dirname(file), { recursive: true });
   writeFileSync(file, body);
-}
-
-function fixtureBundle({ schema = 2, attestationResult = "pass", tamper = false } = {}) {
-  const dir = mkdtempSync(path.join(tmpdir(), "bundle-test-"));
-  const required = membersFor(schema);
-  for (const member of required) {
-    if (member === "attestations.json") continue;
-    if (member.endsWith(".json") || member.endsWith(".duckdb")) write(path.join(dir, member), `${member}\n`);
-    else write(path.join(dir, member, "item.txt"), `${member}\n`);
-  }
-  const snapshot = memberDigest(path.join(dir, "explorer/results.duckdb"));
-  const attestations = [
-    { name: "privacy", result: attestationResult, inputs: { bundle: "x" }, compared: { core_sha: CORE } },
-    { name: "explorer_compat", result: "pass", inputs: { snapshot }, compared: { core_sha: CORE } },
-    { name: "snapshot_invariants", result: "pass", inputs: { snapshot }, compared: { core_sha: CORE } },
-    { name: "corpus_bijection", result: "pass", inputs: { snapshot }, compared: { accepted_ref: CORE } },
-    { name: "validator_parity", result: "skip", reason: "corpus unchanged", compared: { base: PARENT, head: CORE } },
-  ];
-  write(path.join(dir, "attestations.json"), `${JSON.stringify(attestations)}\n`);
-  const members = Object.fromEntries(required.map((member) => [member, memberDigest(path.join(dir, member))]));
-  write(
-    path.join(dir, "manifest.json"),
-    JSON.stringify({
-      schema,
-      core_sha: CORE,
-      parent_core_sha: PARENT,
-      parent_source: "bundle",
-      corpus_sha: "c".repeat(40),
-      package_version: "0.4.2",
-      certified_by: "123",
-      members,
-    }),
-  );
-  if (tamper) write(path.join(dir, "docs/item.txt"), "changed\n");
-  return dir;
 }
 
 test("schema 2 and schema 1 bundles both verify", () => {

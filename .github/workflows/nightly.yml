@@ -1,0 +1,98 @@
+name: Nightly
+
+on:
+  schedule:
+    - cron: "17 6 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: nightly
+  cancel-in-progress: false
+
+jobs:
+  audit:
+    name: dependency audit
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09
+      - uses: actions/setup-node@a0853c24544627f65ddf259abe73b1d18a591444
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+      - run: npm ci --ignore-scripts
+      - run: npm run audit:high -w explorer
+      - run: npm run audit:high -w website
+
+  links:
+    name: external links
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    permissions:
+      contents: read
+      issues: write
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09
+      - name: Check external links in published content
+        id: lychee
+        uses: lycheeverse/lychee-action@e7477775783ea5526144ba13e8db5eec57747ce8
+        with:
+          args: --no-progress --max-concurrency 8 --exclude-loopback --exclude "^https://(next\.)?benchbox\.dev" "blog/**/*.md" "website/src/**/*.astro"
+          output: lychee-report.md
+          fail: false
+      - name: Open or update the broken-links issue
+        if: steps.lychee.outputs.exit_code != '0'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: |
+          set -euo pipefail
+          NUMBER="$(gh issue list --repo "$REPO" --label broken-links --state open --json number --jq '.[0].number // empty')"
+          BODY="$(printf 'External link check found broken links.\n\nRun: %s\n\n' "$RUN_URL"; head -c 60000 lychee-report.md)"
+          if [ -n "$NUMBER" ]; then
+            gh issue comment "$NUMBER" --repo "$REPO" --body "$BODY"
+          else
+            gh label create broken-links --repo "$REPO" --color D93F0B --description "The nightly external link check failed" --force
+            gh issue create --repo "$REPO" --title "Broken external links" --label broken-links --body "$BODY"
+          fi
+
+  availability:
+    name: availability probe
+    if: vars.SITE_DEPLOY_TARGET != ''
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: read
+      issues: write
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09
+      - uses: actions/setup-node@a0853c24544627f65ddf259abe73b1d18a591444
+        with:
+          node-version-file: .nvmrc
+      - name: Probe every route class
+        id: probe
+        env:
+          SITE_ORIGIN: ${{ vars.SITE_ORIGIN }}
+        run: |
+          set -o pipefail
+          node scripts/probe-routes.mjs "$SITE_ORIGIN" | tee probe.txt
+      - name: Open or update the availability issue
+        if: failure() && steps.probe.outcome == 'failure'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: |
+          set -euo pipefail
+          NUMBER="$(gh issue list --repo "$REPO" --label site-unavailable --state open --json number --jq '.[0].number // empty')"
+          BODY="$(printf 'The nightly availability probe failed.\n\nRun: %s\n\n```\n' "$RUN_URL"; cat probe.txt; printf '```\n')"
+          if [ -n "$NUMBER" ]; then
+            gh issue comment "$NUMBER" --repo "$REPO" --body "$BODY"
+          else
+            gh label create site-unavailable --repo "$REPO" --color B60205 --description "The nightly availability probe failed" --force
+            gh issue create --repo "$REPO" --title "Site availability probe failed" --label site-unavailable --body "$BODY"
+          fi
