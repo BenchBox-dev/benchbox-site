@@ -63,7 +63,8 @@ itself plus one versioned core bundle; it reads nothing else from core.
 - Commit messages, pull request text and committed files state the durable
   reason for a change. Leave out tracker ids, plan or handoff references and
   run-local state such as CI counts.
-- `gh pr merge --squash --auto` is allowed once `ci` is required and green.
+- Merge with `gh pr merge --squash` once `ci` is green. Auto-merge is turned
+  off for this repository.
 
 ## Code comments
 

@@ -137,9 +137,10 @@ export function findBrokenLinks(siteDir: string, extraHosts: string[] = []): { b
 
 export function linksGate(input: { siteDir: string; allowance: BrokenLink[]; extraHosts?: string[] }): GateResult {
   const { broken, missingImages } = findBrokenLinks(input.siteDir, input.extraHosts);
-  const allowed = new Set(routedAllowance(input.allowance).map((entry) => JSON.stringify(entry)));
+  const routed = routedAllowance(input.allowance);
+  const allowed = new Set(routed.map((entry) => JSON.stringify(entry)));
   const unexpected = broken.filter((entry) => !allowed.has(JSON.stringify(entry))).map((entry) => entry.join(" -> "));
   const findings = [...unexpected.map((line) => `broken internal link: ${line}`), ...missingImages.map((line) => `missing image: ${line}`)];
   if (findings.length > 0) return fail(`${unexpected.length} new broken links and ${missingImages.length} missing images`, findings);
-  return pass(`${broken.length} broken links, all within the allowance of ${input.allowance.length}`);
+  return pass(`${broken.length} broken links, all within the allowance of ${routed.length} (${input.allowance.length} entries and their /docs/dev/ copies)`);
 }
