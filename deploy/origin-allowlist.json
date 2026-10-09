@@ -1,0 +1,4 @@
+[
+  "^blog/[^/]+\\.html$",
+  "^blog/atom\\.xml$"
+]

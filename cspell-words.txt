@@ -2,6 +2,9 @@ aaaabbbb
 aabbccddeeff
 ablog
 adls
+akia
+akiaiosfodnn
+akiazzzzzzzzzzzzzz
 altra
 amedian
 amplab
@@ -25,6 +28,7 @@ cand
 canonicalises
 ccccdddd
 cedardb
+changeme
 chenhao
 clickbench
 clickhouse
@@ -190,6 +194,7 @@ sparklines
 spezial
 sphx
 ssbf
+sslmode
 starrocks
 streamable
 sublabel
@@ -215,6 +220,7 @@ tpchb
 trendable
 trino
 truecolor
+tsdbadmin
 unauditable
 uncomparable
 underspecified
