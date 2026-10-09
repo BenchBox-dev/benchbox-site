@@ -21,7 +21,8 @@
     "prepare": "lefthook install",
     "charts": "node scripts/render-blog-charts.mjs",
     "deploy": "node --experimental-strip-types --disable-warning=ExperimentalWarning deploy/cli.ts",
-    "test:deploy": "node --experimental-strip-types --disable-warning=ExperimentalWarning --test deploy/test/*.test.ts"
+    "test:deploy": "node --experimental-strip-types --disable-warning=ExperimentalWarning --test deploy/test/*.test.ts",
+    "shadow:compare": "node scripts/shadow-compare.mjs"
   },
   "devDependencies": {
     "ansi-to-html": "0.7.2",
