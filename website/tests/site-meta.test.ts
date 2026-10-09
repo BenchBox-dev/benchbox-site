@@ -1,4 +1,4 @@
-import { readdirSync, readFileSync } from "node:fs";
+import { existsSync, readdirSync, readFileSync } from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { describe, expect, it } from "vitest";
@@ -133,6 +133,15 @@ describe.skipIf(!dist)("built site", () => {
     const source = readFileSync(path.join(repoRoot, "explorer", "index.html"), "utf-8");
     expect(published).toContain('<link rel="canonical" href="https://benchbox.dev/results/" />');
     expect(source).toContain('href="https://benchbox.dev/results/"');
+  });
+
+  it.skipIf(!existsSync(siteInputsPath("explorer", "bundles")))("publishes the core bundle's per-result files unchanged", () => {
+    const bundled = readdirSync(siteInputsPath("explorer", "bundles")).sort();
+    const published = readdirSync(path.join(site, "results", "data", "bundles")).sort();
+    expect(published).toEqual(bundled);
+    for (const name of bundled) {
+      expect(readFileSync(path.join(site, "results", "data", "bundles", name)).equals(readFileSync(siteInputsPath("explorer", "bundles", name)))).toBe(true);
+    }
   });
 
   it("publishes the core bundle's Explorer snapshot unchanged", () => {

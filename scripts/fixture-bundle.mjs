@@ -13,7 +13,7 @@ function write(file, body) {
   writeFileSync(file, body);
 }
 
-export function fixtureBundle({ schema = 2, attestationResult = "pass", tamper = false, dir } = {}) {
+export function fixtureBundle({ schema = 3, attestationResult = "pass", tamper = false, dir } = {}) {
   const root = dir ?? mkdtempSync(path.join(tmpdir(), "bundle-fixture-"));
   const required = membersFor(schema);
   for (const member of required) {

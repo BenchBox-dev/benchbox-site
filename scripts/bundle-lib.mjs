@@ -2,7 +2,7 @@ import { createHash } from "node:crypto";
 import { readFileSync, readdirSync, statSync, existsSync } from "node:fs";
 import path from "node:path";
 
-export const SUPPORTED_SCHEMAS = [1, 2];
+export const SUPPORTED_SCHEMAS = [2, 3];
 const SCHEMA_1_MEMBERS = [
   "docs",
   "repo-files.json",
@@ -14,8 +14,12 @@ const SCHEMA_1_MEMBERS = [
   "api-public-symbols.json",
   "attestations.json",
 ];
-const MEMBERS_BY_SCHEMA = { 1: SCHEMA_1_MEMBERS, 2: [...SCHEMA_1_MEMBERS, "downloads"] };
-export const REQUIRED_MEMBERS = MEMBERS_BY_SCHEMA[2];
+const MEMBERS_BY_SCHEMA = {
+  1: SCHEMA_1_MEMBERS,
+  2: [...SCHEMA_1_MEMBERS, "downloads"],
+  3: [...SCHEMA_1_MEMBERS, "downloads", "explorer/bundles"],
+};
+export const REQUIRED_MEMBERS = MEMBERS_BY_SCHEMA[3];
 
 export function membersFor(schema) {
   return MEMBERS_BY_SCHEMA[schema] ?? REQUIRED_MEMBERS;
