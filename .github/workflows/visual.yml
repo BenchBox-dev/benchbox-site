@@ -1,9 +1,5 @@
 name: Visual comparison
 
-# Advisory: screenshots the public pages of this PR's build and of the
-# deployed artifact, and reports the differences. It is not part of the `ci`
-# aggregate, and a difference never fails the job.
-
 on:
   pull_request:
 
