@@ -19,7 +19,7 @@ meta_description: "BenchBox v0.3.0 moves JoinOrder to real IMDb JOB data, adds 1
 
 The headline addition is a new `/prompts/` page on the landing site. It composes copyable instructions for coding agents so that a first BenchBox run, local or cloud, lands with safer defaults and the right setup steps in the right order. No new runtime command, no MCP tool change, no JSON catalog: the page is a prompt composer over BenchBox's existing CLI and MCP surfaces.
 
-The biggest data-contract change is JoinOrder. A community report ([issue #289](https://github.com/joeharris76/BenchBox/issues/289)) flagged that BenchBox's old JoinOrder data was synthetic and did not exercise the real-world correlations that the Join Order Benchmark was designed around. Thanks to `@partychicken` for raising the issue. v0.3.0 fixes this by making `joinorder` use the real IMDb 2013 JOB dataset at scale factor 1. The companion post, [Reworking JoinOrder around the IMDb 2013 dataset](./2026-05-18-joinorder-imdb-2013-dataset.md), walks through the data contract, scale-factor decision, and provenance work in detail.
+The biggest data-contract change is JoinOrder. A community report ([issue #289](https://github.com/BenchBox-dev/BenchBox/issues/289)) flagged that BenchBox's old JoinOrder data was synthetic and did not exercise the real-world correlations that the Join Order Benchmark was designed around. Thanks to `@partychicken` for raising the issue. v0.3.0 fixes this by making `joinorder` use the real IMDb 2013 JOB dataset at scale factor 1. The companion post, [Reworking JoinOrder around the IMDb 2013 dataset](./2026-05-18-joinorder-imdb-2013-dataset.md), walks through the data contract, scale-factor decision, and provenance work in detail.
 
 The third theme is approximate analytics. BenchBox now covers more of the path that modern platforms expose for approximate aggregates and sketches: one-shot approximate read queries, persisted sketch state, merge queries, storage-size checks, and parameter sweeps where the platform surface supports them. The architecture deep-dive in [Splitting approximate analytics across BenchBox read and write benchmarks](./2026-05-18-sketch-functions-databricks-response.md) covers why the work split across `read_primitives` and `write_primitives`.
 
@@ -156,7 +156,7 @@ The deep-dive post has the full set of invocations including ClickHouse-native a
 ## References
 
 - Changelog entry: `CHANGELOG.md` (`[0.3.0] - 2026-05-16`)
-- JoinOrder issue: [GitHub issue #289](https://github.com/joeharris76/BenchBox/issues/289)
+- JoinOrder issue: [GitHub issue #289](https://github.com/BenchBox-dev/BenchBox/issues/289)
 - JoinOrder paper: [How Good Are Query Optimizers, Really?](https://www.vldb.org/pvldb/vol9/p204-leis.pdf)
 - Companion post: [Reworking JoinOrder around the IMDb 2013 dataset](./2026-05-18-joinorder-imdb-2013-dataset.md)
 - Approximate functions reference: `docs/benchmarks/read-primitives-approximate-functions.md`
