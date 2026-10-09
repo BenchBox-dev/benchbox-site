@@ -231,5 +231,6 @@ jobs:
           if [ -n "$NUMBER" ]; then
             gh issue comment "$NUMBER" --repo "$CORE_REPO" --body "$BODY"
           else
-            gh issue create --repo "$CORE_REPO" --title "Site-inputs bundle build failed" --label site-bundle-failed --body "$BODY"
+            gh label create site-bundle-failed --repo "$CORE_REPO" --color B60205 --description "The core site-inputs bundle build failed" --force
+            gh issue create --repo "$CORE_REPO" --title "Site could not deploy a core bundle" --label site-bundle-failed --body "$BODY"
           fi
