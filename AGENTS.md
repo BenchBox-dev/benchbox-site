@@ -9,11 +9,13 @@ itself plus one versioned core bundle; it reads nothing else from core.
 
 ## Language
 
-- No Python in this repository: no `.py` file, `pyproject.toml`, `uv.lock`,
-  or `python`, `python3`, `uv` or `uvx` call, in the tree or in history.
+- No Python in this repository: no `.py` file, `pyproject.toml` or
+  `uv.lock` in the tree or in history, and no `python`, `python3`, `uv` or
+  `uvx` call apart from the one below.
 - Tooling is Node and TypeScript. A third-party tool fetched at run time is
-  allowed, for example a pinned `npx` package or the published `benchbox`
-  CLI called as an external program.
+  allowed, for example a pinned `npx` package. The one Python tool the site
+  runs is the published `benchbox` CLI, as an external program pinned to the
+  bundle's version, from `scripts/render-blog-charts.mjs` only.
 
 ## The core bundle
 

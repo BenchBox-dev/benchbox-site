@@ -1,0 +1,63 @@
+{
+  "charts": [
+    {
+      "name": "sf1_before_after",
+      "command": [
+        "textcharts",
+        "comparison",
+        "-f",
+        "{data}/sf1_before_after.json",
+        "--title",
+        "SF=1 data size before and after harmonization",
+        "--subtitle",
+        "Target: ~1 GB uncompressed CSV  |  7 adjustable benchmarks  |  BenchBox v0.2.1",
+        "--metric-label",
+        "GB (uncompressed CSV)",
+        "--theme",
+        "dark",
+        "--width",
+        "96"
+      ]
+    },
+    {
+      "name": "tsbs_quadratic",
+      "command": [
+        "textcharts",
+        "comparison",
+        "-f",
+        "{data}/tsbs_comparison.json",
+        "--title",
+        "TSBS DevOps: output size by scale factor",
+        "--subtitle",
+        "BenchBox (fixed duration) vs. naive scaling (hosts x duration)  |  GB",
+        "--metric-label",
+        "GB",
+        "--theme",
+        "dark",
+        "--width",
+        "96"
+      ]
+    },
+    {
+      "name": "v021_release_scope",
+      "command": [
+        "textcharts",
+        "bar",
+        "-f",
+        "{data}/v021_release_scope.json",
+        "--title",
+        "BenchBox v0.2.1 by the numbers",
+        "--subtitle",
+        "Net-new additions in this release  |  shipped 2026-04-26",
+        "--metric-label",
+        "count",
+        "--theme",
+        "dark",
+        "--width",
+        "96",
+        "--sort-by",
+        "value"
+      ]
+    }
+  ]
+}
