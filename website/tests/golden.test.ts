@@ -1,4 +1,4 @@
-import { copyFileSync, cpSync, existsSync, mkdirSync, mkdtempSync, readFileSync, readdirSync, rmSync, statSync, writeFileSync } from "node:fs";
+import { cpSync, existsSync, mkdirSync, mkdtempSync, readFileSync, readdirSync, rmSync, statSync, writeFileSync } from "node:fs";
 import os from "node:os";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
@@ -8,7 +8,6 @@ import { EXCLUSIONS_FILE } from "../src/converter/sources.ts";
 
 const here = path.dirname(fileURLToPath(import.meta.url));
 const goldenRoot = path.join(here, "golden");
-const realDocs = path.join(here, "..", "..", "docs");
 const update = process.env.UPDATE_GOLDEN === "1";
 
 function filesUnder(root: string): string[] {
@@ -46,9 +45,8 @@ describe.each(cases)("golden %s", (name) => {
     rmSync(target, { recursive: true, force: true });
     cpSync(path.join(root, "docs"), target, { recursive: true });
     if (!existsSync(path.join(target, EXCLUSIONS_FILE))) writeFileSync(path.join(target, EXCLUSIONS_FILE), "");
-    for (const [fixture, real] of Object.entries(sources)) {
-      mkdirSync(path.dirname(path.join(target, fixture)), { recursive: true });
-      copyFileSync(path.join(realDocs, real), path.join(target, fixture));
+    for (const fixture of Object.keys(sources)) {
+      if (!existsSync(path.join(target, fixture))) throw new Error(`golden ${name} is missing its vendored source ${fixture}`);
     }
     return target;
   }

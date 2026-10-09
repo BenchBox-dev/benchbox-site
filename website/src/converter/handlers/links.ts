@@ -1,6 +1,6 @@
 import { statSync, type Stats } from "node:fs";
 import path from "node:path";
-import { loadRepoFiles } from "../../lib/repo-files.ts";
+import { repoFilesFor } from "../../lib/repo-files.ts";
 import { cloneTitle, type TitleNode } from "../../lib/smartypants.ts";
 import { routeFor } from "../docs-index.ts";
 import { UnresolvedReferenceError } from "../errors.ts";
@@ -13,8 +13,8 @@ const DOC_SUFFIX = /\.(md|rst)$/;
 const REPOSITORY_URL = "https://github.com/BenchBox-dev/BenchBox";
 const FALLBACK_REF = "develop";
 
-function repositoryRef(): string {
-  return loadRepoFiles()?.coreSha ?? FALLBACK_REF;
+function repositoryRef(docsRoot: string): string {
+  return repoFilesFor(docsRoot)?.coreSha ?? FALLBACK_REF;
 }
 
 function decode(target: string): string {
@@ -37,9 +37,9 @@ function withFragment(url: string, fragment: string): string {
   return fragment === "" ? url : `${url}#${fragment}`;
 }
 
-function repositoryKind(relative: string, absolute: string): "file" | "tree" | undefined {
+function repositoryKind(relative: string, absolute: string, docsRoot: string): "file" | "tree" | undefined {
   if (relative === "") return "tree";
-  const listed = loadRepoFiles()?.kinds.get(relative);
+  const listed = repoFilesFor(docsRoot)?.kinds.get(relative);
   if (listed) return listed;
   const stats = statOf(absolute);
   if (stats === undefined) return undefined;
@@ -48,15 +48,15 @@ function repositoryKind(relative: string, absolute: string): "file" | "tree" | u
 
 function repositoryTarget(absolute: string, docsRoot: string, fragment: string, unresolved: (detail: string) => UnresolvedReferenceError): string {
   const relative = path.relative(path.dirname(docsRoot), absolute).split(path.sep).join("/");
-  const kind = relative.startsWith("..") ? undefined : repositoryKind(relative, absolute);
+  const kind = relative.startsWith("..") ? undefined : repositoryKind(relative, absolute, docsRoot);
   if (kind === undefined) throw unresolved("does not match a file in the repository");
-  const ref = repositoryRef();
+  const ref = repositoryRef(docsRoot);
   return withFragment(relative === "" ? `${REPOSITORY_URL}/tree/${ref}` : `${REPOSITORY_URL}/${kind === "tree" ? "tree" : "blob"}/${ref}/${relative}`, fragment);
 }
 
 function isRepositoryFile(absolute: string, docsRoot: string): boolean {
   const relative = path.relative(path.dirname(docsRoot), absolute).split(path.sep).join("/");
-  return !relative.startsWith("..") && repositoryKind(relative, absolute) === "file";
+  return !relative.startsWith("..") && repositoryKind(relative, absolute, docsRoot) === "file";
 }
 
 export const BLOG_PAGES: Readonly<Record<string, string>> = {

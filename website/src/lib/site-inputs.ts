@@ -55,5 +55,6 @@ export function assembleDocsSource(destination: string): string {
   if (existsSync(downloads)) cpSync(downloads, destination, { recursive: true });
   cpSync(path.join(inputs, "docs"), docsRoot, { recursive: true });
   cpSync(repoPath("blog"), path.join(docsRoot, "blog"), { recursive: true });
+  cpSync(path.join(inputs, "repo-files.json"), path.join(destination, "repo-files.json"));
   return docsRoot;
 }

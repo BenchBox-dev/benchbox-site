@@ -1,19 +1,21 @@
 import { existsSync, readFileSync } from "node:fs";
-import { siteInputsPath } from "./site-inputs.ts";
+import path from "node:path";
+
+export const REPO_FILES_NAME = "repo-files.json";
 
 export type RepoFileKind = "file" | "tree";
 export type RepoFiles = { coreSha: string; kinds: ReadonlyMap<string, RepoFileKind> };
 
-let cached: RepoFiles | undefined;
+const cache = new Map<string, RepoFiles | undefined>();
 
-export function loadRepoFiles(file: string = siteInputsPath("repo-files.json")): RepoFiles | undefined {
-  if (cached) return cached;
-  if (!existsSync(file)) return undefined;
-  const payload = JSON.parse(readFileSync(file, "utf-8")) as { core_sha: string; files: { path: string; kind: RepoFileKind }[] };
-  cached = { coreSha: payload.core_sha, kinds: new Map(payload.files.map((entry) => [entry.path, entry.kind])) };
-  return cached;
-}
-
-export function resetRepoFiles(): void {
-  cached = undefined;
+export function repoFilesFor(docsRoot: string): RepoFiles | undefined {
+  const file = path.join(path.dirname(docsRoot), REPO_FILES_NAME);
+  if (cache.has(file)) return cache.get(file);
+  let loaded: RepoFiles | undefined;
+  if (existsSync(file)) {
+    const payload = JSON.parse(readFileSync(file, "utf-8")) as { core_sha: string; files: { path: string; kind: RepoFileKind }[] };
+    loaded = { coreSha: payload.core_sha, kinds: new Map(payload.files.map((entry) => [entry.path, entry.kind])) };
+  }
+  cache.set(file, loaded);
+  return loaded;
 }
