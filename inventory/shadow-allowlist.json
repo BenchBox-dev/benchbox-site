@@ -1,0 +1,37 @@
+{
+  "entries": [
+    {
+      "pattern": "^_astro/.+\\.HASH\\.js$",
+      "reason": "Minified Astro chunks. The site resolves bundler patch versions (Vite 8.3.4, Rolldown 1.2.13) that differ from core's website lockfile (8.3.2, 1.2.12), so minified output differs for the same sources. JavaScript behavior is covered by the website tests and the Explorer's Chromium suite in CI. Owner decision 2026-10-09."
+    },
+    {
+      "pattern": "^results/assets/.+[.-]HASH\\.js$",
+      "reason": "Explorer bundles. The site injects SITE_ORIGIN into the Explorer at build time, on top of the same bundler patch versions as the Astro chunks. Owner decision 2026-10-09."
+    },
+    {
+      "pattern": "^pagefind/",
+      "reason": "The search index is built from page text, which includes the pinned repository links and the release version, so its binary files differ whenever those do."
+    },
+    {
+      "pattern": "^results/data/results\\.duckdb$",
+      "reason": "Core's preview rebuilds the snapshot, so its file bytes differ from the bundle's. Each comparison must show the two are digest-equivalent with core's scripts/publication/compare_db_digest.py compare, and record the result."
+    }
+  ],
+  "rewrites": [
+    {
+      "pattern": "https://github\\.com/BenchBox-dev/BenchBox/(blob|tree)/(?:develop|[0-9a-f]{40})/",
+      "replacement": "https://github.com/BenchBox-dev/BenchBox/$1/REF/",
+      "reason": "Repository links are pinned to the bundle's core_sha in the site instead of develop."
+    },
+    {
+      "pattern": "https://github\\.com/BenchBox-dev/(?:BenchBox/edit/develop/docs/blog/|benchbox-site/edit/main/blog/)",
+      "replacement": "https://github.com/EDIT/blog/",
+      "reason": "Blog pages edit in the site repository instead of core."
+    },
+    {
+      "pattern": "(releases\" target=\"_blank\" rel=\"noopener\">)v\\d+\\.\\d+\\.\\d+(</a>)",
+      "replacement": "$1vVERSION$2",
+      "reason": "The landing page's release pill takes the version from the bundle manifest; core hard-coded a stale value."
+    }
+  ]
+}
