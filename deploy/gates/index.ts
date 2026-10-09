@@ -15,7 +15,8 @@ export type GateInputs = {
   allowance: BrokenLink[];
   originAllowlist: RegExp[];
   extraHosts: string[];
-  deployed: { corpus_sha: string; snapshot_sha256: string; ui: number; snapshot: number } | null;
+  candidateCanonical: string | null;
+  deployed: { corpus_sha: string; snapshot_sha256: string; snapshot_canonical_sha256?: string | null; ui: number; snapshot: number } | null;
 };
 
 export type GateReport = { ok: boolean; mode: string; results: Record<string, GateResult> };
@@ -43,7 +44,7 @@ export function runGates(inputs: GateInputs): GateReport {
         deployed: deployedVersions,
       }),
     ),
-    snapshot_digest: rollback ? skipped(RESTORED) : run(() => snapshotDigestGate({ siteDir: inputs.siteDir, corpusSha: inputs.corpusSha, deployed: inputs.deployed })),
+    snapshot_digest: rollback ? skipped(RESTORED) : run(() => snapshotDigestGate({ siteDir: inputs.siteDir, corpusSha: inputs.corpusSha, candidateCanonical: inputs.candidateCanonical, deployed: inputs.deployed })),
     links: rollback ? skipped(RESTORED) : run(() => linksGate({ siteDir: inputs.siteDir, allowance: inputs.allowance, extraHosts: inputs.extraHosts })),
     origin: run(() => originGate({ siteDir: inputs.siteDir, target: inputs.target, allowlist: inputs.originAllowlist })),
   };

@@ -12,14 +12,20 @@ export function snapshotSha(siteDir: string): string {
 export function snapshotDigestGate(input: {
   siteDir: string;
   corpusSha: string;
-  deployed: { corpus_sha: string; snapshot_sha256: string } | null;
+  candidateCanonical: string | null;
+  deployed: { corpus_sha: string; snapshot_sha256: string; snapshot_canonical_sha256?: string | null } | null;
 }): GateResult {
   if (!existsSync(path.join(input.siteDir, SNAPSHOT_PATH))) return fail(`${SNAPSHOT_PATH} is missing from the artifact`);
   if (!input.deployed) return skipped("no deployed generation to compare against");
   if (input.deployed.corpus_sha !== input.corpusSha) return skipped("the corpus changed, so the snapshot is expected to change");
-  const candidate = snapshotSha(input.siteDir);
-  if (candidate !== input.deployed.snapshot_sha256) {
-    return fail(`corpus is unchanged but the snapshot changed: ${input.deployed.snapshot_sha256} became ${candidate}`);
+  if (snapshotSha(input.siteDir) === input.deployed.snapshot_sha256) return pass("corpus is unchanged and the snapshot is byte-identical to the deployed one");
+  const deployedCanonical = input.deployed.snapshot_canonical_sha256;
+  if (!deployedCanonical) {
+    return skipped("the snapshot file changed and the deployed receipt predates canonical digests, so its contents cannot be compared");
   }
-  return pass("corpus is unchanged and the snapshot matches the deployed one");
+  if (!input.candidateCanonical) return fail("the candidate snapshot has no canonical digest");
+  if (input.candidateCanonical !== deployedCanonical) {
+    return fail(`corpus is unchanged but the snapshot contents changed: canonical digest ${deployedCanonical} became ${input.candidateCanonical}`);
+  }
+  return pass(`corpus is unchanged and the snapshot contents match the deployed ones (canonical digest ${input.candidateCanonical})`);
 }

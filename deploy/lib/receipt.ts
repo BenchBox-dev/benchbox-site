@@ -17,6 +17,7 @@ export type Receipt = {
   corpus_sha: string;
   bundle_digest: string;
   snapshot_sha256: string;
+  snapshot_canonical_sha256?: string | null;
   artifact: { sha256: string; total_bytes: number; total_files: number };
   explorer_read_model_version: number;
   snapshot_read_model_version: number;
@@ -82,6 +83,7 @@ export function receiptErrors(receipt: Partial<Receipt>): string[] {
   }
   if (receipt.artifact && !/^[0-9a-f]{64}$/.test(receipt.artifact.sha256)) errors.push("receipt artifact sha256 is not 64 hex characters");
   if (receipt.snapshot_sha256 && !/^[0-9a-f]{64}$/.test(receipt.snapshot_sha256)) errors.push("receipt snapshot_sha256 is not 64 hex characters");
+  if (receipt.snapshot_canonical_sha256 && !/^[0-9a-f]{64}$/.test(receipt.snapshot_canonical_sha256)) errors.push("receipt snapshot_canonical_sha256 is not 64 hex characters");
   if (receipt.probes && typeof receipt.probes.ok !== "boolean") errors.push("receipt probes.ok is missing");
   if (receipt.gates && typeof receipt.gates.ok !== "boolean") errors.push("receipt gates.ok is missing");
   return errors;
