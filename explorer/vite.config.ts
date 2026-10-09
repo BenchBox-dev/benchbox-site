@@ -2,8 +2,21 @@ import { defineConfig } from "vitest/config";
 import preact from "@preact/preset-vite";
 import { resolve } from "path";
 
+const PRODUCTION_ORIGIN = "https://benchbox.dev";
+const siteOrigin = (process.env.SITE_ORIGIN ?? PRODUCTION_ORIGIN).replace(/\/+$/, "");
+
 export default defineConfig({
-  plugins: [preact()],
+  plugins: [
+    preact(),
+    {
+      name: "benchbox-site-origin",
+      transformIndexHtml: (html) => html.split(PRODUCTION_ORIGIN).join(siteOrigin),
+    },
+  ],
+
+  define: {
+    "import.meta.env.SITE_ORIGIN": JSON.stringify(siteOrigin),
+  },
 
   base: "/results/",
 

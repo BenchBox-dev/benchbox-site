@@ -61,6 +61,7 @@ import {
   type CompareExclusionReasonCopy,
 } from "@/lib/compareExclusionReasons";
 import { formatSelectedCount } from "@/lib/copyFormatters";
+import { SITE_ORIGIN } from "@/components/siteOrigin";
 
 const EMPTY_STRING_ARRAY: string[] = [];
 
@@ -102,7 +103,7 @@ export function Query({ url }: QueryProps) {
   useDocumentTitle("Find runs · BenchBox Results");
   const pinnedCompareId = useMemo(() => {
     const activeUrl = url ?? (typeof window === "undefined" ? "/results/query" : `${window.location.pathname}${window.location.search}`);
-    return new URL(activeUrl, "https://benchbox.dev").searchParams.get("pick");
+    return new URL(activeUrl, SITE_ORIGIN).searchParams.get("pick");
   }, [url]);
   const resultsScrollerRef = useRef<HTMLDivElement>(null);
   const sqlScrollerRef = useRef<HTMLDivElement>(null);

@@ -83,6 +83,7 @@ const publishStatic = (): AstroIntegration => ({
 
 export default defineConfig({
   site: siteOrigin(),
+  vite: { define: { "import.meta.env.SITE_ORIGIN": JSON.stringify(siteOrigin()) } },
   trailingSlash: "ignore",
   build: { format: "file" },
   markdown: { processor: unified({ remarkPlugins: [headingIds, docutilsQuotes], smartypants: SMARTYPANTS }) },

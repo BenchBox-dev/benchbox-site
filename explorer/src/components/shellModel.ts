@@ -8,7 +8,9 @@ import {
   HEADER_TOGGLE_ARIA_LABEL,
 } from "./headerContract.ts";
 
-export const SITE_ORIGIN = "https://benchbox.dev";
+import { SITE_ORIGIN } from "./siteOrigin.ts";
+
+export { SITE_ORIGIN };
 
 export type Surface = "landing" | "docs" | "blog" | "results";
 

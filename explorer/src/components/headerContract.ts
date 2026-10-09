@@ -1,3 +1,5 @@
+import { SITE_ORIGIN } from "./siteOrigin.ts";
+
 export interface HeaderLink {
   readonly label: string;
   readonly href: string;
@@ -7,20 +9,20 @@ export interface HeaderLink {
 
 export const HEADER_BRAND = {
   label: "BenchBox",
-  href: "https://benchbox.dev/",
+  href: `${SITE_ORIGIN}/`,
 } as const;
 
 export const HEADER_LINKS: readonly HeaderLink[] = [
-  { label: "Home", href: "https://benchbox.dev/", activeOnSurface: "landing" },
-  { label: "Docs", href: "https://benchbox.dev/docs/", activeOnSurface: "docs" },
-  { label: "Blog", href: "https://benchbox.dev/blog/", activeOnSurface: "blog" },
-  { label: "Results", href: "https://benchbox.dev/results/", activeOnSurface: "results" },
+  { label: "Home", href: `${SITE_ORIGIN}/`, activeOnSurface: "landing" },
+  { label: "Docs", href: `${SITE_ORIGIN}/docs/`, activeOnSurface: "docs" },
+  { label: "Blog", href: `${SITE_ORIGIN}/blog/`, activeOnSurface: "blog" },
+  { label: "Results", href: `${SITE_ORIGIN}/results/`, activeOnSurface: "results" },
   { label: "GitHub", href: "https://github.com/BenchBox-dev/BenchBox", external: true },
 ];
 
 export const HEADER_CTA = {
   label: "Run benchmark",
-  href: "https://benchbox.dev/docs/usage/installation.html",
+  href: `${SITE_ORIGIN}/docs/usage/installation.html`,
 } as const;
 
 export const HEADER_NAV_ARIA_LABEL = "BenchBox";
