@@ -1,0 +1,25 @@
+pre-commit:
+  parallel: true
+  commands:
+    comments:
+      glob: "*.{ts,tsx,js,jsx,mjs,cjs,astro,html}"
+      run: node scripts/check-comments.mjs {staged_files}
+    boundary:
+      run: node scripts/check-repo-boundary.mjs
+    markdown:
+      glob: "*.md"
+      exclude:
+        - "drafts/**"
+        - "inventory/**"
+      run: npx markdownlint-cli2 {staged_files}
+    spelling:
+      glob: "*.{md,ts,tsx,astro}"
+      run: npx cspell --no-progress --no-must-find-files {staged_files}
+    yaml:
+      glob: "*.{yml,yaml}"
+      run: node scripts/check-yaml.mjs {staged_files}
+
+commit-msg:
+  commands:
+    trailers:
+      run: node scripts/check-commit-msg.mjs {1}

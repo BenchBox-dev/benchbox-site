@@ -17,6 +17,13 @@
     "check": "npm run typecheck -w explorer && npm run check -w website",
     "test": "node --test scripts/*.test.mjs && npm test -w explorer && npm test -w website",
     "lint:comments": "node scripts/check-comments.mjs",
-    "lint:guard": "node scripts/check-repo-boundary.mjs"
+    "lint:guard": "node scripts/check-repo-boundary.mjs",
+    "prepare": "lefthook install"
+  },
+  "devDependencies": {
+    "cspell": "10.3.6",
+    "lefthook": "2.2.1",
+    "markdownlint-cli2": "0.23.3",
+    "yaml": "2.9.1"
   }
 }
