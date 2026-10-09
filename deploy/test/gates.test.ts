@@ -122,7 +122,9 @@ test("links gate: only breakage outside the allowance fails", () => {
     ["/blog/atom.xml", "/blog/old.html", "missing path"],
     ["/stale", "/also-stale", "missing path"],
   ];
-  assert.equal(linksGate({ siteDir: site(files), allowance }).status, "pass");
+  const passed = linksGate({ siteDir: site(files), allowance });
+  assert.equal(passed.status, "pass");
+  assert.match(passed.detail, /within the allowance of 7 \(5 entries and their \/docs\/dev\/ copies\)$/);
   const result = linksGate({ siteDir: site(files), allowance: allowance.slice(1) });
   assert.equal(result.status, "fail");
   assert.deepEqual(result.findings, ["broken internal link: (site chrome) -> /docs/gone.html -> missing path"]);
