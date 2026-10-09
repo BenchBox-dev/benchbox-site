@@ -35,14 +35,14 @@ if (pagesShaped && !siteDir) {
 if (!pagesShaped && !existsSync(distDir)) {
   console.error(
     `[serve-browser-tests] dist dir not found: ${distDir}\n` +
-      `Run \`npm run build\` inside results-explorer/ before starting the e2e server.`,
+      `Run \`npm run build\` inside explorer/ before starting the e2e server.`,
   );
   process.exit(2);
 }
 if (!pagesShaped && !existsSync(fixtureDir)) {
   console.error(
     `[serve-browser-tests] fixture dir not found: ${fixtureDir}\n` +
-      `Run \`npm run test:e2e:fixtures\` inside results-explorer/ to generate the corpus.`,
+      `Run \`npm run test:e2e:fixtures\` inside explorer/ to generate the corpus.`,
   );
   process.exit(2);
 }

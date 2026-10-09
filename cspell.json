@@ -1,0 +1,8 @@
+{
+  "version": "0.2",
+  "language": "en",
+  "useGitignore": true,
+  "dictionaryDefinitions": [{ "name": "project-words", "path": "./cspell-words.txt", "addWords": true }],
+  "dictionaries": ["project-words", "typescript", "node", "softwareTerms", "companies", "misc", "sql"],
+  "ignorePaths": ["**/node_modules/**", "**/dist/**", "drafts/**", "inventory/**", "website/tests/golden/**", "website/tests/fixtures/**", "explorer/e2e/captures/**", "explorer/test-fixtures/**", "package-lock.json"]
+}

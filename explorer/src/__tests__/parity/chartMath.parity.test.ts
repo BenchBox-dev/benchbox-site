@@ -15,8 +15,9 @@ import {
   computeECDFPoints,
   computeRankTable,
 } from "@/lib/chartMath";
+import { siteInputsPath } from "@/test/siteInputs";
 
-const FIXTURES_DIR = path.resolve(process.cwd(), "../tests/parity/fixtures");
+const FIXTURES_DIR = siteInputsPath("explorer", "parity");
 
 interface FixtureCase {
   id: string;
@@ -48,7 +49,7 @@ function assertParity(
   context: { chart: string; caseId: string; input: unknown },
 ): void {
   const { chart, caseId, input } = context;
-  const msg = `\nchart=${chart}  case=${caseId}  input=${JSON.stringify(input)}\nPython source: tests/parity/generate_visualization_fixtures.py\nTS source:     results-explorer/src/lib/chartMath.ts`;
+  const msg = `\nchart=${chart}  case=${caseId}  input=${JSON.stringify(input)}\nFixture source: core bundle explorer/parity\nTS source:      explorer/src/lib/chartMath.ts`;
 
   if (expected === null || result === null) {
     expect(result, `expected ${String(expected)}${msg}`).toStrictEqual(expected);
@@ -171,7 +172,7 @@ describe("parity: sort_by_magnitude_desc (sortByMagnitudeDesc)", () => {
       const resultOrder = sorted.map(([qid]) => qid);
       expect(
         resultOrder,
-        `chart=${fixture.chart}  case=${c.id}\nPython source: tests/parity/generate_visualization_fixtures.py\nTS source: results-explorer/src/lib/chartMath.ts`,
+        `chart=${fixture.chart}  case=${c.id}\nFixture source: core bundle explorer/parity\nTS source: explorer/src/lib/chartMath.ts`,
       ).toStrictEqual(expectedOrder);
     });
   }

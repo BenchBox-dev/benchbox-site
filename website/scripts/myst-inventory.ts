@@ -3,8 +3,9 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { emptyInventory, scanFile, type Counter, type Inventory } from "../src/converter/inventory.ts";
 import { listDocSources } from "../src/converter/sources.ts";
+import { siteInputsPath } from "../src/lib/site-inputs.ts";
 
-const docsRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..", "..", "docs");
+const docsRoot = siteInputsPath("docs");
 const queriesPrefix = "benchmarks/queries/";
 
 function scanAll(include: (relative: string) => boolean): Inventory {

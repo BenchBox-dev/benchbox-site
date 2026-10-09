@@ -9,8 +9,7 @@ const REPO_ROOT = path.resolve(HERE, "../../..");
 const TODAY = new Date().toISOString().slice(0, 10);
 const OUT = path.join(
   REPO_ROOT,
-  "_project",
-  "audits",
+  "captures",
   "screenshots",
   `results-explorer-pr246-result-compare-remediation-${TODAY}`,
 );

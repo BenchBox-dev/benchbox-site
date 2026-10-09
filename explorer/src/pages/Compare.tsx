@@ -83,6 +83,7 @@ import {
   recoverCompareResults,
   shouldPreserveMultiSelectionUrl,
 } from "@/lib/compareRecovery";
+import { SITE_ORIGIN } from "@/components/siteOrigin";
 
 interface CompareState {
   results: DetailResult[];
@@ -109,7 +110,7 @@ function currentCompareUrl(url: string | undefined): string {
 }
 
 function searchParamsFromUrl(url: string): URLSearchParams {
-  return new URL(url, "https://benchbox.dev").searchParams;
+  return new URL(url, SITE_ORIGIN).searchParams;
 }
 
 function formatIdList(ids: string[]): string {

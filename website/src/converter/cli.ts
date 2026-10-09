@@ -2,6 +2,7 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { assertBuilt, assertOwnedOutput, buildSite, clearOutput, loadKnownBrokenLinks, UnownedOutputError, writeOutput } from "./build.ts";
 import { ConversionFailedError, constructOf } from "./errors.ts";
+import { assembleDocsSource, repoPath } from "../lib/site-inputs.ts";
 
 const websiteRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..", "..");
 
@@ -10,7 +11,7 @@ function option(name: string, fallback: string): string {
   return position >= 0 && process.argv[position + 1] ? process.argv[position + 1] : fallback;
 }
 
-const docsRoot = path.resolve(option("--docs", path.join(websiteRoot, "..", "docs")));
+const docsRoot = process.argv.includes("--docs") ? path.resolve(option("--docs", "")) : assembleDocsSource(path.join(websiteRoot, ".core-source"));
 const outRoot = path.resolve(option("--out", path.join(websiteRoot, ".generated")));
 const showAll = process.argv.includes("--all");
 
@@ -22,7 +23,7 @@ try {
   process.exit(1);
 }
 
-const knownBrokenLinks = loadKnownBrokenLinks(path.join(websiteRoot, "..", "_project", "design", "site-inventory", "known-broken-links.json"));
+const knownBrokenLinks = loadKnownBrokenLinks(repoPath("inventory", "known-broken-links.json"));
 
 const result = buildSite({ docsRoot, knownBrokenLinks });
 

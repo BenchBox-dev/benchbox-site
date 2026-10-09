@@ -1,54 +1,28 @@
-import { spawnSync } from "node:child_process";
-import { resolve } from "node:path";
+import { readFileSync } from "node:fs";
 import { describe, expect, it } from "vitest";
-
-const repoRoot = resolve(process.cwd(), "..");
-const VOCAB_RELATIVE_PATH = "tests/unit/core/tuning/fixtures/tuning_mode_vocabulary.yaml";
+import { NOT_RECORDED_TUNING_MODE } from "@/lib/facetModel";
+import { siteInputsPath } from "@/test/siteInputs";
 
 const EXPECTED_MODES = ["tuned", "tuned-fallback", "notuning", "auto", "custom"];
 const EXPECTED_NOT_RECORDED_SENTINEL = "not-recorded";
 
-interface VocabularyArtifact {
-  modes: string[];
-  not_recorded_sentinel: string;
-}
-
-function loadVocabularyArtifact(): VocabularyArtifact {
-  const result = spawnSync(
-    "uv",
-    [
-      "run",
-      "--",
-      "python",
-      "-c",
-      `import json, yaml; print(json.dumps(yaml.safe_load(open("${VOCAB_RELATIVE_PATH}"))))`,
-    ],
-    { cwd: repoRoot, encoding: "utf8" },
-  );
-
-  if (result.status !== 0) {
-    throw new Error(
-      `Failed to load shared tuning_mode vocabulary artifact at ${VOCAB_RELATIVE_PATH}: ${result.stderr}`,
-    );
-  }
-
-  return JSON.parse(result.stdout) as VocabularyArtifact;
+function loadVocabulary(): string[] {
+  const contract = JSON.parse(readFileSync(siteInputsPath("explorer", "contract.json"), "utf8")) as { tuning_vocabulary: string[] };
+  return contract.tuning_vocabulary;
 }
 
 describe("tuning_mode vocabulary pin (ADR-2)", () => {
-  it("shared artifact modes match the ADR-2 decided set", () => {
-    const vocab = loadVocabularyArtifact();
-    expect(vocab.modes).toEqual(EXPECTED_MODES);
+  it("the core bundle's modes match the ADR-2 decided set", () => {
+    expect(loadVocabulary()).toEqual(EXPECTED_MODES);
   });
 
-  it("shared artifact not-recorded sentinel matches ADR-2", () => {
-    const vocab = loadVocabularyArtifact();
-    expect(vocab.not_recorded_sentinel).toBe(EXPECTED_NOT_RECORDED_SENTINEL);
+  it("the Explorer's not-recorded sentinel matches ADR-2 and is not a mode", () => {
+    expect(NOT_RECORDED_TUNING_MODE).toBe(EXPECTED_NOT_RECORDED_SENTINEL);
+    expect(loadVocabulary()).not.toContain(NOT_RECORDED_TUNING_MODE);
   });
 
-  it("no artifact mode value looks like a raw file path", () => {
-    const vocab = loadVocabularyArtifact();
-    for (const mode of vocab.modes) {
+  it("no mode value looks like a raw file path", () => {
+    for (const mode of loadVocabulary()) {
       expect(mode.includes("/")).toBe(false);
       expect(mode.includes("\\")).toBe(false);
       expect(mode.endsWith(".yaml")).toBe(false);
@@ -56,7 +30,6 @@ describe("tuning_mode vocabulary pin (ADR-2)", () => {
   });
 
   it("'balanced' is not part of the pinned vocabulary", () => {
-    const vocab = loadVocabularyArtifact();
-    expect(vocab.modes).not.toContain("balanced");
+    expect(loadVocabulary()).not.toContain("balanced");
   });
 });

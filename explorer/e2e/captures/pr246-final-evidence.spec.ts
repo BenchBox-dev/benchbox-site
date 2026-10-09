@@ -11,8 +11,7 @@ const REPO_ROOT = path.resolve(HERE, "../../..");
 const TODAY = new Date().toISOString().slice(0, 10);
 const OUT = path.join(
   REPO_ROOT,
-  "_project",
-  "audits",
+  "captures",
   "screenshots",
   `results-explorer-pr246-final-${TODAY}`,
 );
@@ -140,8 +139,8 @@ const ROUTES: CaptureRoute[] = [
 ];
 
 function resolveDevelopSha(): string {
-  execFileSync("git", ["fetch", "--no-tags", "origin", "develop"], { cwd: REPO_ROOT, stdio: "ignore" });
-  return execFileSync("git", ["rev-parse", "origin/develop"], { cwd: REPO_ROOT, encoding: "utf8" }).trim();
+  execFileSync("git", ["fetch", "--no-tags", "origin", "main"], { cwd: REPO_ROOT, stdio: "ignore" });
+  return execFileSync("git", ["rev-parse", "origin/main"], { cwd: REPO_ROOT, encoding: "utf8" }).trim();
 }
 
 function resolveHeadSha(): string {

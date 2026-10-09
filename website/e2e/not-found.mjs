@@ -1,7 +1,5 @@
-import { spawnSync } from "node:child_process";
-import { createReadStream, existsSync, mkdtempSync, statSync, writeFileSync } from "node:fs";
+import { createReadStream, existsSync, statSync } from "node:fs";
 import { createServer } from "node:http";
-import os from "node:os";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { chromium } from "@playwright/test";
@@ -9,7 +7,7 @@ import { chromium } from "@playwright/test";
 const here = path.dirname(fileURLToPath(import.meta.url));
 const repoRoot = path.resolve(here, "..", "..");
 const siteDir = path.resolve(process.env.SITE_DIR ?? path.join(repoRoot, "website", "dist"));
-const explorerDist = path.join(repoRoot, "results-explorer", "dist");
+const explorerDist = path.join(repoRoot, "explorer", "dist");
 
 const types = {
   ".html": "text/html; charset=utf-8",
@@ -45,13 +43,7 @@ function serve(root, notFound) {
 }
 
 function assemblerFallback() {
-  const scratch = mkdtempSync(path.join(process.env.TMPDIR ?? os.tmpdir(), "benchbox-fallback-"));
-  const file = path.join(scratch, "404.html");
-  const code = "import sys; sys.path.insert(0, 'scripts'); from assemble_public_site import RESULTS_FALLBACK; sys.stdout.write(RESULTS_FALLBACK)";
-  const run = spawnSync("python3", ["-c", code], { cwd: repoRoot, encoding: "utf-8" });
-  if (run.status !== 0) throw new Error(`could not read assembler fallback: ${run.stderr}`);
-  writeFileSync(file, run.stdout);
-  return file;
+  return path.join(here, "fixtures", "results-fallback.html");
 }
 
 const routes = [

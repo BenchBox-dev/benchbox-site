@@ -1,8 +1,7 @@
 import { readFileSync } from "node:fs";
-import path from "node:path";
 import type { Catalog } from "./prompt-builder.ts";
+import { siteInputsPath } from "./site-inputs.ts";
 
-const generated = path.resolve(process.cwd(), "..", "landing", "prompts", "catalog.generated.js");
 const ASSIGNMENT = /window\.__BENCHBOX_PROMPT_CATALOG__\s*=\s*/;
 
 export function parseCatalogSource(source: string): Catalog {
@@ -12,6 +11,7 @@ export function parseCatalogSource(source: string): Catalog {
   return JSON.parse(json) as Catalog;
 }
 
-export function loadPromptCatalog(file: string = generated): Catalog {
-  return parseCatalogSource(readFileSync(file, "utf-8"));
+export function loadPromptCatalog(file: string = siteInputsPath("landing", "prompt-catalog.json")): Catalog {
+  const source = readFileSync(file, "utf-8");
+  return file.endsWith(".json") ? (JSON.parse(source) as Catalog) : parseCatalogSource(source);
 }

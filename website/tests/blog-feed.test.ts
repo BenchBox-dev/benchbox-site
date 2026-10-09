@@ -8,7 +8,7 @@ import { absoluteUrls, buildAtomFeed, feedHtml } from "../src/lib/atom.ts";
 import { authorPath, feedCategory, neighbours, slugify, splitDrafts, tagGroups, tagPath, toPost, type BlogPost } from "../src/lib/blog.ts";
 
 const websiteRoot = path.join(path.dirname(fileURLToPath(import.meta.url)), "..");
-const blogRoot = path.join(websiteRoot, "..", "docs", "blog");
+const blogRoot = path.join(websiteRoot, "..", "blog");
 
 type Link = { href: string; rel?: string };
 type Reference = { id: string; links: Link[]; entries: { id: string; links: Link[] }[] };
@@ -142,7 +142,7 @@ describe("blog urls", () => {
 
 describe("editorial drafts", () => {
   it("never reach the feed or the post list", () => {
-    const draftsRoot = path.join(websiteRoot, "..", "_blog");
+    const draftsRoot = path.join(websiteRoot, "..", "drafts");
     const drafts = readdirSync(draftsRoot, { recursive: true, encoding: "utf-8" })
       .filter((entry) => entry.endsWith(".md"))
       .map((entry) => path.basename(entry, ".md"));
@@ -156,7 +156,7 @@ describe("editorial drafts", () => {
 
   it("are not read by any site source", () => {
     const sources = ["astro.config.ts", "src/content.config.ts", "src/converter/sources.ts"].map((file) => readFileSync(path.join(websiteRoot, file), "utf-8"));
-    for (const source of sources) expect(source).not.toMatch(/_blog/);
+    for (const source of sources) expect(source).not.toMatch(/\bdrafts\b|_blog/);
   });
 });
 

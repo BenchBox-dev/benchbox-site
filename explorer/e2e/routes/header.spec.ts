@@ -22,7 +22,6 @@ const REPO_ROOT = resolve(HERE, "../../..");
 const STATIC_SURFACES: ReadonlyArray<{ surface: string; path: string }> = [
   { surface: "landing", path: "landing/index.html" },
   { surface: "prompts", path: "landing/prompts/index.html" },
-  { surface: "docs", path: "docs/_templates/page.html" },
 ];
 
 function readStaticSurface(relativePath: string): string {

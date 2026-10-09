@@ -12,5 +12,5 @@ export {
   shellLinks,
   sitePath,
   surfaceFor,
-} from "../../../results-explorer/src/components/shellModel.ts";
-export type { Surface, ShellLink } from "../../../results-explorer/src/components/shellModel.ts";
+} from "../../../explorer/src/components/shellModel.ts";
+export type { Surface, ShellLink } from "../../../explorer/src/components/shellModel.ts";

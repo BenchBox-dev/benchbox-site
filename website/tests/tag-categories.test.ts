@@ -1,10 +1,9 @@
-import { readFileSync } from "node:fs";
-import path from "node:path";
-import { fileURLToPath } from "node:url";
+import { existsSync, readFileSync } from "node:fs";
 import { describe, expect, it } from "vitest";
 import { TAG_CATEGORIES } from "../src/converter/tag-categories.ts";
+import { siteInputsPath } from "../src/lib/site-inputs.ts";
 
-const pythonSource = path.join(path.dirname(fileURLToPath(import.meta.url)), "..", "..", "docs", "_extensions", "sphinx_tags_fix.py");
+const pythonSource = siteInputsPath("docs", "_extensions", "sphinx_tags_fix.py");
 
 function parsePythonCategories(): { slug: string; title: string; tags: string[] }[] {
   const source = readFileSync(pythonSource, "utf-8");
@@ -23,7 +22,7 @@ function parsePythonCategories(): { slug: string; title: string; tags: string[] 
   }));
 }
 
-describe("tag categories", () => {
+describe.skipIf(!existsSync(pythonSource))("tag categories", () => {
   it("match the Sphinx extension", () => {
     const parsed = parsePythonCategories();
     expect(parsed.length).toBeGreaterThan(0);

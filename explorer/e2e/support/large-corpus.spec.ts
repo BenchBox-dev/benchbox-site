@@ -1,5 +1,5 @@
 import { execFileSync, spawn, type ChildProcess } from "node:child_process";
-import { mkdtempSync, rmSync } from "node:fs";
+import { existsSync, mkdtempSync, rmSync } from "node:fs";
 import { createServer } from "node:http";
 import { tmpdir } from "node:os";
 import { dirname, resolve } from "node:path";
@@ -11,6 +11,7 @@ import { waitForResultRows, waitForShell } from "./fixtures";
 const projectRoot = resolve(dirname(fileURLToPath(import.meta.url)), "..", "..");
 const generatorPath = resolve(projectRoot, "scripts", "generate-browser-fixtures.mjs");
 const serverPath = resolve(projectRoot, "scripts", "serve-browser-tests.mjs");
+const largeFixtureSource = resolve(process.env.SITE_INPUTS ?? resolve(projectRoot, "..", ".site-inputs"), "explorer", "fixtures-large");
 
 function generateLargeFixture(outputRoot: string) {
   execFileSync(process.execPath, [generatorPath], {
@@ -84,6 +85,7 @@ async function withLargeFixture(run: (baseUrl: string) => Promise<void>) {
 
 test.describe("large corpus fixture", () => {
   test.describe.configure({ timeout: 240_000 });
+  test.skip(!existsSync(largeFixtureSource), "the core bundle carries no explorer/fixtures-large member");
 
   test("large comparison rankings cap initial rows and expose the remaining platforms", async ({ browser }) => {
     await withLargeFixture(async (baseUrl) => {

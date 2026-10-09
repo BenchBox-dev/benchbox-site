@@ -2,9 +2,10 @@ import { readdirSync, readFileSync } from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { buildSite, loadKnownBrokenLinks } from "../src/converter/build.ts";
+import { assembleDocsSource, repoPath } from "../src/lib/site-inputs.ts";
 
 const websiteRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
-const baselineDirectory = path.join(websiteRoot, "..", "_project", "design", "site-inventory", "baseline-develop");
+const baselineDirectory = repoPath("inventory", "baseline-develop");
 const THEME_ID = /^(svg-|toctree-checkbox-|__navigation$|__toc$|searchbox$|furo-main-content$|benchbox-site-header-nav$|post-meta-data$)/;
 
 type BaselinePage = { ids: string[] };
@@ -15,8 +16,8 @@ for (const name of readdirSync(baselineDirectory).filter((entry) => /^pages-(doc
   for (const [route, page] of Object.entries(pages)) baseline.set(route, new Set(page.ids.filter((id) => !THEME_ID.test(id))));
 }
 
-const knownBrokenLinks = loadKnownBrokenLinks(path.join(websiteRoot, "..", "_project", "design", "site-inventory", "known-broken-links.json"));
-const result = buildSite({ docsRoot: path.join(websiteRoot, "..", "docs"), knownBrokenLinks });
+const knownBrokenLinks = loadKnownBrokenLinks(repoPath("inventory", "known-broken-links.json"));
+const result = buildSite({ docsRoot: assembleDocsSource(path.join(websiteRoot, ".core-source")), knownBrokenLinks });
 let compared = 0;
 let lost = 0;
 const lines: string[] = [];

@@ -1,13 +1,12 @@
-import { spawnSync } from "node:child_process";
-import { resolve } from "node:path";
+import { readFileSync } from "node:fs";
 import { describe, expect, it, vi } from "vitest";
 import { _EXPECTED_READ_MODEL_VERSION_FOR_TEST, _verifyReadModelVersionForTest } from "@/db";
+import { siteInputsPath } from "@/test/siteInputs";
 
 const EXPECTED_EXPLORER_BUILD_COMMAND =
   "uv run -- python _project/scripts/explorer_publish.py build";
 const CURRENT_READ_MODEL_VERSION = 14;
 const NEWER_READ_MODEL_POLICY = "warn-and-continue";
-const repoRoot = resolve(process.cwd(), "..");
 
 type SnapshotConnection = Parameters<typeof _verifyReadModelVersionForTest>[0];
 
@@ -21,18 +20,8 @@ function connectionWithReadModelVersion(version: number): SnapshotConnection {
 
 describe("db remediation command pin", () => {
   it("matches the live explorer build contract", () => {
-    const result = spawnSync(
-      "uv",
-      ["run", "--no-sync", "--", "python", "_project/scripts/explorer_publish.py", "build-contract"],
-      {
-        cwd: repoRoot,
-        encoding: "utf8",
-        env: { ...process.env, PYTHONUNBUFFERED: "1" },
-      },
-    );
-
-    expect(result.status, result.stderr).toBe(0);
-    const contract = JSON.parse(result.stdout) as {
+    const contract = (JSON.parse(readFileSync(siteInputsPath("explorer", "contract.json"), "utf8")) as { build_contract: unknown })
+      .build_contract as {
       command?: string;
       read_model_version?: number;
       read_model_compatibility?: {

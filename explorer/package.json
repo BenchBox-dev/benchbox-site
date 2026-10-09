@@ -1,5 +1,5 @@
 {
-  "name": "results-explorer",
+  "name": "benchbox-explorer",
   "version": "0.1.0",
   "private": true,
   "type": "module",
@@ -29,30 +29,30 @@
     "uat-external-corpus-smoke": "npm run build && playwright test --grep @uat-external-corpus"
   },
   "dependencies": {
-    "@duckdb/duckdb-wasm": "^1.32.0",
+    "@duckdb/duckdb-wasm": "1.32.0",
     "@fontsource-variable/instrument-sans": "5.3.0",
     "@fontsource-variable/martian-mono": "5.3.0",
-    "preact": "^10.29.8",
-    "preact-router": "^4.1.2"
+    "preact": "10.29.8",
+    "preact-router": "4.1.2"
   },
   "devDependencies": {
-    "@playwright/test": "^1.63.0",
-    "@preact/preset-vite": "^2.10.6",
-    "@testing-library/jest-dom": "^6.9.1",
-    "@testing-library/preact": "^3.2.4",
-    "@types/babel__core": "^7.20.5",
-    "@types/emscripten": "^1.41.6",
-    "@types/jest": "^30.0.0",
-    "@types/jest-axe": "^3.5.9",
-    "@types/node": "^22.20.2",
-    "autoprefixer": "^10.6.0",
-    "jest-axe": "^9.0.0",
-    "jsdom": "^29.1.1",
-    "postcss": "^8.5.28",
-    "tailwindcss": "^3.4.19",
-    "typescript": "^5.9.3",
-    "vite": "^6.4.3",
-    "vitest": "^4.1.11"
+    "@playwright/test": "1.63.0",
+    "@preact/preset-vite": "2.10.6",
+    "@testing-library/jest-dom": "6.9.1",
+    "@testing-library/preact": "3.2.4",
+    "@types/babel__core": "7.20.5",
+    "@types/emscripten": "1.41.6",
+    "@types/jest": "30.0.0",
+    "@types/jest-axe": "3.5.9",
+    "@types/node": "22.20.2",
+    "autoprefixer": "10.6.0",
+    "jest-axe": "9.0.0",
+    "jsdom": "29.1.1",
+    "postcss": "8.5.28",
+    "tailwindcss": "3.4.19",
+    "typescript": "5.9.3",
+    "vite": "6.4.3",
+    "vitest": "4.1.11"
   },
   "overrides": {
     "@babel/core": "7.29.7",

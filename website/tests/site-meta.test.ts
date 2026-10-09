@@ -1,16 +1,16 @@
-import { spawnSync } from "node:child_process";
-import { readFileSync } from "node:fs";
+import { readdirSync, readFileSync } from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { describe, expect, it } from "vitest";
 import { builtSite } from "./built-site.ts";
 import { REDIRECT_PAGES } from "../src/lib/legacy-assets.ts";
 import { canonicalPath, pageMeta, renderRobots, renderSitemap, sitemapPathForFile } from "../src/lib/page-meta.ts";
+import { siteHost, siteOrigin } from "../src/lib/site-origin.ts";
 
 const here = path.dirname(fileURLToPath(import.meta.url));
 const repoRoot = path.resolve(here, "..", "..");
 const dist = builtSite();
-const origin = "https://benchbox.dev";
+const origin = siteOrigin();
 
 describe("canonicalPath", () => {
   it("keeps the site root and the Explorer directory", () => {
@@ -63,16 +63,10 @@ describe("sitemap and robots", () => {
 });
 
 function inventoryPages(site: string): string[] {
-  const code = [
-    "import json, sys",
-    "from pathlib import Path",
-    "sys.path.insert(0, 'scripts')",
-    "from site_inventory import build_inventory",
-    "print(json.dumps(sorted(build_inventory(Path(sys.argv[1]))['pages'])))",
-  ].join("\n");
-  const run = spawnSync("python3", ["-c", code, site], { cwd: repoRoot, encoding: "utf-8", maxBuffer: 64 * 1024 * 1024 });
-  if (run.status !== 0) throw new Error(`site inventory failed: ${run.stderr}`);
-  return (JSON.parse(run.stdout) as string[]).map((entry) => entry.slice(1));
+  return (readdirSync(site, { recursive: true, encoding: "utf-8" }) as string[])
+    .map((entry) => entry.split(path.sep).join("/"))
+    .filter((entry) => entry.endsWith(".html"))
+    .sort();
 }
 
 function head(site: string, file: string): string {
@@ -127,14 +121,14 @@ describe.skipIf(!dist)("built site", () => {
   });
 
   it("keeps CNAME and .nojekyll and no stray sitemap files", () => {
-    expect(readFileSync(path.join(site, "CNAME"), "utf-8")).toBe(readFileSync(path.join(repoRoot, "docs", "CNAME"), "utf-8"));
+    expect(readFileSync(path.join(site, "CNAME"), "utf-8")).toBe(`${siteHost()}\n`);
     expect(readFileSync(path.join(site, ".nojekyll"), "utf-8")).toBe("");
     for (const stray of ["sitemap-index.xml", "sitemap-0.xml"]) expect(() => readFileSync(path.join(site, stray))).toThrow();
   });
 
   it("publishes the Explorer page exactly as the Explorer builds it", () => {
     const published = readFileSync(path.join(site, "results", "index.html"), "utf-8");
-    const source = readFileSync(path.join(repoRoot, "results-explorer", "index.html"), "utf-8");
+    const source = readFileSync(path.join(repoRoot, "explorer", "index.html"), "utf-8");
     expect(published).toContain('<link rel="canonical" href="https://benchbox.dev/results/" />');
     expect(source).toContain('href="https://benchbox.dev/results/"');
   });

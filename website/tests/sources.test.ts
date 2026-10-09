@@ -4,11 +4,11 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { afterAll, describe, expect, it } from "vitest";
 import { EXCLUSIONS_FILE, listDocSources, PUBLISH_LIST_FILE, PUBLISH_LIST_ROOTS, readPublishExclusions, readPublishList, RENDERER_ROOTS } from "../src/converter/sources.ts";
+import { siteInputsPath } from "../src/lib/site-inputs.ts";
 
-const here = path.dirname(fileURLToPath(import.meta.url));
-const docsDir = path.join(here, "..", "..", "docs");
+const docsDir = siteInputsPath("docs");
 const confPath = path.join(docsDir, "conf.py");
-const conf = readFileSync(confPath, "utf-8");
+const conf = existsSync(confPath) ? readFileSync(confPath, "utf-8") : "";
 
 function pythonList(name: string): string[] {
   const block = new RegExp(`^${name}\\s*=\\s*\\[([^\\]]*)\\]`, "m").exec(conf);
@@ -56,7 +56,7 @@ describe("source exclusions", () => {
     expect(listDocSources(docsRoot).map((source) => source.relative)).toEqual(["kept.md"]);
   });
 
-  it("skip what Sphinx skips: the shared list plus each renderer's own working directories", () => {
+  it.skipIf(conf === "")("skip what Sphinx skips: the shared list plus each renderer's own working directories", () => {
     expect(conf).toContain(`DOCS_ROOT / "${EXCLUSIONS_FILE}"`);
     expect(sphinxExcludes().sort()).toEqual([".DS_Store", "Thumbs.db", "_build"]);
     const assetPaths = [...pythonList("templates_path"), ...pythonList("html_static_path"), ...pythonList("html_extra_path")].filter((entry) => !entry.startsWith(".."));

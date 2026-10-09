@@ -1,0 +1,31 @@
+{
+  "name": "benchbox-site",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": ">=22.15.0"
+  },
+  "workspaces": [
+    "explorer",
+    "website"
+  ],
+  "scripts": {
+    "bundle:fetch": "node scripts/bundle-fetch.mjs",
+    "bundle:verify": "node scripts/bundle-verify.mjs",
+    "build": "npm run build -w explorer && npm run build -w website",
+    "check": "npm run typecheck -w explorer && npm run check -w website",
+    "test": "node --test scripts/*.test.mjs && npm test -w explorer && npm test -w website",
+    "lint:comments": "node scripts/check-comments.mjs",
+    "lint:guard": "node scripts/check-repo-boundary.mjs",
+    "prepare": "lefthook install",
+    "charts": "node scripts/render-blog-charts.mjs"
+  },
+  "devDependencies": {
+    "ansi-to-html": "0.7.2",
+    "cspell": "10.3.6",
+    "lefthook": "2.2.1",
+    "markdownlint-cli2": "0.23.3",
+    "yaml": "2.9.1"
+  }
+}

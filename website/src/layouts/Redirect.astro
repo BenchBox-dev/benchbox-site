@@ -1,7 +1,8 @@
 ---
+import { siteOrigin } from "../lib/site-origin.ts";
 type Props = { target: string };
 const { target } = Astro.props;
-const canonical = new URL(target, "https://benchbox.dev").href;
+const canonical = new URL(target, siteOrigin()).href;
 ---
 
 <!doctype html>
