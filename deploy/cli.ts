@@ -4,7 +4,8 @@ import path from "node:path";
 import { uiVersionFromSource } from "./gates/explorer-compat.ts";
 import { runGates } from "./gates/index.ts";
 import type { BrokenLink } from "./gates/links.ts";
-import { snapshotSha } from "./gates/snapshot-digest.ts";
+import { SNAPSHOT_PATH, snapshotSha } from "./gates/snapshot-digest.ts";
+import { canonicalDigest } from "./lib/canonical-digest.ts";
 import { downloadReceipt, githubApi, recordedReceipts, verifiedReceipt } from "./lib/github.ts";
 import { checksumManifest, probe } from "./lib/probe.ts";
 import { latencySeconds, receiptBytes, receiptSha, RECEIPT_SCHEMA, statusDescription, type Receipt } from "./lib/receipt.ts";
@@ -47,7 +48,7 @@ type Resolution = {
   corpus_sha: string;
   bundle_digest: string;
   snapshot_read_model_version: number;
-  deployed: (Deployed & { receipt_sha: string; snapshot_sha256: string; ui: number; snapshot: number; run_id: string }) | null;
+  deployed: (Deployed & { receipt_sha: string; snapshot_sha256: string; snapshot_canonical_sha256: string | null; ui: number; snapshot: number; run_id: string }) | null;
   rollback_target: Receipt | null;
 };
 
@@ -70,6 +71,7 @@ async function resolve(): Promise<void> {
         corpus_sha: current.receipt.corpus_sha,
         receipt_sha: current.sha,
         snapshot_sha256: current.receipt.snapshot_sha256,
+        snapshot_canonical_sha256: current.receipt.snapshot_canonical_sha256 ?? null,
         ui: current.receipt.explorer_read_model_version,
         snapshot: current.receipt.snapshot_read_model_version,
         run_id: current.receipt.run_id,
@@ -120,13 +122,15 @@ async function resolve(): Promise<void> {
   output("core_sha", manifest.core_sha);
 }
 
-function gates(): void {
+async function gates(): Promise<void> {
   const resolution = readJson<Resolution>(path.join(WORK, "resolve.json"));
   const rollback = resolution.rollback_target;
   const uiVersion = rollback ? rollback.explorer_read_model_version : uiVersionFromSource(readFileSync(path.join(ROOT, "explorer", "src", "db.ts"), "utf8"));
   const allowance = readJson<BrokenLink[]>(path.join(ROOT, "inventory", "known-broken-links.json"));
   const originAllowlist = readJson<string[]>(path.join(ROOT, "deploy", "origin-allowlist.json")).map((pattern) => new RegExp(pattern));
   const host = process.env.SITE_HOST;
+  const snapshot = path.join(SITE_DIR, SNAPSHOT_PATH);
+  const canonical = existsSync(snapshot) ? await canonicalDigest(snapshot) : null;
   const report = runGates({
     siteDir: SITE_DIR,
     mode: resolution.mode,
@@ -137,9 +141,10 @@ function gates(): void {
     allowance,
     originAllowlist,
     extraHosts: host ? [host] : [],
+    candidateCanonical: canonical,
     deployed: resolution.deployed,
   });
-  writeWork("gates.json", { ...report, ui_version: uiVersion });
+  writeWork("gates.json", { ...report, ui_version: uiVersion, snapshot_canonical_sha256: canonical });
   for (const [name, result] of Object.entries(report.results)) console.log(`${result.status.padEnd(7)} ${name}: ${result.detail}`);
   if (!report.ok) process.exit(1);
 }
@@ -166,7 +171,9 @@ async function runProbe(): Promise<void> {
 
 async function receipt(): Promise<void> {
   const resolution = readJson<Resolution>(path.join(WORK, "resolve.json"));
-  const gateReport = readJson<{ ok: boolean; results: Record<string, { status: string }>; ui_version: number }>(path.join(WORK, "gates.json"));
+  const gateReport = readJson<{ ok: boolean; results: Record<string, { status: string }>; ui_version: number; snapshot_canonical_sha256?: string | null }>(
+    path.join(WORK, "gates.json"),
+  );
   const probes = existsSync(path.join(WORK, "probe.json"))
     ? readJson<{ ok: boolean; matched: number; mismatched: string[]; errors: string[]; attempts: number }>(path.join(WORK, "probe.json"))
     : { ok: false, matched: 0, mismatched: [], errors: ["not probed"], attempts: 0 };
@@ -187,6 +194,7 @@ async function receipt(): Promise<void> {
     corpus_sha: resolution.corpus_sha,
     bundle_digest: resolution.bundle_digest,
     snapshot_sha256: snapshotSha(SITE_DIR),
+    snapshot_canonical_sha256: gateReport.snapshot_canonical_sha256 ?? null,
     artifact: { sha256: digest.sha256, total_bytes: digest.totalBytes, total_files: digest.totalFiles },
     explorer_read_model_version: gateReport.ui_version,
     snapshot_read_model_version: resolution.snapshot_read_model_version,

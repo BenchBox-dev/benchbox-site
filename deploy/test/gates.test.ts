@@ -74,15 +74,21 @@ test("explorer compat reads exactly one UI version constant", () => {
   assert.throws(() => uiVersionFromSource("const OTHER = 1;\n"), /found 0/);
 });
 
-test("snapshot digest: unchanged corpus needs the same snapshot", () => {
+test("snapshot digest: unchanged corpus needs the same snapshot contents", () => {
   const dir = site(EXPLORER);
   const sha = createHash("sha256").update("duckdb-bytes").digest("hex");
   const corpus = "c".repeat(40);
-  assert.equal(snapshotDigestGate({ siteDir: dir, corpusSha: corpus, deployed: null }).status, "skipped");
-  assert.equal(snapshotDigestGate({ siteDir: dir, corpusSha: corpus, deployed: { corpus_sha: "9".repeat(40), snapshot_sha256: "0".repeat(64) } }).status, "skipped");
-  assert.equal(snapshotDigestGate({ siteDir: dir, corpusSha: corpus, deployed: { corpus_sha: corpus, snapshot_sha256: sha } }).status, "pass");
-  assert.equal(snapshotDigestGate({ siteDir: dir, corpusSha: corpus, deployed: { corpus_sha: corpus, snapshot_sha256: "0".repeat(64) } }).status, "fail");
-  assert.equal(snapshotDigestGate({ siteDir: site({}), corpusSha: corpus, deployed: null }).status, "fail");
+  const contents = "a".repeat(64);
+  const gate = (deployed: Parameters<typeof snapshotDigestGate>[0]["deployed"], candidateCanonical: string | null = contents) =>
+    snapshotDigestGate({ siteDir: dir, corpusSha: corpus, candidateCanonical, deployed });
+  assert.equal(gate(null).status, "skipped");
+  assert.equal(gate({ corpus_sha: "9".repeat(40), snapshot_sha256: "0".repeat(64) }).status, "skipped");
+  assert.equal(gate({ corpus_sha: corpus, snapshot_sha256: sha }).status, "pass");
+  assert.equal(gate({ corpus_sha: corpus, snapshot_sha256: "0".repeat(64), snapshot_canonical_sha256: contents }).status, "pass");
+  assert.equal(gate({ corpus_sha: corpus, snapshot_sha256: "0".repeat(64), snapshot_canonical_sha256: "b".repeat(64) }).status, "fail");
+  assert.equal(gate({ corpus_sha: corpus, snapshot_sha256: "0".repeat(64), snapshot_canonical_sha256: contents }, null).status, "fail");
+  assert.equal(gate({ corpus_sha: corpus, snapshot_sha256: "0".repeat(64) }).status, "skipped");
+  assert.equal(snapshotDigestGate({ siteDir: site({}), corpusSha: corpus, candidateCanonical: null, deployed: null }).status, "fail");
 });
 
 test("origin: rehearsal artifacts carry no production origin outside the allowlist", () => {
@@ -147,6 +153,7 @@ test("the gate runner skips artifact gates on rollback and reports a raising gat
     allowance: [],
     originAllowlist: [],
     extraHosts: [],
+    candidateCanonical: null,
     deployed: null,
   };
   const report = runGates(inputs);
