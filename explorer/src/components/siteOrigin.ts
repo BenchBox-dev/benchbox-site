@@ -1,3 +1,5 @@
 const DEFAULT_SITE_ORIGIN = "https://benchbox.dev";
 
-export const SITE_ORIGIN: string = (import.meta.env.SITE_ORIGIN ?? DEFAULT_SITE_ORIGIN).replace(/\/+$/, "");
+const injected = (import.meta as unknown as { env?: Record<string, string | undefined> }).env?.SITE_ORIGIN;
+
+export const SITE_ORIGIN: string = (injected ?? DEFAULT_SITE_ORIGIN).replace(/\/+$/, "");
