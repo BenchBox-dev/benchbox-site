@@ -11,7 +11,7 @@
     "inventory": "node --experimental-strip-types --disable-warning=ExperimentalWarning scripts/myst-inventory.ts",
     "id-parity": "node --experimental-strip-types --disable-warning=ExperimentalWarning scripts/id-parity.ts",
     "dev": "npm run convert && astro dev",
-    "build": "npm run convert && astro build && node scripts/pagefind-index.mjs dist",
+    "build": "npm run convert && astro build && node scripts/pagefind-index.mjs dist && node --experimental-strip-types --disable-warning=ExperimentalWarning scripts/mount-dev-docs.ts dist",
     "preview": "astro preview",
     "check": "BENCHBOX_ALLOW_EMPTY_SIDEBAR=1 astro check",
     "test": "vitest run",
