@@ -25,9 +25,9 @@ export function publishLegacyFiles(files: LegacyFiles, docsRoot: string, out: st
     mkdirSync(path.dirname(target), { recursive: true });
     cpSync(copy.from, target);
     const sourcePath = path.relative(docsRoot, copy.from).split(path.sep).join("/");
-    const eulaSource = sourcePath.startsWith("../_sources/tpc-ds/")
+    const eulaSource = sourcePath.startsWith("../_sources/tpc-ds/query_templates/")
       ? path.resolve(docsRoot, "../_sources/tpc-ds/EULA.txt")
-      : sourcePath.startsWith("../benchbox/_binaries/tpc-h/")
+      : sourcePath.startsWith("../benchbox/_binaries/tpc-h/templates/queries/")
         ? path.resolve(docsRoot, "../_sources/tpc-h/EULA.txt")
         : undefined;
     if (eulaSource !== undefined) {
