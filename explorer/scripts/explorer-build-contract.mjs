@@ -2,7 +2,7 @@ import { readFileSync } from "node:fs";
 import { siteInputsPath } from "./site-inputs.mjs";
 
 const EXPECTED_CONTRACT_VERSION = "6";
-export const EXPECTED_READ_MODEL_VERSION = 14;
+export const EXPECTED_READ_MODEL_VERSION = 15;
 const EXPECTED_NEWER_READ_MODEL_POLICY = "warn-and-continue";
 const REQUIRED_FLAGS = ["--data-dir", "--output", "--trust-label", "--visibility"];
 const REQUIRED_OUTPUTS = ["results.duckdb", "bundles/{result_id}.json"];
