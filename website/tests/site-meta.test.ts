@@ -111,9 +111,16 @@ describe.skipIf(!dist)("built site", () => {
     expect(missing).toEqual([]);
   });
 
-  it("lists exactly the inventory html pages except 404.html and the /docs/dev/ mirror in sitemap.xml", () => {
+  it("generates the blog drafts page but excludes it from sitemap.xml", () => {
+    const draftsPage = readFileSync(path.join(site, "blog", "drafts.html"), "utf-8");
+    expect(draftsPage).toContain("<title>Drafts - BenchBox Blog</title>");
     const listed = [...readFileSync(path.join(site, "sitemap.xml"), "utf-8").matchAll(/<loc>([^<]*)<\/loc>/g)].map((match) => match[1]);
-    const expected = pages.filter((file) => file !== "404.html" && !file.startsWith("docs/dev/")).map((file) => `${origin}${sitemapPathForFile(file)}`);
+    expect(listed).not.toContain(`${origin}/blog/drafts.html`);
+  });
+
+  it("lists exactly the inventory html pages except 404.html, blog/drafts.html and the /docs/dev/ mirror in sitemap.xml", () => {
+    const listed = [...readFileSync(path.join(site, "sitemap.xml"), "utf-8").matchAll(/<loc>([^<]*)<\/loc>/g)].map((match) => match[1]);
+    const expected = pages.filter((file) => file !== "404.html" && file !== "blog/drafts.html" && !file.startsWith("docs/dev/")).map((file) => `${origin}${sitemapPathForFile(file)}`);
     expect(new Set(listed).size).toBe(listed.length);
     expect([...listed].sort()).toEqual([...expected].sort());
   });

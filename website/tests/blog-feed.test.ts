@@ -156,7 +156,7 @@ describe("editorial drafts", () => {
 
   it("are not read by any site source", () => {
     const sources = ["astro.config.ts", "src/content.config.ts", "src/converter/sources.ts"].map((file) => readFileSync(path.join(websiteRoot, file), "utf-8"));
-    for (const source of sources) expect(source).not.toMatch(/\bdrafts\b|_blog/);
+    for (const source of sources) expect(source).not.toMatch(/\bdrafts\b(?!\.html)|_blog/);
   });
 });
 
