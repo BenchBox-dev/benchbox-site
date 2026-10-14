@@ -2,7 +2,7 @@ import { explorerCompatGate } from "./explorer-compat.ts";
 import { linksGate, type BrokenLink } from "./links.ts";
 import { originGate } from "./origin.ts";
 import { privacyGate } from "./privacy.ts";
-import { snapshotDigestGate } from "./snapshot-digest.ts";
+import { snapshotDigestGate, type SnapshotApproval } from "./snapshot-digest.ts";
 import { skipped, type GateResult } from "./types.ts";
 
 export type GateInputs = {
@@ -16,6 +16,7 @@ export type GateInputs = {
   originAllowlist: RegExp[];
   extraHosts: string[];
   candidateCanonical: string | null;
+  snapshotApproval?: SnapshotApproval | null;
   deployed: { corpus_sha: string; snapshot_sha256: string; snapshot_canonical_sha256?: string | null; ui: number; snapshot: number } | null;
 };
 
@@ -44,7 +45,7 @@ export function runGates(inputs: GateInputs): GateReport {
         deployed: deployedVersions,
       }),
     ),
-    snapshot_digest: rollback ? skipped(RESTORED) : run(() => snapshotDigestGate({ siteDir: inputs.siteDir, corpusSha: inputs.corpusSha, candidateCanonical: inputs.candidateCanonical, deployed: inputs.deployed })),
+    snapshot_digest: rollback ? skipped(RESTORED) : run(() => snapshotDigestGate({ siteDir: inputs.siteDir, corpusSha: inputs.corpusSha, candidateCanonical: inputs.candidateCanonical, deployed: inputs.deployed, approval: inputs.snapshotApproval })),
     links: rollback ? skipped(RESTORED) : run(() => linksGate({ siteDir: inputs.siteDir, allowance: inputs.allowance, extraHosts: inputs.extraHosts })),
     origin: run(() => originGate({ siteDir: inputs.siteDir, target: inputs.target, allowlist: inputs.originAllowlist })),
   };

@@ -77,6 +77,8 @@ jobs:
       - name: Gate the artifact
         env:
           SITE_HOST: ${{ vars.SITE_HOST }}
+          SITE_SNAPSHOT_APPROVED_CHANGE: ${{ vars.SITE_SNAPSHOT_APPROVED_CHANGE }}
+          SITE_SNAPSHOT_APPROVAL_REASON: ${{ vars.SITE_SNAPSHOT_APPROVAL_REASON }}
         run: npm run -s deploy -- gates
       - uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f
         with:
