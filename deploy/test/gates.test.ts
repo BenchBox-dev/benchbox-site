@@ -6,7 +6,7 @@ import { runGates } from "../gates/index.ts";
 import { findBrokenLinks, linksGate, routedAllowance, type BrokenLink } from "../gates/links.ts";
 import { originGate } from "../gates/origin.ts";
 import { privacyFindings, privacyGate } from "../gates/privacy.ts";
-import { snapshotDigestGate } from "../gates/snapshot-digest.ts";
+import { snapshotChange, snapshotDigestGate } from "../gates/snapshot-digest.ts";
 import { site } from "./helpers.ts";
 
 const EXPLORER = {
@@ -89,6 +89,27 @@ test("snapshot digest: unchanged corpus needs the same snapshot contents", () =>
   assert.equal(gate({ corpus_sha: corpus, snapshot_sha256: "0".repeat(64), snapshot_canonical_sha256: contents }, null).status, "fail");
   assert.equal(gate({ corpus_sha: corpus, snapshot_sha256: "0".repeat(64) }).status, "skipped");
   assert.equal(snapshotDigestGate({ siteDir: site({}), corpusSha: corpus, candidateCanonical: null, deployed: null }).status, "fail");
+});
+
+test("snapshot digest: an unchanged corpus accepts only the exact approved change with a reason", () => {
+  const corpus = "c".repeat(40);
+  const before = "b".repeat(64);
+  const after = "a".repeat(64);
+  const dir = site(EXPLORER);
+  const deployed = { corpus_sha: corpus, snapshot_sha256: "0".repeat(64), snapshot_canonical_sha256: before };
+  const gate = (approval: { change: string; reason: string } | null) =>
+    snapshotDigestGate({ siteDir: dir, corpusSha: corpus, candidateCanonical: after, deployed, approval });
+  const change = snapshotChange(before, after);
+  assert.equal(change, `${before}->${after}`);
+  assert.equal(gate(null).status, "fail");
+  assert.match(gate(null).detail, new RegExp(`set SITE_SNAPSHOT_APPROVED_CHANGE to ${change}`));
+  const approved = gate({ change, reason: "pipeline adds cost estimates" });
+  assert.equal(approved.status, "pass");
+  assert.match(approved.detail, /pipeline adds cost estimates/);
+  assert.equal(gate({ change, reason: "" }).status, "fail");
+  assert.equal(gate({ change: snapshotChange(before, "d".repeat(64)), reason: "other candidate" }).status, "fail");
+  assert.equal(gate({ change: snapshotChange("e".repeat(64), after), reason: "other baseline" }).status, "fail");
+  assert.equal(gate({ change: snapshotChange(after, before), reason: "reversed" }).status, "fail");
 });
 
 test("origin: rehearsal artifacts carry no production origin outside the allowlist", () => {

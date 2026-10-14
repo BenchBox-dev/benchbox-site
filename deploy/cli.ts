@@ -122,6 +122,12 @@ async function resolve(): Promise<void> {
   output("core_sha", manifest.core_sha);
 }
 
+function snapshotApprovalFromEnv(): { change: string; reason: string } | null {
+  const change = process.env.SITE_SNAPSHOT_APPROVED_CHANGE?.trim();
+  if (!change) return null;
+  return { change, reason: process.env.SITE_SNAPSHOT_APPROVAL_REASON?.trim() ?? "" };
+}
+
 async function gates(): Promise<void> {
   const resolution = readJson<Resolution>(path.join(WORK, "resolve.json"));
   const rollback = resolution.rollback_target;
@@ -142,6 +148,7 @@ async function gates(): Promise<void> {
     originAllowlist,
     extraHosts: host ? [host] : [],
     candidateCanonical: canonical,
+    snapshotApproval: snapshotApprovalFromEnv(),
     deployed: resolution.deployed,
   });
   writeWork("gates.json", { ...report, ui_version: uiVersion, snapshot_canonical_sha256: canonical });

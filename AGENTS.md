@@ -41,6 +41,13 @@ itself plus one versioned core bundle; it reads nothing else from core.
 - Nothing deploys unless every gate passes: privacy, Explorer
   compatibility, snapshot digest, links (within
   `inventory/known-broken-links.json`) and origin.
+- The snapshot digest gate fails when the corpus is unchanged but the
+  snapshot contents differ from the deployed ones, for example after a core
+  pipeline change. After reviewing the change, the owner sets the repository
+  variable `SITE_SNAPSHOT_APPROVED_CHANGE` to the exact
+  `<deployed digest>-><candidate digest>` value that the failed gate prints,
+  and `SITE_SNAPSHOT_APPROVAL_REASON` to the reason, then reruns the deploy.
+  The approval matches only that pair. Clear both variables after the deploy.
 - Each deploy writes a receipt, uploads it with the artifact, and records
   its digest on the GitHub Pages deployment. `npm run deploy -- deployed`
   prints the current one. If the probes fail after a deploy, the run
