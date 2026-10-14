@@ -37,6 +37,14 @@ describe.skipIf(dist === undefined)("built dist/blog/atom.xml", () => {
     expect(entries.map((entry) => ({ id: entry.id, links: links(entry) }))).toEqual(reference.entries);
   });
 
+  it("keeps entry ids on the legacy id base", () => {
+    const entries = Array.isArray(parsed.entry) ? (parsed.entry as Node[]) : [];
+    expect(entries.length).toBeGreaterThan(0);
+    for (const entry of entries) {
+      expect(String(entry.id).startsWith(`${reference.id}blog/`)).toBe(true);
+    }
+  });
+
   it("holds plain code blocks without scripts, stylesheets or buttons", () => {
     expect(xml).not.toMatch(/&lt;(script|link|button)|style=&quot;--|_astro\//);
   });
