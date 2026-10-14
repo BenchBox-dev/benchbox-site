@@ -79,7 +79,9 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
           GITHUB_TOKEN: ${{ github.token }}
-        run: node scripts/check-contract-drift.mjs | tee drift.txt
+        run: |
+          set -o pipefail
+          node scripts/check-contract-drift.mjs 2>&1 | tee drift.txt
       - name: Open or update the contract-drift issue
         if: failure() && steps.drift.outcome == 'failure'
         env:
