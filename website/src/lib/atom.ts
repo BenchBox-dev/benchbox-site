@@ -3,12 +3,13 @@ import { atomTimestamp, BLOG_BASE_URL, BLOG_TITLE, feedCategory, FEED_LENGTH, ne
 
 const SITE_ORIGIN = siteOrigin();
 const GENERATOR = { uri: "https://astro.build/", name: "Astro" };
+const LEGACY_FEED_ID_BASE = `${BLOG_BASE_URL}blog/`;
 
 export function feedEntryUrl(post: Pick<BlogPost, "slug">): string {
-  return `${BLOG_BASE_URL}blog/${post.slug}.html`;
+  return `${BLOG_BASE_URL}${post.slug}.html`;
 }
 
-export const FEED_SELF_URL = `${BLOG_BASE_URL}blog/atom.xml`;
+export const FEED_SELF_URL = `${BLOG_BASE_URL}atom.xml`;
 
 export function escapeXml(value: string): string {
   return value.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
@@ -60,10 +61,11 @@ function summaryOf(post: BlogPost): string {
 
 function entry(post: BlogPost): string {
   const stamp = atomTimestamp(post.date);
+  const entryId = `${LEGACY_FEED_ID_BASE}${post.slug}.html`;
   const url = feedEntryUrl(post);
   const lines = [
     "  <entry>",
-    `    <id>${escapeXml(url)}</id>`,
+    `    <id>${escapeXml(entryId)}</id>`,
     `    <title>${escapeXml(post.title)}</title>`,
     `    <updated>${stamp}</updated>`,
     "    <author>",

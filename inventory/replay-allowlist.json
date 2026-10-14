@@ -1,0 +1,26 @@
+[
+  {
+    "site": "website/src/lib/atom.ts",
+    "reason": "siteOrigin() indirection lets preview and local builds serve their own origin; feed routes otherwise track core"
+  },
+  {
+    "site": "explorer/scripts/explorer-build-contract.mjs",
+    "reason": "reads the bundle explorer/contract.json through siteInputs instead of spawning the core publisher; version constants track core"
+  },
+  {
+    "site": "explorer/src/lib/__tests__/db-remediation-pin.test.ts",
+    "reason": "same adapted contract source as the contract script; the pinned version tracks core"
+  },
+  {
+    "site": "website/tests/dist-feed.test.ts",
+    "reason": "site proof file for the built feed; extends core coverage with the legacy id-base case"
+  },
+  {
+    "site": "inventory/known-broken-links.json",
+    "reason": "link inventory regenerated for the site build"
+  },
+  {
+    "site": "inventory/allowed-differences.json",
+    "reason": "site-maintained shadow allowlist; carries core entries plus site-shell ones"
+  }
+]
