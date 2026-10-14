@@ -625,12 +625,14 @@ window.__BENCHBOX_PROMPT_CATALOG__ = {
     {
       "cost_class": "free",
       "credential_deployments": [
-        "self-hosted"
+        "self-hosted",
+        "managed"
       ],
       "dependency_check_command": "uv run benchbox check-deps --platform influxdb",
       "dependency_check_platform": "influxdb",
       "deployments": [
-        "self-hosted"
+        "self-hosted",
+        "managed"
       ],
       "id": "influxdb",
       "install_command": "uv add influxdb3-python",
@@ -894,14 +896,12 @@ window.__BENCHBOX_PROMPT_CATALOG__ = {
     {
       "cost_class": "paid_compute",
       "credential_deployments": [
-        "self-hosted",
-        "managed"
+        "self-hosted"
       ],
       "dependency_check_command": "uv run benchbox check-deps --platform singlestore",
       "dependency_check_platform": "singlestore",
       "deployments": [
-        "self-hosted",
-        "managed"
+        "self-hosted"
       ],
       "id": "singlestore",
       "install_command": "uv add singlestoredb",

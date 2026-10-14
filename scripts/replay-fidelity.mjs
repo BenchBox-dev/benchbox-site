@@ -48,7 +48,7 @@ export function seededFilesInCommit(coreRepo, sha) {
 
 export function readCoreBlob(coreRepo, ref, corePath) {
   try {
-    return execFileSync("git", ["-C", coreRepo, "show", `${ref}:${corePath}`], { encoding: "buffer", maxBuffer: 64 * 1024 * 1024 });
+    return execFileSync("git", ["-C", coreRepo, "show", `${ref}:${corePath}`], { encoding: "buffer", maxBuffer: 64 * 1024 * 1024, stdio: ["ignore", "pipe", "ignore"] });
   } catch {
     return null;
   }
@@ -71,7 +71,7 @@ export function checkFidelity({ coreRepo, siteRoot, sinceRef, coreRef }) {
     const siteAbs = path.join(siteRoot, siteRel);
     const blob = readCoreBlob(coreRepo, coreRef, corePath);
     if (blob === null) {
-      results.push({ site: siteRel, core: corePath, commit, state: "core-removed" });
+      results.push({ site: siteRel, core: corePath, commit, state: existsSync(siteAbs) ? "core-removed" : "removed" });
       continue;
     }
     if (!existsSync(siteAbs)) {

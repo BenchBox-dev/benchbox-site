@@ -26,12 +26,15 @@ test("fidelity check passes identical replays and flags the rest", () => {
   writeFileSync(path.join(core, "results-explorer", "src", "kept.ts"), "one\n");
   writeFileSync(path.join(core, "results-explorer", "src", "adapted.ts"), "one\n");
   writeFileSync(path.join(core, "results-explorer", "src", "dropped.ts"), "one\n");
+  writeFileSync(path.join(core, "results-explorer", "src", "retired.ts"), "one\n");
+  writeFileSync(path.join(core, "results-explorer", "src", "lingering.ts"), "one\n");
   git(["add", "."]);
   git(["commit", "-qm", "seed"]);
   const seed = git(["rev-parse", "HEAD"]).trim();
   writeFileSync(path.join(core, "results-explorer", "src", "kept.ts"), "two\n");
   writeFileSync(path.join(core, "results-explorer", "src", "adapted.ts"), "two\n");
   writeFileSync(path.join(core, "results-explorer", "src", "dropped.ts"), "two\n");
+  git(["rm", "-q", "results-explorer/src/retired.ts", "results-explorer/src/lingering.ts"]);
   git(["add", "."]);
   git(["commit", "-qm", "change"]);
   const ref = git(["rev-parse", "HEAD"]).trim();
@@ -39,6 +42,7 @@ test("fidelity check passes identical replays and flags the rest", () => {
   mkdirSync(path.join(site, "inventory"), { recursive: true });
   writeFileSync(path.join(site, "explorer", "src", "kept.ts"), "two\n");
   writeFileSync(path.join(site, "explorer", "src", "adapted.ts"), "site-flavoured two\n");
+  writeFileSync(path.join(site, "explorer", "src", "lingering.ts"), "one\n");
   writeFileSync(
     path.join(site, "inventory", "replay-allowlist.json"),
     JSON.stringify([{ site: "explorer/src/adapted.ts", reason: "fixture adaptation" }]),
@@ -49,9 +53,11 @@ test("fidelity check passes identical replays and flags the rest", () => {
   assert.equal(bySite.get("explorer/src/kept.ts"), "identical");
   assert.equal(bySite.get("explorer/src/adapted.ts"), "allowlisted");
   assert.equal(bySite.get("explorer/src/dropped.ts"), "missing");
+  assert.equal(bySite.get("explorer/src/retired.ts"), "removed");
+  assert.equal(bySite.get("explorer/src/lingering.ts"), "core-removed");
   const { text, blocking } = formatReport({ range, results });
-  assert.equal(blocking.length, 1);
-  assert.match(text, /fidelity: 2\/3 clean, 1 blocking/);
+  assert.equal(blocking.length, 2);
+  assert.match(text, /fidelity: 3\/5 clean, 2 blocking/);
 });
 
 test("allowlist loads keyed by site path", () => {

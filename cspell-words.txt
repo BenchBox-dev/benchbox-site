@@ -39,6 +39,8 @@ changeme
 chenhao
 clickbench
 clickhouse
+Cmissing
+Cmixed
 cnyctaxi
 coffeeshop
 colindex
@@ -48,6 +50,7 @@ colours
 columnstore
 combinators
 crème
+Crun
 cssb
 cudf
 custkey
@@ -139,16 +142,19 @@ matplotlib
 mdxjs
 mirchev
 misclaims
+MLAZ
 modin
 monkeypatch
 mooncake
 motherduck
 mutmut
+neighbouring
 neighbours
 neoverse
 neumann
 nohw
 nojekyll
+nonbaseline
 normalise
 normalised
 notanumber
@@ -157,6 +163,7 @@ notimingdb
 notlabel
 notrun
 notuning
+ntile
 numpy
 nunique
 nyctaxi
@@ -166,6 +173,7 @@ oldschool
 ondemand
 onehouse
 orderdate
+orderkey
 orsted
 Ørsted
 pagefind
@@ -209,6 +217,7 @@ requeryable
 retarget
 retunes
 rewait
+rnkd
 runin
 ryzen
 scriptable
@@ -256,6 +265,7 @@ trendable
 trino
 truecolor
 tsdbadmin
+ualify
 unauditable
 unbuilt
 uncomparable
@@ -266,6 +276,7 @@ unparseable
 unrankable
 unranked
 unrecognised
+unrk
 unscrolled
 unsmartened
 unstub

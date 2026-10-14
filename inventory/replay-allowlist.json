@@ -22,5 +22,25 @@
   {
     "site": "inventory/allowed-differences.json",
     "reason": "site-maintained shadow allowlist; carries core entries plus site-shell ones"
+  },
+  {
+    "site": "explorer/src/pages/Compare.tsx",
+    "reason": "resolves share URLs against SITE_ORIGIN so preview and local builds keep their own origin; otherwise tracks core"
+  },
+  {
+    "site": "explorer/src/pages/Query.tsx",
+    "reason": "resolves the pick and ids parameters against SITE_ORIGIN so preview and local builds keep their own origin; otherwise tracks core"
+  },
+  {
+    "site": "explorer/e2e/captures/followup-usability-release.spec.ts",
+    "reason": "writes captures under explorer/captures because the site has no _project/audits tree; otherwise tracks core"
+  },
+  {
+    "site": "explorer/src/lib/queryRunComparison.ts",
+    "reason": "resolves comparison URLs against SITE_ORIGIN so preview and local builds keep their own origin; otherwise tracks core"
+  },
+  {
+    "site": "explorer/src/components/RunReceipt.tsx",
+    "reason": "falls back to SITE_ORIGIN outside the browser so preview and local builds keep their own origin; otherwise tracks core"
   }
 ]
