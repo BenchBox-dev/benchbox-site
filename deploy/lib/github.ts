@@ -29,19 +29,37 @@ export function githubApi(token = process.env.GH_TOKEN ?? process.env.GITHUB_TOK
   };
 }
 
-export type RecordedReceipt = { deploymentId: number; sha: string; runId: string };
+export type RecordedReceipt = { deploymentId: number; sha: string; runId: string; target: string | null };
 
-export async function recordedReceipts(api: Api, repo: string, environment = "github-pages"): Promise<RecordedReceipt[]> {
-  const deployments = await api(`repos/${repo}/deployments?environment=${environment}&per_page=100`);
-  if (deployments.status !== 200) throw new Error(`listing deployments failed closed (HTTP ${deployments.status})`);
+export async function recordedReceipts(
+  api: Api,
+  repo: string,
+  environment = "github-pages",
+  target?: string,
+  load?: (runId: string) => Receipt,
+): Promise<RecordedReceipt[]> {
   const recorded: RecordedReceipt[] = [];
-  for (const deployment of deployments.body as { id: number }[]) {
-    const statuses = await api(`repos/${repo}/deployments/${deployment.id}/statuses?per_page=100`);
-    if (statuses.status !== 200) throw new Error(`reading deployment ${deployment.id} statuses failed closed (HTTP ${statuses.status})`);
-    for (const status of statuses.body as { state: string; description: string | null }[]) {
-      const parsed = status.state === "success" ? parseStatusDescription(status.description) : null;
-      if (parsed) {
-        recorded.push({ deploymentId: deployment.id, ...parsed });
+  for (let page = 1; ; page += 1) {
+    const deployments = await api(`repos/${repo}/deployments?environment=${environment}&per_page=100&page=${page}`);
+    if (deployments.status !== 200) throw new Error(`listing deployments failed closed (HTTP ${deployments.status})`);
+    const rows = deployments.body as { id: number }[];
+    if (rows.length === 0) break;
+    for (const deployment of rows) {
+      const statuses = await api(`repos/${repo}/deployments/${deployment.id}/statuses?per_page=100`);
+      if (statuses.status !== 200)
+        throw new Error(`reading deployment ${deployment.id} statuses failed closed (HTTP ${statuses.status})`);
+      for (const status of statuses.body as { state: string; description: string | null }[]) {
+        const parsed = status.state === "success" ? parseStatusDescription(status.description) : null;
+        if (!parsed) continue;
+        const resolved =
+          parsed.target ??
+          (load
+            ? verifiedReceipt({ deploymentId: deployment.id, sha: parsed.sha, runId: parsed.runId, target: null }, load)
+                .target
+            : null);
+        if (target === undefined || resolved === target) {
+          recorded.push({ deploymentId: deployment.id, sha: parsed.sha, runId: parsed.runId, target: resolved });
+        }
         break;
       }
     }

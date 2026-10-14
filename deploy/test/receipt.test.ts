@@ -15,7 +15,11 @@ test("the deployment status description round-trips and fits GitHub's limit", ()
   const value = receipt({ run_id: "37884131752" });
   const description = statusDescription(value);
   assert.ok(description.length <= 140);
-  assert.deepEqual(parseStatusDescription(description), { sha: receiptSha(value), runId: "37884131752" });
+  assert.deepEqual(parseStatusDescription(description), {
+    sha: receiptSha(value),
+    runId: "37884131752",
+    target: "rehearsal",
+  });
   assert.equal(parseStatusDescription("deployed"), null);
 });
 
