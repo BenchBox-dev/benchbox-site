@@ -1,17 +1,15 @@
 # Browser-test fixture sources
 
-Deterministic input corpus for the results-explorer browser-functional
-test suite. The generator script
-`results-explorer/scripts/generate-browser-fixtures.mjs` copies files
-from here into `../.generated/source/`, applies controlled metadata
-variants, and then runs
-`uv run -- python _project/scripts/explorer_publish.py build` to produce
-`../.generated/data/results.duckdb` plus the companion bundle copies.
+Deterministic input corpus for the Explorer browser-functional test suite.
+Core owns these files and builds the browser fixtures from them. The core
+bundle carries the result in `explorer/fixtures`, and
+`explorer/scripts/generate-browser-fixtures.mjs` stages it from
+`.site-inputs/` into `../.generated/`. That script does not read this
+directory. Unit and browser tests read the bundles here directly, for
+example `localResult.test.ts` and `local-result-preview.spec.ts`.
 
-The curated public corpus under `results-explorer/public/data/` and the
-source corpus under `results-data/bundles/` are never touched during a
-test run. See `docs/development/browser-test-architecture.md` for the
-full rationale.
+Change these files in core and replay them. See "Replaying core changes" in
+the repository `AGENTS.md`.
 
 ## Why these specific bundles
 
@@ -19,9 +17,9 @@ full rationale.
   CedarDB** - gives a valid ≥4-platform compare cohort at a single
   `benchmark × scale_factor × phase` key, which is required for the
   compare-happy-path and honesty-control tests. All five are
-  byte-for-byte copies of curated `results-data/bundles` power runs
-  (see `provenance/*.source.manifest.json`, hash-verified by the
-  generator before use). The Polars source is a genuine SF 0.01 power
+  byte-for-byte copies of curated core `results-data/bundles` power runs
+  (see `provenance/*.source.manifest.json`, hash-verified by core's
+  fixture builder before use). The Polars source is a genuine SF 0.01 power
   run over a partial query subset (60k lineitem rows, matching SF 0.01
   scale); its narrower query coverage is real, not rescaled.
   Pandas stays a `standard`-phase fixture because its source is a `power`
@@ -32,15 +30,15 @@ full rationale.
 
 The Pandas input is a byte-for-byte copy of the immutable internal corpus
 bundle named in `provenance/tpch-pandas-sf0.01-20260826-8bde2222.source.manifest.json`.
-The generator verifies both hashes before use. Its source is a `power` run;
+Core's fixture builder verifies both hashes before use. Its source is a `power` run;
 the standard-phase Pandas row is generated under `synthetic/` with run ID
 `8bde2222-fixture-standard`. It is therefore fixture-only, not relabelled
 contributed evidence.
 
 ## Generator-derived honesty coverage
 
-The generator also synthesises additive variants from these sources
-(never written back here):
+Core's fixture builder also synthesises additive variants from these
+sources (never written back here):
 
 - **Trust labels** - `maintainer-run` (verbatim sources),
   `community-submission` (DuckDB under `community/` with a submission
@@ -55,9 +53,8 @@ The generator also synthesises additive variants from these sources
 
 ## Adding new sources
 
-Prefer reusing existing curated bundles from
-`results-explorer/public/data/bundles/` or `results-data/bundles/` rather
-than committing new fixtures. If a variant cannot be expressed by copying
-an existing bundle plus a sidecar or metadata mutation, that's a signal
-the explorer pipeline needs the capability - raise the question before
-growing this directory.
+Prefer reusing existing curated bundles from core's `results-data/bundles/`
+rather than committing new fixtures. If a variant cannot be expressed by
+copying an existing bundle plus a sidecar or metadata mutation, that's a
+signal the core explorer pipeline needs the capability - raise the question
+before growing this directory.
