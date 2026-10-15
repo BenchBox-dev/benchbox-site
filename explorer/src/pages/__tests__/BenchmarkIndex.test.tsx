@@ -1230,7 +1230,7 @@ describe("BenchmarkIndex", () => {
     const trustFilter = screen.getByTestId("benchmark-trust-filter") as HTMLSelectElement;
     const optionLabels = Array.from(trustFilter.options).map((option) => option.text);
     expect(optionLabels).toContain("Maintainer run");
-    expect(optionLabels).toContain("Community submission");
+    expect(optionLabels).toContain("Community Submission");
   });
 
   it("keeps active matrix controls on the data surface theme contract", async () => {

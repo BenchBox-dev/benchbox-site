@@ -64,7 +64,7 @@ describe("CohortFilterPanel", () => {
       options: [
         { value: "all", label: "All tiers" },
         { value: "maintainer-run", label: "Maintainer run" },
-        { value: "community-submission", label: "Community submission" },
+        { value: "community-submission", label: "Community Submission" },
       ],
       multiValueOption: { value: "__multiple__", label: "2 tiers selected" },
     });

@@ -107,7 +107,7 @@ const sectionLinks = [
     <section class="ticker" aria-label="Benchmarks BenchBox runs">
       <div class="ticker__track">
         <ul class="ticker__list">{tickerItems.map((item) => <li>{item}</li>)}</ul>
-        <ul class="ticker__list" aria-hidden="true">{tickerItems.map((item) => <li>{item}</li>)}</ul>
+        <ul class="ticker__list" aria-hidden="true" inert>{tickerItems.map((item) => <li>{item}</li>)}</ul>
       </div>
     </section>
 
@@ -209,8 +209,8 @@ const sectionLinks = [
                         <p class="results-example-card__label">TPC-H · Scale factor 10</p>
                         <h3>Four DuckDB versions, one comparable cohort</h3>
                     </div>
-                    <a href="/results/compare?ids=6235bd1a,47bdcef5,282a4d75,19b96c85"
-                        >View comparison ↗</a>
+                    <a href="/results/?compare=true&ids=6235bd1a,47bdcef5,282a4d75,19b96c85"
+                        >View comparison →</a>
                 </div>
                 <dl class="results-example-stats">
                     <div><dt>Platforms</dt><dd>4</dd></div>
@@ -225,7 +225,7 @@ const sectionLinks = [
                         </thead>
                         <tbody>
                             <tr class="results-series results-series--blue">
-                                <th><span></span>DuckDB v2.0.0…</th><td>128 ms</td>
+                                <th title="DuckDB v2.0.0-dev" aria-label="DuckDB v2.0.0-dev"><span></span>DuckDB v2.0.0…</th><td>128 ms</td>
                                 <td><i style="--bar-size: 100%"></i><b>281,041</b></td>
                             </tr>
                             <tr class="results-series results-series--green">
@@ -248,9 +248,9 @@ const sectionLinks = [
             <figure class="results-example-card results-example-card--chart">
                 <figcaption>
                     <span><strong>Latency distribution</strong>Range and middle 50% for all 22 queries</span>
-                    <a href="/results/compare?ids=6235bd1a,47bdcef5,282a4d75,19b96c85"
+                    <a href="/results/?chart=distribution_box&ids=6235bd1a,47bdcef5,282a4d75,19b96c85"
                         aria-label="Explore the full latency distribution comparison"
-                        >Explore ↗</a>
+                        >Explore →</a>
                 </figcaption>
                 <svg viewBox="0 0 640 195" role="img" aria-label="Box plots of query latency by DuckDB version">
                     <g class="results-chart-grid">
@@ -262,7 +262,7 @@ const sectionLinks = [
                         <line x1="582.8" y1="12" x2="582.8" y2="158"></line>
                     </g>
                     <g class="results-chart-labels">
-                        <text x="8" y="37">v2.0.0…</text><text x="8" y="73">v1.5.5</text>
+                        <text x="8" y="37" aria-label="DuckDB v2.0.0-dev">v2.0.0…</text><text x="8" y="73">v1.5.5</text>
                         <text x="8" y="109">v1.4.4</text><text x="8" y="145">v1.3.2</text>
                     </g>
                     <g class="results-boxplot results-series--blue">
@@ -290,9 +290,9 @@ const sectionLinks = [
             <figure class="results-example-card results-example-card--chart">
                 <figcaption>
                     <span><strong>Cumulative latency</strong>Share of queries completed by each latency</span>
-                    <a href="/results/compare?ids=6235bd1a,47bdcef5,282a4d75,19b96c85"
+                    <a href="/results/?chart=cdf_chart&ids=6235bd1a,47bdcef5,282a4d75,19b96c85"
                         aria-label="Explore the full cumulative latency comparison"
-                        >Explore ↗</a>
+                        >Explore →</a>
                 </figcaption>
                 <svg viewBox="0 0 640 230" role="img" aria-label="Cumulative query latency by DuckDB version">
                     <g class="results-chart-grid">
@@ -316,7 +316,7 @@ const sectionLinks = [
                     </g>
                 </svg>
                 <ul class="results-chart-legend" aria-label="DuckDB versions">
-                    <li class="results-series--blue"><span></span>v2.0.0…</li>
+                    <li class="results-series--blue" title="DuckDB v2.0.0-dev" aria-label="DuckDB v2.0.0-dev"><span></span>v2.0.0…</li>
                     <li class="results-series--green"><span></span>v1.5.5</li>
                     <li class="results-series--orange"><span></span>v1.4.4</li>
                     <li class="results-series--purple"><span></span>v1.3.2</li>
@@ -346,6 +346,7 @@ const sectionLinks = [
               Open a BenchBox result JSON file locally in the browser. Review its charts and run receipt without
               uploading it or adding it to the public rankings.
             </p>
+            <a href="/results/?mode=local" class="step__link">Open local result file →</a>
           </li>
         </ol>
       </div>

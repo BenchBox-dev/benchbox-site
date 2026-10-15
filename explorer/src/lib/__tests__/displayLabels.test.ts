@@ -19,7 +19,7 @@ import {
 describe("formatTrustLabel", () => {
   it("humanizes the canonical trust labels", () => {
     expect(formatTrustLabel("maintainer-run")).toBe("Maintainer run");
-    expect(formatTrustLabel("community-submission")).toBe("Community submission");
+    expect(formatTrustLabel("community-submission")).toBe("Community Submission");
   });
 
   it("returns 'unknown' for null/empty values", () => {

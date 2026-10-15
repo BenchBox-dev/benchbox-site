@@ -41,6 +41,21 @@
         max-width: 100%;
         overflow-x: auto;
     }
+
+    .skip-link {
+        position: absolute;
+        top: 0;
+        left: 0;
+        z-index: 2000;
+        padding: 0.75rem 1rem;
+        background: var(--bb-surface-elevated, #24141e);
+        color: var(--bb-data-fg-primary, #fbf7f4);
+        transform: translateY(-100%);
+    }
+
+    .skip-link:focus {
+        transform: none;
+    }
 }
 
 @layer components {

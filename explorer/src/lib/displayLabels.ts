@@ -3,7 +3,7 @@ import { humanizeBenchmark } from "@/utils";
 
 const TRUST_LABEL_LABELS: Record<string, string> = {
   "maintainer-run": "Maintainer run",
-  "community-submission": "Community submission",
+  "community-submission": "Community Submission",
   "local-run": "Local run",
 };
 

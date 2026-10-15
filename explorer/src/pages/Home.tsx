@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "preact/hooks";
 import type { RoutableProps } from "preact-router";
+import { route } from "preact-router";
 import type { MetaLeaderboard as MetaLeaderboardData } from "@/types";
 import type { ResultRow } from "@/lib/duckdbQueries";
 import { getMetaLeaderboardData, listResults } from "@/lib/duckdbQueries";
@@ -31,6 +32,26 @@ export function Home(_: RoutableProps) {
   const [metaLeaderboard, setMetaLeaderboard] = useState<MetaLeaderboardData | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [resultsRetryToken, setResultsRetryToken] = useState(0);
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const search = window.location.search;
+    const hash = window.location.hash;
+    const params = new URLSearchParams(search);
+    if (params.get("mode") === "local" || hash === "#local") {
+      route("/results/local", true);
+      return;
+    }
+    const ids = params.get("ids");
+    const chart = params.get("chart");
+    const compare = params.get("compare");
+    if (ids || compare || chart) {
+      const q = new URLSearchParams();
+      if (ids) q.set("ids", ids);
+      if (chart) q.set("chart", chart);
+      route(`/results/compare?${q.toString()}`, true);
+    }
+  }, []);
 
   useEffect(() => {
     let cancelled = false;

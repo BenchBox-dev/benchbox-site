@@ -13,7 +13,14 @@
     <h2 id="search-dialog-title">Search docs and blog</h2>
     <form method="dialog"><button class="search-close" aria-label="Close search">Close</button></form>
   </div>
-  <div data-search-mount></div>
+  <div data-search-mount>
+    <div class="search-dialog__fallback">
+      <input type="search" placeholder="Search documentation and blog..." aria-label="Search docs and blog" class="search-dialog__fallback-input" />
+    </div>
+  </div>
+  <div class="search-dialog__footer">
+    <a href="/results/" class="search-dialog__results-link">Looking for benchmark runs? Explore Results →</a>
+  </div>
 </dialog>
 
 <script>
@@ -31,6 +38,9 @@
       script.src = "/pagefind/pagefind-ui.js";
       script.onload = () => {
         const mount = dialog?.querySelector("[data-search-mount]");
+        if (mount) {
+          mount.innerHTML = "";
+        }
         const Ui = (window as unknown as { PagefindUI: new (options: object) => unknown }).PagefindUI;
         new Ui({ element: mount, showSubResults: true, showImages: false });
         resolve();
