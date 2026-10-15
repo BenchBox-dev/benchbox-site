@@ -15,6 +15,16 @@
     "excluded": true
   },
   {
+    "site": "drafts/PUBLICATION_SCHEDULE.md",
+    "reason": "site repo publication path update",
+    "expectedDiff": "2d5cd11e53537141066de9d6b70978022809d1280a8d0dcb1bcd289594ea20b7"
+  },
+  {
+    "site": "drafts/PUBLISHING.md",
+    "reason": "site repo publishing workflow description",
+    "expectedDiff": "b97585fa19372c5cc9489c3e5bc5584a5487a7ba5c88f2216d5aeb151f39b6e4"
+  },
+  {
     "site": "drafts/table-formats/research/format_benchmark.py",
     "reason": "research helper scripts are not carried",
     "excluded": true
@@ -73,6 +83,11 @@
     "site": "explorer/e2e/captures/responsive-a11y-pass.spec.ts",
     "reason": "capture paths point at explorer/captures",
     "expectedDiff": "f69626db0fb1a6fac1e381934d6d02025fb31e4f57e95647422893f60f97b216"
+  },
+  {
+    "site": "explorer/e2e/README.md",
+    "reason": "explorer test fixture provenance from core bundle",
+    "expectedDiff": "fc8363cf5a4254673806a3c399a12de98a448b7164589bfac8659b6a74898deb"
   },
   {
     "site": "explorer/e2e/routes/header.spec.ts",
@@ -150,14 +165,14 @@
     "expectedDiff": "e3dfbbeea2916c9ddde28cbdb0b8c77c715ad7016e2114bb4b25d61d307eab70"
   },
   {
-    "site": "explorer/src/components/RunReceipt.tsx",
-    "reason": "falls back to SITE_ORIGIN outside the browser so preview and local builds keep their own origin; otherwise tracks core",
-    "expectedDiff": "dadf32590118719ae037fec714acf25237db24c34bbb60b77e6fe89118053610"
-  },
-  {
     "site": "explorer/src/components/headerContract.ts",
     "reason": "site origin indirection for preview builds",
     "expectedDiff": "1d1c1e4ee3f80705bbbf888466d15454d62ed40f443dc5bdb5e8098ea6df76b7"
+  },
+  {
+    "site": "explorer/src/components/RunReceipt.tsx",
+    "reason": "falls back to SITE_ORIGIN outside the browser so preview and local builds keep their own origin; otherwise tracks core",
+    "expectedDiff": "dadf32590118719ae037fec714acf25237db24c34bbb60b77e6fe89118053610"
   },
   {
     "site": "explorer/src/components/shellModel.ts",
@@ -193,6 +208,11 @@
     "site": "explorer/src/pages/Query.tsx",
     "reason": "resolves the pick and ids parameters against SITE_ORIGIN so preview and local builds keep their own origin; otherwise tracks core",
     "expectedDiff": "7e3b21caa8bd83fec22dfa66f317af9649892e45b34aff38f2e3dc9f4ca84531"
+  },
+  {
+    "site": "explorer/test-fixtures/source/README.md",
+    "reason": "explorer fixture provenance note",
+    "expectedDiff": "d813f38dddc3e9e474929981fc4ba05c4fe6c19147131837565ff949ed2fa02b"
   },
   {
     "site": "explorer/tsconfig.json",
