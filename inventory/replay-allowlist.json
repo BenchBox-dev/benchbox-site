@@ -4,6 +4,14 @@
     "reason": "siteOrigin() indirection lets preview and local builds serve their own origin; feed routes otherwise track core"
   },
   {
+    "site": "explorer/e2e/README.md",
+    "reason": "describes the site layout and bundle-staged fixtures (npm run bundle:fetch, explorer/ paths) instead of core's results-explorer paths"
+  },
+  {
+    "site": "explorer/test-fixtures/source/README.md",
+    "reason": "states that the core bundle carries the browser fixtures and that these sources are core-owned; core's text describes its own generator"
+  },
+  {
     "site": "explorer/scripts/explorer-build-contract.mjs",
     "reason": "reads the bundle explorer/contract.json through siteInputs instead of spawning the core publisher; version constants track core"
   },
