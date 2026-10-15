@@ -1,7 +1,7 @@
 import { createHash } from "node:crypto";
 
 export const RECEIPT_SCHEMA = "site-deploy-receipt/v1";
-export const RECEIPT_STATUS = /^site-deploy receipt sha256:([0-9a-f]{64}) run:(\d+)$/;
+export const RECEIPT_STATUS = /^site-deploy receipt sha256:([0-9a-f]{64}) run:(\d+)(?: target:(\S+))?$/;
 
 export type GateSummary = { ok: boolean; results: Record<string, string> };
 export type ProbeSummary = { ok: boolean; matched: number; mismatched: string[]; errors: string[]; attempts: number };
@@ -66,12 +66,15 @@ export function receiptSha(receipt: Receipt): string {
 }
 
 export function statusDescription(receipt: Receipt): string {
-  return `site-deploy receipt sha256:${receiptSha(receipt)} run:${receipt.run_id}`;
+  return `site-deploy receipt sha256:${receiptSha(receipt)} run:${receipt.run_id} target:${receipt.target}`;
 }
 
-export function parseStatusDescription(description: string | null | undefined): { sha: string; runId: string } | null {
+export function parseStatusDescription(
+  description: string | null | undefined,
+): { sha: string; runId: string; target?: string } | null {
   const match = RECEIPT_STATUS.exec(description ?? "");
-  return match ? { sha: match[1], runId: match[2] } : null;
+  if (!match) return null;
+  return { sha: match[1], runId: match[2], ...(match[3] ? { target: match[3] } : {}) };
 }
 
 export function receiptErrors(receipt: Partial<Receipt>): string[] {
