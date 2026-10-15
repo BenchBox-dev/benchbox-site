@@ -1,25 +1,26 @@
-# results-explorer browser-functional tests
+# Explorer browser-functional tests
 
-Playwright suite that exercises the built explorer (`dist/`) against a
-per-run generated fixture corpus. Architecture decisions live in
-[`docs/development/browser-test-architecture.md`](../../docs/development/browser-test-architecture.md).
+Playwright suite that exercises the built explorer (`dist/`) against the
+fixture corpus that the core bundle carries. Architecture decisions live in
+core, in `docs/internal/browser-test-architecture.md` of `BenchBox-dev/BenchBox`.
 
 ## One-shot local run
 
 ```bash
-cd results-explorer
 npm ci
+npm run bundle:fetch
+cd explorer
 npm run test:e2e:install
 npm run test:e2e:chromium
 npm run test:e2e:full
 ```
 
-`test:e2e:install` runs once and downloads the browser binaries. `test:e2e:chromium` writes fixtures, rebuilds `dist/` and runs Chromium. `test:e2e:full` is the local full-matrix convenience entrypoint.
+`test:e2e:install` runs once and downloads the browser binaries. `test:e2e:chromium` stages the bundle's fixtures, rebuilds `dist/` and runs Chromium. `test:e2e:full` is the local full-matrix convenience entrypoint.
 
 For a brand-new machine, `npm run test:e2e:chromium:setup` wraps the browser
 install and then runs the same deterministic Chromium entrypoint.
 
-The browser scripts regenerate `test-fixtures/.generated/`, rebuild `dist/`,
+The browser scripts restage `test-fixtures/.generated/` from `.site-inputs/`, rebuild `dist/`,
 and then invoke Playwright, which starts the static server in
 `scripts/serve-browser-tests.mjs`. The server mounts `dist/` at `/results/`
 and routes `/results/data/` to `test-fixtures/.generated/data/`.
@@ -41,11 +42,10 @@ and routes `/results/data/` to `test-fixtures/.generated/data/`.
   tests are Chromium-only by default.
 - Prefer user-visible assertions (rendered copy, visible error banner)
   over internal state or console noise.
-- Never mutate `results-explorer/public/data/` or `results-data/bundles/`;
-  use the fixture generator or Playwright route interception instead.
+- Never mutate `explorer/public/data/` or the bundle in `.site-inputs/`;
+  use the fixture staging script or Playwright route interception instead.
 
 ## See also
 
-- [docs/operations/results-explorer-qa.md](../../docs/operations/results-explorer-qa.md)
-  — the manual end-to-end QA test plan that pairs with this automated
-  suite. Run it before declaring a release candidate green.
+- `docs/internal/results-explorer-qa.md` in `BenchBox-dev/BenchBox` — the
+  manual end-to-end QA test plan that pairs with this automated suite.

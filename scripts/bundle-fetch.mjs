@@ -11,11 +11,33 @@ import { CORE_REPO, githubJson, verifyWithCertification } from "./bundle-verify.
 
 const ARTIFACT_PREFIX = "site-inputs-";
 
+export function producingRunErrors(run) {
+  const errors = [];
+  if (!run) return ["producing site-inputs run not found"];
+  if (String(run.repository?.full_name ?? "").toLowerCase() !== CORE_REPO.toLowerCase())
+    errors.push(`producing run is in ${run.repository?.full_name}, not ${CORE_REPO}`);
+  if (run.path !== ".github/workflows/site-inputs.yml")
+    errors.push(`producing run is ${run.path}, not site-inputs.yml`);
+  if (run.head_branch !== "develop") errors.push(`producing run branch is ${run.head_branch}, not develop`);
+  if (run.event !== "workflow_run" && run.event !== "workflow_dispatch")
+    errors.push(`producing run event is ${run.event}, not workflow_run or workflow_dispatch`);
+  if (run.conclusion !== "success") errors.push(`producing run concluded ${run.conclusion}`);
+  return errors;
+}
+
+export async function producingRun(runId, env = process.env) {
+  const run = await githubJson(`repos/${CORE_REPO}/actions/runs/${runId}`, env);
+  const errors = producingRunErrors(run);
+  if (errors.length > 0) throw new Error(errors.join("; "));
+  return run;
+}
+
 export async function newestBundle(env = process.env) {
   if (env.SITE_INPUTS_RUN_ID) {
     const { artifacts } = await githubJson(`repos/${CORE_REPO}/actions/runs/${env.SITE_INPUTS_RUN_ID}/artifacts`, env);
     const artifact = artifacts.find((item) => item.name.startsWith(ARTIFACT_PREFIX) && !item.expired);
     if (!artifact) throw new Error(`run ${env.SITE_INPUTS_RUN_ID} has no unexpired site-inputs artifact`);
+    await producingRun(env.SITE_INPUTS_RUN_ID, env);
     return { runId: env.SITE_INPUTS_RUN_ID, artifact };
   }
   if (env.SITE_INPUTS_CORE_SHA) {
@@ -23,6 +45,7 @@ export async function newestBundle(env = process.env) {
     const { artifacts } = await githubJson(`repos/${CORE_REPO}/actions/artifacts?name=${name}&per_page=10`, env);
     const artifact = artifacts.find((item) => !item.expired && item.workflow_run?.head_branch === "develop");
     if (!artifact) throw new Error(`no unexpired develop bundle is named ${name}`);
+    await producingRun(artifact.workflow_run.id, env);
     return { runId: String(artifact.workflow_run.id), artifact };
   }
   const { workflow_runs: runs } = await githubJson(
