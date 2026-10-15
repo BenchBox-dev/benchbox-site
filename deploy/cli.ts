@@ -53,8 +53,8 @@ type Resolution = {
 };
 
 async function currentDeployed(): Promise<{ receipt: Receipt; sha: string } | null> {
-    const deployTarget = process.env.SITE_DEPLOY_TARGET || undefined;
-    const recorded = await recordedReceipts(githubApi(), SITE_REPO, "github-pages", deployTarget, (runId) =>
+  const target = process.env.SITE_DEPLOY_TARGET || undefined;
+  const recorded = await recordedReceipts(githubApi(), SITE_REPO, "github-pages", target, (runId) =>
     downloadReceipt(SITE_REPO, runId),
   );
   if (recorded.length === 0) return null;
