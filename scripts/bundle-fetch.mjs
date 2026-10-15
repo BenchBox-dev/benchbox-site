@@ -16,7 +16,7 @@ export function producingRunErrors(run) {
   if (!run) return ["producing site-inputs run not found"];
   if (String(run.repository?.full_name ?? "").toLowerCase() !== CORE_REPO.toLowerCase())
     errors.push(`producing run is in ${run.repository?.full_name}, not ${CORE_REPO}`);
-  if (!/(^|\/)site-inputs\.ya?ml$/.test(run.path ?? ""))
+  if (run.path !== ".github/workflows/site-inputs.yml")
     errors.push(`producing run is ${run.path}, not site-inputs.yml`);
   if (run.head_branch !== "develop") errors.push(`producing run branch is ${run.head_branch}, not develop`);
   if (run.event !== "workflow_run" && run.event !== "workflow_dispatch")

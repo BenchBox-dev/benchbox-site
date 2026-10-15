@@ -49,6 +49,12 @@ test("a run from another workflow is refused", () => {
   assert.ok(errors[0].includes("trunk.yml"));
 });
 
+test("a nested workflow with the same name is refused", () => {
+  const errors = producingRunErrors({ ...RUN, path: "nested/.github/workflows/site-inputs.yml" });
+  assert.equal(errors.length, 1);
+  assert.ok(errors[0].includes("nested/.github/workflows/site-inputs.yml"));
+});
+
 test("a non-develop branch is refused", () => {
   const errors = producingRunErrors({ ...RUN, head_branch: "feature" });
   assert.equal(errors.length, 1);
