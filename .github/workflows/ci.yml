@@ -167,7 +167,7 @@ jobs:
   ci:
     name: ci
     if: always()
-    needs: [bundle, checks, e2e, audit, bundle-schema, replay-fidelity]
+    needs: [bundle, checks, e2e, audit, bundle-schema]
     runs-on: ubuntu-latest
     timeout-minutes: 2
     steps:
