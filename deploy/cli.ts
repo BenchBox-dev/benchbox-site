@@ -53,8 +53,8 @@ type Resolution = {
 };
 
 async function currentDeployed(): Promise<{ receipt: Receipt; sha: string } | null> {
-  const target = process.env.SITE_DEPLOY_TARGET || undefined;
-  const recorded = await recordedReceipts(githubApi(), SITE_REPO, "github-pages", target, (runId) =>
+    const deployTarget = process.env.SITE_DEPLOY_TARGET || undefined;
+    const recorded = await recordedReceipts(githubApi(), SITE_REPO, "github-pages", deployTarget, (runId) =>
     downloadReceipt(SITE_REPO, runId),
   );
   if (recorded.length === 0) return null;
@@ -83,10 +83,10 @@ async function resolve(): Promise<void> {
   if (mode === "rollback") {
     const runId = process.env.ROLLBACK_RUN_ID ?? "";
     if (!/^\d+$/.test(runId)) failWith(["rollback needs a numeric receipt run id"]);
-    const target = process.env.SITE_DEPLOY_TARGET || undefined;
+    const deployTarget = process.env.SITE_DEPLOY_TARGET || undefined;
     const recorded =
       (
-        await recordedReceipts(githubApi(), SITE_REPO, "github-pages", target, (id) => downloadReceipt(SITE_REPO, id))
+        await recordedReceipts(githubApi(), SITE_REPO, "github-pages", deployTarget, (id) => downloadReceipt(SITE_REPO, id))
       ).find((entry) => entry.runId === runId) ?? null;
     const target = recorded ? verifiedReceipt(recorded, (id) => downloadReceipt(SITE_REPO, id)) : null;
     const errors = rollbackTargetErrors(target, runId);
