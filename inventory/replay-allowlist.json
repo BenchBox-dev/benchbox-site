@@ -15,16 +15,6 @@
     "excluded": true
   },
   {
-    "site": "drafts/PUBLICATION_SCHEDULE.md",
-    "reason": "site repo publication path update",
-    "expectedDiff": "2d5cd11e53537141066de9d6b70978022809d1280a8d0dcb1bcd289594ea20b7"
-  },
-  {
-    "site": "drafts/PUBLISHING.md",
-    "reason": "site repo publishing workflow description",
-    "expectedDiff": "b97585fa19372c5cc9489c3e5bc5584a5487a7ba5c88f2216d5aeb151f39b6e4"
-  },
-  {
     "site": "drafts/table-formats/research/format_benchmark.py",
     "reason": "research helper scripts are not carried",
     "excluded": true
@@ -172,7 +162,7 @@
   {
     "site": "explorer/src/components/RunReceipt.tsx",
     "reason": "falls back to SITE_ORIGIN outside the browser so preview and local builds keep their own origin; otherwise tracks core",
-    "expectedDiff": "dadf32590118719ae037fec714acf25237db24c34bbb60b77e6fe89118053610"
+    "expectedDiff": "30cdb9f8da38b6c1cebd54500ce46bedee3b6a75259cee1874776954c760311b"
   },
   {
     "site": "explorer/src/components/shellModel.ts",
@@ -202,7 +192,7 @@
   {
     "site": "explorer/src/pages/Compare.tsx",
     "reason": "resolves share URLs against SITE_ORIGIN so preview and local builds keep their own origin; otherwise tracks core",
-    "expectedDiff": "5d11e853f9876c6ff97d0d7f22d8550fdbde9ce2fbc421cd51df2ec9c076802b"
+    "expectedDiff": "858c49ea3f43e9af754628c77764bd831641e2c5007297e482487a05d3373526"
   },
   {
     "site": "explorer/src/pages/Query.tsx",
@@ -228,11 +218,6 @@
     "site": "inventory/known-broken-links.json",
     "reason": "link inventory regenerated for the site build",
     "expectedDiff": "f1b4b34065fbd4d1024936f8acb1d30f04c1e0a1b45233da168456532f108f22"
-  },
-  {
-    "site": "landing/prompts/catalog.yaml",
-    "reason": "superseded by the bundle prompt catalog input",
-    "excluded": true
   },
   {
     "site": "website/astro.config.ts",
@@ -328,11 +313,6 @@
     "site": "website/src/lib/prompt-catalog.ts",
     "reason": "bundle prompt catalog input",
     "expectedDiff": "55c6a750d5e54dd4f3f4762d794beb894740838eb3146ab2e157f53d0e020f15"
-  },
-  {
-    "site": "website/src/pages/index.astro",
-    "reason": "release version from the bundle manifest",
-    "expectedDiff": "3e3c6576fd5afa373f4863f7474d166587ded3f0abf19fcff6d1ae869cb9257c"
   },
   {
     "site": "website/tests/blog-feed.test.ts",
