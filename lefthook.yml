@@ -9,6 +9,7 @@ pre-commit:
     markdown:
       glob: "*.md"
       exclude:
+        - "blog/**"
         - "drafts/**"
         - "inventory/**"
       run: npx markdownlint-cli2 {staged_files}
