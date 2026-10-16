@@ -297,3 +297,4 @@ xlarge
 xsmall
 zipfian
 zstd
+sfqid
