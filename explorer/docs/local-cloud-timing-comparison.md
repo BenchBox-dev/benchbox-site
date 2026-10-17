@@ -1,20 +1,22 @@
 # Comparing Local and Cloud Runs: Round-Trip Latency
 
 How the Explorer should compare an in-process run (DuckDB, Polars) with a
-networked run (Snowflake, BigQuery), and whether to leave client
+networked run (Snowflake, Redshift), and whether to leave client
 round-trip time out of the comparison.
 
 **Decision in brief:**
 
 - End-to-end time stays the only default, on every page.
-- Users can choose to leave out the client round trip that BenchBox
-  measured. This view is labeled *round trip removed (estimated)*. It is
-  shown next to end-to-end time, never in place of it.
+- On Compare, users can choose to leave out the client round trip that
+  BenchBox measured. This view is labeled *round trip removed
+  (estimated)*. It is shown with end-to-end time, never in place of it.
+- An adapter gets that view only after core shows that its round-trip
+  probe measures transport, not server work.
 - Embedded runs have no network between client and engine, so they keep
   their end-to-end time in every view.
 - Core captures the timings each platform reports for every query and
   keeps them in the result bundles. They stay out of the Explorer for
-  now and can be added later if a page needs them.
+  now.
 - Before any of this ships, fix the timers in core so they stop counting
   work that is not the query.
 
@@ -25,7 +27,7 @@ means different things on each side of a local-vs-cloud comparison:
 
 | Run | What `ms` covers |
 | --- | --- |
-| DuckDB (embedded, local storage) | Engine work plus the Python fetch. No network. |
+| DuckDB (embedded) | Engine work plus the Python fetch. No network. |
 | Snowflake, TPC power test | Cursor setup; an `ALTER SESSION SET QUERY_TAG` round trip; the query round trip with queue, compile, execute and result transfer; then, still inside the outer timer, a `QUERY_HISTORY` lookup round trip, row count validation and `commit()`. Multi-statement queries add `BEGIN` and `COMMIT` round trips. |
 | BigQuery, TPC power test | SQL rewrite, job submit, job wait, result fetch, and plan capture when it is not deferred. |
 | Redshift, TPC power test | The query, plus `pg_last_query_id()` and `stl_query` lookups and a plan merge. |
@@ -48,10 +50,20 @@ and partly the network.
 ### What exists today
 
 - **Per query:** one time, `duration_ms`, which becomes `display_ms`.
-- **Per run:** a round-trip floor, `statement_overhead_{min,median}_ms`.
-  It comes from 1 warmup plus 5 `SELECT 1` calls after the run. On
-  BigQuery each probe is a full job, so the floor measures the job API,
-  not the network.
+- **Per run:** a round-trip floor, `statement_overhead_{min,median}_ms`,
+  already in the snapshot (`result_environment`).
+  - It comes from 1 warmup plus 5 `SELECT 1` calls on one warm cursor,
+    after the run, within a 5-second deadline (`link_probe.py`).
+  - It times execute plus fetch, so on most cloud SQL services it also
+    includes the service's minimum per-statement work (parse, compile,
+    admission). On BigQuery and Athena each probe is a full job.
+  - No timestamp is recorded.
+  - `link_status` is `available`, `partial`, `not_requested` or
+    `unavailable`. `partial` can mean the probe failed.
+- **Statements sent:** only Snowflake, Databricks, DataFusion and the
+  MySQL-wire path split multi-statement text before sending. Redshift and
+  the Postgres family send the whole text in one `execute`, and BigQuery
+  submits one job.
 - **Platform stats collected but not published:**
   - Snowflake reads `QUERY_HISTORY`.
   - BigQuery keeps job timestamps.
@@ -69,18 +81,22 @@ and partly the network.
   - For explicit transactions it returns the `COMMIT`.
 - **Redshift's `cpu_time_microsecs`** is a copy of the duration.
 - **The result cache is already turned off and recorded**
-  (`result_cache_enabled`) for Snowflake, BigQuery and Redshift. There is
-  no per-query cache-hit evidence.
-- **Measurement basis** covers passes and statistic only
-  (`measurementBasis.ts`).
+  (`result_cache_enabled`) for Snowflake, BigQuery and Redshift.
+- **Measurement basis** covers passes and statistic only. On the default
+  basis, `resolveQueryValue` and `resolveResultsForBasis` return the
+  published end-to-end values directly (`measurementBasis.ts:290-301`).
+- **Leaderboard ranks** are computed in core and read as `row.rank`; the
+  page does not re-rank (`Leaderboard.tsx:282-295`).
 - **Locality receipt:**
   - DuckDB vs a collocated Snowflake run reads as "2 localities differ",
     a warning that does not say why it matters.
   - DuckDB in process vs Postgres on localhost both read "Local" and
     count as a match.
-  - `endpoint_class` exists in core (`embedded_process`,
-    `localhost_port`, `remote_host`, `cloud_endpoint`) but is folded into
-    `deployment_class` and never reaches the snapshot.
+  - It shows the floor's median, not its min.
+- **`endpoint_class`** exists in core (`embedded_process`,
+  `localhost_port`, `remote_host`, `cloud_endpoint`, `unknown`) but is
+  folded into `deployment_class` and never reaches the snapshot. Any
+  DuckDB connection is `embedded_process`, whatever its storage.
 - **Core ADR** `adr-client-link-locality-disclosure.md`: "Disclose the
   topology; do not infer the distance." It rejects subtracting latency,
   and it rejects named latency bands.
@@ -92,11 +108,14 @@ People who put DuckDB and Snowflake side by side ask one of two things:
 1. **Delivered latency.** "What will my client see?" For example: should
    I move small dashboard queries off Snowflake? End-to-end time answers
    this.
-2. **Engine work.** "Which engine does the work faster?" Removing the
-   measured round trip estimates this from BenchBox's own data.
+2. **Most of the engine's work.** "How do they compare once the client
+   round trip is taken out?" Removing BenchBox's measured round trip
+   estimates this, on the recorded hardware. It leaves in result
+   transfer, extra fetch round trips and driver work, so it is a partial,
+   conservative correction.
 
-No single default serves both. The page answers both, side by side, with
-end-to-end time first.
+No single default serves both. Compare answers both in one sentence,
+with end-to-end time first.
 
 ## Options
 
@@ -109,21 +128,21 @@ Keep end-to-end time and improve the warnings.
 
 ### B. Subtract the measured floor
 
-Remove one measured floor (`statement_overhead_min_ms`) for each SQL
-statement the query sends.
+Remove one measured floor (`statement_overhead_min_ms`) for each request
+the client sends inside the query's timer.
 
 - Pro: BenchBox measures the round trip itself, so the system under test
   does not grade itself. It works on platforms that report no timing of
   their own.
 - Con: it is an estimate.
   - It is sound only once the timer covers just the query's own
-    statements, so it applies to runs after the timer fix.
-  - `SELECT 1` does not cover result transfer, and on BigQuery it
-    measures the job API.
+    requests, so it applies to runs after the timer fix.
+  - On most cloud services `SELECT 1` includes server work, which would
+    be wrongly removed. Each adapter must pass a check first.
   - The floor is one figure per run, taken after the run.
   - The ADR rejects subtraction because it can hide stalls.
 - Safe only as an opt-in, labeled estimate that leans conservative and is
-  always shown next to end-to-end time.
+  always shown with end-to-end time.
 
 ### C. A platform-reported clock
 
@@ -140,32 +159,33 @@ Move everything that is not the query out of the timers.
 - Pro: makes end-to-end time more honest everywhere.
 - Con: changes published numbers. Old and new runs must be told apart.
 
-### E. Show every view side by side
+### E. Show every view together
 
-Show B's figures next to A's, with no default other than end-to-end time.
+Show B's figures with A's, with no default other than end-to-end time.
 
 - Pro: answers both questions, with nothing hidden.
 - Con: a denser display.
 
 ## Decision
 
-Do D first. Then B as an opt-in view, presented as in E. Keep A's
-warnings, improved. Capture C's data in core now, but keep it out of the
-Explorer for now.
+Do D first. Then B as an opt-in view on Compare, presented as in E. Keep
+A's warnings, improved. Capture C's data in core now, but keep it out of
+the Explorer.
 
 1. **End-to-end time is the only default.** That holds on run pages,
    leaderboards and Compare, for any cohort. No other view is ever
-   chosen automatically, and none drives a ranking unless the user picks
-   it.
-2. **Leaving out the round trip is the user's choice.** It uses the
-   round trip BenchBox measured, labeled *round trip removed
-   (estimated)*.
-3. **Embedded runs keep their end-to-end time.** With client and engine
+   chosen automatically.
+2. **Leaving out the round trip is the user's choice, on Compare.** It
+   uses the round trip BenchBox measured, labeled *round trip removed
+   (estimated)*. Leaderboards stay end-to-end.
+3. **Each adapter must earn the view.** Core checks, per adapter, that
+   the probe measures transport and not server work. Until an adapter
+   passes, its runs show end-to-end time only.
+4. **Embedded runs keep their end-to-end time.** With client and engine
    on one machine there is no network latency to remove.
-4. **Platform timings are captured and kept in the result bundles.**
-   Every platform with a source records them per statement and keeps
-   them raw, including values marked suspect. The Explorer snapshot and
-   pages leave them out for now.
+5. **Platform timings are captured and kept in the result bundles.**
+   Every platform with a source records them raw, including values
+   marked suspect. The Explorer snapshot and pages leave them out.
 
 ## Design
 
@@ -182,85 +202,129 @@ Move these out of every measured timer:
 - Plan capture: always deferred to its own phase.
 
 Record `run.timing_method`, an integer that starts at 2 for the fixed
-scope. Runs without it count as method 1. The Explorer:
+scope, as part of schema 2.4. Runs without it count as method 1.
 
-- warns when a cohort mixes methods, and
-- locks rankings that mix them, the same way it locks mixed bases.
+- `timing_method` joins the cohort signature (`compareCohort.ts`) and
+  core's leaderboard cohorts, so runs are ranked and compared within one
+  method. Mixed-method Compare cohorts warn and suppress winner claims.
+- Leaderboards show the newest method that has ranked runs for a cohort,
+  with a link to the other.
+- Core holds method-2 runs out of the published corpus until the
+  Explorer reads `timing_method` (read model 17). Otherwise old and new
+  runs would mix unseen: the snapshot digest gate skips whenever the
+  corpus changes.
 
-The snapshot digest gate does not catch this change, because it skips
-whenever the corpus changes. `timing_method` is the safeguard.
+**Re-runs.** The timer fix touches every platform, DuckDB included, and
+the round-trip view needs method-2 runs. Before the view launches, re-run
+the canonical corpus with method 2: the benchmarks and scale factors the
+home page and blog posts cite, for each platform they show. Launch the
+view once there are method-2 local and cloud runs for at least TPC-H at
+SF1 and SF10.
 
 ### Round trip removed (estimated)
 
 For each networked query execution:
 
 ```text
-removed_ms = statement_count × statement_overhead_min_ms
+removed_ms = request_count × statement_overhead_min_ms
 net_ms     = ms − removed_ms
 ```
 
-`statement_count` is the number of SQL statements the client sent inside
-the timer for that query, including any `BEGIN` and `COMMIT`. Almost
-every benchmark query is one statement. It is a plain count, not a new
-latency metric. Core writes it from the statement split the adapter
-already does.
+`request_count` is the number of requests the adapter sent to the
+platform inside the timer for that query: each `execute()` or job
+submit, including any `BEGIN` and `COMMIT`. Core counts the calls at the
+adapter's call site; it does not parse the SQL.
 
-Rules:
+- Almost every benchmark query is one request.
+- TPC-H Q15 is three requests on Snowflake, which splits it, and one on
+  Redshift, which sends it whole.
 
-- **Use the floor's min, never its median.** The min is the smallest
-  round trip observed, so the subtraction stays below the true
-  overhead. Large results that need extra fetch round trips are not
-  counted either. The view leans toward under-correcting.
-- **Fixed timer scope only.** The view is offered only for runs with
-  `timing_method` 2 or later. Before the fix, Snowflake and Redshift
-  timers include extra calls (tag setup, stats lookups), so one floor per
-  statement would describe the wrong thing.
-- **The probe runs as it does today:** once, after the measured run. The
-  receipt shows when the floor was taken.
-- **Embedded engines are out of scope.** For `endpoint_class` of
-  `embedded_process` with local storage, every view uses end-to-end time
-  unchanged and labels it "in process".
-  - Classify by `endpoint_class` and storage backing, not by platform
-    name. DuckLake on S3, MotherDuck, `pg_duckdb` and Snowpark Connect
-    reach remote storage or a remote service, so they are not embedded
-    for this purpose.
-- **Localhost engines** subtract their own, smaller floor.
-- **Bounds:**
-  - When `net_ms` falls below 10% of `ms`, the query is marked
-    *round-trip dominated*. It is left out of this view's winner claims,
-    with the reason shown.
-  - The view never reports a value of zero or less.
-- **Missing data:**
-  - A run with no floor (`link_status` not collected, or
-    `--no-link-probe`) cannot use this view, and the cohort is locked.
-  - BigQuery is locked out until its probe measures a single round
-    trip, because its `SELECT 1` is a full job, not a network round
-    trip.
-- **Displayed figures:** the view applies `net_ms` per execution, then
-  takes the chosen basis statistic and the geomean as usual. End-to-end
-  values stay visible in the same table.
+It is a plain count of calls, not a new latency metric.
 
-This view answers "how would these engines compare if the client sat
-next to them?" It is a BenchBox estimate, not a platform measurement.
+#### Eligibility
 
-**Validating the estimate.** Core checks the estimate per adapter
-against the platform timings it captures: for each conformance run, the
-gap between `ms − platform_ms` and `removed_ms`. A large gap means the
-floor misses part of that adapter's overhead. That check reads the
-bundles; it needs nothing in the Explorer.
+The view is offered for a run only when all of these hold:
+
+- `endpoint_class` is `localhost_port`, `remote_host` or
+  `cloud_endpoint`. `embedded_process` always keeps end-to-end time;
+  `unknown` cannot use the view.
+- `timing_method` is 2 or later.
+- `statement_overhead_min_ms` is present from at least 5 samples.
+- The adapter passes the probe check (below). Core publishes the result
+  per run as `net_estimate_status` (`eligible`, or a reason).
+- No measured execution in the run has `ms < removed_ms`. If one does,
+  the floor is larger than time actually measured (for example after
+  network drift), so the floor is marked suspect and the run locked.
+
+#### Probe check
+
+`SELECT 1` on most cloud services runs through parse, compile and
+admission, so the floor can include server work the view must not
+remove. Core checks each adapter before it is eligible:
+
+1. Record the platform statement IDs of the probe's `SELECT 1` calls and
+   capture their platform timings into the bundle, like any query.
+2. On conformance runs, compare the floor with the probe's own platform
+   time, and compare `removed_ms` with `ms − platform_ms` per query.
+3. The adapter passes when the probe's platform time is under a stated
+   share of the floor, and `removed_ms` stays below `ms − platform_ms`
+   within a stated tolerance.
+
+Every adapter starts ineligible, including BigQuery and Athena, whose
+probes run full jobs. The per-adapter results go on the methods page.
+
+#### Rules
+
+- **Use the floor's min.** The min is the smallest round trip observed
+  on a warm cursor. The query path also creates a cursor, which the probe
+  leaves out, so the subtraction stays below the true overhead. Large
+  results that need extra fetch round trips are not counted either. For
+  eligible adapters the view under-corrects networked runs, so it errs
+  toward the local engine.
+- **Embedded runs** have `removed_ms = 0`. Their figure in this view
+  equals their end-to-end time, labeled "in process: nothing removed;
+  includes client fetch".
+- **Localhost engines** subtract their own, smaller floor, which
+  includes socket, protocol and driver work. Embedded engines' per-call
+  overhead is not subtracted. The asymmetry is small, and the methods
+  page states it.
+- **The probe runs as it does today:** once, after the measured run.
+  Schema 2.4 adds `probed_at`. The receipt shows when the floor was
+  taken, and its min, median and spread.
+- **Round-trip dominated queries.** A query is *round-trip dominated*
+  when, for any networked run in the cohort, its net value under the
+  chosen basis statistic is below 10% of its end-to-end value. Such a
+  query:
+  - leaves the round-trip view for every run in the cohort, for both the
+    geomean and the win counts;
+  - shows "round-trip dominated: under 10% of end-to-end left" in its
+    cell, never a number;
+  - is null in exports, with a reason column;
+  - is still valid for the end-to-end view and the coverage gate.
+
+  This is a reliability floor on a derived estimate, applied only inside
+  the opt-in view. It labels no run and ranks nothing. It is fixed in
+  core, is the same for every platform, and is shown on the receipt.
+- **Displayed figures:** the view subtracts per execution, then takes
+  the chosen basis statistic and the geomean as usual.
+
+This view answers "how do these engines compare with BenchBox's measured
+per-statement round trip taken out, on the recorded hardware?" It is a
+BenchBox estimate, not a platform measurement.
 
 ### Core: schema 2.4
 
 Every query execution on a platform with a source records platform
-timings, in every pass, including warmup and failed attempts.
+timings, in every pass, including warmup, failed attempts and the link
+probe.
 
 Per query execution, next to `ms`, a `platform_timing` object:
 
 | Field | Meaning |
 | --- | --- |
 | `source` | The platform view or API read, for example `snowflake.query_history`. |
-| `statements` | One entry per statement the query ran, in order. Each has the platform's statement ID, the attempt number, the statement kind (query, `BEGIN`, `COMMIT`, setup), and `fields`: every timing and size field the source returns, under the platform's own names, converted to ms and bytes. |
-| `platform_ms` | The derived total: the source's elapsed field, summed over the query's statements. Setup statements are left out. |
+| `requests` | One entry per request the adapter sent, in order. Each has the platform's ID for it, the attempt number, the kind (query, `BEGIN`, `COMMIT`, setup), and `fields`: every timing and size field the source returns for it, under the platform's own names, converted to ms and bytes. |
+| `platform_ms` | The derived total: the source's elapsed field, summed over the query's requests. Setup requests are left out. |
 | `queue_ms`, `compile_ms`, `exec_ms` | Derived parts, when the source reports them. |
 | `cache_hit` | Whether the platform reports a cache hit. |
 | `status` | `valid`, `suspect` or `unavailable`, with a `reason`. |
@@ -269,12 +333,17 @@ Also per query execution:
 
 | Field | Meaning |
 | --- | --- |
-| `statement_count` | SQL statements the client sent inside the timer for this query. |
+| `request_count` | Requests the adapter sent inside the timer for this query. |
 | `result_rows`, `result_bytes` | The size of what crossed back to the client. |
 
-Per run, `run.platform_timing`: the `source`, its `definition` class
-(next section), and `coverage`, the share of measured queries with a
-valid `platform_ms`.
+Per run:
+
+- `run.timing_method`.
+- `run.platform_timing`: the `source`, its `definition` class (next
+  section), and `coverage`, the share of measured queries with a valid
+  `platform_ms`.
+- `run.net_estimate_status`.
+- `environment.client_link.probed_at`, and the probe's platform timings.
 
 Examples of the `fields` to keep in full:
 
@@ -286,7 +355,9 @@ Examples of the `fields` to keep in full:
   `total_slot_ms`; bytes processed and billed; `cache_hit`.
 - **Redshift:** `SYS_QUERY_HISTORY` `elapsed_time`, `queue_time`,
   `execution_time` and `compile_time` on serverless, or the `stl_query`
-  and `stl_wlm_query` times on provisioned.
+  and `stl_wlm_query` times on provisioned. A multi-statement text sent
+  in one `execute` yields one `pg_last_query_id()`, so it is one request
+  entry.
 
 Keeping the raw fields means a later change to how `platform_ms` is
 derived can be re-run on old results, with no need to run the benchmark
@@ -296,15 +367,19 @@ again. The name `platform_ms` avoids clashing with the existing
 A 2.4 bump must also update:
 
 - `CURRENT_SCHEMA_VERSION` and `KNOWN_SCHEMA_V2_VERSIONS`
-- `COMPACT_V2_QUERY_FIELDS`, `LEGACY_QUERY_FIELDS` and `query_key_order`
+  (`schema_policy.py`)
+- `COMPACT_V2_QUERY_FIELDS` and `LEGACY_QUERY_FIELDS`
+  (`query_execution.py`), and `query_key_order` (`schema_specs.yaml`)
+- bundle validation (`benchbox/validation/bundle.py`) and the explorer
+  pipeline models
 - the site's local preview (`explorer/src/lib/localResult.ts`), which
   must accept 2.4 before users can export it
 
 Rules:
 
-- **Capture by statement ID, never by tag.** Record the platform's ID
-  for every statement (Snowflake `cursor.sfqid`, the BigQuery job ID,
-  the Redshift query ID) and every attempt.
+- **Capture by platform ID, never by tag.** Record the platform's ID for
+  every request (Snowflake `cursor.sfqid`, the BigQuery job ID, the
+  Redshift query ID) and every attempt.
   - Look the IDs up after the measured phase, in batches spanning the
     run's time range. Chunk the Snowflake `INFORMATION_SCHEMA` lookups,
     which return a limited number of rows. Avoid `ACCOUNT_USAGE`, which
@@ -313,7 +388,7 @@ Rules:
     stats per query, outside the timer.
 - **Validity marks, never deletes.** Keep every captured value. Set
   `status: suspect`, with a reason, when:
-  - the statement count does not match the statements run, or
+  - the number of platform IDs does not match `request_count`, or
   - `platform_ms > ms`, or
   - the platform reports a cache hit, or
   - `platform_ms` is under 1% of `ms` and the query scanned nothing.
@@ -322,9 +397,9 @@ Rules:
   bounded deadline. The result bundle still publishes.
 - **Conformance test per adapter.** A known-cost query, such as a sleep
   or a fixed scan, must yield `platform_ms` within a stated tolerance of
-  its expected value.
-- **Embedded, local-storage engines** have no platform timing to
-  capture, and core writes none.
+  its expected value. The same runs feed the probe check.
+- **Embedded engines** have no platform timing to capture, and core
+  writes none.
 
 ### Platform time definitions
 
@@ -353,19 +428,18 @@ The Explorer refuses a snapshot older than it expects, and only warns on
 a newer one (`db.ts:203-215`). So the order is:
 
 1. Core emits read model 17 with the new columns. Today's Explorer loads
-   it with a warning.
+   it with a warning and ignores them.
 2. The Explorer moves to 17.
 
-New columns, only what the round-trip view and the receipt need:
+New columns, only what the round-trip view, the cohort lock and the
+receipt need:
 
-- `query_executions`: `statement_count`.
-- `results`: `timing_method`, `endpoint_class`.
-- Basis availability: the clock becomes part of each per-basis
-  availability token, so coverage is judged per pass and statistic.
-  - A missing value means *end-to-end only*. Never treat it as
-    available, the way `rowAnswersBasis` treats missing pass data today.
+- `query_executions`: `request_count`.
+- `results`: `timing_method`, `endpoint_class`, `net_estimate_status`.
+- `result_environment`: `statement_overhead_sample_count`, `probed_at`.
 
-Platform timings are not in the snapshot.
+`available_bases` stays as it is. A null `net_estimate_status` means
+*end-to-end only*. Platform timings are not in the snapshot.
 
 New columns on an unchanged corpus change the snapshot digest, so this
 phase needs a digest approval.
@@ -375,86 +449,124 @@ phase needs a digest approval.
 `explorer/` is a replay copy of core's `results-explorer/`. Every change
 below lands in core first and then replays here.
 
-**Compare summary.** The end-to-end line always comes first. On a
-mixed-transport cohort where the estimate is available, add its line:
+**Clock choice.**
 
-> Delivered latency (end to end): DuckDB wins by 4.1x.
-> Round trip removed (estimated): Snowflake wins by 1.2x.
+- Compare gets a separate `clock` URL parameter: `end_to_end` (the
+  default, left out of the URL) or `net`. It stays apart from the
+  `basis` token, so `encodeBasis`, `decodeBasis` and old links stay
+  untouched.
+- `clock` threads through `sharedQueryGeomeans`, `resolveQueryValue` and
+  `resolveResultsForBasis`. Their published-value shortcut applies only
+  when `isDefaultBasis(basis) && clock === "end_to_end"`. Tests cover
+  `clock=net` on the default basis.
+- On `net`:
+  - values are recomputed from `duration_ms` minus `removed_ms` per
+    execution;
+  - Power@Size, Throughput@Size and cost are nulled, and the summary
+    says "Power@Size is defined on end-to-end time; showing geomean".
+- A cohort can use `net` only when every networked run in it is
+  eligible. Otherwise the view is offered with the reason it is
+  unavailable, naming the run.
+- Leaderboards stay end-to-end; their ranks come from core.
+  `leaderboardCompareHref` and the other link builders carry `clock`.
 
-When the two disagree, say so. When the estimate is unavailable, say
-why.
+**Compare summary.** Under `net`, one sentence carries both figures, so
+neither can be quoted alone. It uses the existing "than the slowest
+selected run" grammar:
+
+> End to end, DuckDB's geomean query time was 4.1x faster than the
+> slowest selected run. With BenchBox's measured round trip removed
+> (estimate, 17 of 22 shared queries; 5 round-trip dominated, not
+> ranked), Snowflake's was about 1.2x faster (1.1–1.3x using the
+> floor's min to median).
+
+- The range recomputes the net figure with the floor's median. The
+  headline uses the min.
+- When the two answers name different winners, the sentence says
+  "The winner changes when the round trip is removed."
+- Social preview images and the copied link title render the whole
+  sentence when `clock=net`.
+
+**Query sets.**
+
+- The end-to-end figure always uses the end-to-end shared set, the same
+  as on the default page.
+- The net figure uses that set minus round-trip-dominated queries, and
+  shows its count.
+- The flip notice uses the intersection.
 
 **Per-query table and chart.**
 
-- Show end-to-end and estimated columns, over the same query set.
-- For each networked run, show a stacked bar: the estimated round trip
-  removed, then the rest. Do not call the rest "engine time"; it still
-  includes driver, protocol and transfer time.
-- List the queries dropped from the shared set, with reasons.
-
-**Clock choice.**
-
-- Add a separate `clock` URL parameter: `end_to_end` (the default, left
-  out of the URL) or `net`. Keep it apart from the `basis` token, so the
-  existing `encodeBasis` and `decodeBasis` grammar, `isDefaultBasis` and
-  old links stay untouched.
-- Choosing `net` re-ranks rankings and winner claims by the estimate.
-  `resolveResultsForBasis` then:
-  - recomputes from `duration_ms` minus one floor per statement;
-  - nulls Power@Size, Throughput@Size and cost, as non-default bases do
-    today. The summary says "Power@Size is defined on end-to-end time;
-    showing geomean".
-- Mixed clocks are refused in cohorts, the same way mixed bases are.
+- Show end-to-end and estimated columns.
+- Show a stacked bar for each eligible networked run. The legend reads
+  "estimated round trip (removed)" and "remaining: engine + driver +
+  transfer".
+- Embedded bars carry "in process: nothing removed; includes client
+  fetch".
+- List the queries dropped from the net view, with reasons.
 
 **Label every figure.** The clock goes in:
 
 - the summary sentence and chart titles
 - social preview images
-- CSV and JSON export column names (`end_to_end_ms`,
-  `round_trip_removed_estimated_ms`)
+- CSV and JSON exports, as two columns: `round_trip_estimate_ms` (the
+  amount removed) and `net_estimated_ms`, next to `end_to_end_ms`
 - the SQL view names
-
-A screenshot or export must never be ambiguous.
 
 **Comparability receipt.**
 
 - Add a *Transport* field from `endpoint_class`: in process, localhost,
-  or network. This fixes the in-process vs localhost match.
+  network or unknown. This fixes the in-process vs localhost match.
 - Rewrite the locality summary to say why a difference matters, for
   example: "End-to-end times include client round trips for networked
   runs only."
-- Show `timing_method`, and the floor used with when it was taken.
+- Show `timing_method`, `net_estimate_status`, and the floor's min,
+  median, spread and `probed_at`.
+- For ineligible networked runs, a neutral line: "Round trip not
+  estimated for BigQuery: its probe runs a full job."
+
+**Methods page.** Every *(estimated)* label links to a methods page.
+A short follow-up to the Results Explorer introduction post announces
+it. The page covers:
+
+- the formula and what is and is not removed;
+- the eligibility rules and the per-adapter probe check results;
+- the 10% rule and why it exists;
+- a worked example from a real method-2 run: `ms`, the floor's min and
+  median, `request_count`, `net_ms`, and the bundle's `platform_ms` for
+  comparison.
 
 ### Latency sensitivity
 
-Fixed share bands ("25% is latency-bound") are dropped. They resemble
-the bands the ADR rejects, and they misfire on BigQuery.
+Fixed share bands that label or rank runs ("25% is latency-bound") stay
+rejected. They resemble the bands the ADR rejects, and they misfire on
+BigQuery.
 
-Instead, on the default end-to-end view of a mixed-transport compare,
-compare the result with the *round trip removed* view:
+Instead, on the default end-to-end view of a cohort where `net` is
+available, compare the result with the *round trip removed* view:
 
-- If a per-query winner or the headline flips, say so on the end-to-end
-  view: "This result changes when client round trips are removed; 7 of
-  22 queries flip."
-- Link to the `net` view.
+- A per-query winner counts as flipped only when the net difference
+  exceeds the uncertainty margin, `request_count × (floor median −
+  floor min)` for the runs involved. Smaller differences are estimate
+  ties.
+- The headline flips only when it flips under the min floor. Because
+  the min under-corrects, such a flip is robust, and the copy says so.
+- If anything flips, say so on the end-to-end view: "This result
+  changes when client round trips are removed; 7 of 22 queries flip."
+  Then link to the `net` view.
 
-This tells users who stay on the default when round trips decide the
-result. It uses the same rules as the view, so it too applies only to
-runs with the fixed timer scope.
-
-For mixed-transport compares below the scale factor where the
-sensitivity check passes, add a hint: "At this scale, client round trips
-are a large share of query time; try a larger scale factor."
+Show a scale-factor hint on a mixed-transport compare when the flip
+notice fires, or when the view is unavailable for a networked run:
+"At this scale, client round trips are a large share of query time;
+try a larger scale factor."
 
 ### Statistics
 
-- Every view that shows both figures uses one shared query set: queries
-  valid in both for every run. It shows the count dropped and the
-  reasons.
 - Coverage has one definition: the existing evidence gates (at least 2
-  shared queries, and at least 50% valid per run) applied per clock.
-- Per-query wins inside the tie band (`COMPARE_TIE_THRESHOLD`) are
-  reported as ties in both views.
+  shared queries, and at least 50% valid per run). Round-trip-dominated
+  queries do not count against them.
+- Per-query wins inside the tie band (`COMPARE_TIE_THRESHOLD`) are ties
+  in both views.
 
 ### Edge cases
 
@@ -484,10 +596,11 @@ Deferred until a page needs them. Adding them would take:
 
 | Phase | Where | Work | Needs |
 | --- | --- | --- | --- |
-| 0 | Core | Amend the locality ADR. A labeled, opt-in estimate that removes the measured round trip is allowed, shown next to end-to-end time and never the default. Platform timings are captured and published in result bundles. Fixed latency bands stay rejected. Record the outcome of the terms check. | Owner decision (agreed). |
-| 1 | Core | Timer scope fixes and `run.timing_method`. Stream ID in Snowflake tags. | Changelog note. Cohort warnings for mixed methods. |
-| 2 | Core | Schema 2.4: `platform_timing` (raw fields per statement, derived totals, status), `statement_count` and result size, using ID-based capture. Snowflake, BigQuery and Redshift first, then Athena, Databricks, Trino and ClickHouse; check MotherDuck. Conformance tests per adapter, including the estimate check. | Schema bump. Site local preview accepts 2.4 first. |
-| 3 | Core, then replay | Read model 17: `statement_count`, `timing_method`, `endpoint_class`. The *round trip removed* view (`clock=net`), with its column, stacked bar, summary line and flip notice. The Transport receipt field, the rewritten locality text, and the scale-factor hint. | Read model 17 from core first. Digest approval. |
+| 0 | Core | Amend the locality ADR. A labeled, opt-in estimate that removes the measured round trip is allowed on Compare, shown with end-to-end time and never the default, for adapters that pass the probe check. The 10% round-trip-dominated rule is named as a reliability floor inside that view. Fixed latency bands that label or rank runs stay rejected. Platform timings are captured and published in result bundles. Record the outcome of the terms check. | Owner decision (agreed). |
+| 1 | Core | Schema 2.4: timer scope fixes, `timing_method`, `request_count`, result size, `probed_at`, `platform_timing` (including the probe's), ID-based capture, stream ID in Snowflake tags, `net_estimate_status`. Snowflake, BigQuery and Redshift first, then Athena, Databricks, Trino and ClickHouse; check MotherDuck. Conformance tests and the probe check per adapter. Method-2 runs held out of publication. | Schema bump. Site local preview accepts 2.4 first. Changelog note. |
+| 2 | Core, then replay | Read model 17: `request_count`, `timing_method`, `endpoint_class`, `net_estimate_status`, probe sample count and time. `timing_method` in Compare and leaderboard cohorts. The Transport receipt field and rewritten locality text. Then release method-2 runs to the corpus. | Read model 17 from core first. Digest approval. |
+| 3 | Core | Re-run the canonical corpus with method 2. | Runs for the launch set. |
+| 4 | Core, then replay | The *round trip removed* view on Compare (`clock=net`), with its sentence, columns, stacked bar, flip notice, scale-factor hint, exports and methods page. | Launch set in place: method-2 local and cloud TPC-H at SF1 and SF10. |
 | Later | Core, then replay | Platform timings in the Explorer, if needed. | Its own design pass. |
 
 ## Rejected alternatives
@@ -496,28 +609,42 @@ Deferred until a page needs them. Adding them would take:
   estimate, and it would hide stalls on the default view. It stays
   opt-in.
 - **Subtracting the median floor:** the median can exceed the round trip
-  a given query actually paid, so it can over-correct. The min is used.
-- **A per-query round-trip count:** never an agreed metric, and hard to
-  define across drivers. One floor per statement, on runs with the fixed
-  timer scope, needs only a plain statement count.
+  a given query actually paid, so it can over-correct. The min is used,
+  and the median only bounds the range shown.
+- **A per-query round-trip count:** never an agreed metric. A count of
+  requests the adapter sent is a plain fact the adapter already knows.
+- **Counting SQL statements by parsing the text:** drivers differ.
+  Redshift sends a multi-statement text as one request, so a parsed
+  count would subtract too much.
+- **Locking out only BigQuery:** the probe includes server work on most
+  cloud services. One rule, the probe check, applies to every adapter.
+- **The round-trip view on leaderboards:** ranks are computed in core,
+  and one ineligible run would complicate a whole board. Leaderboards
+  stay end-to-end.
+- **Classifying DuckLake on S3 as networked:** its probe is an
+  in-process `SELECT 1`, which removes none of the S3 latency, and core
+  has no detected storage backing. Embedded runs stay end-to-end.
 - **Switching the default view by cohort:** links and rankings would
   change meaning as runs were added, and Compare and leaderboards would
   disagree.
-- **A fixed latency-bound share threshold:** a named band by another
-  name. Replaced by the sensitivity check.
-- **Dropping short queries from winner claims below a duration
-  threshold:** hides data, and the threshold invites tuning to a result.
-  The sensitivity check flags these queries without hiding them.
-- **DuckDB profiler time for embedded runs:** the question it answers
-  does not arise. With client and engine on one machine there is no
-  network latency to remove.
+- **Fixed latency bands that label or rank runs:** named bands by
+  another name. The 10% rule is different: it only removes unreliable
+  estimates from the opt-in view.
+- **Dropping short queries from end-to-end winner claims below a
+  duration threshold:** hides real data, and the threshold invites
+  tuning to a result.
+- **Keeping round-trip-dominated queries at a clamped value as a
+  robustness line:** the clamped values are the unreliable ones, so a
+  line built on them adds noise, not robustness.
+- **DuckDB profiler time for embedded runs:** with client and engine on
+  one machine there is no network latency to remove.
 - **Re-probing during long runs:** not worth the extra code for now. The
-  receipt shows when the floor was taken.
+  floor-suspect check catches a floor larger than measured time.
 - **Reusing the stats Snowflake collects today:** matched by tag, so
   they can belong to another stream or to `COMMIT`.
-- **A third part in the `basis` token:** breaks the token grammar and
-  `isDefaultBasis`, and old builds would silently fall back. A separate
-  `clock` parameter is cleaner.
+- **The clock as part of the `basis` token or `available_bases`:** breaks
+  the token grammar, and today's Explorer would read every row as
+  answering every basis. Separate fields are used.
 
 ## Open questions
 
