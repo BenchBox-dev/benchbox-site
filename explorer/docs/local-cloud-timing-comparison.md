@@ -334,7 +334,7 @@ Also per query execution:
 | Field | Meaning |
 | --- | --- |
 | `request_count` | Requests the adapter sent inside the timer for this query. |
-| `result_rows`, `result_bytes` | The size of what crossed back to the client. |
+| `result_bytes` | The size of what crossed back to the client. The row count stays in `rows`. |
 
 Per run:
 
@@ -446,8 +446,9 @@ phase needs a digest approval.
 
 ### Explorer
 
-`explorer/` is a replay copy of core's `results-explorer/`. Every change
-below lands in core first and then replays here.
+The Explorer's sources live only in this repository. Core builds the
+snapshot, so new snapshot columns land in core first; the page changes
+below land here.
 
 **Clock choice.**
 
@@ -598,10 +599,10 @@ Deferred until a page needs them. Adding them would take:
 | --- | --- | --- | --- |
 | 0 | Core | Amend the locality ADR. A labeled, opt-in estimate that removes the measured round trip is allowed on Compare, shown with end-to-end time and never the default, for adapters that pass the probe check. The 10% round-trip-dominated rule is named as a reliability floor inside that view. Fixed latency bands that label or rank runs stay rejected. Platform timings are captured and published in result bundles. Record the outcome of the terms check. | Owner decision (agreed). |
 | 1 | Core | Schema 2.4: timer scope fixes, `timing_method`, `request_count`, result size, `probed_at`, `platform_timing` (including the probe's), ID-based capture, stream ID in Snowflake tags, `net_estimate_status`. Snowflake, BigQuery and Redshift first, then Athena, Databricks, Trino and ClickHouse; check MotherDuck. Conformance tests and the probe check per adapter. Method-2 runs held out of publication. | Schema bump. Site local preview accepts 2.4 first. Changelog note. |
-| 2 | Core, then replay | Read model 18: `request_count`, `timing_method`, `endpoint_class`, `net_estimate_status`, probe sample count and time. `timing_method` in Compare and leaderboard cohorts. The Transport receipt field and rewritten locality text. Then release method-2 runs to the corpus. | Read model 18 from core first. Digest approval. |
+| 2 | Core, then site | Read model 18: `request_count`, `timing_method`, `endpoint_class`, `net_estimate_status`, probe sample count and time. `timing_method` in Compare and leaderboard cohorts. The Transport receipt field and rewritten locality text. Then release method-2 runs to the corpus. | Read model 18 from core first. Digest approval. |
 | 3 | Core | Re-run the canonical corpus with method 2. | Runs for the launch set. |
-| 4 | Core, then replay | The *round trip removed* view on Compare (`clock=net`), with its sentence, columns, stacked bar, flip notice, scale-factor hint, exports and methods page. | Launch set in place: method-2 local and cloud TPC-H at SF1 and SF10. |
-| Later | Core, then replay | Platform timings in the Explorer, if needed. | Its own design pass. |
+| 4 | Site | The *round trip removed* view on Compare (`clock=net`), with its sentence, columns, stacked bar, flip notice, scale-factor hint, exports and methods page. | Launch set in place: method-2 local and cloud TPC-H at SF1 and SF10. |
+| Later | Core, then site | Platform timings in the Explorer, if needed. | Its own design pass. |
 
 ## Rejected alternatives
 
