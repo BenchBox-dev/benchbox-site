@@ -175,6 +175,11 @@
     "expectedDiff": "a55291e2588b798651d86ea0616944075c1eb460f490f62ccc0a33fc1dc564e1"
   },
   {
+    "site": "explorer/src/lib/__tests__/localResult.test.ts",
+    "reason": "accepts result schema 2.4 ahead of core, which no longer carries the Explorer",
+    "expectedDiff": "734e5ddce50bed608d6b8e2f5f217506fc3db6e7909883a1b45074cba30ef9eb"
+  },
+  {
     "site": "explorer/src/lib/__tests__/publicSiteVisualBaselineLookup.test.ts",
     "reason": "core CI baseline tooling; the site visual workflow compares the deployed artifact",
     "excluded": true
@@ -183,6 +188,11 @@
     "site": "explorer/src/lib/__tests__/tuningModeVocabulary.test.ts",
     "reason": "vocabulary read from the bundle contract instead of spawning python",
     "expectedDiff": "6dfb6057e89b07a54daa0ba32aae9870f362d593c615d81ffc5e8e8232e9db9e"
+  },
+  {
+    "site": "explorer/src/lib/localResult.ts",
+    "reason": "accepts result schema 2.4 ahead of core, which no longer carries the Explorer",
+    "expectedDiff": "35cacfa258b4a48bf31e6ace5dc8a99769250fe51bc38629046bfbc3fc915347"
   },
   {
     "site": "explorer/src/lib/queryRunComparison.ts",
