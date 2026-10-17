@@ -429,7 +429,7 @@ a newer one (`db.ts:203-215`). So the order is:
 
 1. Core emits read model 18 with the new columns. Today's Explorer loads
    it with a warning and ignores them.
-2. The Explorer moves to 17.
+2. The Explorer moves to 18.
 
 New columns, only what the round-trip view, the cohort lock and the
 receipt need:
