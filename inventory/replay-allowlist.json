@@ -112,7 +112,7 @@
   {
     "site": "explorer/scripts/explorer-build-contract.mjs",
     "reason": "reads the bundle explorer/contract.json through siteInputs instead of spawning the core publisher; version constants track core",
-    "expectedDiff": "bbb56729f51174dd97a92f6210c07885c661289581a0638b8be7571ce91ac1d5"
+    "expectedDiff": "72cce4dbe5c14d726eecacff9180326354a4294b98319fd9d9f887fe5bf3bea6"
   },
   {
     "site": "explorer/scripts/generate-browser-fixtures.mjs",
@@ -162,7 +162,7 @@
   {
     "site": "explorer/src/components/RunReceipt.tsx",
     "reason": "falls back to SITE_ORIGIN outside the browser so preview and local builds keep their own origin; otherwise tracks core",
-    "expectedDiff": "30cdb9f8da38b6c1cebd54500ce46bedee3b6a75259cee1874776954c760311b"
+    "expectedDiff": "d24d40d9d39a8883c15063efccf51e8951c43d316d612f15bcdb47b5e30a5dff"
   },
   {
     "site": "explorer/src/components/shellModel.ts",
@@ -172,7 +172,7 @@
   {
     "site": "explorer/src/lib/__tests__/db-remediation-pin.test.ts",
     "reason": "same adapted contract source as the contract script; the pinned version tracks core",
-    "expectedDiff": "7d555cbf5b775e423856274325c3824d7e3056056843740b96561514ac51359a"
+    "expectedDiff": "a55291e2588b798651d86ea0616944075c1eb460f490f62ccc0a33fc1dc564e1"
   },
   {
     "site": "explorer/src/lib/__tests__/publicSiteVisualBaselineLookup.test.ts",
@@ -192,12 +192,12 @@
   {
     "site": "explorer/src/pages/Compare.tsx",
     "reason": "resolves share URLs against SITE_ORIGIN so preview and local builds keep their own origin; otherwise tracks core",
-    "expectedDiff": "858c49ea3f43e9af754628c77764bd831641e2c5007297e482487a05d3373526"
+    "expectedDiff": "8d25755c04c46e01a91d7d531984d15043d791de0dbba7b4204fcf6ad5806972"
   },
   {
     "site": "explorer/src/pages/Query.tsx",
     "reason": "resolves the pick and ids parameters against SITE_ORIGIN so preview and local builds keep their own origin; otherwise tracks core",
-    "expectedDiff": "7e3b21caa8bd83fec22dfa66f317af9649892e45b34aff38f2e3dc9f4ca84531"
+    "expectedDiff": "e85fb64201156598bb2c05a11ab7347ab97fafac9225c67fca293b7f47b4cba8"
   },
   {
     "site": "explorer/test-fixtures/source/README.md",
