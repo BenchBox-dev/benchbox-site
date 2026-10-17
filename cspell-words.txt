@@ -297,3 +297,5 @@ xlarge
 xsmall
 zipfian
 zstd
+sfqid
+microsecs
