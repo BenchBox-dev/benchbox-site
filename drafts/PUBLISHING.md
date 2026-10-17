@@ -151,9 +151,9 @@ git add _blog/{series}/published/{post}.md \
 git commit -m "docs(blog): publish {title}"
 ```
 
-### 8. Replay the post into benchbox-site
+### 8. Merge the post
 
-After the development PR merges to `develop`, replay the change into `BenchBox-dev/benchbox-site` by pull request, following "Replaying core changes" in that repository's `AGENTS.md`. The replay copies `docs/blog/` to `blog/` and `_blog/` to `drafts/`, and `node scripts/replay-fidelity.mjs` must report 0 blocking. Squash-merging the replay pull request to `main` deploys the site. Do not use `make release-cut` / `make release-finalize` for site publishing; that flow releases the Python package.
+Squash-merging the pull request to `main` in `BenchBox-dev/benchbox-site` deploys the site. Do not use `make release-cut` / `make release-finalize` for site publishing; that flow releases the Python package.
 
 The post will appear at `https://benchbox.dev/blog/YYYY-MM-DD-{slug}/` and will automatically be included in:
 
