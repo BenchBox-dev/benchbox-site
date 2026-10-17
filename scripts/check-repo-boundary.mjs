@@ -31,7 +31,6 @@ export const ORIGIN_ALLOWLIST = [
 ];
 const BOUNDARY_ALLOWLIST = [
   /^scripts\/check-repo-boundary(\.test)?\.mjs$/,
-  /^scripts\/replay-fidelity(\.test)?\.mjs$/,
   /^drafts\//,
   /^inventory\//,
   /^explorer\/e2e\/captures\//,
