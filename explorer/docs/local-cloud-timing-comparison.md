@@ -12,8 +12,8 @@ round-trip time out of the comparison.
   shown next to end-to-end time, never in place of it.
 - Core captures, keeps and publishes the timings each platform reports
   for every query: the raw fields as returned, plus a derived total.
-  Run pages and downloads show them whether or not a comparison uses
-  them.
+  Result bundles keep them in full, and run pages show the totals,
+  whether or not a comparison uses them.
 - Comparisons can also use the platform's own time as a further clock,
   labeled *platform-reported*.
 - Nothing switches by default.
@@ -112,14 +112,15 @@ Keep end-to-end time and improve the warnings.
 
 ### B. Subtract the measured floor
 
-Compute a view that removes `round_trips × statement_overhead_min_ms`
-from each query.
+Compute a view that removes one measured floor
+(`statement_overhead_min_ms`) for each SQL statement the query sends.
 
 - Pro: BenchBox measures the round trip itself, so the system under test
-  does not grade itself. It works on today's data, and on platforms
-  that report no timing of their own.
+  does not grade itself. It works on platforms that report no timing of
+  their own.
 - Con: it is an estimate.
-  - The number of round trips per query varies by adapter and phase.
+  - It is sound only once the timer covers just the query's own
+    statements, so it applies to runs after the timer fix.
   - `SELECT 1` does not cover result transfer, and on BigQuery it
     measures the job API.
   - The floor is one figure per run, taken after the run.
@@ -165,9 +166,9 @@ E. Keep A's warnings, improved.
    (estimated)*. It needs no platform timings, so it does not wait for
    them.
 3. **Platform timings are always captured and published.** Every
-   platform with a source records them per statement and keeps them raw.
-   Run pages and downloads publish them in full, including values marked
-   suspect. They are labeled *platform-reported* everywhere they appear,
+   platform with a source records them per statement and keeps them raw
+   in the result bundle, including values marked suspect. Run pages show
+   the derived totals. They are labeled *platform-reported* everywhere they appear,
    and carry their source.
 4. **Gaps in coverage block the comparison.** A compare that mixes
    platform-time sources with different definitions is locked, just as
@@ -198,25 +199,39 @@ whenever the corpus changes. `timing_method` is the safeguard.
 
 ### Round trip removed (estimated)
 
-For each query and run:
+For each networked query execution:
 
 ```text
-removed_ms = round_trips × statement_overhead_min_ms
+removed_ms = statement_count × statement_overhead_min_ms
 net_ms     = ms − removed_ms
 ```
+
+`statement_count` is the number of SQL statements the client sent inside
+the timer for that query, including any `BEGIN` and `COMMIT`. Almost
+every benchmark query is one statement. It is a plain count, not a new
+latency metric:
+
+- It comes from `platform_timing.statements` where present.
+- Otherwise it comes from a `statement_count` field that core writes from
+  the statement split the adapter already does.
 
 Rules:
 
 - **Use the floor's min, never its median.** The min is the smallest
   round trip observed, so the subtraction stays below the true
-  overhead. The view leans toward under-correcting.
-- **Round trips per query.** Core records `round_trips` for each query.
-  Until it does, the Explorer uses a per-adapter count from a table in
-  core, set from the timer scope after the D fixes. The receipt says
-  "assumed N round trips".
-- **Embedded engines** (`endpoint_class` of `embedded_process`) have no
-  round trip: `net_ms = ms`. Localhost engines subtract their own,
-  smaller floor.
+  overhead. Large results that need extra fetch round trips are not
+  counted either. The view leans toward under-correcting.
+- **Fixed timer scope only.** The view is offered only for runs with
+  `timing_method` 2 or later. Before the fix, Snowflake and Redshift
+  timers include extra calls (tag setup, stats lookups), so one floor per
+  statement would describe the wrong thing.
+- **The probe runs as it does today:** once, after the measured run. The
+  receipt shows when the floor was taken.
+- **Embedded engines are out of scope.** For `endpoint_class` of
+  `embedded_process` with local storage, client and engine share one
+  machine, so there is no network latency to remove. Every view uses
+  their end-to-end time unchanged and labels it "in process".
+- **Localhost engines** subtract their own, smaller floor.
 - **Bounds:**
   - When `net_ms` falls below 10% of `ms`, or below `platform_ms` where
     that exists, the query is marked *round-trip dominated*. It is left
@@ -233,7 +248,7 @@ Rules:
   values stay visible in the same table.
 - **Consistency check:** where a run has both this estimate and
   `platform_ms`, the receipt shows the gap between them. A large gap
-  means the round-trip count or floor is wrong for that adapter.
+  means the floor misses part of that adapter's overhead.
 
 This view answers "how would these engines compare if the client sat
 next to them?" It is a BenchBox estimate, not a platform measurement.
@@ -261,7 +276,7 @@ Also per query execution:
 
 | Field | Meaning |
 | --- | --- |
-| `round_trips` | Client round trips inside the timer for this query. |
+| `statement_count` | SQL statements the client sent inside the timer for this query. |
 | `result_rows`, `result_bytes` | The size of what crossed back to the client. |
 
 Examples of the `fields` to keep in full:
@@ -323,13 +338,13 @@ Rules:
 - **Conformance test per adapter.** A known-cost query, such as a sleep
   or a fixed scan, must yield `platform_ms` within a stated tolerance of
   its expected value.
-- **Embedded, local-storage engines** (`endpoint_class` of
-  `embedded_process`, without remote storage): set `platform_ms = ms`
-  with `definition: client_equivalent`. The Explorer labels it "in
-  process: same as end to end".
+- **Embedded, local-storage engines** have no platform timing to
+  capture, and core writes none. The Explorer uses their end-to-end time
+  in every view.
   - Classify by `endpoint_class` and storage backing, not by platform
-    name. DuckLake on S3, MotherDuck, `pg_duckdb` and Snowpark Connect do
-    not qualify.
+    name. DuckLake on S3, MotherDuck, `pg_duckdb` and Snowpark Connect
+    reach remote storage or a remote service, so they are not embedded
+    for this purpose.
 
 ### Platform time definitions
 
@@ -342,18 +357,23 @@ clock. Check each row against the live platform before shipping it.
 | Snowflake `TOTAL_ELAPSED_TIME` | yes | yes | yes | no | `server_complete` |
 | BigQuery job `end_time - creation_time` | yes | yes | yes | no | `server_complete` |
 | Redshift serverless `SYS_QUERY_HISTORY.elapsed_time` | yes, as `queue_time` | yes | yes | no | `server_complete` |
-| Redshift provisioned `stl_query` | no (WLM queue left out) | yes | yes | no | `server_no_queue` |
+| Redshift provisioned `stl_query` | no (WLM queue left out) | yes | yes | no | `server_complete` |
 | Athena `TotalExecutionTimeInMillis` | yes | yes | yes | written to S3 | `server_complete` |
 | Databricks `total_duration_ms` | yes | yes | yes | yes | `includes_fetch` |
 | Trino `elapsedTime` | yes | yes | yes | yes | `includes_fetch` |
 | ClickHouse `query_duration_ms` | no queue concept | yes | yes | yes | `includes_fetch` |
 | MotherDuck | unknown | | | | none until checked |
-| Embedded, local storage | n/a | yes | yes | Python fetch | `client_equivalent` |
 
-`client_equivalent` may be compared with `server_complete`, but the
-comparison is labeled. The local side includes the Python fetch, which
-favors cloud engines on large results. Showing `result_rows` and
-`result_bytes` lets readers judge how much.
+Redshift provisioned is compared with the other `server_complete`
+sources even though `stl_query` leaves out WLM queue time. The receipt
+notes it, and the captured raw fields keep any queue time reported in
+`stl_wlm_query`.
+
+A cohort with embedded runs and networked runs uses the embedded runs'
+end-to-end time in the platform view. That time includes the Python
+fetch, while server-side sources leave out result transfer, so
+`result_rows` and `result_bytes` are shown to let readers judge the
+effect on large results.
 
 ### Snapshot read model
 
@@ -366,13 +386,12 @@ a newer one (`db.ts:203-215`). So the order is:
 
 New columns and tables:
 
-- `query_executions`: `platform_ms`, `platform_timing_status`,
-  `round_trips`, `result_rows`, `result_bytes`.
-- `query_platform_timings`, a new long-format table with one row per
-  execution, statement and field: `result_id`, `query_id`, `iter`,
-  `stream`, `statement_id`, `statement_kind`, `source`, `field`,
-  `value`, `unit`. This publishes every captured field without a schema
-  change per platform.
+- `query_executions`: `platform_ms`, `queue_ms`, `compile_ms`,
+  `exec_ms`, `platform_timing_status`, `statement_count`, `result_rows`,
+  `result_bytes`.
+- The raw per-statement fields stay in the result bundles only, not in
+  the snapshot the browser loads. A snapshot table can be added later if
+  a page needs them.
 - `query_display_timings`: `display_platform_ms` over the same passes as
   `display_ms`, with its own validity and exclusion reason.
 - `results`: `timing_method`, `platform_clock_source`,
@@ -423,7 +442,7 @@ When the views disagree, say so. When a view is unavailable, say why.
   untouched.
 - Choosing `net` or `platform` re-ranks rankings and winner claims by
   that view. `resolveResultsForBasis` then:
-  - recomputes from `duration_ms` minus the removed round trips for
+  - recomputes from `duration_ms` minus one floor per statement for
     `net`;
   - reads `display_platform_ms` for `platform`, and recomputes
     `platform_ms` for other bases (it is added to `BasisExecution`);
@@ -437,13 +456,11 @@ When the views disagree, say so. When a view is unavailable, say why.
 
 **Run pages publish platform timings regardless of comparisons.** The
 per-query table on a run page shows `platform_ms` and its parts next to
-end-to-end time, with each value's status. A *Platform timings* panel
-lists every captured field per statement. It needs no coverage gate and
+end-to-end time, with each value's status. It needs no coverage gate and
 no cohort, and appears whenever the run has timings.
 
-**Downloads.** The run's JSON and CSV downloads include
-`platform_timing` in full. The Explorer's SQL console exposes
-`query_platform_timings`.
+**Downloads.** A run's result bundle download carries `platform_timing`
+in full, with every raw field per statement.
 
 **Label every figure.** The clock and its provenance go in:
 
@@ -479,8 +496,8 @@ compare the result with the *round trip removed* view:
 - Link to the `net` view.
 
 This tells users who stay on the default when round trips decide the
-result. It uses the same rules as the view. Version it, because the
-timer-scope fix changes round-trip counts.
+result. It uses the same rules as the view, so it too applies only to
+runs with the fixed timer scope.
 
 For mixed-transport compares below the scale factor where the sensitivity
 check passes, add a hint: "At this scale, client round trips are a large
@@ -515,9 +532,9 @@ share of query time; try a larger scale factor."
 | Phase | Where | Work | Needs |
 | --- | --- | --- | --- |
 | 0 | Core | Amend the locality ADR. A labeled, opt-in estimate that removes the measured round trip is allowed, shown next to end-to-end time and never the default. A platform-reported clock is disclosure under the same rules. Fixed latency bands stay rejected. Record the outcome of the terms check. | Owner decision. |
-| 1 | Core | Timer scope fixes and `run.timing_method`. Stream ID in Snowflake tags. The per-adapter round-trip count table. | Changelog note. Cohort warnings for mixed methods. |
-| 2 | Core | Schema 2.4: capture, keep and publish `platform_timing` (raw fields per statement, derived totals, status), `round_trips` and result size, using ID-based capture. Snowflake, BigQuery and Redshift first, then Athena, Databricks, Trino and ClickHouse; check MotherDuck. Conformance tests per adapter. | Schema bump. Site local preview accepts 2.4 first. Every new run from here on carries platform timings. |
-| 3 | Core, then replay | Read model 17: `endpoint_class`, platform timing columns and `query_platform_timings`. Run pages and downloads show platform timings. The *round trip removed* view (`clock=net`), with its column, stacked bar, summary line and flip notice. The Transport receipt field, the rewritten locality text, and the scale-factor hint. | Read model 17 from core first. Digest approval. |
+| 1 | Core | Timer scope fixes and `run.timing_method`. Stream ID in Snowflake tags. | Changelog note. Cohort warnings for mixed methods. |
+| 2 | Core | Schema 2.4: capture, keep and publish `platform_timing` (raw fields per statement, derived totals, status), `statement_count` and result size, using ID-based capture. Snowflake, BigQuery and Redshift first, then Athena, Databricks, Trino and ClickHouse; check MotherDuck. Conformance tests per adapter. | Schema bump. Site local preview accepts 2.4 first. Every new run from here on carries platform timings. |
+| 3 | Core, then replay | Read model 17: `endpoint_class` and the derived platform timing columns. Run pages show platform timings. The *round trip removed* view (`clock=net`), with its column, stacked bar, summary line and flip notice. The Transport receipt field, the rewritten locality text, and the scale-factor hint. | Read model 17 from core first. Digest approval. |
 | 4 | Core, then replay | The platform-reported clock in comparisons (`clock=platform`), with summary line, columns and export labels. | Digest approval if columns change. |
 | 5 | Core, then replay | The leaderboard platform clock, once coverage across ranked cloud platforms is broad. | Coverage check. |
 
@@ -539,27 +556,26 @@ share of query time; try a larger scale factor."
   The sensitivity check flags these queries without hiding them.
 - **Reusing the stats Snowflake collects today:** matched by tag, so
   they can belong to another stream or to `COMMIT`.
+- **A per-query round-trip count:** never an agreed metric, and hard to
+  define across drivers. One floor per statement, on runs with the fixed
+  timer scope, needs only a plain statement count.
+- **DuckDB profiler time for embedded runs:** the question it answers
+  does not arise. With client and engine on one machine there is no
+  network latency to remove, so end-to-end time is the comparable
+  figure.
+- **A separate class for Redshift provisioned:** it is compared with the
+  other server-side sources, and the receipt notes that queue time is
+  left out.
+- **Re-probing during long runs:** not worth the extra code for now. The
+  receipt shows when the floor was taken.
+- **Raw platform timings in the browser snapshot:** they could grow the
+  download a lot. They stay in the result bundles until a page needs
+  them.
 - **A third part in the `basis` token:** breaks the token grammar and
   `isDefaultBasis`, and old builds would silently fall back. A separate
   `clock` parameter is cleaner.
 
 ## Open questions
 
-1. Should DuckDB use its own profiler latency instead of
-   `client_equivalent`? It would leave out the Python fetch, the
-   counterpart of excluding result transfer on cloud platforms. But
-   profiling may add overhead to measured passes. Measure that overhead
-   first.
-2. Should Redshift provisioned (`server_no_queue`) be comparable with
-   `server_complete` when the reported queue time is zero?
-3. What share of ranked cloud platforms must have a platform clock before
+1. What share of ranked cloud platforms must have a platform clock before
    leaderboards offer it?
-4. Is 10% of `ms` the right lower bound for marking a query
-   *round-trip dominated* in the estimated view?
-5. Should the link probe run again during long runs, so the floor
-   follows drift? Today it runs once, after the run.
-6. Should `query_platform_timings` ship in the main snapshot, or as a
-   separate file the Explorer loads only when a run page or the SQL
-   console needs it? The snapshot is loaded in the browser, and one row
-   per field per statement could grow it substantially. Measure that on
-   a full corpus first.
