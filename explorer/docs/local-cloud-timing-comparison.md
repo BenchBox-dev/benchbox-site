@@ -1,8 +1,18 @@
 # Comparing Local and Cloud Runs: Round-Trip Latency
 
 How the Explorer should compare an in-process run (DuckDB, Polars) with a
-networked run (Snowflake, BigQuery), and when it should leave client
+networked run (Snowflake, BigQuery), and whether to leave client
 round-trip time out of the comparison.
+
+**Decision in brief:**
+
+- End-to-end time stays the only default, on every page.
+- Time reported by the platform becomes a second clock, labeled
+  *platform-reported*. It is shown next to end-to-end time, not in place
+  of it.
+- Nothing is subtracted, and nothing switches by default.
+- Before any of this ships, fix the timers in core so they stop counting
+  work that is not the query.
 
 ## Problem
 
@@ -11,253 +21,404 @@ means different things on each side of a local-vs-cloud comparison:
 
 | Run | What `ms` covers |
 | --- | --- |
-| DuckDB (in process) | Engine work plus the Python fetch. No network. |
-| Snowflake | Cursor setup, an `ALTER SESSION SET QUERY_TAG` round trip, the query round trip, queue, compile, execute, and result transfer. Multi-statement queries add `BEGIN` and `COMMIT` round trips. |
-| BigQuery | SQL rewrite, job submit, job wait, and result fetch. |
-| TPC power and throughput tests | All of the above, plus query text generation from the seed, because the outer timer starts before `get_query`. |
+| DuckDB (embedded, local storage) | Engine work plus the Python fetch. No network. |
+| Snowflake, TPC power test | Cursor setup; an `ALTER SESSION SET QUERY_TAG` round trip; the query round trip with queue, compile, execute and result transfer; then, still inside the outer timer, a `QUERY_HISTORY` lookup round trip, row count validation and `commit()`. Multi-statement queries add `BEGIN` and `COMMIT` round trips. |
+| BigQuery, TPC power test | SQL rewrite, job submit, job wait, result fetch, and plan capture when it is not deferred. |
+| Redshift, TPC power test | The query, plus `pg_last_query_id()` and `stl_query` lookups and a plan merge. |
+| TPC power tests (all platforms) | Query text generation from the seed, since the outer timer starts before `get_query`. Throughput tests generate text before timing, except TPC-DS without preflight. |
 
-Sources in core: `benchbox/platforms/snowflake.py:1144-1192`,
-`benchbox/platforms/bigquery.py:1540-1566`,
-`benchbox/core/tpch/power_test.py:213-265`.
+Sources in core:
+
+- `benchbox/platforms/snowflake.py:1144-1196`
+- `benchbox/platforms/bigquery.py:1540-1624`
+- `benchbox/platforms/redshift.py:1840-1882`
+- `benchbox/core/tpch/power_test.py:213-265`
+- `benchbox/core/tpcds/power_test.py:251-279`
+- `benchbox/platforms/base/connection_wrappers.py:190-212`
 
 For long queries the overhead is noise. For short ones (SF0.01 to SF1,
-queries under about 100 ms) it can be most of the number. A DuckDB vs
-Snowflake compare at SF1 then mostly measures the network, not the engine.
+under about 100 ms) it can be most of the number. A DuckDB vs Snowflake
+compare at SF1 then partly measures BenchBox's own extra round trips, and
+partly the network.
 
 ### What exists today
 
 - **Per query:** one time, `duration_ms`, which becomes `display_ms`.
-  There is no engine or server time field.
 - **Per run:** a round-trip floor, `statement_overhead_{min,median}_ms`.
-  It comes from 1 warmup plus 5 `SELECT 1` calls after the run, under
-  `environment.client_link`.
-- **Engine stats collected but discarded:** the Snowflake adapter reads
-  `QUERY_HISTORY` (`total_elapsed_time_ms`, `execution_time_ms`,
-  `compilation_time_ms`). BigQuery keeps job timestamps and `slot_ms`.
-  Redshift reads `sys_query_history` duration. The export drops all of
-  these: they sit in `LEGACY_IGNORED_EXTRA_FIELDS`, and schema 2.3 has no
-  slot for them.
-- **Measurement basis** covers only passes and statistic
-  (`measurementBasis.ts`). There is no clock axis.
-- **Locality receipt** (`ComparabilityReceipt.tsx:260-343`) warns on
-  cross-cloud and cross-region runs. A local run counts as a "match" with
-  a collocated cloud run, so DuckDB vs Snowflake gets no warning at all.
-- **Core ADR** `adr-client-link-locality-disclosure.md` says: "Disclose
-  the topology; do not infer the distance." It rejects subtracting latency
-  from reported timings.
+  It comes from 1 warmup plus 5 `SELECT 1` calls after the run. On
+  BigQuery each probe is a full job, so the floor measures the job API,
+  not the network.
+- **Platform stats collected but not published:**
+  - Snowflake reads `QUERY_HISTORY`.
+  - BigQuery keeps job timestamps.
+  - Redshift reads `sys_query_history` on serverless and `stl_query` on
+    provisioned. `stl_query` leaves out WLM queue time.
+
+  These values ride in `resource_usage`. The compact query entry writes a
+  fixed key set (`COMPACT_V2_QUERY_FIELDS`), so they never reach the
+  bundle.
+- **The Snowflake values are not trustworthy as collected:**
+  - The lookup matches on query tag, takes the latest row, and has
+    `max_retries=0`.
+  - Throughput streams share tags, so a lookup can return another
+    stream's query.
+  - For explicit transactions it returns the `COMMIT`.
+  - Redshift's `cpu_time_microsecs` is a copy of the duration.
+- **The result cache is already turned off and recorded**
+  (`result_cache_enabled`) for Snowflake, BigQuery and Redshift. There is
+  no per-query cache-hit evidence.
+- **Measurement basis** covers passes and statistic only
+  (`measurementBasis.ts`).
+- **Locality receipt:**
+  - DuckDB vs a collocated Snowflake run reads as "2 localities differ",
+    a warning that does not say why it matters.
+  - DuckDB in process vs Postgres on localhost both read "Local" and
+    count as a match.
+  - `endpoint_class` exists in core (`embedded_process`,
+    `localhost_port`, `remote_host`, `cloud_endpoint`) but is folded into
+    `deployment_class` and never reaches the snapshot.
+- **Core ADR** `adr-client-link-locality-disclosure.md`: "Disclose the
+  topology; do not infer the distance." It rejects subtracting latency,
+  and it rejects named latency bands.
+
+## The two questions
+
+People who put DuckDB and Snowflake side by side ask one of two things:
+
+1. **Delivered latency.** "What will my client see?" For example: should
+   I move small dashboard queries off Snowflake? End-to-end time answers
+   this.
+2. **Engine work.** "Which engine does the work faster?" Time reported by
+   the platform answers this, with caveats.
+
+No single default serves both. The page should answer both, side by side.
 
 ## Options
 
-### A. Disclose only (status quo, plus a fix)
+### A. Disclose only
 
-Keep end-to-end time. Add a transport mismatch warning for the gap above.
+Keep end-to-end time and improve the warnings.
 
-- Pro: no new data, and it matches the ADR.
-- Con: the headline winner on short queries stays a network result. A
-  warning does not tell the user how big the effect is.
+- Pro: no new data needed, and it matches the ADR.
+- Con: it never answers question 2.
 
 ### B. Subtract the measured floor
 
-Compute `net_ms = max(ms - k * statement_overhead_median_ms, floor)` in
-the browser.
+- Rejected. It is a guess:
+  - The number of round trips per query varies by adapter and phase.
+  - `SELECT 1` does not cover result transfer, and on BigQuery it
+    measures the job API.
+  - The floor is one figure per run, taken after the run.
+  - It hides stalls, which is why the ADR rejects it.
 
-- Pro: works on today's snapshot, with no core change.
-- Con: it is a guess, and the ADR rejects it.
-  - `k` differs by adapter: 2 for Snowflake (tag plus query), more with
-    `BEGIN`/`COMMIT`.
-  - `SELECT 1` does not cover result transfer.
-  - The floor is per run and taken after the run, so it misses drift
-    during the run.
-  - Near-zero results blow up ratios and geomeans.
-  - It can hide real driver or engine stalls.
+### C. Publish a platform-reported clock
 
-### C. Publish an engine clock
+Add `platform_ms` per query, as the platform itself reports it.
 
-Add a per-query `engine_ms`, reported by the platform, to the result
-schema. Offer it as a second clock in the Explorer.
-
-- Pro: it is measured, not inferred, so it fits the ADR (it is more
-  disclosure, not an adjustment). `ms - engine_ms` gives a real
-  per-query transport time. It also fixes cloud vs cloud cross-region
-  compares.
-- Con: needs a schema bump in core, adapter work, and a read model bump.
-  Coverage will be partial at first, and each platform defines "elapsed"
-  a little differently.
+- Pro: measured, not inferred.
+- Con: it is the vendor's own telemetry about itself, and each platform
+  defines it differently. As a default or a headline it would let the
+  system under test grade itself.
 
 ### D. Shrink the overhead at the source
 
-Move work that is not the query out of the timer:
+Move everything that is not the query out of the timers.
 
-- Snowflake: set the query tag before the timer starts.
-- TPC drivers: generate the query text before the timer starts.
-- Plan capture: always defer it to its own phase.
+- Pro: makes end-to-end time more honest everywhere.
+- Con: changes published numbers. Old and new runs must be told apart.
 
-- Pro: makes end-to-end time more honest for every platform, with no UI
-  change.
-- Con: the true network round trip remains. It changes published numbers,
-  so it needs a snapshot digest approval.
+### E. Show both clocks side by side
 
-## Recommendation
+Show C's figures next to A's, with no toggle default.
 
-Do D, then C, with A's warning as the fallback. Do not ship B as a basis.
+- Pro: answers both questions, with nothing hidden.
+- Con: a denser display.
 
-1. **D first, in core.** These are measurement bugs, not policy. Add a
-   changelog note, since short-query cloud times will drop.
-2. **C: an engine clock, as a second clock.** End-to-end stays the
-   published default, and engine time is an opt-in lens.
-3. **Use the floor only as a diagnostic.** Show "round-trip share", meaning
-   floor / `display_ms`, per query. Flag queries where it is 25% or more as
-   *latency-bound*. This works on today's data and fits the ADR.
-4. **Defaults:**
-   - Single-run pages, leaderboards, and same-transport compares default
-     to end-to-end.
-   - A compare that mixes transports (in-process or localhost vs network)
-     defaults to engine time, but only when every run in the cohort has
-     engine time for the shared queries.
-   - If any run lacks it, stay on end-to-end, show the transport warning,
-     and show the latency-bound flags.
-   - Any user choice wins, and is kept in the URL.
+## Decision
 
-Why default to engine time only for mixed-transport compares? The person
-who picks DuckDB and Snowflake side by side is asking "which engine is
-faster". Leaderboards and run pages answer "what would I see from a
-client", where end-to-end is the honest number.
+Do D first. Then C, presented as E. Keep A's warnings, improved. Reject B.
+
+1. **End-to-end time is the only default.** That holds on run pages,
+   leaderboards and Compare, for any cohort. Platform time is never
+   chosen automatically, and never drives a ranking unless the user
+   picks it.
+2. **Platform time is disclosure.** It is labeled *platform-reported*
+   everywhere it appears, and it carries its source.
+3. **Gaps in coverage block the comparison.** A compare that mixes
+   platform-time sources with different definitions is locked, just as
+   mixed passes are today.
 
 ## Design
 
-### Core schema (2.4)
+### Core: timer scope (option D)
+
+Move these out of every measured timer:
+
+- Snowflake: set the query tag before the timer starts.
+- All adapters: per-query stats lookups (Snowflake `QUERY_HISTORY`,
+  Redshift `pg_last_query_id` and `stl_query`), row count validation,
+  and result digests.
+- TPC power tests: query text generation (`get_query`) and `commit()`,
+  unless the benchmark defines commit as part of the query.
+- Plan capture: always deferred to its own phase.
+
+Record `run.timing_method`, an integer that starts at 2 for the fixed
+scope. Runs without it count as method 1. The Explorer:
+
+- warns when a cohort mixes methods, and
+- locks rankings that mix them, the same way it locks mixed bases.
+
+The snapshot digest gate does not catch this change, because it skips
+whenever the corpus changes. `timing_method` is the safeguard.
+
+### Core: schema 2.4
 
 Per query, next to `ms`:
 
-| Field | Type | Meaning |
-| --- | --- | --- |
-| `engine_ms` | number, optional | Time from the platform accepting the statement to the result being ready, as the platform reports it. Includes queue and compile. Excludes result transfer to the client. |
-| `queue_ms` | number, optional | The queued part, when reported. Lets the UI show it on its own. |
+| Field | Meaning |
+| --- | --- |
+| `platform_ms` | Duration the platform reports for this query, summed over all of the query's statements. Null when not reported, or when the query failed. |
+| `queue_ms`, `compile_ms`, `exec_ms` | The parts, when the platform reports them. |
+| `round_trips` | Client round trips inside the timer for this query. |
+| `result_rows`, `result_bytes` | The size of what crossed back to the client. |
+| `platform_cache_hit` | Whether the platform reports a cache hit. |
 
-Per run, `run.engine_clock`:
+Per run, `run.platform_clock`:
 
-- `source`: for example `snowflake.query_history.total_elapsed_time`,
-  `bigquery.job.end_minus_creation`, or `in_process`.
-- `coverage`: the share of measured queries that have `engine_ms`.
+- `source`: for example `snowflake.query_history.total_elapsed_time`.
+- `definition`: one of the classes in the next section.
+- `coverage`: the share of measured queries with a valid `platform_ms`.
+
+The name `platform_ms` avoids clashing with the existing
+`queries[].execution_engine`, and it matches the *platform-reported*
+label.
+
+A 2.4 bump must also update:
+
+- `CURRENT_SCHEMA_VERSION` and `KNOWN_SCHEMA_V2_VERSIONS`
+- `COMPACT_V2_QUERY_FIELDS`, `LEGACY_QUERY_FIELDS` and `query_key_order`
+- the site's local preview (`explorer/src/lib/localResult.ts`), which
+  must accept 2.4 before users can export it
 
 Rules:
 
-- **Validity:** drop `engine_ms` when it exceeds `ms * 1.05 + 5 ms`
-  (clock skew), and record the reason. Never fill it in from `ms` for a
-  networked platform.
-- **In-process engines** (DuckDB, Polars, DataFusion, pandas): set
-  `engine_ms = ms` with source `in_process`. There is no transport to
-  remove. The Python fetch stays in both clocks; disclose this, since it
-  slightly favors cloud engines on large results.
-- **Localhost servers** (CedarDB, Postgres, local ClickHouse): use the
-  server's own stats where they exist. Otherwise leave `engine_ms` out.
+- **Capture by statement ID, never by tag.** Record the platform's ID
+  for every statement (Snowflake `cursor.sfqid`, the BigQuery job ID,
+  the Redshift query ID) and use only the successful attempt.
+  - Look the IDs up after the measured phase, in batches spanning the
+    run's time range. Chunk the Snowflake `INFORMATION_SCHEMA` lookups,
+    which return a limited number of rows. Avoid `ACCOUNT_USAGE`, which
+    lags.
+  - Where the platform keeps history only briefly (Trino), capture the
+    stats per query, outside the timer.
+- **Validity.** Null `platform_ms`, with a reason, when:
+  - the statement count does not match the statements run, or
+  - `platform_ms > ms`, or
+  - the platform reports a cache hit, or
+  - `platform_ms` is under 1% of `ms` and the query scanned nothing.
+- **Conformance test per adapter.** A known-cost query, such as a sleep
+  or a fixed scan, must yield `platform_ms` within a stated tolerance of
+  its expected value.
+- **Embedded, local-storage engines** (`endpoint_class` of
+  `embedded_process`, without remote storage): set `platform_ms = ms`
+  with `definition: client_equivalent`. The Explorer labels it "in
+  process: same as end to end".
+  - Classify by `endpoint_class` and storage backing, not by platform
+    name. DuckLake on S3, MotherDuck, `pg_duckdb` and Snowpark Connect do
+    not qualify.
 
-### Adapter sources
+### Platform time definitions
 
-Check each source against the live platform before using it.
+What each source includes. Explorer cohorts may compare only sources in
+the same definition class. A run with no valid source has no platform
+clock. Check each row against the live platform before shipping it.
 
-| Platform | Source for `engine_ms` | Today |
-| --- | --- | --- |
-| Snowflake | `QUERY_HISTORY.TOTAL_ELAPSED_TIME` by query ID; `QUEUED_*` for `queue_ms` | Collected, then dropped. The lookup often returns only a note because `max_retries=0`. Collect `sfqid` per query and look them all up in one batch after the run. |
-| BigQuery | job `end_time - creation_time`; `start_time - creation_time` for `queue_ms` | Timestamps collected, then dropped. |
-| Redshift | `SYS_QUERY_HISTORY.elapsed_time` and `queue_time` | Duration collected, then dropped. |
-| Databricks SQL | query history `total_duration_ms` | Not collected. |
-| Athena | `TotalExecutionTimeInMillis`, `QueryQueueTimeInMillis` | Not collected. |
-| Trino / Presto | query info `elapsedTime`, `queuedTime` | Not collected. |
-| ClickHouse | `system.query_log.query_duration_ms` | Not collected. |
-| MotherDuck | none known | Leave it out. Engine clock compares lock MotherDuck out. |
+| Source | Queue | Compile | Execute | Result streaming to client | Class |
+| --- | --- | --- | --- | --- | --- |
+| Snowflake `TOTAL_ELAPSED_TIME` | yes | yes | yes | no | `server_complete` |
+| BigQuery job `end_time - creation_time` | yes | yes | yes | no | `server_complete` |
+| Redshift serverless `SYS_QUERY_HISTORY.elapsed_time` | yes, as `queue_time` | yes | yes | no | `server_complete` |
+| Redshift provisioned `stl_query` | no (WLM queue left out) | yes | yes | no | `server_no_queue` |
+| Athena `TotalExecutionTimeInMillis` | yes | yes | yes | written to S3 | `server_complete` |
+| Databricks `total_duration_ms` | yes | yes | yes | yes | `includes_fetch` |
+| Trino `elapsedTime` | yes | yes | yes | yes | `includes_fetch` |
+| ClickHouse `query_duration_ms` | no queue concept | yes | yes | yes | `includes_fetch` |
+| MotherDuck | unknown | | | | none until checked |
+| Embedded, local storage | n/a | yes | yes | Python fetch | `client_equivalent` |
+
+`client_equivalent` may be compared with `server_complete`, but the
+comparison is labeled. The local side includes the Python fetch, which
+favors cloud engines on large results. Showing `result_rows` and
+`result_bytes` lets readers judge how much.
 
 ### Snapshot read model
 
-- `query_executions` gains `engine_ms` and `queue_ms`.
-- `query_display_timings` gains `display_engine_ms`, the median over the
-  same passes as `display_ms`, plus its own validity and exclusion reason.
-- `result_basis_availability` gains `available_clocks`
-  (`end_to_end`, `engine`).
-- Bump `EXPECTED_READ_MODEL_VERSION`. Per `AGENTS.md`, support N and N-1.
-  An N-1 snapshot reports only `end_to_end`.
+The Explorer refuses a snapshot older than it expects, and only warns on
+a newer one (`db.ts:203-215`). So the order is:
+
+1. Core emits read model 17 with the new columns. Today's Explorer loads
+   it with a warning.
+2. The Explorer moves to 17.
+
+New columns:
+
+- `query_executions`: `platform_ms`, `round_trips`, `result_rows`,
+  `result_bytes`.
+- `query_display_timings`: `display_platform_ms` over the same passes as
+  `display_ms`, with its own validity and exclusion reason.
+- `results`: `timing_method`, `platform_clock_source`,
+  `platform_clock_definition`, `endpoint_class`.
+- Basis availability: the clock becomes part of each per-basis
+  availability token, so coverage is judged per pass and statistic.
+  - A missing value means *end-to-end only*. Never treat it as
+    available, the way `rowAnswersBasis` treats missing pass data today.
+
+New columns on an unchanged corpus change the snapshot digest, so this
+phase needs a digest approval.
 
 ### Explorer
 
-**The basis token gets a clock axis.**
-`MeasurementBasis = { passes, statistic, clock }`, serialized as
-`all_warm:median:engine`. Leave out `:end_to_end` so today's URLs stay
-valid. This reuses the existing `basesEqual`, `lockCrossRunBasis`,
-`formatBasisLabel` and `?basis=` plumbing.
+`explorer/` is a replay copy of core's `results-explorer/`. Every change
+below lands in core first and then replays here.
 
-**`MeasurementBasisBar`** gets a third select, Clock: *End to end* or
-*Engine*.
+**Compare summary.** On any cohort where every run has a platform clock,
+state both answers, one line each:
 
-- Disable the Engine option, with a reason, when any run in the cohort
-  lacks it.
-- Copy on Engine: "Engine time from each platform's own stats. Client
-  round trip and result transfer are excluded."
+> Delivered latency (end to end): DuckDB wins by 4.1x.
+> Engine work (platform-reported): Snowflake wins by 1.3x.
 
-**Resolved defaults are written to the URL.** When the page picks Engine
-for a mixed-transport cohort, write `basis=…:engine` explicitly. A shared
-link must not change its meaning when new runs arrive.
+When the clocks disagree, say so. Otherwise show only the end-to-end line
+and say why the other is missing.
 
-**`resolveResultsForBasis`** reads `display_engine_ms` / `engine_ms` on
-the engine clock, and recomputes `display_geomean_ms` over shared
-queries. It nulls the same fields as today's non-default bases:
+**Per-query table and chart.**
 
-- `power_score` and `throughput_at_size`, because TPC defines them on the
-  end-to-end clock.
-- Cost. Warehouse billing follows uptime, not engine time, so cost per
-  engine-second would mislead.
+- Show both clocks as columns, over the same query set.
+- Show a stacked bar: platform time, then *outside-engine time* (client,
+  driver, protocol, transfer). Do not call it "network".
+- List the queries dropped from the shared set, with reasons.
 
-**Cohort lock.** Mixed clocks are refused just like mixed passes: "One
-run's clock against another's measures the clock, not the platform."
+**Clock choice.**
 
-**`ComparabilityReceipt`** gets a *Transport* field: `in_process`,
-`localhost`, or `network`. Derive it from `platform.deployment` and
-`endpoint_class`, following `facet-environment-migration.md`.
+- Add a separate `clock` URL parameter, `end_to_end` (the default, left
+  out of the URL) or `platform`. Keep it apart from the `basis` token, so
+  the existing `encodeBasis` and `decodeBasis` grammar, `isDefaultBasis`
+  and old links stay untouched.
+- Choosing `platform` re-ranks rankings and winner claims by platform
+  time. `resolveResultsForBasis` then:
+  - reads `display_platform_ms`, and recomputes `platform_ms` for other
+    bases (it is added to `BasisExecution`);
+  - nulls Power@Size, Throughput@Size and cost, as non-default bases do
+    today. The summary says "Power@Size is defined on end-to-end time;
+    showing geomean".
+- Mixed clocks are refused in cohorts, the same way mixed bases are.
+- Leaderboards offer the platform clock only once most ranked cloud
+  platforms have a source. A clock available for only two vendors would
+  make those vendors look different.
 
-| Clock | Transports | Receipt shows |
-| --- | --- | --- |
-| End to end | Mixed | Warning: "Local vs networked: end-to-end times include round trip (floor X ms) for networked runs only." |
-| Engine | Mixed | Info: "Round trip excluded." |
+**Label every figure.** The clock and its provenance go in:
 
-**`CompareSummary`.** On mixed transports with the end-to-end clock:
+- the summary sentence and chart titles
+- social preview images
+- CSV and JSON export column names (`end_to_end_ms`,
+  `platform_reported_ms`)
+- the SQL view names
 
-- Count the latency-bound queries.
-- When winner claims rest mostly on them, say so: "7 of 22 queries are
-  latency-bound for Snowflake".
-- Link to the Engine clock when it is available.
+A screenshot or export must never be ambiguous.
 
-**Per-query chart.** On any run with both clocks, show `ms` as a stacked
-bar: engine time, then transport (`ms - engine_ms`). This makes the
-round trip visible, not just excluded.
+**Comparability receipt.**
+
+- Add a *Transport* field from `endpoint_class`: in process, localhost,
+  or network. This fixes the in-process vs localhost match.
+- Rewrite the locality summary to say why a difference matters, for
+  example: "End-to-end times include client round trips for networked
+  runs only."
+- Show `timing_method` and the platform clock's source.
+
+### Latency sensitivity
+
+Fixed share bands ("25% is latency-bound") are dropped. They resemble the
+bands the ADR rejects, they misfire on BigQuery, and they divide a single
+round trip by several.
+
+Instead, for a mixed-transport compare, run a decision-sensitivity check
+on end-to-end time:
+
+1. Take each run's `round_trips` × `statement_overhead_min_ms` as the
+   most overhead that could be explained by latency.
+2. Recompute the per-query winners and the geomean ratio with that
+   amount removed.
+3. If a winner or the headline flips, say so: "This result could change
+   if client round trips were removed; 7 of 22 queries are sensitive."
+
+Nothing is subtracted from a displayed number. The check uses the floor's
+min, as the conservative bound, and phrases the result as "could". Until
+core records `round_trips`, assume one round trip and say so. Version the
+check, because the timer-scope fix changes round-trip counts.
+
+For mixed-transport compares below the scale factor where the sensitivity
+check passes, add a hint: "At this scale, client round trips are a large
+share of query time; try a larger scale factor."
+
+### Statistics
+
+- Every view that shows both clocks uses one shared query set: queries
+  valid in both clocks for every run. It shows the count dropped and
+  the reasons.
+- Coverage has one definition: the existing evidence gates (at least 2
+  shared queries, and at least 50% valid per run) applied per clock.
+- Per-query wins inside the tie band (`COMPARE_TIE_THRESHOLD`) are
+  reported as ties under both clocks.
 
 ### Edge cases
 
-- **Throughput tests:** engine time per query is valid, but throughput
-  stays a wall-clock metric. Keep it on end-to-end only.
-- **Result cache:** an engine clock makes a cached result look free.
-  Core should check that the result cache is off (Snowflake
-  `USE_CACHED_RESULT`, BigQuery `useQueryCache`) and record it in the run.
-- **Queue time:** keep it in `engine_ms`, since an undersized warehouse
-  is the platform's cost. Show `queue_ms` on its own when reported.
-- **Partial coverage inside a run:** the engine clock uses the shared
-  query set. The existing evidence gates still apply: at least 2 queries,
-  and at least 50% valid per run.
+- **Throughput tests:** throughput stays end-to-end only. Snowflake tags
+  must include the stream ID until ID-based capture lands.
+- **Failed or retried queries:** `platform_ms` is null for failures. For
+  retries, only the successful attempt counts.
+- **Queue time:** it stays inside `platform_ms` for `server_complete`
+  sources, because an undersized warehouse is the platform's cost.
+  `queue_ms` is shown on its own when reported.
+- **Vendor terms:** before publishing platform-reported figures, check
+  each platform's terms on publishing benchmarks and on republishing its
+  telemetry. Record the outcome in the ADR amendment.
 
 ## Rollout
 
 | Phase | Where | Work | Needs |
 | --- | --- | --- | --- |
-| 1 | Site | Transport receipt field and warning. Latency-bound flags from the floor. | Existing data only. |
-| 2 | Core | Option D measurement fixes. | Snapshot digest approval, changelog note. |
-| 3 | Core | Schema 2.4 `engine_ms` and `queue_ms`. Snowflake, BigQuery and Redshift first. Amend the locality ADR: an engine clock is disclosure, not subtraction. | Schema bump. |
-| 4 | Core then site | Read model fields, then the clock axis, defaults, and stacked bars in the Explorer. | Read model bump, then a replay into `explorer/`. |
-| 5 | Core | Databricks, Athena, Trino and ClickHouse sources. | Per-adapter checks. |
+| 0 | Core | Amend the locality ADR: a platform-reported clock is disclosure, shown next to end-to-end time and never the default; fixed latency bands stay rejected; record the outcome of the terms check. | Owner decision. |
+| 1 | Core | Timer scope fixes and `run.timing_method`. Stream ID in Snowflake tags. | Changelog note. Cohort warnings for mixed methods. |
+| 2 | Core, then replay | `endpoint_class` in the snapshot, the Transport receipt field, the rewritten locality text, the sensitivity check (with one assumed round trip), and the scale-factor hint. | Read model 17 from core first. Digest approval. |
+| 3 | Core | Schema 2.4: `platform_ms`, its parts, `round_trips`, result size, cache hits, ID-based capture, and conformance tests. Snowflake, BigQuery and Redshift serverless first. Site local preview accepts 2.4 first. | Schema bump. |
+| 4 | Core, then replay | Both-clocks summary, columns, stacked bar, `clock` parameter, export labels. | Read model bump from core first. Digest approval. |
+| 5 | Core | Athena, Databricks, Trino, ClickHouse and MotherDuck sources. The leaderboard platform clock goes on once coverage is broad. | Per-adapter conformance tests. |
+
+## Rejected alternatives
+
+- **Subtracting the round-trip floor:** a guess, and the ADR rejects it.
+- **Switching the default clock by cohort:** this would let the vendor's
+  own telemetry decide the headline. Links and rankings would change
+  meaning as runs were added, and Compare and leaderboards would
+  disagree.
+- **A fixed latency-bound share threshold:** a named band by another
+  name. Replaced by the sensitivity check.
+- **Dropping short queries from winner claims below a duration
+  threshold:** hides data, and the threshold invites tuning to a result.
+  The sensitivity check flags these queries without hiding them.
+- **Reusing the stats Snowflake collects today:** matched by tag, so
+  they can belong to another stream or to `COMMIT`.
+- **A third part in the `basis` token:** breaks the token grammar and
+  `isDefaultBasis`, and old builds would silently fall back. A separate
+  `clock` parameter is cleaner.
 
 ## Open questions
 
-1. Should leaderboards that mix transports also default to the engine
-   clock when coverage is complete, so they agree with Compare?
-2. Is a 25% round-trip share the right latency-bound threshold?
-3. Should Snowflake `engine_ms` use `TOTAL_ELAPSED_TIME`, or
-   `EXECUTION_TIME + COMPILATION_TIME` to leave out cloud-services
-   overhead? This doc assumes total elapsed, to match "includes queue
-   and compile".
+1. Should DuckDB use its own profiler latency instead of
+   `client_equivalent`? It would leave out the Python fetch, the
+   counterpart of excluding result transfer on cloud platforms. But
+   profiling may add overhead to measured passes. Measure that overhead
+   first.
+2. Should Redshift provisioned (`server_no_queue`) be comparable with
+   `server_complete` when the reported queue time is zero?
+3. What share of ranked cloud platforms must have a platform clock before
+   leaderboards offer it?
