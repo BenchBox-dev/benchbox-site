@@ -7,10 +7,12 @@ round-trip time out of the comparison.
 **Decision in brief:**
 
 - End-to-end time stays the only default, on every page.
-- Time reported by the platform becomes a second clock, labeled
-  *platform-reported*. It is shown next to end-to-end time, not in place
-  of it.
-- Nothing is subtracted, and nothing switches by default.
+- Users can choose to leave out the client round trip that BenchBox
+  measured. This view is labeled *round trip removed (estimated)* and is
+  shown next to end-to-end time, never in place of it.
+- Later, time reported by the platform becomes a further clock, labeled
+  *platform-reported*.
+- Nothing switches by default.
 - Before any of this ships, fix the timers in core so they stop counting
   work that is not the query.
 
@@ -88,8 +90,10 @@ People who put DuckDB and Snowflake side by side ask one of two things:
 1. **Delivered latency.** "What will my client see?" For example: should
    I move small dashboard queries off Snowflake? End-to-end time answers
    this.
-2. **Engine work.** "Which engine does the work faster?" Time reported by
-   the platform answers this, with caveats.
+2. **Engine work.** "Which engine does the work faster?" Removing the
+   measured round trip estimates this from BenchBox's own data. Time
+   reported by the platform answers it more directly, but it comes from
+   the vendor and has caveats.
 
 No single default serves both. The page should answer both, side by side.
 
@@ -104,12 +108,20 @@ Keep end-to-end time and improve the warnings.
 
 ### B. Subtract the measured floor
 
-- Rejected. It is a guess:
+Compute a view that removes `round_trips × statement_overhead_min_ms`
+from each query.
+
+- Pro: BenchBox measures the round trip itself, so the system under test
+  does not grade itself. It works on today's data, and on platforms
+  that report no timing of their own.
+- Con: it is an estimate.
   - The number of round trips per query varies by adapter and phase.
   - `SELECT 1` does not cover result transfer, and on BigQuery it
     measures the job API.
   - The floor is one figure per run, taken after the run.
-  - It hides stalls, which is why the ADR rejects it.
+  - The ADR rejects subtraction because it can hide stalls.
+- Safe only as an opt-in, labeled estimate that leans conservative and is
+  always shown next to end-to-end time.
 
 ### C. Publish a platform-reported clock
 
@@ -129,22 +141,27 @@ Move everything that is not the query out of the timers.
 
 ### E. Show both clocks side by side
 
-Show C's figures next to A's, with no toggle default.
+Show the figures from B and C next to A's, with no default other than
+end-to-end time.
 
 - Pro: answers both questions, with nothing hidden.
 - Con: a denser display.
 
 ## Decision
 
-Do D first. Then C, presented as E. Keep A's warnings, improved. Reject B.
+Do D first. Then B as an opt-in view, then C. Present every view as in
+E. Keep A's warnings, improved.
 
 1. **End-to-end time is the only default.** That holds on run pages,
-   leaderboards and Compare, for any cohort. Platform time is never
-   chosen automatically, and never drives a ranking unless the user
-   picks it.
-2. **Platform time is disclosure.** It is labeled *platform-reported*
+   leaderboards and Compare, for any cohort. No other view is ever
+   chosen automatically, and none drives a ranking unless the user picks
+   it.
+2. **Leaving out the round trip is the user's choice.** It uses the
+   round trip BenchBox measured, labeled *round trip removed
+   (estimated)*. It ships first because it needs no new platform data.
+3. **Platform time is disclosure.** It is labeled *platform-reported*
    everywhere it appears, and it carries its source.
-3. **Gaps in coverage block the comparison.** A compare that mixes
+4. **Gaps in coverage block the comparison.** A compare that mixes
    platform-time sources with different definitions is locked, just as
    mixed passes are today.
 
@@ -170,6 +187,48 @@ scope. Runs without it count as method 1. The Explorer:
 
 The snapshot digest gate does not catch this change, because it skips
 whenever the corpus changes. `timing_method` is the safeguard.
+
+### Round trip removed (estimated)
+
+For each query and run:
+
+```text
+removed_ms = round_trips × statement_overhead_min_ms
+net_ms     = ms − removed_ms
+```
+
+Rules:
+
+- **Use the floor's min, never its median.** The min is the smallest
+  round trip observed, so the subtraction stays below the true
+  overhead. The view leans toward under-correcting.
+- **Round trips per query.** Core records `round_trips` for each query.
+  Until it does, the Explorer uses a per-adapter count from a table in
+  core, set from the timer scope after the D fixes. The receipt says
+  "assumed N round trips".
+- **Embedded engines** (`endpoint_class` of `embedded_process`) have no
+  round trip: `net_ms = ms`. Localhost engines subtract their own,
+  smaller floor.
+- **Bounds:**
+  - When `net_ms` falls below 10% of `ms`, or below `platform_ms` where
+    that exists, the query is marked *round-trip dominated*. It is left
+    out of this view's winner claims, with the reason shown.
+  - The view never reports a value of zero or less.
+- **Missing data:**
+  - A run with no floor (`link_status` not collected, or
+    `--no-link-probe`) cannot use this view, and the cohort is locked.
+  - BigQuery is locked out until its probe measures a single round
+    trip, because its `SELECT 1` is a full job, not a network round
+    trip.
+- **Displayed figures:** the view applies `net_ms` per execution, then
+  takes the chosen basis statistic and the geomean as usual. End-to-end
+  values stay visible in the same table.
+- **Consistency check:** where a run has both this estimate and
+  `platform_ms`, the receipt shows the gap between them. A large gap
+  means the round-trip count or floor is wrong for that adapter.
+
+This view answers "how would these engines compare if the client sat
+next to them?" It is a BenchBox estimate, not a platform measurement.
 
 ### Core: schema 2.4
 
@@ -281,32 +340,43 @@ phase needs a digest approval.
 `explorer/` is a replay copy of core's `results-explorer/`. Every change
 below lands in core first and then replays here.
 
-**Compare summary.** On any cohort where every run has a platform clock,
-state both answers, one line each:
+**Compare summary.** The end-to-end line always comes first. On a
+mixed-transport cohort, add a line for each other view the cohort
+supports:
 
 > Delivered latency (end to end): DuckDB wins by 4.1x.
+> Round trip removed (estimated): Snowflake wins by 1.2x.
 > Engine work (platform-reported): Snowflake wins by 1.3x.
 
-When the clocks disagree, say so. Otherwise show only the end-to-end line
-and say why the other is missing.
+When the views disagree, say so. When a view is unavailable, say why.
 
 **Per-query table and chart.**
 
-- Show both clocks as columns, over the same query set.
-- Show a stacked bar: platform time, then *outside-engine time* (client,
-  driver, protocol, transfer). Do not call it "network".
+- Show every available view as a column, over the same query set.
+- Show a stacked bar for each networked run:
+  - the estimated round trip removed;
+  - where platform time exists, platform time and the rest of the
+    *outside-engine time* (client, driver, protocol, transfer).
+
+  Do not call the remainder "network".
 - List the queries dropped from the shared set, with reasons.
 
 **Clock choice.**
 
-- Add a separate `clock` URL parameter, `end_to_end` (the default, left
-  out of the URL) or `platform`. Keep it apart from the `basis` token, so
-  the existing `encodeBasis` and `decodeBasis` grammar, `isDefaultBasis`
-  and old links stay untouched.
-- Choosing `platform` re-ranks rankings and winner claims by platform
-  time. `resolveResultsForBasis` then:
-  - reads `display_platform_ms`, and recomputes `platform_ms` for other
-    bases (it is added to `BasisExecution`);
+- Add a separate `clock` URL parameter:
+  - `end_to_end`: the default, left out of the URL
+  - `net`: round trip removed (estimated)
+  - `platform`: platform-reported
+
+  Keep it apart from the `basis` token, so the existing `encodeBasis`
+  and `decodeBasis` grammar, `isDefaultBasis` and old links stay
+  untouched.
+- Choosing `net` or `platform` re-ranks rankings and winner claims by
+  that view. `resolveResultsForBasis` then:
+  - recomputes from `duration_ms` minus the removed round trips for
+    `net`;
+  - reads `display_platform_ms` for `platform`, and recomputes
+    `platform_ms` for other bases (it is added to `BasisExecution`);
   - nulls Power@Size, Throughput@Size and cost, as non-default bases do
     today. The summary says "Power@Size is defined on end-to-end time;
     showing geomean".
@@ -340,20 +410,17 @@ Fixed share bands ("25% is latency-bound") are dropped. They resemble the
 bands the ADR rejects, they misfire on BigQuery, and they divide a single
 round trip by several.
 
-Instead, for a mixed-transport compare, run a decision-sensitivity check
-on end-to-end time:
+Instead, on the default end-to-end view of a mixed-transport compare,
+compare the result with the *round trip removed* view:
 
-1. Take each run's `round_trips` × `statement_overhead_min_ms` as the
-   most overhead that could be explained by latency.
-2. Recompute the per-query winners and the geomean ratio with that
-   amount removed.
-3. If a winner or the headline flips, say so: "This result could change
-   if client round trips were removed; 7 of 22 queries are sensitive."
+- If a per-query winner or the headline flips, say so on the end-to-end
+  view: "This result changes when client round trips are removed; 7 of
+  22 queries flip."
+- Link to the `net` view.
 
-Nothing is subtracted from a displayed number. The check uses the floor's
-min, as the conservative bound, and phrases the result as "could". Until
-core records `round_trips`, assume one round trip and say so. Version the
-check, because the timer-scope fix changes round-trip counts.
+This tells users who stay on the default when round trips decide the
+result. It uses the same rules as the view. Version it, because the
+timer-scope fix changes round-trip counts.
 
 For mixed-transport compares below the scale factor where the sensitivity
 check passes, add a hint: "At this scale, client round trips are a large
@@ -386,20 +453,24 @@ share of query time; try a larger scale factor."
 
 | Phase | Where | Work | Needs |
 | --- | --- | --- | --- |
-| 0 | Core | Amend the locality ADR: a platform-reported clock is disclosure, shown next to end-to-end time and never the default; fixed latency bands stay rejected; record the outcome of the terms check. | Owner decision. |
-| 1 | Core | Timer scope fixes and `run.timing_method`. Stream ID in Snowflake tags. | Changelog note. Cohort warnings for mixed methods. |
-| 2 | Core, then replay | `endpoint_class` in the snapshot, the Transport receipt field, the rewritten locality text, the sensitivity check (with one assumed round trip), and the scale-factor hint. | Read model 17 from core first. Digest approval. |
+| 0 | Core | Amend the locality ADR. A labeled, opt-in estimate that removes the measured round trip is allowed, shown next to end-to-end time and never the default. A platform-reported clock is disclosure under the same rules. Fixed latency bands stay rejected. Record the outcome of the terms check. | Owner decision. |
+| 1 | Core | Timer scope fixes and `run.timing_method`. Stream ID in Snowflake tags. The per-adapter round-trip count table. | Changelog note. Cohort warnings for mixed methods. |
+| 2 | Core, then replay | `endpoint_class` in the snapshot. The *round trip removed* view (`clock=net`), with its column, stacked bar, summary line and flip notice. The Transport receipt field, the rewritten locality text, and the scale-factor hint. | Read model 17 from core first. Digest approval. |
 | 3 | Core | Schema 2.4: `platform_ms`, its parts, `round_trips`, result size, cache hits, ID-based capture, and conformance tests. Snowflake, BigQuery and Redshift serverless first. Site local preview accepts 2.4 first. | Schema bump. |
 | 4 | Core, then replay | Both-clocks summary, columns, stacked bar, `clock` parameter, export labels. | Read model bump from core first. Digest approval. |
 | 5 | Core | Athena, Databricks, Trino, ClickHouse and MotherDuck sources. The leaderboard platform clock goes on once coverage is broad. | Per-adapter conformance tests. |
 
 ## Rejected alternatives
 
-- **Subtracting the round-trip floor:** a guess, and the ADR rejects it.
-- **Switching the default clock by cohort:** this would let the vendor's
-  own telemetry decide the headline. Links and rankings would change
-  meaning as runs were added, and Compare and leaderboards would
-  disagree.
+- **Removing the round trip by default:** the headline would rest on an
+  estimate, and it would hide stalls on the default view. It stays
+  opt-in.
+- **Subtracting the median floor:** the median can exceed the round trip
+  a given query actually paid, so it can over-correct. The min is used.
+- **Switching the default clock by cohort:** links and rankings would
+  change meaning as runs were added, and Compare and leaderboards would
+  disagree. For the platform clock, it would also let the vendor's own
+  telemetry decide the headline.
 - **A fixed latency-bound share threshold:** a named band by another
   name. Replaced by the sensitivity check.
 - **Dropping short queries from winner claims below a duration
@@ -422,3 +493,7 @@ share of query time; try a larger scale factor."
    `server_complete` when the reported queue time is zero?
 3. What share of ranked cloud platforms must have a platform clock before
    leaderboards offer it?
+4. Is 10% of `ms` the right lower bound for marking a query
+   *round-trip dominated* in the estimated view?
+5. Should the link probe run again during long runs, so the floor
+   follows drift? Today it runs once, after the run.
