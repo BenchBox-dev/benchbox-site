@@ -10,8 +10,12 @@ round-trip time out of the comparison.
 - Users can choose to leave out the client round trip that BenchBox
   measured. This view is labeled *round trip removed (estimated)* and is
   shown next to end-to-end time, never in place of it.
-- Later, time reported by the platform becomes a further clock, labeled
-  *platform-reported*.
+- Core captures, keeps and publishes the timings each platform reports
+  for every query: the raw fields as returned, plus a derived total.
+  Run pages and downloads show them whether or not a comparison uses
+  them.
+- Comparisons can also use the platform's own time as a further clock,
+  labeled *platform-reported*.
 - Nothing switches by default.
 - Before any of this ships, fix the timers in core so they stop counting
   work that is not the query.
@@ -158,9 +162,13 @@ E. Keep A's warnings, improved.
    it.
 2. **Leaving out the round trip is the user's choice.** It uses the
    round trip BenchBox measured, labeled *round trip removed
-   (estimated)*. It ships first because it needs no new platform data.
-3. **Platform time is disclosure.** It is labeled *platform-reported*
-   everywhere it appears, and it carries its source.
+   (estimated)*. It needs no platform timings, so it does not wait for
+   them.
+3. **Platform timings are always captured and published.** Every
+   platform with a source records them per statement and keeps them raw.
+   Run pages and downloads publish them in full, including values marked
+   suspect. They are labeled *platform-reported* everywhere they appear,
+   and carry their source.
 4. **Gaps in coverage block the comparison.** A compare that mixes
    platform-time sources with different definitions is locked, just as
    mixed passes are today.
@@ -232,15 +240,45 @@ next to them?" It is a BenchBox estimate, not a platform measurement.
 
 ### Core: schema 2.4
 
-Per query, next to `ms`:
+Capturing, keeping and publishing platform timings is separate from
+using them in comparisons. Every query execution on a platform with a
+source records them, in every pass, including warmup and failed
+attempts. Comparisons choose which recorded values they use; capture and
+publication do not depend on that choice.
+
+Per query execution, next to `ms`, a `platform_timing` object:
 
 | Field | Meaning |
 | --- | --- |
-| `platform_ms` | Duration the platform reports for this query, summed over all of the query's statements. Null when not reported, or when the query failed. |
-| `queue_ms`, `compile_ms`, `exec_ms` | The parts, when the platform reports them. |
+| `source` | The platform view or API read, for example `snowflake.query_history`. |
+| `statements` | One entry per statement the query ran, in order. Each has the platform's statement ID, the attempt number, the statement kind (query, `BEGIN`, `COMMIT`, setup), and `fields`: every timing and size field the source returns, under the platform's own names, converted to ms and bytes. |
+| `platform_ms` | The derived total: the source's elapsed field, summed over the query's statements. Setup statements are left out. |
+| `queue_ms`, `compile_ms`, `exec_ms` | Derived parts, when the source reports them. |
+| `cache_hit` | Whether the platform reports a cache hit. |
+| `status` | `valid`, `suspect` or `unavailable`, with a `reason`. |
+
+Also per query execution:
+
+| Field | Meaning |
+| --- | --- |
 | `round_trips` | Client round trips inside the timer for this query. |
 | `result_rows`, `result_bytes` | The size of what crossed back to the client. |
-| `platform_cache_hit` | Whether the platform reports a cache hit. |
+
+Examples of the `fields` to keep in full:
+
+- **Snowflake:** `TOTAL_ELAPSED_TIME`, `COMPILATION_TIME`,
+  `EXECUTION_TIME`, the `QUEUED_*` times, `TRANSACTION_BLOCKED_TIME`,
+  `LIST_EXTERNAL_FILES_TIME`, `BYTES_SCANNED`, `ROWS_PRODUCED`,
+  `CREDITS_USED_CLOUD_SERVICES`.
+- **BigQuery:** the job's `creation_time`, `start_time` and `end_time`;
+  `total_slot_ms`; bytes processed and billed; `cache_hit`.
+- **Redshift:** `SYS_QUERY_HISTORY` `elapsed_time`, `queue_time`,
+  `execution_time` and `compile_time` on serverless, or the `stl_query`
+  and `stl_wlm_query` times on provisioned.
+
+Keeping the raw fields means a later change to how `platform_ms` is
+derived can be re-run on old results, with no need to run the
+benchmark again.
 
 Per run, `run.platform_clock`:
 
@@ -270,11 +308,18 @@ Rules:
     lags.
   - Where the platform keeps history only briefly (Trino), capture the
     stats per query, outside the timer.
-- **Validity.** Null `platform_ms`, with a reason, when:
+- **Validity marks, never deletes.** Keep every captured value. Set
+  `status: suspect`, with a reason, when:
   - the statement count does not match the statements run, or
   - `platform_ms > ms`, or
   - the platform reports a cache hit, or
   - `platform_ms` is under 1% of `ms` and the query scanned nothing.
+
+  Comparisons use only `valid` values. Run pages and exports show all
+  of them, with their status.
+- **Capture never blocks a run.** If a lookup fails, record
+  `status: unavailable` with the error. Retry it after the run, up to a
+  bounded deadline. The result bundle still publishes.
 - **Conformance test per adapter.** A known-cost query, such as a sleep
   or a fixed scan, must yield `platform_ms` within a stated tolerance of
   its expected value.
@@ -319,10 +364,15 @@ a newer one (`db.ts:203-215`). So the order is:
    it with a warning.
 2. The Explorer moves to 17.
 
-New columns:
+New columns and tables:
 
-- `query_executions`: `platform_ms`, `round_trips`, `result_rows`,
-  `result_bytes`.
+- `query_executions`: `platform_ms`, `platform_timing_status`,
+  `round_trips`, `result_rows`, `result_bytes`.
+- `query_platform_timings`, a new long-format table with one row per
+  execution, statement and field: `result_id`, `query_id`, `iter`,
+  `stream`, `statement_id`, `statement_kind`, `source`, `field`,
+  `value`, `unit`. This publishes every captured field without a schema
+  change per platform.
 - `query_display_timings`: `display_platform_ms` over the same passes as
   `display_ms`, with its own validity and exclusion reason.
 - `results`: `timing_method`, `platform_clock_source`,
@@ -385,6 +435,16 @@ When the views disagree, say so. When a view is unavailable, say why.
   platforms have a source. A clock available for only two vendors would
   make those vendors look different.
 
+**Run pages publish platform timings regardless of comparisons.** The
+per-query table on a run page shows `platform_ms` and its parts next to
+end-to-end time, with each value's status. A *Platform timings* panel
+lists every captured field per statement. It needs no coverage gate and
+no cohort, and appears whenever the run has timings.
+
+**Downloads.** The run's JSON and CSV downloads include
+`platform_timing` in full. The Explorer's SQL console exposes
+`query_platform_timings`.
+
 **Label every figure.** The clock and its provenance go in:
 
 - the summary sentence and chart titles
@@ -440,8 +500,9 @@ share of query time; try a larger scale factor."
 
 - **Throughput tests:** throughput stays end-to-end only. Snowflake tags
   must include the stream ID until ID-based capture lands.
-- **Failed or retried queries:** `platform_ms` is null for failures. For
-  retries, only the successful attempt counts.
+- **Failed or retried queries:** every attempt's timings are kept, with
+  attempt numbers. Comparisons use only the successful attempt. Failed
+  attempts appear on the run page.
 - **Queue time:** it stays inside `platform_ms` for `server_complete`
   sources, because an undersized warehouse is the platform's cost.
   `queue_ms` is shown on its own when reported.
@@ -455,10 +516,10 @@ share of query time; try a larger scale factor."
 | --- | --- | --- | --- |
 | 0 | Core | Amend the locality ADR. A labeled, opt-in estimate that removes the measured round trip is allowed, shown next to end-to-end time and never the default. A platform-reported clock is disclosure under the same rules. Fixed latency bands stay rejected. Record the outcome of the terms check. | Owner decision. |
 | 1 | Core | Timer scope fixes and `run.timing_method`. Stream ID in Snowflake tags. The per-adapter round-trip count table. | Changelog note. Cohort warnings for mixed methods. |
-| 2 | Core, then replay | `endpoint_class` in the snapshot. The *round trip removed* view (`clock=net`), with its column, stacked bar, summary line and flip notice. The Transport receipt field, the rewritten locality text, and the scale-factor hint. | Read model 17 from core first. Digest approval. |
-| 3 | Core | Schema 2.4: `platform_ms`, its parts, `round_trips`, result size, cache hits, ID-based capture, and conformance tests. Snowflake, BigQuery and Redshift serverless first. Site local preview accepts 2.4 first. | Schema bump. |
-| 4 | Core, then replay | Both-clocks summary, columns, stacked bar, `clock` parameter, export labels. | Read model bump from core first. Digest approval. |
-| 5 | Core | Athena, Databricks, Trino, ClickHouse and MotherDuck sources. The leaderboard platform clock goes on once coverage is broad. | Per-adapter conformance tests. |
+| 2 | Core | Schema 2.4: capture, keep and publish `platform_timing` (raw fields per statement, derived totals, status), `round_trips` and result size, using ID-based capture. Snowflake, BigQuery and Redshift first, then Athena, Databricks, Trino and ClickHouse; check MotherDuck. Conformance tests per adapter. | Schema bump. Site local preview accepts 2.4 first. Every new run from here on carries platform timings. |
+| 3 | Core, then replay | Read model 17: `endpoint_class`, platform timing columns and `query_platform_timings`. Run pages and downloads show platform timings. The *round trip removed* view (`clock=net`), with its column, stacked bar, summary line and flip notice. The Transport receipt field, the rewritten locality text, and the scale-factor hint. | Read model 17 from core first. Digest approval. |
+| 4 | Core, then replay | The platform-reported clock in comparisons (`clock=platform`), with summary line, columns and export labels. | Digest approval if columns change. |
+| 5 | Core, then replay | The leaderboard platform clock, once coverage across ranked cloud platforms is broad. | Coverage check. |
 
 ## Rejected alternatives
 
@@ -497,3 +558,8 @@ share of query time; try a larger scale factor."
    *round-trip dominated* in the estimated view?
 5. Should the link probe run again during long runs, so the floor
    follows drift? Today it runs once, after the run.
+6. Should `query_platform_timings` ship in the main snapshot, or as a
+   separate file the Explorer loads only when a run page or the SQL
+   console needs it? The snapshot is loaded in the browser, and one row
+   per field per statement could grow it substantially. Measure that on
+   a full corpus first.
