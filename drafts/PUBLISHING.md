@@ -4,93 +4,141 @@
 
 ## Overview
 
-Blog content is developed under `_blog/` in the single `BenchBox-dev/BenchBox` repository. When a post is ready, archive the final source under `_blog/{series}/published/` and place its ABlog copy under `docs/blog/` in the same change.
+Blog drafts and published posts both live in this repository
+(`BenchBox-dev/benchbox-site`). Drafts are written under `drafts/`.
+Published posts live under `blog/`. There is no second repository and
+no replay step: merging a pull request to `main` in this repository
+builds and deploys the site, and the post goes live with that deploy.
 
-The release branch excludes `_blog/` but retains `docs/blog/` for versioned artifacts. A pull request to `develop` validates the post and the docs build. Merging to `develop` does not publish the post. benchbox.dev is built and deployed from `BenchBox-dev/benchbox-site`, which keeps copies of `docs/blog/` as `blog/` and of `_blog/` as `drafts/`. The post goes live when the change is replayed into that repository by pull request and merged to its `main` branch. The release flow publishes the Python package, not the site.
+The site has no Python tooling (see `AGENTS.md`). All validation uses
+the Node commands defined in `package.json`. Do not use `uv` or any
+Python script to validate blog content; no such script exists in this
+repository.
 
 ## Directory Structure
 
-### Editorial source (`_blog/`)
+### Editorial source (`drafts/`)
 
 Each blog series has a consistent structure:
 
 ```
-_blog/
+drafts/
   STYLE_GUIDE.md          # Voice and content rules
   VOICE_REFERENCE.md      # Quick reference for tone
+  PUBLISHING.md           # This guide
+  PUBLICATION_SCHEDULE.md # Publication queue
+  ASSETS.md               # What happens to each draft asset
+  charts/                 # Chart definitions for scripts/render-blog-charts.mjs
   {series-name}/
     outlines/             # Post outlines and planning
     research/             # Reference materials and notes
     drafts/               # Work-in-progress posts
     published/            # Finalized posts (series archive)
-    archived/             # Deprecated versions
+    images/               # Draft images (mirrored to blog/images/ on publish)
 ```
 
-### Published site source (`docs/blog/`)
+Current series include `building-benchbox`, `benchbox-in-action`,
+`cloud-cost-controls`, `free-trial-benchmarking`, `platform-deep-dives`
+and `table-formats`.
 
-Published posts only, with ABlog frontmatter:
+### Published site source (`blog/`)
+
+Published posts only:
 
 ```
-docs/blog/
+blog/
   index.md                # Blog index (postlist + toctree)
-  2025-01-22-welcome.md   # Published post
+  images/                 # Published images
+  2026-01-22-welcome.md   # Published post (YYYY-MM-DD-{slug}.md)
 ```
+
+`website/` builds the site. At build time it copies `blog/` into the
+docs source tree and converts every post with the converter in
+`website/src/converter/`. The blog index, archive, tag and author
+pages, and the Atom feed are generated from the post frontmatter, so
+a correctly placed post with correct frontmatter needs no other
+registration beyond the index entry in step 6.
 
 ## Step-by-Step Publishing Process
 
 ### 1. Write the draft
 
-Create the post in `_blog/{series}/drafts/`. Follow the style guide:
+Create the post in `drafts/{series}/drafts/`. Name the file with the
+series post number and slug, for example
+`drafts/building-benchbox/drafts/19-site-redesign.md`. Follow the
+style guide:
 
 - **Voice**: Community-inclusive ("we" not "I"), enthusiastic but grounded
 - **Claims**: Back with data, not opinions ("2.3x faster" not "much faster")
-- **Platforms**: Neutral, no advocacy ("In this run, [platform A] finished [query] in [time] on [hardware]; [platform B] finished the same query in [time]. Include benchmark, scale, and phase so readers can interpret the measurement.")
+- **Platforms**: Neutral, no advocacy. Report the measurement and its
+  conditions: platform, query, time, hardware, benchmark, scale and phase.
 - **Methodology**: Show your work, acknowledge limitations
 
-See `_blog/STYLE_GUIDE.md` for the full guide and `_blog/VOICE_REFERENCE.md` for a quick tone reference. Sentence craft is defined in VOICE_REFERENCE. Do not copy it here.
+See `drafts/STYLE_GUIDE.md` for the full guide and
+`drafts/VOICE_REFERENCE.md` for a quick tone reference. Sentence craft
+is defined in `VOICE_REFERENCE.md`. Do not copy it here.
 
-### 2. Editorial check and content validation
+Draft frontmatter carries a `title` and `status: draft`:
 
-Run the automated blog content validator on your draft:
-
-```bash
-uv run python scripts/blog_content_validation.py _blog/{series}/drafts/{post}.md
+```yaml
+---
+title: "Post Title"
+blogpost: true
+status: draft
+date: October 7, 2026
+author: Joe Harris
+series: building-benchbox
+post_number: 19
+type: architecture-design
+tags: [benchbox, design, website]
+meta_description: "One-sentence summary of the post."
+---
 ```
 
-Or validate all blog content:
+Reference draft images relative to the series folder, for example
+`../images/{image}.png` from `drafts/{series}/drafts/`.
 
-```bash
-uv run python scripts/blog_content_validation.py
-```
+### 2. Editorial check
 
-The validator checks:
-- **Punctuation** (Error): Prohibits em-dashes (U+2014) and en-dashes (U+2013). Use ASCII hyphens or punctuation.
-- **Platform advocacy** (Error): Prohibits platform-winner claims (`"destroys the competition"`, `"clearly superior"`).
-- **Voice & tone** (Warning): Flags unsourced superlatives (`"revolutionary"`), vendor critiques (`"needs to fix"`), first-person pronouns (`"I think"`), and banned hedges (`"your mileage may vary"`, `"each platform has different strengths"`).
-- **LLM writing tells** (Warning): Flags conversational residue (`"good point"`, `"you're right"`), temporal filler (`"going forward"`), empty throat-clearing (`"in today's digital landscape"`, `"whether you're a seasoned developer"`), AI vocabulary clichés (`"delve"`, `"rich tapestry"`), and formulaic essay conclusions (`"In conclusion"`).
-- **Affirmation-denial couplets** (Advisory): Flags singleton denial echoes in post prose.
+Complete the editorial checklist in `drafts/STYLE_GUIDE.md` by hand.
+Check in particular:
 
-Exceptions can be annotated with `<!-- content-ok: <category> -->` or `<!-- content-ok -->`.
+- No em-dashes (U+2014) or en-dashes (U+2013). Use ASCII hyphens.
+- No platform-winner claims or unsourced superlatives.
+- Community-inclusive voice, direct imperatives for steps, and no
+  LLM writing tells. Ensure that agent work on the writing (reviews,
+  style checks and similar) has not added LLM writing tells.
 
-Before publication, also complete the `_blog/STYLE_GUIDE.md` editorial checklist by hand. Ensure that agent work on our writing (e.g. reviews, style checks, etc.) has not added LLM writing tells to our work.
+There is no automated blog content validator in this repository.
+Editorial quality is a human check against `STYLE_GUIDE.md` and
+`VOICE_REFERENCE.md`, backed by the build and repository checks in
+step 7.
 
 ### 3. Finalize the post
 
 Once the editorial checklist is complete and the post is reviewed:
 
-1. Move (or copy) the draft to `_blog/{series}/published/` for archival
-2. Prepare the filename for publication: `YYYY-MM-DD-{slug}.md`
+1. Copy the draft to `drafts/{series}/published/` for archival.
+2. Prepare the publication filename: `YYYY-MM-DD-{slug}.md`, where
+   the date is the publication date in the frontmatter.
 
-### 4. Add ABlog frontmatter
+### 4. Prepare the published frontmatter
 
-The post needs YAML frontmatter for ABlog to recognize it:
+The published copy drops the draft-only `title` (the post title comes
+from the `#` heading) and the YAML tag list becomes a comma-separated
+string. Set `status` to `published`:
 
 ```yaml
 ---
 blogpost: true
-date: Mon DD, YYYY
+status: published
+date: October 7, 2026
 author: Joe Harris
-tags: tag1, tag2
+series: building-benchbox
+post_number: 19
+type: architecture-design
+tags: benchbox, design, website
+meta_description: "One-sentence summary of the post."
 ---
 
 # Post Title
@@ -103,76 +151,134 @@ Post content...
 | Field | Format | Example |
 |-------|--------|---------|
 | `blogpost` | `true` | `true` |
-| `date` | `Mon DD, YYYY` | `Jan 22, 2025` |
-| `author` | Author name (must match `blog_authors` in `docs/conf.py`) | `Joe Harris` |
+| `date` | `Month DD, YYYY` | `October 7, 2026` |
+| `author` | Author name | `Joe Harris` |
 | `tags` | Comma-separated | `benchmarking, tpc-h, methodology` |
 
-### 5. Place the post in the published site tree
+`series`, `post_number`, `type` and `meta_description` are carried
+over from the draft when present. The build derives the post title
+from the `#` heading and the URL slug from the filename.
 
-Copy the finalized post to `docs/blog/` in the same repository:
+### 5. Place the post in the published tree
+
+Copy the finalized post to `blog/` in this repository:
 
 ```bash
-cp _blog/{series}/published/{post}.md \
-   docs/blog/YYYY-MM-DD-{slug}.md
+cp drafts/{series}/published/{post}.md \
+   blog/YYYY-MM-DD-{slug}.md
 ```
 
-Then adapt relative links for the destination. `_blog/{series}/published/` uses
-`../images/{image}.png`, while `docs/blog/` uses `./images/{image}.png`.
-Companion-post links in `docs/blog/` must include the companion's date-prefixed
-filename. Do not rely on a blind copy when either form appears in the source.
+Then adapt relative links for the destination.
+`drafts/{series}/published/` uses `../images/{image}.png`, while
+`blog/` uses `./images/{image}.png`. Copy each referenced image to
+`blog/images/` as well. Companion-post links in `blog/` must include
+the companion's date-prefixed filename. Do not rely on a blind copy
+when either form appears in the source.
+
+For charts, `npm run charts -- <name>` renders a chart from
+`drafts/charts/`; add `--publish` to copy the result into
+`blog/images/`. See `drafts/ASSETS.md` for how draft assets are kept
+in step with their published copies.
 
 ### 6. Register the post in the blog index
 
-Edit `docs/blog/index.md`. Add the post filename (without extension) to the `toctree`:
+Edit `blog/index.md`. Add the post filename (without extension) to
+the `toctree`, in date order:
 
 ````md
 ```{toctree}
 :maxdepth: 1
 :hidden:
 
-2025-01-22-welcome
+2026-01-22-welcome
 YYYY-MM-DD-{slug}
 ```
 ````
 
-The `postlist` directive at the top of the index will automatically pick up the new post for the recent posts listing.
+The `postlist` directive at the top of the index picks up the new
+post for the recent posts listing automatically.
 
-### 7. Open the development pull request
+### 7. Validate locally
 
-Commit the archive copy, published copy, images, and index on a topic branch,
-then open a pull request against `develop`. The Documentation workflow builds
-Sphinx and ABlog, assembles the public site, runs link checks, and exercises the
-public-site browser gate.
+Run the repository checks that do not need the core bundle first:
 
 ```bash
-git add _blog/{series}/published/{post}.md \
-  docs/blog/YYYY-MM-DD-{slug}.md docs/blog/images/{image}.png \
-  docs/blog/index.md
+npm run lint:guard
+npm run lint:comments
+```
+
+`lint:guard` runs `scripts/check-repo-boundary.mjs`, which fails on
+Python files or calls, hard-coded production origins outside the
+allowlist, and paths from the old core layout. `lint:comments` runs
+`scripts/check-comments.mjs`. Both run in CI and as pre-commit hooks
+via `lefthook.yml`.
+
+The full build also converts and validates the new post, but it
+needs the certified core bundle in `.site-inputs/`:
+
+```bash
+npm run bundle:fetch
+npm run build
+```
+
+`npm run build` builds the Explorer and the website. The website
+build runs the converter over `blog/`, so unresolved links, bad
+frontmatter and unknown `toctree` targets fail here. If the bundle
+cannot be fetched, rely on the pull request checks in step 8 and
+say so in the pull request.
+
+### 8. Open the pull request
+
+Commit the archive copy, published copy, images and index on a named
+branch, then open a pull request against `main`:
+
+```bash
+git add drafts/{series}/published/{post}.md \
+  blog/YYYY-MM-DD-{slug}.md blog/images/{image}.png \
+  blog/index.md
 git commit -m "docs(blog): publish {title}"
 ```
 
-### 8. Merge the post
+Stage files by explicit path only. Never run `git add -A`.
 
-Squash-merging the pull request to `main` in `BenchBox-dev/benchbox-site` deploys the site. Do not use `make release-cut` / `make release-finalize` for site publishing; that flow releases the Python package.
+The `ci` workflow (`.github/workflows/ci.yml`) fetches and verifies
+the core bundle, then runs the script tests, `lint:comments`,
+`lint:guard`, `bundle:verify`, the Explorer and website type checks,
+the unit tests and `npm run build`. All of it must pass.
 
-The post will appear at `https://benchbox.dev/blog/YYYY-MM-DD-{slug}/` and will automatically be included in:
+### 9. Merge the post
 
-- Recent Posts sidebar widget
-- Tag cloud (based on `tags` frontmatter)
-- Archives (organized by date)
-- RSS feed (`blog/atom.xml`)
+Merge the pull request to `main` with a squash merge once `ci` is
+green. The deploy workflow (`.github/workflows/deploy.yml`) then
+builds and, when the repository's deploy target is set, deploys the
+site. Nothing deploys unless every deploy gate passes.
+
+The post will appear at `https://benchbox.dev/blog/YYYY-MM-DD-{slug}/`
+and will automatically be included in:
+
+- The blog index and recent posts listing
+- Archive pages (organized by year)
+- Tag and author pages (based on frontmatter)
+- The Atom feed (`blog/atom.xml`)
+
+Check the post live at `https://benchbox.dev/blog/` after the deploy
+run succeeds.
 
 ## Quick Checklist
 
-- [ ] Draft written in `_blog/{series}/drafts/`
-- [ ] Style guide followed (`STYLE_GUIDE.md`)
+- [ ] Draft written in `drafts/{series}/drafts/`
+- [ ] Style guide followed (`drafts/STYLE_GUIDE.md`)
 - [ ] STYLE_GUIDE editorial checklist completed by hand
-- [ ] ABlog frontmatter added (`blogpost`, `date`, `author`, `tags`)
+- [ ] No em-dashes or en-dashes; voice checked against `VOICE_REFERENCE.md`
+- [ ] Final post archived in `drafts/{series}/published/`
+- [ ] Published frontmatter set (`blogpost`, `status: published`, `date`, `author`, `tags`)
 - [ ] Filename follows convention: `YYYY-MM-DD-{slug}.md`
-- [ ] `_blog/` archive keeps `../images/` links; `docs/blog/` copy uses `./images/`
-- [ ] Companion links use exact date-prefixed filenames in `docs/blog/`
-- [ ] Post copied to `docs/blog/` in the same repository
-- [ ] Post added to `docs/blog/index.md` toctree
-- [ ] Development PR checks pass against `develop`
-- [ ] Change replayed into `BenchBox-dev/benchbox-site` and its pull request merged to `main`
-- [ ] Deploy run succeeded; post checked live at `https://benchbox.dev/blog/`
+- [ ] `drafts/` archive keeps `../images/` links; `blog/` copy uses `./images/`
+- [ ] Referenced images copied to `blog/images/`
+- [ ] Companion links use exact date-prefixed filenames in `blog/`
+- [ ] Post copied to `blog/` in this repository
+- [ ] Post added to `blog/index.md` toctree
+- [ ] `npm run lint:guard` and `npm run lint:comments` pass
+- [ ] Pull request `ci` checks pass against `main`
+- [ ] Pull request merged to `main`; deploy run succeeded
+- [ ] Post checked live at `https://benchbox.dev/blog/`
