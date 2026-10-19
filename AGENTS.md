@@ -68,6 +68,15 @@ itself plus one versioned core bundle; it reads nothing else from core.
   input; it does not bypass any deploy gate.
 - `npm run test:deploy` includes an isolated real-process `gh` stub smoke
   covering class transitions, unchanged creation bodies, closure and markers.
+- Bundle fetch waits at most ten minutes of monotonic elapsed time for the
+  producer to complete successfully, including API calls; an unfinished success
+  conclusion does not bypass completion. Each poll request uses the remaining
+  deadline as its fetch timeout.
+- Bundle and receipt downloads share three attempts, with delays of 5 and
+  15 seconds. Only HTTP 5xx and network failures retry. Each attempt starts
+  with an empty temporary download directory; digest, provenance and deploy
+  gates remain outside the retry boundary. Retry delays add at most 20 seconds.
+- A failed run opens or updates an issue.
 - `npm run shadow:compare -- <core tree> website/dist
   inventory/shadow-allowlist.json` compares a build with core's build of
   the same bundle. Every allowed difference in that file carries a reason.

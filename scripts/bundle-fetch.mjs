@@ -8,10 +8,13 @@ import { pathToFileURL } from "node:url";
 import { createHash } from "node:crypto";
 import { siteInputsDir } from "./bundle-lib.mjs";
 import { CORE_REPO, githubJson, verifyWithCertification } from "./bundle-verify.mjs";
+import { downloadArtifact } from "./github-download.mjs";
 
 const ARTIFACT_PREFIX = "site-inputs-";
+export const MAX_PRODUCING_RUN_WAIT_MS = 10 * 60 * 1000;
+export const PRODUCING_RUN_POLL_INTERVALS_MS = [5000, 10000, 15000, 30000];
 
-export function producingRunErrors(run) {
+function producingRunProvenanceErrors(run) {
   const errors = [];
   if (!run) return ["producing site-inputs run not found"];
   if (String(run.repository?.full_name ?? "").toLowerCase() !== CORE_REPO.toLowerCase())
@@ -21,23 +24,57 @@ export function producingRunErrors(run) {
   if (run.head_branch !== "develop") errors.push(`producing run branch is ${run.head_branch}, not develop`);
   if (run.event !== "workflow_run" && run.event !== "workflow_dispatch")
     errors.push(`producing run event is ${run.event}, not workflow_run or workflow_dispatch`);
-  if (run.conclusion !== "success") errors.push(`producing run concluded ${run.conclusion}`);
   return errors;
 }
 
-export async function producingRun(runId, env = process.env) {
-  const run = await githubJson(`repos/${CORE_REPO}/actions/runs/${runId}`, env);
-  const errors = producingRunErrors(run);
-  if (errors.length > 0) throw new Error(errors.join("; "));
-  return run;
+export function producingRunErrors(run) {
+  const errors = producingRunProvenanceErrors(run);
+  if (run && run.conclusion !== "success") errors.push(`producing run concluded ${run.conclusion}`);
+  return errors;
 }
 
-export async function newestBundle(env = process.env) {
+export async function producingRun(runId, env = process.env, options = {}) {
+  const maxWaitMs = options.maxWaitMs ?? MAX_PRODUCING_RUN_WAIT_MS;
+  const now = options.now ?? (() => performance.now());
+  const deadline = now() + maxWaitMs;
+  const sleep = options.sleep ?? ((ms) => new Promise((resolve) => setTimeout(resolve, ms)));
+  const log = options.log ?? console.log;
+  const timeout = () => new Error(`producing run ${runId} did not complete within the ${maxWaitMs / 1000}s wait cap`);
+  let attempt = 0;
+  while (true) {
+    const remaining = deadline - now();
+    if (remaining <= 0) throw timeout();
+    const signal = AbortSignal.timeout(Math.ceil(remaining));
+    let run;
+    try {
+      run = await (options.fetchJson ?? githubJson)(`repos/${CORE_REPO}/actions/runs/${runId}`, env, signal);
+    } catch (error) {
+      if (signal.aborted || now() >= deadline) throw timeout();
+      throw error;
+    }
+    if (now() >= deadline) throw timeout();
+    const errors = producingRunProvenanceErrors(run);
+    if (errors.length) throw new Error(errors.join("; "));
+    if (run.conclusion && run.conclusion !== "success") throw new Error(`producing run concluded ${run.conclusion}`);
+    if (run.status === "completed") {
+      if (run.conclusion !== "success") throw new Error(`producing run concluded ${run.conclusion}`);
+      return run;
+    }
+    const interval = PRODUCING_RUN_POLL_INTERVALS_MS[Math.min(attempt, PRODUCING_RUN_POLL_INTERVALS_MS.length - 1)];
+    const delay = Math.min(interval, deadline - now());
+    if (delay <= 0) throw timeout();
+    log(`bundle:fetch: producing run ${runId} is ${run.status}; waiting ${delay / 1000}s...`);
+    await sleep(delay);
+    attempt += 1;
+  }
+}
+
+export async function newestBundle(env = process.env, options = {}) {
   if (env.SITE_INPUTS_RUN_ID) {
     const { artifacts } = await githubJson(`repos/${CORE_REPO}/actions/runs/${env.SITE_INPUTS_RUN_ID}/artifacts`, env);
     const artifact = artifacts.find((item) => item.name.startsWith(ARTIFACT_PREFIX) && !item.expired);
     if (!artifact) throw new Error(`run ${env.SITE_INPUTS_RUN_ID} has no unexpired site-inputs artifact`);
-    await producingRun(env.SITE_INPUTS_RUN_ID, env);
+    await producingRun(env.SITE_INPUTS_RUN_ID, env, options);
     return { runId: env.SITE_INPUTS_RUN_ID, artifact };
   }
   if (env.SITE_INPUTS_CORE_SHA) {
@@ -45,7 +82,7 @@ export async function newestBundle(env = process.env) {
     const { artifacts } = await githubJson(`repos/${CORE_REPO}/actions/artifacts?name=${name}&per_page=10`, env);
     const artifact = artifacts.find((item) => !item.expired && item.workflow_run?.head_branch === "develop");
     if (!artifact) throw new Error(`no unexpired develop bundle is named ${name}`);
-    await producingRun(artifact.workflow_run.id, env);
+    await producingRun(artifact.workflow_run.id, env, options);
     return { runId: String(artifact.workflow_run.id), artifact };
   }
   const { workflow_runs: runs } = await githubJson(
@@ -81,7 +118,7 @@ async function main() {
   const { runId, artifact } = await newestBundle();
   const work = mkdtempSync(path.join(tmpdir(), "site-inputs-fetch-"));
   try {
-    execFileSync("gh", ["run", "download", runId, "-R", CORE_REPO, "-n", artifact.name, "-D", work], { stdio: "inherit" });
+    downloadArtifact(CORE_REPO, runId, artifact.name, work);
     const archive = path.join(work, readdirSync(work).find((name) => name.endsWith(".tar.zst")) ?? "");
     const digest = `sha256:${createHash("sha256").update(readFileSync(archive)).digest("hex")}`;
     if (process.env.SITE_INPUTS_DIGEST && process.env.SITE_INPUTS_DIGEST !== digest) {

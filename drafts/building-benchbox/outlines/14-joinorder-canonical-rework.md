@@ -242,7 +242,7 @@ Add:
 ## Follow-Up Research Before Draft
 
 - Confirm issue #289 is still the primary reference link at publish time; archive the issue body
-  (and any comments) to `_blog/building-benchbox/research/14-joinorder/issue-289-snapshot.md` so the
+  (and any comments) to `../research/14-joinorder/issue-289-snapshot.md` so the
   post survives later edits or deletion.
 - Check whether @partychicken would like to be credited by GitHub handle or by name; default to the
   GitHub handle until the reporter says otherwise.

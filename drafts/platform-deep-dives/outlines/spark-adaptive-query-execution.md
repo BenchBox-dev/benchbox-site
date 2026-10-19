@@ -13,7 +13,7 @@ adaptation exactly when they add it (Trino under fault-tolerant execution,
 BigQuery), and single-node engines have no shuffle boundary for this problem to
 live at (DuckDB). Architectural fit, not maturity.
 
-**Evidence source:** `_blog/platform-deep-dives/research/spark-aqe-verification-2026-07-04.md`.
+**Evidence source:** `../research/spark-aqe-verification-2026-07-04.md`.
 Every external claim cites a dated entry there, with its real provenance
 (verbatim from official Apache mirrors vs search-derived, labeled). BenchBox
 source findings cite file and line. No BenchBox benchmark run is claimed
@@ -283,4 +283,4 @@ first sentence and again in Limitations.
 - [ ] Run the section 6 plan; replace the future tense with measured results
       and move the resulting evidence into the research file with dates.
 - [ ] Draft the synthesis table (4e) and check it reads neutrally with the
-      content validation checklist in `_blog/STYLE_GUIDE.md`.
+      content validation checklist in `../../STYLE_GUIDE.md`.

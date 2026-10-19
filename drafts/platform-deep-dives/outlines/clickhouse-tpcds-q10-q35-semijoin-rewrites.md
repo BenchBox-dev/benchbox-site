@@ -196,5 +196,5 @@ consistency rewrite, and Q10 is the memory case. The outline below still works.
 ## Next step
 
 Run E1-E3 and attach the results under
-`_blog/platform-deep-dives/research/clickhouse-tpcds-q10-q35-verification-<date>.md`.
+`../research/clickhouse-tpcds-q10-q35-verification-<date>.md`.
 Then run the `research` action to fill the ledger, and `draft`.

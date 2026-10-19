@@ -1,7 +1,7 @@
 # Research: DuckDB tpch extension vs BenchBox TPCH implementation
 
 Research notes for planned Building BenchBox post:
-`_blog/building-benchbox/outlines/05-duckdb-tpch-extension-vs-benchbox.md`
+`../outlines/05-duckdb-tpch-extension-vs-benchbox.md`
 
 ---
 
@@ -19,7 +19,7 @@ The goal is not to pick a winner. The goal is to explain design intent, capabili
 ## Overlap and duplication check
 
 Reviewed:
-`_blog/benchbox-in-action/drafts/06-platform-specific-optimization-patterns.md`
+`../../benchbox-in-action/drafts/06-platform-specific-optimization-patterns.md`
 
 Finding:
 - Low topical overlap.

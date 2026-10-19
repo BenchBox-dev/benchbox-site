@@ -43,7 +43,7 @@ comparison.
 ## Structure and word budget
 
 Target: 1,800-2,200 words. Series beats from
-`_blog/building-benchbox/outlines/series-plan.md`. H2s need not use the
+`series-plan.md`. H2s need not use the
 template labels.
 
 ### 1. The problem - Which numbers belong together (~180 words)
