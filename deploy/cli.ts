@@ -8,7 +8,7 @@ import { SNAPSHOT_PATH, snapshotSha } from "./gates/snapshot-digest.ts";
 import { canonicalDigest } from "./lib/canonical-digest.ts";
 import { downloadReceipt, githubApi, recordedReceipts, verifiedReceipt } from "./lib/github.ts";
 import { checksumManifest, probe } from "./lib/probe.ts";
-import { latencySeconds, receiptBytes, receiptSha, RECEIPT_SCHEMA, statusDescription, type Receipt } from "./lib/receipt.ts";
+import { latencySeconds, receiptBytes, receiptSha, RECEIPT_SCHEMA, statusDescription, type Receipt, type ProbeSummary } from "./lib/receipt.ts";
 import { recheckErrors } from "./lib/recheck.ts";
 import { markRehearsal } from "./lib/rehearsal.ts";
 import { chainErrors, freshnessErrors, type Deployed } from "./lib/resolve.ts";
@@ -189,8 +189,8 @@ async function receipt(): Promise<void> {
     path.join(WORK, "gates.json"),
   );
   const probes = existsSync(path.join(WORK, "probe.json"))
-    ? readJson<{ ok: boolean; matched: number; mismatched: string[]; errors: string[]; attempts: number }>(path.join(WORK, "probe.json"))
-    : { ok: false, matched: 0, mismatched: [], errors: ["not probed"], attempts: 0 };
+    ? readJson<ProbeSummary>(path.join(WORK, "probe.json"))
+    : { ok: false, matched: 0, mismatched: [], mismatch_details: [], errors: ["not probed"], attempts: 0 };
   const coreCommit = await githubApi()(`repos/${CORE_REPO}/commits/${resolution.core_sha}`);
   const coreMergedAt = coreCommit.status === 200 ? ((coreCommit.body as { commit?: { committer?: { date?: string } } }).commit?.committer?.date ?? null) : null;
   const liveAt = new Date().toISOString();
@@ -213,7 +213,7 @@ async function receipt(): Promise<void> {
     explorer_read_model_version: gateReport.ui_version,
     snapshot_read_model_version: resolution.snapshot_read_model_version,
     gates: { ok: gateReport.ok, results: Object.fromEntries(Object.entries(gateReport.results).map(([name, result]) => [name, result.status])) },
-    probes: { ok: probes.ok, matched: probes.matched, mismatched: probes.mismatched, errors: probes.errors, attempts: probes.attempts },
+    probes: { ok: probes.ok, matched: probes.matched, mismatched: probes.mismatched, mismatch_details: probes.mismatch_details ?? [], errors: probes.errors, attempts: probes.attempts },
     rollback_of: resolution.rollback_target?.run_id ?? null,
     queued_at: queuedAt,
     core_merged_at: coreMergedAt,

@@ -2,6 +2,7 @@ import { createHash } from "node:crypto";
 import { existsSync, readFileSync } from "node:fs";
 import path from "node:path";
 import { filesUnder } from "../gates/files.ts";
+import type { ProbeMismatch } from "./receipt.ts";
 
 export const ROUTE_ROOTS = ["index.html", "docs/index.html", "docs/dev/index.html", "blog/index.html", "results/index.html", "404.html"];
 export const REQUIRED_PATHS = [...ROUTE_ROOTS, "results/data/results.duckdb", "docs/objects.inv"];
@@ -34,31 +35,43 @@ export type ProbeOutcome = {
   attempts: number;
   matched: number;
   mismatched: string[];
+  mismatch_details: ProbeMismatch[];
   errors: string[];
   deep_link: { ok: boolean; status: number };
 };
 
-type Fetch = (url: string) => Promise<{ status: number; body: Uint8Array }>;
+type ProbeResponse = { status: number; body: Uint8Array; headers?: Record<string, string> };
+type Fetch = (url: string) => Promise<ProbeResponse>;
+const CACHE_HEADERS = ["age", "cache-control", "date", "etag", "last-modified", "via", "x-cache", "x-cache-hits", "x-served-by", "x-proxy-cache"];
 
-export async function fetchBytes(url: string): Promise<{ status: number; body: Uint8Array }> {
+export async function fetchBytes(url: string): Promise<ProbeResponse> {
   const response = await fetch(url, { redirect: "follow", headers: { "User-Agent": "benchbox-site-deploy-probe/1.0" } });
-  return { status: response.status, body: new Uint8Array(await response.arrayBuffer()) };
+  const headers: Record<string, string> = {};
+  for (const name of CACHE_HEADERS) {
+    const value = response.headers.get(name);
+    if (value !== null) headers[name] = value;
+  }
+  return { status: response.status, body: new Uint8Array(await response.arrayBuffer()), headers };
 }
 
 export async function probeOnce(baseUrl: string, manifest: Record<string, string>, fetchImpl: Fetch = fetchBytes): Promise<Omit<ProbeOutcome, "attempts">> {
   const mismatched: string[] = [];
+  const mismatchDetails: ProbeMismatch[] = [];
   const errors: string[] = [];
   let matched = 0;
   for (const [url, expected] of Object.entries(manifest).sort()) {
     try {
-      const { status, body } = await fetchImpl(new URL(url, baseUrl).href);
+      const { status, body, headers = {} } = await fetchImpl(new URL(url, baseUrl).href);
       if (status < 200 || status >= 300) {
         errors.push(`${url}: HTTP ${status}`);
         continue;
       }
       const actual = createHash("sha256").update(body).digest("hex");
       if (actual.toLowerCase() === expected.toLowerCase()) matched += 1;
-      else mismatched.push(url);
+      else {
+        mismatched.push(url);
+        mismatchDetails.push({ url, expected_sha256: expected, served_sha256: actual, headers });
+      }
     } catch (error) {
       errors.push(`${url}: ${String(error)}`);
     }
@@ -70,7 +83,7 @@ export async function probeOnce(baseUrl: string, manifest: Record<string, string
   } catch (error) {
     errors.push(`${DEEP_LINK}: ${String(error)}`);
   }
-  return { ok: mismatched.length === 0 && errors.length === 0 && deepLink.ok, base_url: baseUrl, matched, mismatched, errors, deep_link: deepLink };
+  return { ok: mismatched.length === 0 && errors.length === 0 && deepLink.ok, base_url: baseUrl, matched, mismatched, mismatch_details: mismatchDetails, errors, deep_link: deepLink };
 }
 
 export async function probe(
