@@ -1,12 +1,22 @@
 import { test, afterEach } from "node:test";
 import assert from "node:assert/strict";
-import { newestBundle, producingRunErrors } from "./bundle-fetch.mjs";
+import {
+  newestBundle,
+  producingRunErrors,
+  producingRun,
+  downloadArtifactWithRetry,
+  isRetryableDownloadError,
+  MAX_PRODUCING_RUN_WAIT_MS,
+  DOWNLOAD_RETRY_INTERVALS_MS,
+  JOB_TIMEOUT_MS,
+} from "./bundle-fetch.mjs";
 
 const RUN = {
   id: 38607974569,
   path: ".github/workflows/site-inputs.yml",
   event: "workflow_run",
   head_branch: "develop",
+  status: "completed",
   conclusion: "success",
   head_sha: "d16a0761bfc79dbfdaa253bf121d194c2b8c7bd7",
   repository: { full_name: "BenchBox-dev/benchbox" },
@@ -86,4 +96,168 @@ test("a run id fetch accepts the recorded develop run", async () => {
   stubFetch(RUN);
   const found = await newestBundle({ SITE_INPUTS_RUN_ID: "38607974569" });
   assert.equal(found.runId, "38607974569");
+});
+
+test("producer in_progress then success proceeds", async () => {
+  let calls = 0;
+  const slept = [];
+  const run = await producingRun(
+    "38607974569",
+    {},
+    {
+      fetchJson: async () => {
+        calls += 1;
+        if (calls === 1) return { ...RUN, status: "in_progress", conclusion: null };
+        return { ...RUN, status: "completed", conclusion: "success" };
+      },
+      sleep: async (ms) => {
+        slept.push(ms);
+      },
+      log: () => {},
+    },
+  );
+  assert.equal(run.conclusion, "success");
+  assert.equal(calls, 2);
+  assert.deepEqual(slept, [5000]);
+});
+
+test("in_progress beyond the cap fails with a clear message", async () => {
+  const slept = [];
+  await assert.rejects(
+    producingRun(
+      "38607974569",
+      {},
+      {
+        maxWaitMs: 15000,
+        pollIntervals: [5000, 5000, 5000],
+        fetchJson: async () => ({ ...RUN, status: "in_progress", conclusion: null }),
+        sleep: async (ms) => {
+          slept.push(ms);
+        },
+        log: () => {},
+      },
+    ),
+    /did not complete within the 10-minute wait cap/,
+  );
+  assert.ok(slept.length >= 3);
+});
+
+test("concluded failure fails immediately without waiting", async () => {
+  let sleepCalled = false;
+  await assert.rejects(
+    producingRun(
+      "38607974569",
+      {},
+      {
+        fetchJson: async () => ({ ...RUN, status: "completed", conclusion: "failure" }),
+        sleep: async () => {
+          sleepCalled = true;
+        },
+        log: () => {},
+      },
+    ),
+    /concluded failure/,
+  );
+  assert.equal(sleepCalled, false);
+});
+
+test("download retry on 503 then success proceeds", () => {
+  let calls = 0;
+  const slept = [];
+  const result = downloadArtifactWithRetry(
+    () => {
+      calls += 1;
+      if (calls === 1) throw new Error("HTTP 503: 503 Egress is over the account limit");
+      return "downloaded";
+    },
+    {
+      sleep: (ms) => {
+        slept.push(ms);
+      },
+      log: () => {},
+    },
+  );
+  assert.equal(result, "downloaded");
+  assert.equal(calls, 2);
+  assert.deepEqual(slept, [5000]);
+});
+
+test("download retry fails after three 503 attempts", () => {
+  let calls = 0;
+  const slept = [];
+  assert.throws(
+    () => {
+      downloadArtifactWithRetry(
+        () => {
+          calls += 1;
+          throw new Error("HTTP 503: 503 Egress is over the account limit");
+        },
+        {
+          sleep: (ms) => {
+            slept.push(ms);
+          },
+          log: () => {},
+        },
+      );
+    },
+    /503 Egress is over the account limit/,
+  );
+  assert.equal(calls, 3);
+  assert.deepEqual(slept, [5000, 15000]);
+});
+
+test("404 and 403 errors are not retried", () => {
+  let calls = 0;
+  assert.throws(
+    () => {
+      downloadArtifactWithRetry(() => {
+        calls += 1;
+        throw new Error("HTTP 404: Not Found");
+      });
+    },
+    /HTTP 404/,
+  );
+  assert.equal(calls, 1);
+
+  assert.throws(
+    () => {
+      downloadArtifactWithRetry(() => {
+        calls += 1;
+        throw new Error("HTTP 403: Resource not accessible by integration");
+      });
+    },
+    /HTTP 403/,
+  );
+  assert.equal(calls, 2);
+});
+
+test("digest mismatch is not retried", () => {
+  let calls = 0;
+  assert.throws(
+    () => {
+      downloadArtifactWithRetry(() => {
+        calls += 1;
+        throw new Error("bundle digest sha256:abc does not match sha256:def");
+      });
+    },
+    /bundle digest/,
+  );
+  assert.equal(calls, 1);
+});
+
+test("isRetryableDownloadError classifies correctly", () => {
+  assert.equal(isRetryableDownloadError(new Error("HTTP 503: Service Unavailable")), true);
+  assert.equal(isRetryableDownloadError(new Error("HTTP 500: Internal Server Error")), true);
+  assert.equal(isRetryableDownloadError(new Error("fetch failed: ECONNRESET")), true);
+  assert.equal(isRetryableDownloadError(new Error("HTTP 404: Not Found")), false);
+  assert.equal(isRetryableDownloadError(new Error("HTTP 403: Forbidden")), false);
+  assert.equal(isRetryableDownloadError(new Error("digest mismatch: sha256:123 vs sha256:456")), false);
+  assert.equal(isRetryableDownloadError(new Error("gate failed: snapshot_digest")), false);
+});
+
+test("total added wait is bounded below the job timeout", () => {
+  const maxDownloadRetryWaitMs = DOWNLOAD_RETRY_INTERVALS_MS.reduce((acc, curr) => acc + curr, 0);
+  const totalMaxWaitMs = MAX_PRODUCING_RUN_WAIT_MS + maxDownloadRetryWaitMs;
+  assert.ok(totalMaxWaitMs < JOB_TIMEOUT_MS);
+  assert.ok(totalMaxWaitMs < 15 * 60 * 1000);
 });
