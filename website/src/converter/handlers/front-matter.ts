@@ -1,4 +1,4 @@
-import { NotYetImplementedError, UnknownConstructError } from "../errors.ts";
+import { ConverterError, NotYetImplementedError, UnknownConstructError } from "../errors.ts";
 import type { FrontMatterHandler } from "../types.ts";
 
 const PASSTHROUGH = ["author", "blogpost", "created", "date", "orphan", "owner", "post_number", "series", "status", "type"] as const;
@@ -8,7 +8,10 @@ const SUPPORTED_EXTENSIONS = new Set(["deflist", "attrs_block"]);
 export const passthroughFrontMatter: FrontMatterHandler = {
   kind: "front-matter",
   keys: PASSTHROUGH,
-  handle(key, value, _at, context) {
+  handle(key, value, at, context) {
+    if (key === "status" && value === "draft" && context.collection === "blog") {
+      throw new ConverterError(at.file, at.line, "blog articles marked as drafts cannot be published; prepare the article on a publication branch before adding it to blog/");
+    }
     context.setPageData(key, value);
   },
 };

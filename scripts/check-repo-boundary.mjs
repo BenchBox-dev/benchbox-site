@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 import { execFileSync } from "node:child_process";
-import { readFileSync } from "node:fs";
+import { existsSync, readFileSync } from "node:fs";
 import path from "node:path";
 import { pathToFileURL } from "node:url";
 
@@ -66,7 +66,7 @@ export function findingsFor(file, source) {
 }
 
 function trackedFiles() {
-  return execFileSync("git", ["ls-files", "-z"], { encoding: "utf8" }).split("\0").filter(Boolean);
+  return execFileSync("git", ["ls-files", "-z"], { encoding: "utf8" }).split("\0").filter(existsSync);
 }
 
 function main() {

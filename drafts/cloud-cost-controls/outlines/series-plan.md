@@ -41,34 +41,36 @@ Benchmarking databases means spinning up expensive resources, and forgetting to 
 
 ### Metadata template
 
+Frontmatter follows `drafts/PUBLISHING.md`: no `title` field (the `#` heading carries the title) and no `status` field. Set the publication `date` for real on the publication branch.
+
 ```yaml
-title: "{Topic}: {Specific Technique}"
+blogpost: true
+date: Month DD, YYYY
+author: Joe Harris
 series: cloud-cost-controls
 post_number: N
-date: YYYY-MM-DD
-tags: [cost-management, aws, benchmarking, {specific-service}, finops]
+type: tutorial
+tags: cost-management, aws, benchmarking, {specific-service}, finops
+meta_description: "One-sentence summary of the post."
 ```
 
-## Planned posts
+## Posts
 
-| #   | Title                                         | Status       | Key Insight                                                         | Notes                                      |
-| --- | --------------------------------------------- | ------------ | ------------------------------------------------------------------- | ------------------------------------------ |
-| 1   | AWS cost controls for analytics benchmarks    | **DRAFTED**  | Service-specific limits + Budget Actions provide layered protection | Establishes pattern for series             |
-| 2   | GCP cost controls for BigQuery benchmarking   | **DRAFTED**  | $6.25/TB on-demand; custom quotas + max_bytes_billed for control    | ~2,100 words; follows AWS pattern          |
-| 3   | Snowflake credit controls for testing         | **DRAFTED**  | Resource monitors with suspend actions; 60s auto-suspend minimum    | ~2,300 words; credit-based controls        |
-| 4   | Databricks cost controls for benchmarking     | **DRAFTED**  | Cluster policies, DBU limits; budgets don't stop spending (critical gap) | ~2,200 words                              |
-| 5   | Azure Synapse and Fabric cost controls        | **DRAFTED**  | DWU caps, Fabric CU, pause/resume; budgets need automation          | ~2,200 words                              |
-| 6   | The AWS Free Tier trap                        | **DRAFTED**  | Organizations aggregate Free Tier; no analytics Free Tier           | ~1,600 words                              |
-| 7   | Budget Actions: the emergency brake you need  | IDEA         | IAM deny policies on budget threshold are the nuclear option        | When alerts aren't enough                  |
-| 8   | Existing tools: what works and what doesn't   | IDEA         | Cloud Custodian, Budget Controls for AWS, cloud-nuke                | Tool comparison for cost control           |
-| 9   | Multi-cloud cost governance patterns          | IDEA         | Common patterns across AWS/GCP/Azure/Snowflake                      | Series synthesis                           |
+Location is the one maintained copy: published posts link their `blog/` canonical file, unpublished posts their draft file. Publication order is set in `drafts/PUBLICATION_SCHEDULE.md`, not here.
 
-### Status definitions
+| #   | Title                                         | Location | Key Insight                                                         |
+| --- | --------------------------------------------- | -------- | ------------------------------------------------------------------- |
+| 0   | Cloud cost controls for benchmarking (series intro) | [Draft](../drafts/00-series-intro.md) | Layered defense pattern, pricing scope, and cross-platform comparison |
+| 1   | AWS cost controls for analytics benchmarks    | [Draft](../drafts/01-aws-cost-controls-analytics-benchmarks.md) | Service-specific limits + Budget Actions provide layered protection |
+| 2   | GCP cost controls for BigQuery benchmarking   | [Draft](../drafts/02-gcp-bigquery-cost-controls.md) | $6.25/TB on-demand; custom quotas + max_bytes_billed for control |
+| 3   | Snowflake credit controls for testing         | [Draft](../drafts/03-snowflake-credit-controls.md) | Resource monitors with suspend actions; 60s auto-suspend minimum |
+| 4   | Databricks cost controls for benchmarking     | [Draft](../drafts/04-databricks-cost-controls.md) | Cluster policies, DBU limits; budgets don't stop spending (critical gap) |
+| 5   | Azure Synapse and Fabric cost controls        | [Draft](../drafts/05-azure-synapse-fabric-cost-controls.md) | DWU caps, Fabric CU, pause/resume; budgets need automation |
+| 6   | The AWS Free Tier trap                        | [Draft](../drafts/06-aws-free-tier-trap.md) | Organizations aggregate Free Tier; no analytics Free Tier |
+| 7   | Budget Actions: the emergency brake you need  | Idea, no file yet | IAM deny policies on budget threshold are the nuclear option |
+| 8   | Existing tools: what works and what doesn't   | Idea, no file yet | Tool comparison for cost control |
+| 9   | Multi-cloud cost governance patterns          | Idea, no file yet | Series synthesis |
 
-- **DRAFTING**: Draft in progress (`drafts/`)
-- **OUTLINE**: Full outline complete, ready for draft (`outlines/`)
-- **PLANNED**: Concept defined, needs research and outline
-- **IDEA**: Topic identified, needs scoping
 
 ## Key themes
 
@@ -208,35 +210,9 @@ This series directly supports BenchBox users:
 
 ---
 
-## Progress tracker
+## History
 
-| Milestone | Status | Date |
-|-----------|--------|------|
-| Series plan created | Done | 2026-01-22 |
-| Post #1 research | Done | 2026-01-22 |
-| Post #1 outline | Done | 2026-01-22 |
-| Post #1 draft | Done | 2026-01-22 |
-| Post #2 (GCP) outline | Done | 2026-01-31 |
-| Post #2 (GCP) research | Done | 2026-01-31 |
-| Post #3 (Snowflake) outline | Done | 2026-01-31 |
-| Post #3 (Snowflake) research | Done | 2026-01-31 |
-| Post #2 draft | Done | 2026-01-31 |
-| Post #3 draft | Done | 2026-01-31 |
-| Post #4 (Databricks) research | Done | 2026-02-01 |
-| Post #4 (Databricks) outline | Done | 2026-02-01 |
-| Post #5 (Azure) research | Done | 2026-02-01 |
-| Post #5 (Azure) outline | Done | 2026-02-01 |
-| Post #6 (Free Tier) research | Done | 2026-02-01 |
-| Post #6 (Free Tier) outline | Done | 2026-02-01 |
-| Post #4 draft | Done | 2026-02-01 |
-| Post #5 draft | Done | 2026-02-01 |
-| Post #6 draft | Done | 2026-02-01 |
-| Posts #1-6 critique | Done | 2026-02-01 |
-| Posts #1-6 revisions | Done | 2026-02-01 |
-| Series intro (Post 0) | Done | 2026-03-02 |
-| Posts #1-6 second critique + fixes | Done | 2026-03-02 |
-
----
+Series plan created 2026-01-22. Posts 1-6 researched, outlined, drafted, critiqued, and revised through 2026-02-01; series intro added with a second critique pass 2026-03-02. The publication queue lives in `drafts/PUBLICATION_SCHEDULE.md`.
 
 *Series created: 2026-01-22*
-*Last updated: 2026-03-02 (second critique, series intro, and cross-cutting fixes)*
+*Last updated: 2026-10-19 (locations replace the status matrix; queue lives in `drafts/PUBLICATION_SCHEDULE.md`)*

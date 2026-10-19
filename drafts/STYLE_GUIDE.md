@@ -28,7 +28,7 @@ The BenchBox voice is that of a **friendly community member sharing useful findi
 
 ### Core Voice: "Factual yet friendly, technical yet understandable"
 
-Drafting card: [_blog/VOICE_REFERENCE.md](VOICE_REFERENCE.md), including Sentence craft. Do not copy that section into this file.
+Drafting card: [VOICE_REFERENCE.md](VOICE_REFERENCE.md), including Sentence craft. Do not copy that section into this file.
 
 ### Voice Characteristics
 
@@ -677,7 +677,7 @@ Include 5-8 relevant tags:
 
 ## Voice Reference (Quick Reference)
 
-For a condensed voice guide during drafting, see: `_blog/VOICE_REFERENCE.md`
+For a condensed voice guide during drafting, see: `drafts/VOICE_REFERENCE.md`
 
 ---
 
