@@ -220,19 +220,46 @@ jobs:
           private-key: ${{ secrets.SITE_BRIDGE_PRIVATE_KEY }}
           owner: BenchBox-dev
           repositories: BenchBox
-      - name: Open or update the core site-bundle-failed issue
+      - name: Open or update the core site-bundle-undeployed issue
         if: steps.app.outputs.token != ''
         env:
           GH_TOKEN: ${{ steps.app.outputs.token }}
+          CORE_REPO: BenchBox-dev/BenchBox
           RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
           CORE_SHA: ${{ github.event.client_payload.core_sha }}
+          EXPECTED_REJECTION: ${{ github.event.client_payload.expected_rejection }}
         run: |
-          set -euo pipefail
-          BODY="$(printf 'The site could not deploy the bundle for core commit %s.\n\nSite run: %s\n' "$CORE_SHA" "$RUN_URL")"
-          NUMBER="$(gh issue list --repo "$CORE_REPO" --label site-bundle-failed --state open --json number --jq '.[0].number // empty')"
-          if [ -n "$NUMBER" ]; then
-            gh issue comment "$NUMBER" --repo "$CORE_REPO" --body "$BODY"
-          else
-            gh label create site-bundle-failed --repo "$CORE_REPO" --color B60205 --description "The core site-inputs bundle build failed" --force
-            gh issue create --repo "$CORE_REPO" --title "Site could not deploy a core bundle" --label site-bundle-failed --body "$BODY"
-          fi
+          node --experimental-strip-types deploy/relay-cli.ts fail
+
+  report-success:
+    name: report success
+    needs: [build, deploy]
+    if: success() && github.event_name == 'repository_dispatch' && vars.SITE_DEPLOY_TARGET != ''
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    env:
+      HAS_BRIDGE_APP: ${{ secrets.SITE_BRIDGE_APP_ID != '' }}
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09
+      - uses: actions/setup-node@a0853c24544627f65ddf259abe73b1d18a591444
+        with:
+          node-version-file: .nvmrc
+      - name: Mint a core-scoped token
+        id: app
+        if: env.HAS_BRIDGE_APP == 'true'
+        uses: actions/create-github-app-token@bcd2ba49218906704ab6c1aa796996da409d3eb1
+        with:
+          app-id: ${{ secrets.SITE_BRIDGE_APP_ID }}
+          private-key: ${{ secrets.SITE_BRIDGE_PRIVATE_KEY }}
+          owner: BenchBox-dev
+          repositories: BenchBox
+      - name: Close any open core site-bundle-undeployed issue
+        if: steps.app.outputs.token != ''
+        env:
+          GH_TOKEN: ${{ steps.app.outputs.token }}
+          CORE_REPO: BenchBox-dev/BenchBox
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+          CORE_SHA: ${{ github.event.client_payload.core_sha }}
+          EXPECTED_REJECTION: ${{ github.event.client_payload.expected_rejection }}
+        run: |
+          node --experimental-strip-types deploy/relay-cli.ts success
