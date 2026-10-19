@@ -48,8 +48,7 @@ render them as "This is Y. This is not X."
   a rerun on v0.4.0.
 - Do **not** imply a foundation, new governance, or a new maintainer team.
 - Do **not** use Title Case after the colon. Follow post 13: sentence case.
-- Companion filename in this worktree:
-  `./16-results-explorer-introduction.md`. Do not retarget the
+- Companion file (published): `../../../blog/2026-09-15-results-explorer-introduction.md`. Do not retarget the
   older handoff name `16-results-explorer-sharing-reliable-results.md`.
 - Smoke commands use `--scale 0.01`. TPC-H SF1 is the DuckLake *validation*
   scale, not the try-it scale.

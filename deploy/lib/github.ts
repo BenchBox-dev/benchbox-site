@@ -1,8 +1,8 @@
-import { execFileSync } from "node:child_process";
-import { mkdtempSync, readFileSync, readdirSync } from "node:fs";
+import { mkdtempSync, readFileSync, readdirSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
 import path from "node:path";
 import { parseStatusDescription, receiptSha, type Receipt } from "./receipt.ts";
+import { downloadArtifact } from "../../scripts/github-download.mjs";
 
 export type Api = (route: string, init?: { method?: string; body?: unknown }) => Promise<{ status: number; body: unknown }>;
 
@@ -75,12 +75,20 @@ export function siteArtifactName(runId: string): string {
   return `site-artifact-${runId}`;
 }
 
-export function downloadReceipt(repo: string, runId: string): Receipt {
+export function downloadReceipt(
+  repo: string,
+  runId: string,
+  options: { sleep?: (ms: number) => void; log?: (msg: string) => void } = {},
+): Receipt {
   const dir = mkdtempSync(path.join(tmpdir(), "site-receipt-"));
-  execFileSync("gh", ["run", "download", runId, "-R", repo, "-n", receiptArtifactName(runId), "-D", dir], { stdio: "inherit" });
-  const file = readdirSync(dir).find((name) => name.endsWith(".json"));
-  if (!file) throw new Error(`receipt artifact of run ${runId} holds no JSON`);
-  return JSON.parse(readFileSync(path.join(dir, file), "utf8")) as Receipt;
+  try {
+    downloadArtifact(repo, runId, receiptArtifactName(runId), dir, options);
+    const file = readdirSync(dir).find((name) => name.endsWith(".json"));
+    if (!file) throw new Error(`receipt artifact of run ${runId} holds no JSON`);
+    return JSON.parse(readFileSync(path.join(dir, file), "utf8")) as Receipt;
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
 }
 
 export function verifiedReceipt(recorded: RecordedReceipt, load: (runId: string) => Receipt): Receipt {

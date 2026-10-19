@@ -79,3 +79,4 @@ test("rollback lookup finds a receipt beyond the first page", async () => {
   assert.ok(found);
   assert.equal(found.deploymentId, 5);
 });
+

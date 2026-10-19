@@ -49,25 +49,33 @@ This series demonstrates **real benchmarking workflows** using BenchBox: MCP ser
 
 ### Metadata template
 
+Frontmatter follows `drafts/PUBLISHING.md`: no `title` field (the `#` heading carries the title) and no `status` field. Set the publication `date` for real on the publication branch.
+
 ```yaml
-title: "BenchBox in action: {methodology insight}"
+blogpost: true
+date: Month DD, YYYY
+author: Joe Harris
 series: benchbox-in-action
 post_number: N
-date: YYYY-MM-DD
-tags: [benchmarking, benchbox, mcp, {topic}, {platform}]
+type: technical-challenge
+tags: benchmarking, benchbox, mcp, {topic}, {platform}
+meta_description: "One-sentence summary of the post."
 ```
 
-## Planned posts
+## Posts
 
-| # | Title | Status | Methodology insight | Notes |
-|---|-------|--------|---------------------|-------|
-| 1 | BenchBox in action: discovering the SQL vs DataFrame optimization gap | **DRAFTED** | Same engine, different interfaces → 9.4x gap reveals decorrelation architecture | MCP → CLI → compare → investigate |
-| 2 | BenchBox in action: vector search across six engines (and what recall@k does to your numbers) | **OUTLINED** | Reporting ANN latency without recall@k compares apples to oranges across engines | DuckDB, pgvector, Snowflake, ClickHouse, StarRocks, Doris; Q5 exact vs HNSW split |
-| 3 | BenchBox in action: scale factor effects on query rankings | IDEA | Query rankings change at different scale factors | SF0.01 vs SF1 vs SF10 |
-| 4 | BenchBox in action: cloud vs embedded cost-per-query | IDEA | What does a TPC-H query actually cost on Snowflake vs local DuckDB? | Ties to cloud-cost-controls series |
-| 5 | BenchBox in action: tuned vs untuned benchmarking | IDEA | How much does platform-specific tuning change results? | BenchBox tuning profiles |
-| 6 | BenchBox in action: DataFrame translation challenges | IDEA | Where do DataFrame implementations diverge from SQL semantics? | Q16, Q21, Q22 patterns |
-| 7 | BenchBox in action: when the same query needs different code | **OUTLINED** | Same DataFrame pattern, 5x difference across platforms → query planner architecture | Polars vs DataFusion vs PySpark |
+Location is the one maintained copy: published posts link their `blog/` canonical file, unpublished posts their draft or outline file. Publication order is set in `drafts/PUBLICATION_SCHEDULE.md`, not here.
+
+| # | Title | Location | Methodology insight |
+|---|-------|----------|---------------------|
+| 1 | BenchBox in action: discovering the SQL vs DataFrame optimization gap | No draft file in `drafts/`; research notes in the Post #1 section below | Same engine, different interfaces → 9.4x gap reveals decorrelation architecture |
+| 2 | BenchBox in action: vector search across six engines (and what recall@k does to your numbers) | [Outline](02-vector-search-recall-latency.md) | Reporting ANN latency without recall@k compares apples to oranges across engines |
+| 3 | BenchBox in action: scale factor effects on query rankings | Idea, no file yet | Query rankings change at different scale factors |
+| 4 | BenchBox in action: cloud vs embedded cost-per-query | Idea, no file yet | What does a TPC-H query actually cost on Snowflake vs local DuckDB? |
+| 5 | BenchBox in action: tuned vs untuned benchmarking | Idea, no file yet | How much does platform-specific tuning change results? |
+| 6 | BenchBox in action: DataFrame translation challenges | Idea, no file yet | Where do DataFrame implementations diverge from SQL semantics? |
+| 7 | BenchBox in action: when the same query needs different code | [Draft](../drafts/06-platform-specific-optimization-patterns.md) ([outline](06-platform-specific-optimization-patterns.md)) | Same DataFrame pattern, 5x difference across platforms → query planner architecture |
+
 
 ## Key themes
 
@@ -158,5 +166,5 @@ This series serves multiple purposes:
 ---
 
 *Series created: 2026-01-18*
-*Last updated: 2026-04-24*
+*Last updated: 2026-10-19 (locations replace the status matrix; queue lives in `drafts/PUBLICATION_SCHEDULE.md`)*
 *Revised: Removed platform-vs-platform framing; aligned with Blog Style Guide v2.0*

@@ -8,7 +8,7 @@ that convenience is real, but it is a pipeline-bound, Databricks-only abstractio
 The right lens is convenience vs portability, with honest numbers and code side by
 side. Let readers weigh the trade-off.
 
-**Evidence source:** `_blog/platform-deep-dives/research/apply-changes-into-vs-merge-verification-2026-06-27.md`.
+**Evidence source:** `../research/apply-changes-into-vs-merge-verification-2026-06-27.md`.
 Every perf/behavior claim cites a dated entry there. BenchBox harness results and
 Databricks doc/marketing claims are never conflated. No Databricks workspace was
 available, so the declarative side is documentation-grounded only.

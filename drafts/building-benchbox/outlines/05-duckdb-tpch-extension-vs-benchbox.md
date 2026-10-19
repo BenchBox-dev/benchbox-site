@@ -15,7 +15,7 @@ status: OUTLINE
 
 **Series fit**: Building BenchBox (engineering decision and trade-off post)
 
-**Non-overlap with existing draft**: `_blog/benchbox-in-action/drafts/06-platform-specific-optimization-patterns.md` is about TPC-DS DataFrame optimization patterns across Polars, DataFusion, and PySpark. This post will stay on TPCH architecture and workflow differences between DuckDB extension mode and BenchBox mode.
+**Non-overlap with existing draft**: `../../benchbox-in-action/drafts/06-platform-specific-optimization-patterns.md` is about TPC-DS DataFrame optimization patterns across Polars, DataFusion, and PySpark. This post will stay on TPCH architecture and workflow differences between DuckDB extension mode and BenchBox mode.
 
 ## Thesis
 
@@ -105,7 +105,7 @@ DuckDB's `tpch` extension and BenchBox's TPCH implementation solve different pro
 - Call out when data is reused versus regenerated.
 
 **Evidence needed**:
-- Existing BenchBox DuckDB timing verification notes in `_blog/platform-deep-dives/research/duckdb-architecture-verification-2026-02-20.md`.
+- Existing BenchBox DuckDB timing verification notes in `../../platform-deep-dives/research/duckdb-architecture-verification-2026-02-20.md`.
 - New controlled runs for this post.
 
 ### 6. Decision guide: when to use each path (~200 words)

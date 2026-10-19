@@ -69,26 +69,33 @@ Table formats are foundational to modern analytics architectures, but choosing b
 
 ### Metadata Template
 
+Frontmatter follows `drafts/PUBLISHING.md`: no `title` field (the `#` heading carries the title) and no `status` field. Set the publication `date` for real on the publication branch.
+
 ```yaml
-title: "Table formats with BenchBox: {Format}"
+blogpost: true
+date: Month DD, YYYY
+author: Joe Harris
 series: table-formats
 post_number: N
-date: YYYY-MM-DD
-tags: [benchmarking, benchbox, table-formats, {format}, parquet, data-lake]
+type: methodology-guide
+tags: benchmarking, benchbox, table-formats, {format}, parquet, data-lake
+meta_description: "One-sentence summary of the post."
 ```
 
 ---
 
-## Planned Posts
+## Posts
 
-| # | Post | Status | Purpose |
-|---|------|--------|---------|
-| 0 | **Series intro: Table formats for benchmarking** | PUBLISHED 2026-03-04 | Overview of formats, why they matter, series roadmap |
-| 1 | **Parquet basics: The foundation of modern analytics** | DRAFT | Parquet fundamentals, compression, row groups; SF1 data measured |
-| 2 | **Delta Lake: ACID transactions meet benchmarking** | OUTLINE | Delta Lake with BenchBox, local SF1 storage measured (305 MB); Databricks/Spark cloud benchmarks pending |
-| 3 | **Apache Iceberg: The open table format** | OUTLINE | Iceberg with BenchBox, multi-engine support; local SF1 measured (311 MB snappy, 246 MB zstd) via pyiceberg SQLite catalog |
-| 4 | **DuckLake: DuckDB-native ACID** | OUTLINE | DuckLake with BenchBox, local SF1 storage measured (309 MB) |
-| 5 | **Vortex: High-performance columnar format** | OUTLINE | Vortex with BenchBox; DuckDB extension + Python vortex-data bindings available; SF1 measured (274 MB) |
+Location is the one maintained copy: published posts link their `blog/` canonical file, unpublished posts their draft or outline file. Publication order is set in `drafts/PUBLICATION_SCHEDULE.md`, not here.
+
+| # | Post | Location | Purpose |
+|---|------|----------|---------|
+| 0 | **Series intro: Table formats for benchmarking** | [Draft](../drafts/00-table-formats-what-we-learned.md) | Overview of formats, why they matter, series roadmap |
+| 1 | **Parquet basics: The foundation of modern analytics** | [Draft](../drafts/01-parquet-basics.md) | Parquet fundamentals, compression, row groups; SF1 data measured |
+| 2 | **Delta Lake: ACID transactions meet benchmarking** | [Outline](02-delta-lake.md) | Delta Lake with BenchBox, local SF1 storage measured (305 MB); Databricks/Spark cloud benchmarks pending |
+| 3 | **Apache Iceberg: The open table format** | [Outline](03-iceberg.md) | Iceberg with BenchBox, multi-engine support; local SF1 measured (311 MB snappy, 246 MB zstd) via pyiceberg SQLite catalog |
+| 4 | **DuckLake: DuckDB-native ACID** | Idea, no outline yet | DuckLake with BenchBox, local SF1 storage measured (309 MB) |
+| 5 | **Vortex: High-performance columnar format** | [Outline](04-vortex.md) | Vortex with BenchBox; DuckDB extension + Python vortex-data bindings available; SF1 measured (274 MB) |
 
 ### Outline Files
 
@@ -145,11 +152,14 @@ tags: [benchmarking, benchbox, table-formats, {format}, parquet, data-lake]
 ### Metadata
 
 ```yaml
-title: "Table formats for benchmarking: A practical guide"
+blogpost: true
+date: Month DD, YYYY
+author: Joe Harris
 series: table-formats
 post_number: 0
-date: YYYY-MM-DD
-tags: [benchmarking, benchbox, table-formats, parquet, delta-lake, iceberg, vortex]
+type: methodology-guide
+tags: benchmarking, benchbox, table-formats, parquet, delta-lake, iceberg, vortex
+meta_description: "One-sentence summary of the post."
 ```
 
 ---
@@ -194,11 +204,14 @@ tags: [benchmarking, benchbox, table-formats, parquet, delta-lake, iceberg, vort
 ### Metadata
 
 ```yaml
-title: "Parquet basics: The foundation of modern analytics"
+blogpost: true
+date: Month DD, YYYY
+author: Joe Harris
 series: table-formats
 post_number: 1
-date: YYYY-MM-DD
-tags: [benchmarking, benchbox, table-formats, parquet, compression, columnar]
+type: methodology-guide
+tags: benchmarking, benchbox, table-formats, parquet, compression, columnar
+meta_description: "One-sentence summary of the post."
 ```
 
 ---
@@ -244,11 +257,14 @@ tags: [benchmarking, benchbox, table-formats, parquet, compression, columnar]
 ### Metadata
 
 ```yaml
-title: "Delta Lake: ACID transactions meet benchmarking"
+blogpost: true
+date: Month DD, YYYY
+author: Joe Harris
 series: table-formats
 post_number: 2
-date: YYYY-MM-DD
-tags: [benchmarking, benchbox, table-formats, delta-lake, databricks, acid]
+type: methodology-guide
+tags: benchmarking, benchbox, table-formats, delta-lake, databricks, acid
+meta_description: "One-sentence summary of the post."
 ```
 
 ---
@@ -294,11 +310,14 @@ tags: [benchmarking, benchbox, table-formats, delta-lake, databricks, acid]
 ### Metadata
 
 ```yaml
-title: "Apache Iceberg: The open table format"
+blogpost: true
+date: Month DD, YYYY
+author: Joe Harris
 series: table-formats
 post_number: 3
-date: YYYY-MM-DD
-tags: [benchmarking, benchbox, table-formats, iceberg, multi-engine, data-lake]
+type: methodology-guide
+tags: benchmarking, benchbox, table-formats, iceberg, multi-engine, data-lake
+meta_description: "One-sentence summary of the post."
 ```
 
 ---
@@ -346,11 +365,14 @@ tags: [benchmarking, benchbox, table-formats, iceberg, multi-engine, data-lake]
 ### Metadata
 
 ```yaml
-title: "Vortex: High-performance columnar format"
+blogpost: true
+date: Month DD, YYYY
+author: Joe Harris
 series: table-formats
 post_number: 4
-date: YYYY-MM-DD
-tags: [benchmarking, benchbox, table-formats, vortex, columnar, performance]
+type: methodology-guide
+tags: benchmarking, benchbox, table-formats, vortex, columnar, performance
+meta_description: "One-sentence summary of the post."
 ```
 
 ---
@@ -439,29 +461,9 @@ Rationale:
 ---
 
 *Series created: 2026-01-31*
-*Last updated: 2026-03-04*
 
-## Progress Tracker
+*Last updated: 2026-10-19 (locations replace the status matrix; queue lives in `drafts/PUBLICATION_SCHEDULE.md`)*
 
-| Milestone | Status | Date |
-|-----------|--------|------|
-| Series plan created | Done | 2026-01-31 |
-| Post #0 outline | Done | 2026-01-31 |
-| Post #1 outline | Done | 2026-01-31 |
-| Post #2 outline | Done | 2026-01-31 |
-| Post #3 outline | Done | 2026-01-31 |
-| Vortex research | Done | 2026-01-31 |
-| Local SF1 measurements (Parquet compressions) | Done | 2026-03-04 |
-| Local SF1 measurements (Delta Lake, DuckLake) | Done | 2026-03-04 |
-| Local SF1 measurements (Iceberg, Vortex) | Done | 2026-03-04 |
-| Post #0 published | Done | 2026-03-04 |
-| Post #1 draft (Parquet) | In Progress | 2026-03-04 |
-| Post #2 outline (Delta Lake) | Done | 2026-01-31 |
-| Post #3 outline (Iceberg) | Done | 2026-01-31 |
-| Post #4 outline (DuckLake) | Needed | - |
-| Post #5 outline (Vortex) | Needed | - |
-| SF10 benchmarks | Needed | - |
-| Cloud platform benchmarks (Delta/Iceberg) | Blocked | - |
 
 ## Research Files
 

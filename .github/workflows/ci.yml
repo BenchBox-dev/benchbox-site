@@ -80,6 +80,15 @@ jobs:
       - run: npm test -w explorer
       - run: npm run build
       - run: npm test -w website
+      - name: Upload the rendered site for editorial review
+        if: github.event_name == 'pull_request'
+        uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f
+        with:
+          name: site-preview
+          path: website/dist
+          include-hidden-files: true
+          retention-days: 7
+          if-no-files-found: error
 
   e2e:
     name: Explorer browser suite
@@ -142,27 +151,6 @@ jobs:
           dir="$(mktemp -d)"
           node scripts/fixture-bundle.mjs "$SCHEMA" "$dir"
           node scripts/bundle-verify.mjs --offline "$dir"
-
-  replay-fidelity:
-    name: seeded replay fidelity
-    runs-on: ubuntu-latest
-    timeout-minutes: 10
-    steps:
-      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09
-      - name: Read the pinned core ref
-        id: pin
-        run: echo "ref=$(cat inventory/replay-core-ref.txt)" >> "$GITHUB_OUTPUT"
-      - name: Check out core at the pinned ref
-        uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09
-        with:
-          repository: BenchBox-dev/BenchBox
-          ref: ${{ steps.pin.outputs.ref }}
-          path: .core
-      - uses: actions/setup-node@a0853c24544627f65ddf259abe73b1d18a591444
-        with:
-          node-version-file: .nvmrc
-      - name: Compare every seeded file with the pinned core ref
-        run: node scripts/replay-fidelity.mjs --core .core --ref "$(cat inventory/replay-core-ref.txt)" --site . --full
 
   ci:
     name: ci

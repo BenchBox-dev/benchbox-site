@@ -19,6 +19,34 @@ describe("front matter", () => {
     expect(front).toContain("date: 2026-01-02");
   });
 
+  it.each(["draft", "Draft", "DRAFT", " draft "])("rejects %j blog articles without emitting public pages", (status) => {
+    const result = build({
+      "blog/candidate.md": `---\nblogpost: true\ndate: October 19, 2026\nstatus: ${JSON.stringify(status)}\n---\n\n# Candidate\n\nUnapproved article.\n`,
+    });
+    expect(result.errors).toHaveLength(1);
+    expect(result.errors[0]).toMatchObject({ file: "blog/candidate.md", line: 4 });
+    expect(result.files.size).toBe(0);
+  });
+
+  it("rejects blog articles with draft status in an array", () => {
+    const result = build({
+      "blog/candidate.md": "---\nblogpost: true\ndate: October 19, 2026\nstatus:\n  - Draft\n---\n\n# Candidate\n\nUnapproved article.\n",
+    });
+    expect(result.errors).toHaveLength(1);
+    expect(result.errors[0]).toMatchObject({ file: "blog/candidate.md", line: 4 });
+    expect(result.files.size).toBe(0);
+  });
+
+  it.each(["published", undefined])("allows %s blog articles alongside draft documentation", (status) => {
+    const result = build({
+      "guide.md": "---\nstatus: draft\n---\n\n# Guide\n\nWork in progress.\n",
+      "blog/post.md": `---\nblogpost: true\ndate: October 19, 2026\n${status ? `status: ${status}\n` : ""}---\n\n# Published article\n\nReviewed article.\n`,
+    });
+    expect(result.errors).toEqual([]);
+    expect(result.files.has("content/docs/guide.md")).toBe(true);
+    expect(result.files.has("content/blog/post.md")).toBe(true);
+  });
+
   it("rejects an unknown key with its file and line", () => {
     const result = build({ "a.md": "---\nmystery: 1\n---\n\n# A\n" });
     expect(result.errors).toHaveLength(1);

@@ -4,7 +4,20 @@ export const RECEIPT_SCHEMA = "site-deploy-receipt/v1";
 export const RECEIPT_STATUS = /^site-deploy receipt sha256:([0-9a-f]{64}) run:(\d+)(?: target:(\S+))?$/;
 
 export type GateSummary = { ok: boolean; results: Record<string, string> };
-export type ProbeSummary = { ok: boolean; matched: number; mismatched: string[]; errors: string[]; attempts: number };
+export type ProbeMismatch = {
+  url: string;
+  expected_sha256: string;
+  served_sha256: string;
+  headers: Record<string, string>;
+};
+export type ProbeSummary = {
+  ok: boolean;
+  matched: number;
+  mismatched: string[];
+  mismatch_details?: ProbeMismatch[];
+  errors: string[];
+  attempts: number;
+};
 
 export type Receipt = {
   schema: typeof RECEIPT_SCHEMA;

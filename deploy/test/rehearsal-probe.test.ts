@@ -3,6 +3,10 @@ import assert from "node:assert/strict";
 import { createHash } from "node:crypto";
 import { readFileSync } from "node:fs";
 import path from "node:path";
+import { createServer } from "node:http";
+import { once } from "node:events";
+import { receiptBytes, type Receipt } from "../lib/receipt.ts";
+import { receipt } from "./helpers.ts";
 import { checksumManifest, probe, probeOnce, servedUrl } from "../lib/probe.ts";
 import { addNoindex, markRehearsal, NOINDEX, REHEARSAL_ROBOTS } from "../lib/rehearsal.ts";
 import { site } from "./helpers.ts";
@@ -73,4 +77,44 @@ test("the probe retries until the site serves the artifact", async () => {
   const never = await probe("https://site.test", { "/": sha("home") }, { attempts: 2, delayMs: 0, fetchImpl: fakeFetch({ "/": { status: 500, body: "" } }) });
   assert.equal(never.ok, false);
   assert.equal(never.attempts, 2);
+});
+
+test("persistent byte mismatches retain hashes and cache headers in the receipt", async () => {
+  const server = createServer((req, res) => {
+    if (req.url === "/") {
+      res.writeHead(200, { age: "72", "cache-control": "max-age=600", "x-cache": "HIT", etag: '"old"', "set-cookie": "private=value" });
+      res.end("old generation");
+    } else {
+      res.writeHead(404);
+      res.end("benchbox.results.redirect");
+    }
+  });
+  server.listen(0, "127.0.0.1");
+  await once(server, "listening");
+  try {
+    const address = server.address();
+    assert.ok(address && typeof address !== "string");
+    const outcome = await probe(`http://127.0.0.1:${address.port}`, { "/": sha("new generation") }, { attempts: 2, delayMs: 0 });
+    assert.equal(outcome.ok, false);
+    assert.equal(outcome.attempts, 2);
+    assert.deepEqual(outcome.mismatched, ["/"]);
+    assert.deepEqual(outcome.mismatch_details, [{
+      url: "/",
+      expected_sha256: sha("new generation"),
+      served_sha256: sha("old generation"),
+      headers: {
+        age: "72",
+        "cache-control": "max-age=600",
+        date: outcome.mismatch_details[0].headers.date,
+        etag: '"old"',
+        "x-cache": "HIT",
+      },
+    }]);
+    const stored: Receipt = JSON.parse(receiptBytes(receipt({ probes: outcome })));
+    assert.deepEqual(stored.probes.mismatch_details, outcome.mismatch_details);
+    assert.equal(stored.probes.ok, false);
+  } finally {
+    server.closeAllConnections();
+    await new Promise<void>((resolve, reject) => server.close((error) => error ? reject(error) : resolve()));
+  }
 });

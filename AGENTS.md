@@ -52,6 +52,14 @@ itself plus one versioned core bundle; it reads nothing else from core.
   its digest on the GitHub Pages deployment. `npm run deploy -- deployed`
   prints the current one. If the probes fail after a deploy, the run
   dispatches at most one rollback to the last known good receipt.
+- Bundle fetch waits at most ten minutes of monotonic elapsed time for the
+  producer to complete successfully, including API calls; an unfinished success
+  conclusion does not bypass completion. Each poll request uses the remaining
+  deadline as its fetch timeout.
+- Bundle and receipt downloads share three attempts, with delays of 5 and
+  15 seconds. Only HTTP 5xx and network failures retry. Each attempt starts
+  with an empty temporary download directory; digest, provenance and deploy
+  gates remain outside the retry boundary. Retry delays add at most 20 seconds.
 - A failed run opens or updates an issue.
 - `npm run shadow:compare -- <core tree> website/dist
   inventory/shadow-allowlist.json` compares a build with core's build of
@@ -60,60 +68,21 @@ itself plus one versioned core bundle; it reads nothing else from core.
   artifact and reports the differences. It is advisory: it is not part of
   `ci` and never fails on a difference.
 
-## Replaying core changes
+## Core and this repository
 
 Core's data and pipeline changes reach this repository through the core
 bundle and need no action here: core's `site-inputs.yml` builds the
 `site-inputs-<sha>` artifact after each successful push to `develop` and
 dispatches `core-bundle`, and the deploy fetches and verifies it.
 
-Core also holds the source of six paths that this repository keeps a copy
-of. A change to one of them in core does not deploy. It reaches benchbox.dev
-only when it is replayed here by pull request.
+The site, the Explorer, the landing assets, the blog and the drafts live
+only here. Change them in this repository by pull request.
 
-| Core path | Path here |
-| --- | --- |
-| `results-explorer/` | `explorer/` |
-| `docs/blog/` | `blog/` |
-| `_blog/` | `drafts/` |
-| `_project/design/site-inventory/` | `inventory/` |
-| `website/` | `website/` |
-| `landing/` | `landing/` |
-
-`SEED_RENAMES` in `scripts/replay-fidelity.mjs` is the authority for this
-table. To replay:
-
-1. Find the last replayed core SHA in the title of the newest replay commit:
-   `git log -1 --grep='^Replay'`.
-2. Choose the core commit to replay through (`<ref>`) and list the commits
-   that touch the mapped paths since the last one:
-   `git -C <core> log --format='%h %s' <last>..<ref> -- results-explorer docs/blog _blog _project/design/site-inventory website landing`.
-3. For each touched file, copy core's version to the mapped path here:
-   `git -C <core> show <ref>:<core path> > <site path>`. Delete the copy of
-   any file core deleted. Where this repository keeps a deliberate
-   adaptation, merge three ways instead: write core's version at `<last>`
-   and at `<ref>` to temporary files and run
-   `git merge-file <site path> <core at last> <core at ref>`.
-4. List every file that stays different from core in
-   `inventory/replay-allowlist.json` with its `site` path and a `reason`.
-5. Run `node scripts/replay-fidelity.mjs --core <core> --ref <ref> --since <last>`.
-   It reads git objects only, so any core clone that has both commits works.
-   It must report 0 blocking. A file reported as `mismatch`, `missing` or
-   `core-removed` blocks. `identical`, `allowlisted` and `removed` (deleted
-   in both core and here) do not.
-6. Run `npm run bundle:fetch`, then the commands of the `checks` job in
-   `.github/workflows/ci.yml`. The `e2e` and `audit` jobs run in CI.
-7. Open a pull request to `main` titled
-   `Replay <what changed> from core through <ref>`, and squash-merge it once
-   `ci` is green. The push to `main` deploys.
-
-Adaptations to keep when replaying:
+Adaptations to keep:
 
 - Explorer code takes the origin from `SITE_ORIGIN` in
   `explorer/src/components/siteOrigin.ts` and never hard-codes the
   production origin. `npm run lint:guard` fails on a hard-coded one.
-- Core fixtures can bring words that `cspell-words.txt` lacks. The pre-commit
-  hook runs cspell, so add them there.
 
 ## Changes
 

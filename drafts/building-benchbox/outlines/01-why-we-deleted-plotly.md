@@ -257,7 +257,7 @@ Plus: performance bar, heatmap, scatter plot (with Pareto frontier), line chart,
 - Decision document: `_project/DONE/core-functionality/active/drop-plotly-html-charts.yaml`
 - Library evaluation: `_project/DONE/core-functionality/planning/enhance-ascii-charting.yaml`
 - Implementation: `benchbox/core/visualization/ascii/` (3,365 lines)
-- Full research: `_blog/building-benchbox/research/plotly-removal-research.md`
+- Full research: `../research/plotly-removal-research.md`
 
 ## Conflicts Check
 

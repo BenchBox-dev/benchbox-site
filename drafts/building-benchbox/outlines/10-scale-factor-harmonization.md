@@ -311,7 +311,7 @@ detail section is essential to the post's value (users need to see the actual nu
 
 ## Images
 
-Both images generated and committed to `_blog/building-benchbox/images/` and synced to `docs/blog/images/`.
+Both images generated and committed to `drafts/building-benchbox/images/` and synced to `blog/images/`.
 
 - `sf1_before_after.png`: comparison bar chart of SF=1 sizes per benchmark, before vs. after harmonization
 - `tsbs_quadratic.png`: line chart showing linear (hosts only) vs. quadratic (hosts x duration) TSBS growth
@@ -340,7 +340,7 @@ under `benchbox/core/`.
 ## Reference
 
 - Changelog entry: `CHANGELOG.md` (`[0.2.1] - 2026-04-22`, "Scale factor harmonization" bullet)
-- Companion post: `09-v0-2-1-release-summary.md` (full release notes for v0.2.1)
+- Companion post: `../../../blog/2026-04-26-v0-2-1-release-summary.md` (full release notes for v0.2.1)
 - Test coverage: `tests/unit/generators/test_scale_factor_harmonization.py`
 - Per-benchmark generators: `benchbox/core/{coffeeshop,joinorder,amplab,h2odb,tsbs_devops,nyctaxi,flightdata}/`
 

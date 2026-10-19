@@ -254,7 +254,7 @@ None - all research complete.
 
 ## Research notes
 
-See `_blog/benchbox-in-action/research/platform-optimization-patterns.md` for detailed research notes including:
+See `../research/platform-optimization-patterns.md` for detailed research notes including:
 - Query plan captures for all platforms
 - Full benchmark results table (all 6 scales, all 3 platforms)
 - Architectural explanation of performance differences
