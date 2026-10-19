@@ -4,9 +4,10 @@ import { siteInputsDir, verifyBundle } from "./bundle-lib.mjs";
 
 export const CORE_REPO = process.env.CORE_REPO ?? "BenchBox-dev/BenchBox";
 
-export async function githubJson(route, env = process.env) {
+export async function githubJson(route, env = process.env, signal) {
   const token = env.GH_TOKEN ?? env.GITHUB_TOKEN;
   const response = await fetch(`https://api.github.com/${route}`, {
+    signal,
     headers: {
       Accept: "application/vnd.github+json",
       "X-GitHub-Api-Version": "2022-11-28",

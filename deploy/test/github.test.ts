@@ -1,6 +1,6 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { recordedReceipts, downloadWithRetry, isRetryableDownloadError, type Api } from "../lib/github.ts";
+import { recordedReceipts, type Api } from "../lib/github.ts";
 import { receiptSha, statusDescription, type Receipt } from "../lib/receipt.ts";
 import { receipt } from "./helpers.ts";
 
@@ -80,95 +80,3 @@ test("rollback lookup finds a receipt beyond the first page", async () => {
   assert.equal(found.deploymentId, 5);
 });
 
-test("downloadWithRetry proceeds after 503 retry", () => {
-  let calls = 0;
-  const slept: number[] = [];
-  const result = downloadWithRetry(
-    () => {
-      calls += 1;
-      if (calls === 1) throw new Error("HTTP 503: 503 Egress is over the account limit");
-      return "receipt-data";
-    },
-    {
-      sleep: (ms) => {
-        slept.push(ms);
-      },
-      log: () => {},
-    },
-  );
-  assert.equal(result, "receipt-data");
-  assert.equal(calls, 2);
-  assert.deepEqual(slept, [5000]);
-});
-
-test("downloadWithRetry fails after three 503 attempts", () => {
-  let calls = 0;
-  const slept: number[] = [];
-  assert.throws(
-    () => {
-      downloadWithRetry(
-        () => {
-          calls += 1;
-          throw new Error("HTTP 503: 503 Egress is over the account limit");
-        },
-        {
-          sleep: (ms) => {
-            slept.push(ms);
-          },
-          log: () => {},
-        },
-      );
-    },
-    /503 Egress is over the account limit/,
-  );
-  assert.equal(calls, 3);
-  assert.deepEqual(slept, [5000, 15000]);
-});
-
-test("downloadWithRetry does not retry 404 or 403", () => {
-  let calls = 0;
-  assert.throws(
-    () => {
-      downloadWithRetry(() => {
-        calls += 1;
-        throw new Error("HTTP 404: Not Found");
-      });
-    },
-    /HTTP 404/,
-  );
-  assert.equal(calls, 1);
-
-  assert.throws(
-    () => {
-      downloadWithRetry(() => {
-        calls += 1;
-        throw new Error("HTTP 403: Forbidden");
-      });
-    },
-    /HTTP 403/,
-  );
-  assert.equal(calls, 2);
-});
-
-test("downloadWithRetry does not retry digest mismatch", () => {
-  let calls = 0;
-  assert.throws(
-    () => {
-      downloadWithRetry(() => {
-        calls += 1;
-        throw new Error("receipt sha256 mismatch");
-      });
-    },
-    /mismatch/,
-  );
-  assert.equal(calls, 1);
-});
-
-test("isRetryableDownloadError classifies correctly in deploy", () => {
-  assert.equal(isRetryableDownloadError(new Error("HTTP 503: Service Unavailable")), true);
-  assert.equal(isRetryableDownloadError(new Error("HTTP 502: Bad Gateway")), true);
-  assert.equal(isRetryableDownloadError(new Error("ECONNRESET: connection reset")), true);
-  assert.equal(isRetryableDownloadError(new Error("HTTP 404: Not Found")), false);
-  assert.equal(isRetryableDownloadError(new Error("HTTP 401: Unauthorized")), false);
-  assert.equal(isRetryableDownloadError(new Error("digest mismatch: sha256")), false);
-});

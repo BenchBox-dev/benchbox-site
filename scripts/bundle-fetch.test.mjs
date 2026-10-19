@@ -4,12 +4,10 @@ import {
   newestBundle,
   producingRunErrors,
   producingRun,
-  downloadArtifactWithRetry,
-  isRetryableDownloadError,
   MAX_PRODUCING_RUN_WAIT_MS,
-  DOWNLOAD_RETRY_INTERVALS_MS,
-  JOB_TIMEOUT_MS,
 } from "./bundle-fetch.mjs";
+import { readFileSync } from "node:fs";
+import { downloadWithRetry as downloadArtifactWithRetry, isRetryableDownloadError, DOWNLOAD_RETRY_INTERVALS_MS } from "./github-download.mjs";
 
 const RUN = {
   id: 38607974569,
@@ -101,10 +99,12 @@ test("a run id fetch accepts the recorded develop run", async () => {
 test("producer in_progress then success proceeds", async () => {
   let calls = 0;
   const slept = [];
+  let clock = 0;
   const run = await producingRun(
     "38607974569",
     {},
     {
+      now: () => clock,
       fetchJson: async () => {
         calls += 1;
         if (calls === 1) return { ...RUN, status: "in_progress", conclusion: null };
@@ -112,6 +112,7 @@ test("producer in_progress then success proceeds", async () => {
       },
       sleep: async (ms) => {
         slept.push(ms);
+        clock += ms;
       },
       log: () => {},
     },
@@ -123,23 +124,26 @@ test("producer in_progress then success proceeds", async () => {
 
 test("in_progress beyond the cap fails with a clear message", async () => {
   const slept = [];
+  let clock = 0;
   await assert.rejects(
     producingRun(
       "38607974569",
       {},
       {
+        now: () => clock,
         maxWaitMs: 15000,
-        pollIntervals: [5000, 5000, 5000],
         fetchJson: async () => ({ ...RUN, status: "in_progress", conclusion: null }),
         sleep: async (ms) => {
           slept.push(ms);
+          clock += ms;
         },
         log: () => {},
       },
     ),
-    /did not complete within the 10-minute wait cap/,
+    /did not complete within the 15s wait cap/,
   );
-  assert.ok(slept.length >= 3);
+  assert.equal(clock, 15000);
+  assert.deepEqual(slept, [5000, 10000]);
 });
 
 test("concluded failure fails immediately without waiting", async () => {
@@ -255,9 +259,10 @@ test("isRetryableDownloadError classifies correctly", () => {
   assert.equal(isRetryableDownloadError(new Error("gate failed: snapshot_digest")), false);
 });
 
-test("total added wait is bounded below the job timeout", () => {
-  const maxDownloadRetryWaitMs = DOWNLOAD_RETRY_INTERVALS_MS.reduce((acc, curr) => acc + curr, 0);
-  const totalMaxWaitMs = MAX_PRODUCING_RUN_WAIT_MS + maxDownloadRetryWaitMs;
-  assert.ok(totalMaxWaitMs < JOB_TIMEOUT_MS);
-  assert.ok(totalMaxWaitMs < 15 * 60 * 1000);
+test("wait budget is below the actual deploy workflow timeout", () => {
+  const workflow = readFileSync(new URL("../.github/workflows/deploy.yml", import.meta.url), "utf8");
+  const timeoutMinutes = Number(workflow.match(/timeout-minutes:\s*(\d+)/)[1]);
+  assert.equal(MAX_PRODUCING_RUN_WAIT_MS, 600000);
+  assert.deepEqual(DOWNLOAD_RETRY_INTERVALS_MS, [5000, 15000]);
+  assert.ok(MAX_PRODUCING_RUN_WAIT_MS + DOWNLOAD_RETRY_INTERVALS_MS.reduce((a, b) => a + b, 0) < timeoutMinutes * 60000);
 });

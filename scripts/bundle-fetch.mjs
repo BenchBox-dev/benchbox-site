@@ -8,15 +8,13 @@ import { pathToFileURL } from "node:url";
 import { createHash } from "node:crypto";
 import { siteInputsDir } from "./bundle-lib.mjs";
 import { CORE_REPO, githubJson, verifyWithCertification } from "./bundle-verify.mjs";
+import { downloadArtifact } from "./github-download.mjs";
 
 const ARTIFACT_PREFIX = "site-inputs-";
 export const MAX_PRODUCING_RUN_WAIT_MS = 10 * 60 * 1000;
 export const PRODUCING_RUN_POLL_INTERVALS_MS = [5000, 10000, 15000, 30000];
-export const DOWNLOAD_RETRY_INTERVALS_MS = [5000, 15000, 45000];
-export const MAX_DOWNLOAD_ATTEMPTS = 3;
-export const JOB_TIMEOUT_MS = 45 * 60 * 1000;
 
-export function producingRunErrors(run) {
+function producingRunProvenanceErrors(run) {
   const errors = [];
   if (!run) return ["producing site-inputs run not found"];
   if (String(run.repository?.full_name ?? "").toLowerCase() !== CORE_REPO.toLowerCase())
@@ -26,105 +24,48 @@ export function producingRunErrors(run) {
   if (run.head_branch !== "develop") errors.push(`producing run branch is ${run.head_branch}, not develop`);
   if (run.event !== "workflow_run" && run.event !== "workflow_dispatch")
     errors.push(`producing run event is ${run.event}, not workflow_run or workflow_dispatch`);
-  if (run.conclusion !== "success") errors.push(`producing run concluded ${run.conclusion}`);
+  return errors;
+}
+
+export function producingRunErrors(run) {
+  const errors = producingRunProvenanceErrors(run);
+  if (run && run.conclusion !== "success") errors.push(`producing run concluded ${run.conclusion}`);
   return errors;
 }
 
 export async function producingRun(runId, env = process.env, options = {}) {
   const maxWaitMs = options.maxWaitMs ?? MAX_PRODUCING_RUN_WAIT_MS;
-  const pollIntervals = options.pollIntervals ?? PRODUCING_RUN_POLL_INTERVALS_MS;
+  const now = options.now ?? (() => performance.now());
+  const deadline = now() + maxWaitMs;
   const sleep = options.sleep ?? ((ms) => new Promise((resolve) => setTimeout(resolve, ms)));
   const log = options.log ?? console.log;
-
-  let elapsed = 0;
+  const timeout = () => new Error(`producing run ${runId} did not complete within the ${maxWaitMs / 1000}s wait cap`);
   let attempt = 0;
-
   while (true) {
-    const run = await (options.fetchJson ?? githubJson)(`repos/${CORE_REPO}/actions/runs/${runId}`, env);
-    if (!run) throw new Error("producing site-inputs run not found");
-
-    if (String(run.repository?.full_name ?? "").toLowerCase() !== CORE_REPO.toLowerCase())
-      throw new Error(`producing run is in ${run.repository?.full_name}, not ${CORE_REPO}`);
-    if (run.path !== ".github/workflows/site-inputs.yml")
-      throw new Error(`producing run is ${run.path}, not site-inputs.yml`);
-    if (run.head_branch !== "develop")
-      throw new Error(`producing run branch is ${run.head_branch}, not develop`);
-    if (run.event !== "workflow_run" && run.event !== "workflow_dispatch")
-      throw new Error(`producing run event is ${run.event}, not workflow_run or workflow_dispatch`);
-
-    if (run.status === "completed" || run.conclusion) {
-      if (run.conclusion !== "success") {
-        throw new Error(`producing run concluded ${run.conclusion}`);
-      }
+    const remaining = deadline - now();
+    if (remaining <= 0) throw timeout();
+    const signal = AbortSignal.timeout(Math.ceil(remaining));
+    let run;
+    try {
+      run = await (options.fetchJson ?? githubJson)(`repos/${CORE_REPO}/actions/runs/${runId}`, env, signal);
+    } catch (error) {
+      if (signal.aborted || now() >= deadline) throw timeout();
+      throw error;
+    }
+    if (now() >= deadline) throw timeout();
+    const errors = producingRunProvenanceErrors(run);
+    if (errors.length) throw new Error(errors.join("; "));
+    if (run.conclusion && run.conclusion !== "success") throw new Error(`producing run concluded ${run.conclusion}`);
+    if (run.status === "completed") {
+      if (run.conclusion !== "success") throw new Error(`producing run concluded ${run.conclusion}`);
       return run;
     }
-
-    if (elapsed >= maxWaitMs) {
-      throw new Error(`producing run ${runId} did not complete within the 10-minute wait cap (status: ${run.status})`);
-    }
-
-    const interval = pollIntervals[attempt] ?? pollIntervals[pollIntervals.length - 1];
-    const delay = Math.min(interval, maxWaitMs - elapsed);
-    if (delay <= 0) {
-      throw new Error(`producing run ${runId} did not complete within the 10-minute wait cap (status: ${run.status})`);
-    }
-
+    const interval = PRODUCING_RUN_POLL_INTERVALS_MS[Math.min(attempt, PRODUCING_RUN_POLL_INTERVALS_MS.length - 1)];
+    const delay = Math.min(interval, deadline - now());
+    if (delay <= 0) throw timeout();
     log(`bundle:fetch: producing run ${runId} is ${run.status}; waiting ${delay / 1000}s...`);
     await sleep(delay);
-    elapsed += delay;
     attempt += 1;
-  }
-}
-
-export function isRetryableDownloadError(error) {
-  if (!error) return false;
-  const message = (error instanceof Error ? `${error.message} ${error.stderr ?? ""}` : String(error)).toLowerCase();
-  if (/http\s+4\d\d\b/.test(message) || /\b4\d\d\s+(not found|forbidden|unauthorized|bad request)\b/i.test(message) || /\b40[0-9]\b/.test(message)) {
-    return false;
-  }
-  if (message.includes("digest") || message.includes("mismatch") || message.includes("gate failure") || message.includes("gate failed")) {
-    return false;
-  }
-  if (
-    /http\s+5\d\d\b/.test(message) ||
-    /\b5\d\d\s+(egress|server error|bad gateway|gateway timeout)\b/i.test(message) ||
-    /\b50[0-9]\b/.test(message) ||
-    message.includes("egress is over the account limit")
-  ) {
-    return true;
-  }
-  if (
-    message.includes("econnreset") ||
-    message.includes("etimedout") ||
-    message.includes("enotfound") ||
-    message.includes("network error") ||
-    message.includes("fetch failed") ||
-    message.includes("socket hang up")
-  ) {
-    return true;
-  }
-  return false;
-}
-
-export function downloadArtifactWithRetry(runner, options = {}) {
-  const maxAttempts = options.maxAttempts ?? MAX_DOWNLOAD_ATTEMPTS;
-  const intervals = options.intervals ?? DOWNLOAD_RETRY_INTERVALS_MS;
-  const sleep = options.sleep ?? ((ms) => Atomics.wait(new Int32Array(new SharedArrayBuffer(4)), 0, 0, ms));
-  const log = options.log ?? console.warn;
-
-  let attempt = 1;
-  while (true) {
-    try {
-      return runner();
-    } catch (error) {
-      if (attempt >= maxAttempts || !isRetryableDownloadError(error)) {
-        throw error;
-      }
-      const delay = intervals[attempt - 1] ?? intervals[intervals.length - 1];
-      log(`bundle:fetch: artifact download failed (attempt ${attempt}/${maxAttempts}), retrying in ${delay / 1000}s: ${error.message}`);
-      sleep(delay);
-      attempt += 1;
-    }
   }
 }
 
@@ -177,11 +118,7 @@ async function main() {
   const { runId, artifact } = await newestBundle();
   const work = mkdtempSync(path.join(tmpdir(), "site-inputs-fetch-"));
   try {
-    downloadArtifactWithRetry(() => {
-      execFileSync("gh", ["run", "download", runId, "-R", CORE_REPO, "-n", artifact.name, "-D", work], {
-        stdio: ["ignore", "pipe", "pipe"],
-      });
-    });
+    downloadArtifact(CORE_REPO, runId, artifact.name, work);
     const archive = path.join(work, readdirSync(work).find((name) => name.endsWith(".tar.zst")) ?? "");
     const digest = `sha256:${createHash("sha256").update(readFileSync(archive)).digest("hex")}`;
     if (process.env.SITE_INPUTS_DIGEST && process.env.SITE_INPUTS_DIGEST !== digest) {
