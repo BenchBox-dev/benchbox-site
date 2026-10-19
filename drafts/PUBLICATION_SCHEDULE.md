@@ -57,15 +57,17 @@
 
 ## Backlog (outlines and ideas worth keeping)
 
-Outlines only; no draft exists yet. Kept for their planning value,
-not queued for publication.
+Outlines and ideas worth keeping; no draft exists yet. Kept for their
+planning value, not queued for publication.
 
 | Idea | Source | Notes |
 | ---- | ------ | ----- |
 | Delta Lake with BenchBox | [Outline](table-formats/outlines/02-delta-lake.md) | Local SF1 storage measured (305 MB); Databricks/Spark cloud benchmarks pending |
 | Apache Iceberg with BenchBox | [Outline](table-formats/outlines/03-iceberg.md) | Local SF1 measured via pyiceberg SQLite catalog; cross-engine comparisons need a shared catalog |
 | Vortex with BenchBox | [Outline](table-formats/outlines/04-vortex.md) | Local SF1 measured (274 MB) via DuckDB vortex extension |
+| DuckLake: DuckDB-native ACID | Table formats idea, no file | Local SF1 storage measured (309 MB); DuckDB-native ACID benchmark planning |
 | Vector search across six engines | [Outline](benchbox-in-action/outlines/02-vector-search-recall-latency.md) | Outlined; needs drafting |
+| Discovering the SQL vs DataFrame optimization gap | BenchBox in action idea, no draft | Research notes in series plan; 9.4x gap reveals decorrelation architecture |
 | Rewriting TPC-DS Q10 and Q35 for ClickHouse | [Outline](platform-deep-dives/outlines/clickhouse-tpcds-q10-q35-semijoin-rewrites.md) | Plan only; do not draft until the listed experiments run |
 | Spark Adaptive Query Execution | [Outline](platform-deep-dives/outlines/spark-adaptive-query-execution.md) | Outlined; BenchBox measurements are future work |
 | TPC binary wrangling (building-benchbox idea) | Series plan idea, no file | Cross-platform binary distribution for TPC data generation |

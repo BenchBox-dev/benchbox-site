@@ -311,7 +311,7 @@ detail section is essential to the post's value (users need to see the actual nu
 
 ## Images
 
-Both images generated and committed to `_blog/building-benchbox/images/` and synced to `docs/blog/images/`.
+Both images generated and committed to `drafts/building-benchbox/images/` and synced to `blog/images/`.
 
 - `sf1_before_after.png`: comparison bar chart of SF=1 sizes per benchmark, before vs. after harmonization
 - `tsbs_quadratic.png`: line chart showing linear (hosts only) vs. quadratic (hosts x duration) TSBS growth

@@ -3,8 +3,8 @@
 **Series**: Building BenchBox
 **Post type**: Release Notes
 **Status**: PLANNING
-**Target file**: `docs/blog/2026-02-23-v0-1-3-release-summary.md`
-**Mirrors**: `docs/blog/2026-02-15-v0-1-2-release-summary.md`
+**Target file**: `blog/2026-02-23-v0-1-3-release-summary.md`
+**Mirrors**: `blog/2026-02-15-v0-1-2-release-summary.md`
 
 ---
 
