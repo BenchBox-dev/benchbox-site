@@ -7,7 +7,6 @@ import {
   reportRelayFailure,
   closeRelayOnSuccess,
   RELAY_LABEL,
-  FORBIDDEN_LABEL,
   type GhClient,
 } from "../lib/relay.ts";
 
@@ -18,6 +17,7 @@ function fakeGhClient(initialIssues: { number: number; body?: string }[] = []): 
   labelsCreated: string[];
 } {
   const issues = [...initialIssues];
+  const comments = new Map<number, string[]>();
   const created: { repo: string; title: string; label: string; body: string }[] = [];
   const commented: { repo: string; issueNumber: number; body: string }[] = [];
   const closed: { repo: string; issueNumber: number; comment: string }[] = [];
@@ -32,6 +32,9 @@ function fakeGhClient(initialIssues: { number: number; body?: string }[] = []): 
       if (label !== RELAY_LABEL) return [];
       return [...issues];
     },
+    async issueBodies(_repo: string, number: number) {
+      return [issues.find((issue) => issue.number === number)?.body || "", ...(comments.get(number) || [])];
+    },
     async createIssue(repo: string, title: string, label: string, body: string) {
       const number = issues.length + 100;
       issues.push({ number, body });
@@ -40,8 +43,7 @@ function fakeGhClient(initialIssues: { number: number; body?: string }[] = []): 
     },
     async commentIssue(repo: string, issueNumber: number, body: string) {
       commented.push({ repo, issueNumber, body });
-      const found = issues.find((item) => item.number === issueNumber);
-      if (found) found.body = body;
+      comments.set(issueNumber, [...(comments.get(issueNumber) || []), body]);
     },
     async closeIssue(repo: string, issueNumber: number, comment: string) {
       closed.push({ repo, issueNumber, comment });
@@ -83,7 +85,6 @@ test("reportRelayFailure creates an issue when none is open", async () => {
   assert.equal(outcome.action, "created");
   assert.equal(client.created.length, 1);
   assert.equal(client.created[0].label, RELAY_LABEL);
-  assert.notEqual(client.created[0].label, FORBIDDEN_LABEL);
   assert.ok(client.created[0].body.includes("contract-version-mismatch"));
 });
 
@@ -145,10 +146,9 @@ test("closeRelayOnSuccess skips when expected rejection", async () => {
 
 test("relay never uses forbidden site-bundle-failed label", async () => {
   assert.equal(RELAY_LABEL, "site-bundle-undeployed");
-  assert.notEqual(RELAY_LABEL, FORBIDDEN_LABEL);
 
   const client = fakeGhClient();
   await reportRelayFailure(client, "BenchBox-dev/BenchBox", "egress 503");
   assert.equal(client.created[0].label, "site-bundle-undeployed");
-  assert.ok(!client.labelsCreated.includes(FORBIDDEN_LABEL));
+  assert.ok(!client.labelsCreated.includes("site-bundle-failed"));
 });

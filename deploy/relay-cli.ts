@@ -17,6 +17,11 @@ export function execGhClient(env: Record<string, string | undefined> = process.e
       const output = execGh(["issue", "list", "--repo", repo, "--label", label, "--state", "open", "--json", "number,body"]);
       return JSON.parse(output || "[]") as { number: number; body?: string }[];
     },
+    async issueBodies(repo: string, issueNumber: number) {
+      const output = execGh(["issue", "view", String(issueNumber), "--repo", repo, "--json", "body,comments"]);
+      const issue = JSON.parse(output) as { body: string; comments: { body: string }[] };
+      return [issue.body, ...issue.comments.map((comment) => comment.body)];
+    },
     async createIssue(repo: string, title: string, label: string, body: string) {
       const output = execGh(["issue", "create", "--repo", repo, "--title", title, "--label", label, "--body", body]);
       const match = output.match(/\/issues\/(\d+)/);
@@ -30,11 +35,7 @@ export function execGhClient(env: Record<string, string | undefined> = process.e
       execGh(["issue", "close", String(issueNumber), "--repo", repo, "--comment", comment]);
     },
     async createLabelIfMissing(repo: string, label: string, color: string, description: string) {
-      try {
-        execGh(["label", "create", label, "--repo", repo, "--color", color, "--description", description, "--force"]);
-      } catch {
-        return;
-      }
+      execGh(["label", "create", label, "--repo", repo, "--color", color, "--description", description, "--force"]);
     },
   };
 }

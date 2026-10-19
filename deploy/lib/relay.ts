@@ -1,6 +1,5 @@
 export const RELAY_LABEL = "site-bundle-undeployed";
 export const RELAY_TITLE = "Site could not deploy a core bundle";
-export const FORBIDDEN_LABEL = "site-bundle-failed";
 export const FAILURE_CLASSES = [
   "producer-not-concluded",
   "contract-version-mismatch",
@@ -28,7 +27,7 @@ export function classifyFailure(errorText: string): FailureClass {
   ) {
     return "contract-version-mismatch";
   }
-  if (text.includes("snapshot_digest") || text.includes("snapshot digest")) {
+  if (text.includes("snapshot_digest") || text.includes("snapshot digest") || text.includes("snapshot-digest")) {
     return "snapshot-digest";
   }
   if (
@@ -66,6 +65,7 @@ export function failureMessage(
 
 export type GhClient = {
   listOpenIssues: (repo: string, label: string) => Promise<{ number: number; body?: string }[]>;
+  issueBodies: (repo: string, issueNumber: number) => Promise<string[]>;
   createIssue: (repo: string, title: string, label: string, body: string) => Promise<{ number: number }>;
   commentIssue: (repo: string, issueNumber: number, body: string) => Promise<void>;
   closeIssue: (repo: string, issueNumber: number, comment: string) => Promise<void>;
@@ -97,7 +97,8 @@ export async function reportRelayFailure(
   }
 
   const existing = openIssues[0];
-  const existingClass = extractFailureClass(existing.body);
+  const bodies = await client.issueBodies(coreRepo, existing.number);
+  const existingClass = bodies.reverse().map(extractFailureClass).find((value) => value !== null);
 
   if (existingClass === failureClass) {
     return { action: "no_change", issueNumber: existing.number, failureClass };

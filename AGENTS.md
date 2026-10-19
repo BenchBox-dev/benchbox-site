@@ -52,7 +52,22 @@ itself plus one versioned core bundle; it reads nothing else from core.
   its digest on the GitHub Pages deployment. `npm run deploy -- deployed`
   prints the current one. If the probes fail after a deploy, the run
   dispatches at most one rollback to the last known good receipt.
-- A failed run opens or updates an issue.
+- A failed run opens or updates a site-local `site-deploy-failed` issue.
+  Core-dispatched failures also relay to core under `site-bundle-undeployed`,
+  classified as producer-not-concluded, contract-version-mismatch,
+  snapshot-digest, probe-mismatch or infrastructure (including unknown errors).
+  Contract mismatches require updating the Explorer for the new contract.
+  The relay comments only when the latest reported class changes; a successful
+  deploy comments and closes only issues bearing that relay label.
+- Set the boolean `expected_rejection` manual input, or the
+  `client_payload.expected_rejection` dispatch field to `true`, for deliberate
+  negative probes such as wrong digests or runs before certification.
+  The explicit marker suppresses both local and core incident writes,
+  including success closure. Error text cannot set it. Unmarked failures
+  always report. This matches the core bundle reporter's `expected_rejection`
+  input; it does not bypass any deploy gate.
+- `npm run test:deploy` includes an isolated real-process `gh` stub smoke
+  covering class transitions, unchanged creation bodies, closure and markers.
 - `npm run shadow:compare -- <core tree> website/dist
   inventory/shadow-allowlist.json` compares a build with core's build of
   the same bundle. Every allowed difference in that file carries a reason.

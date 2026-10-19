@@ -16,6 +16,11 @@ on:
         description: "For rollback: the run id of the receipt to restore"
         required: false
         default: ""
+      expected_rejection:
+        description: "Expected-failure probe: do not open, comment on or close incidents"
+        type: boolean
+        required: false
+        default: false
 
 permissions:
   contents: read
@@ -42,6 +47,7 @@ jobs:
       deployments: read
     outputs:
       core_sha: ${{ steps.resolve.outputs.core_sha }}
+      failure_class: ${{ steps.resolve.outputs.failure_class || steps.build.outputs.failure_class || steps.gates.outputs.failure_class }}
     steps:
       - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09
       - uses: actions/setup-node@a0853c24544627f65ddf259abe73b1d18a591444
@@ -56,13 +62,14 @@ jobs:
           ROLLBACK_RUN_ID: ${{ inputs.receipt_run_id }}
           SITE_INPUTS_RUN_ID: ${{ github.event.client_payload.run_id }}
           SITE_INPUTS_DIGEST: ${{ github.event.client_payload.digest }}
-        run: npm run -s deploy -- resolve
+        run: node --experimental-strip-types deploy/run-step.ts npm run -s deploy -- resolve
       - name: Build from the bundle
+        id: build
         if: env.DEPLOY_MODE != 'rollback'
         env:
           SITE_ORIGIN: ${{ vars.SITE_ORIGIN }}
           SITE_HOST: ${{ vars.SITE_HOST }}
-        run: npm run build
+        run: node --experimental-strip-types deploy/run-step.ts npm run build
       - name: Restore the receipt's artifact
         if: env.DEPLOY_MODE == 'rollback'
         env:
@@ -75,11 +82,12 @@ jobs:
         if: env.SITE_DEPLOY_TARGET == 'rehearsal' && env.DEPLOY_MODE != 'rollback'
         run: npm run -s deploy -- rehearsal
       - name: Gate the artifact
+        id: gates
         env:
           SITE_HOST: ${{ vars.SITE_HOST }}
           SITE_SNAPSHOT_APPROVED_CHANGE: ${{ vars.SITE_SNAPSHOT_APPROVED_CHANGE }}
           SITE_SNAPSHOT_APPROVAL_REASON: ${{ vars.SITE_SNAPSHOT_APPROVAL_REASON }}
-        run: npm run -s deploy -- gates
+        run: node --experimental-strip-types deploy/run-step.ts npm run -s deploy -- gates
       - uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f
         with:
           name: site-artifact-${{ github.run_id }}
@@ -115,6 +123,8 @@ jobs:
       deployments: write
       pages: write
       id-token: write
+    outputs:
+      failure_class: ${{ steps.recheck.outputs.failure_class || steps.probe.outputs.failure_class || (steps.probe.outputs.probes_ok == 'false' && 'probe-mismatch') }}
     steps:
       - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09
       - uses: actions/setup-node@a0853c24544627f65ddf259abe73b1d18a591444
@@ -131,9 +141,10 @@ jobs:
           name: deploy-work-${{ github.run_id }}
           path: deploy-work
       - name: Recheck the deployed generation
+        id: recheck
         env:
           GH_TOKEN: ${{ github.token }}
-        run: npm run -s deploy -- recheck
+        run: node --experimental-strip-types deploy/run-step.ts npm run -s deploy -- recheck
       - uses: actions/upload-pages-artifact@fc324d3547104276b827a68afc52ff2a11cc49c9
         with:
           path: website/dist
@@ -149,7 +160,7 @@ jobs:
         id: probe
         env:
           PROBE_BASE_URL: ${{ vars.SITE_ORIGIN }}
-        run: npm run -s deploy -- probe
+        run: node --experimental-strip-types deploy/run-step.ts npm run -s deploy -- probe
       - name: Write the receipt
         id: receipt
         env:
@@ -194,6 +205,12 @@ jobs:
     env:
       HAS_BRIDGE_APP: ${{ secrets.SITE_BRIDGE_APP_ID != '' }}
     steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@a0853c24544627f65ddf259abe73b1d18a591444
+        with:
+          node-version-file: .nvmrc
       - name: Open or update the site-deploy-failed issue
         env:
           GH_TOKEN: ${{ github.token }}
@@ -201,8 +218,12 @@ jobs:
           RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
           EVENT: ${{ github.event_name }}
           CORE_SHA: ${{ needs.build.outputs.core_sha || github.event.client_payload.core_sha }}
+          EXPECTED_REJECTION: ${{ inputs.expected_rejection || github.event.client_payload.expected_rejection }}
         run: |
           set -euo pipefail
+          if [ "${EXPECTED_REJECTION:-}" = "true" ]; then
+            exit 0
+          fi
           BODY="$(printf 'The %s deploy run failed (core commit %s).\n\nRun: %s\n\nNothing deploys unless every gate passes; a probe failure after deploy dispatches at most one rollback to the last known good receipt.\n' "$EVENT" "${CORE_SHA:-unknown}" "$RUN_URL")"
           NUMBER="$(gh issue list --repo "$REPO" --label site-deploy-failed --state open --json number --jq '.[0].number // empty')"
           if [ -n "$NUMBER" ]; then
@@ -227,14 +248,15 @@ jobs:
           CORE_REPO: BenchBox-dev/BenchBox
           RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
           CORE_SHA: ${{ github.event.client_payload.core_sha }}
-          EXPECTED_REJECTION: ${{ github.event.client_payload.expected_rejection }}
+          ERROR_TEXT: ${{ needs.build.outputs.failure_class || needs.deploy.outputs.failure_class || 'infrastructure' }}
+          EXPECTED_REJECTION: ${{ inputs.expected_rejection || github.event.client_payload.expected_rejection }}
         run: |
           node --experimental-strip-types deploy/relay-cli.ts fail
 
   report-success:
     name: report success
     needs: [build, deploy]
-    if: success() && github.event_name == 'repository_dispatch' && vars.SITE_DEPLOY_TARGET != ''
+    if: success() && needs.deploy.result == 'success' && github.event_name == 'repository_dispatch'
     runs-on: ubuntu-latest
     timeout-minutes: 5
     env:
@@ -260,6 +282,6 @@ jobs:
           CORE_REPO: BenchBox-dev/BenchBox
           RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
           CORE_SHA: ${{ github.event.client_payload.core_sha }}
-          EXPECTED_REJECTION: ${{ github.event.client_payload.expected_rejection }}
+          EXPECTED_REJECTION: ${{ inputs.expected_rejection || github.event.client_payload.expected_rejection }}
         run: |
           node --experimental-strip-types deploy/relay-cli.ts success
