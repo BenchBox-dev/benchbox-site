@@ -1,7 +1,7 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { execFileSync, spawnSync } from "node:child_process";
-import { mkdtempSync, rmSync, unlinkSync, writeFileSync } from "node:fs";
+import { mkdirSync, mkdtempSync, rmSync, unlinkSync, writeFileSync } from "node:fs";
 import os from "node:os";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
@@ -43,6 +43,11 @@ test("tracked file deletions do not bypass checks on surviving files", () => {
     const invalid = spawnSync(process.execPath, [script], { cwd: root, encoding: "utf8" });
     assert.equal(invalid.status, 1, invalid.stderr);
     assert.match(invalid.stdout, /kept\.ts:/);
+    const sub = path.join(root, "sub");
+    mkdirSync(sub, { recursive: true });
+    const fromSubdir = spawnSync(process.execPath, [script], { cwd: sub, encoding: "utf8" });
+    assert.equal(fromSubdir.status, 1, fromSubdir.stderr);
+    assert.match(fromSubdir.stdout, /kept\.ts:/);
   } finally {
     rmSync(root, { recursive: true, force: true });
   }
