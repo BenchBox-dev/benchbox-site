@@ -33,4 +33,4 @@ Run it 3 times and report median wall time (`real`). Also capture the BenchBox r
 
 - These measurements reused an existing SF10 DuckDB database when available.
 - If schema/data must be recreated, runtime can increase significantly due to load/setup work.
-- Full evidence and logs: `_blog/platform-deep-dives/research/duckdb-architecture-verification-2026-02-20.md`
+- Full evidence and logs: `../research/duckdb-architecture-verification-2026-02-20.md`

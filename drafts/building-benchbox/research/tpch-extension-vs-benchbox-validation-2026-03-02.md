@@ -30,7 +30,7 @@ Capture a small, reproducible two-scale comparison with explicit timing boundari
   - Median of the 3 measured `PRAGMA tpch(1)` runs
 
 Raw data file:
-- `_blog/building-benchbox/research/tpch-extension-vs-benchbox-measurements-2026-03-02.json`
+- `tpch-extension-vs-benchbox-measurements-2026-03-02.json`
 
 ### DuckDB extension API scope check
 

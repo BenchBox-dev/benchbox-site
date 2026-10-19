@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 import { execFileSync } from "node:child_process";
-import { existsSync, readFileSync } from "node:fs";
+import { readFileSync } from "node:fs";
 import path from "node:path";
 import { pathToFileURL } from "node:url";
 
@@ -65,18 +65,40 @@ export function findingsFor(file, source) {
   return findings;
 }
 
-function trackedFiles() {
-  return execFileSync("git", ["ls-files", "-z"], { encoding: "utf8" }).split("\0").filter(existsSync);
+function repoRoot() {
+  return execFileSync("git", ["rev-parse", "--show-toplevel"], { encoding: "utf8" }).trim();
+}
+
+function worktreeDeletedFiles(root) {
+  return new Set(
+    execFileSync("git", ["-C", root, "ls-files", "--deleted", "-z"], { encoding: "utf8" })
+      .split("\0")
+      .filter(Boolean),
+  );
+}
+
+function trackedFiles(root) {
+  const deleted = worktreeDeletedFiles(root);
+  return execFileSync("git", ["-C", root, "ls-files", "-z"], { encoding: "utf8" })
+    .split("\0")
+    .filter(Boolean)
+    .filter((file) => !deleted.has(file));
 }
 
 function main() {
+  const root = repoRoot();
+  const files = trackedFiles(root);
+  if (files.length === 0) {
+    console.error("repository boundary: no tracked files found");
+    return 1;
+  }
   const findings = [];
-  for (const file of trackedFiles()) {
+  for (const file of files) {
     if (/\.(png|jpe?g|gif|webp|ico|svg|woff2?|duckdb|wasm|zst|gz|pdf)$/i.test(file)) {
       if (PYTHON_FILES.test(file)) findings.push(`${file}: Python file in the repository`);
       continue;
     }
-    findings.push(...findingsFor(file, readFileSync(file, "utf8")));
+    findings.push(...findingsFor(file, readFileSync(path.join(root, file), "utf8")));
   }
   for (const finding of findings) console.log(finding);
   console.log(`repository boundary: ${findings.length} findings`);

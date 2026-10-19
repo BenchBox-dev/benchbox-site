@@ -106,12 +106,12 @@ rejected):
 ```yaml
 ---
 blogpost: true
-date: October 7, 2026
+date: September 29, 2026
 author: Joe Harris
 series: building-benchbox
-post_number: 19
-type: architecture-design
-tags: benchbox, design, website
+post_number: 18
+type: release-notes
+tags: benchbox, release, lakehouse, delta, iceberg, hudi
 meta_description: "One-sentence summary of the post."
 ---
 ```
@@ -322,4 +322,4 @@ run succeeds.
 - [ ] Candidate rendered and inspected using a fresh local build or the identified CI `site-preview` artifact
 - [ ] Pull request `ci` checks pass against `main`
 - [ ] Pull request merged to `main` by Joe; deploy run succeeded
-- [ ] Production target, deploy receipt, and live URL confirmed at `https://benchbox.dev/blog/`
+- [ ] Production target, deploy receipt, and live URL confirmed at `https://benchbox.dev/blog/YYYY-MM-DD-{slug}.html`

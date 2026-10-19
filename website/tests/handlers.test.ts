@@ -19,9 +19,18 @@ describe("front matter", () => {
     expect(front).toContain("date: 2026-01-02");
   });
 
-  it("rejects draft blog articles without emitting public pages", () => {
+  it.each(["draft", "Draft", "DRAFT", " draft "])("rejects %j blog articles without emitting public pages", (status) => {
     const result = build({
-      "blog/candidate.md": "---\nblogpost: true\ndate: October 19, 2026\nstatus: draft\n---\n\n# Candidate\n\nUnapproved article.\n",
+      "blog/candidate.md": `---\nblogpost: true\ndate: October 19, 2026\nstatus: ${JSON.stringify(status)}\n---\n\n# Candidate\n\nUnapproved article.\n`,
+    });
+    expect(result.errors).toHaveLength(1);
+    expect(result.errors[0]).toMatchObject({ file: "blog/candidate.md", line: 4 });
+    expect(result.files.size).toBe(0);
+  });
+
+  it("rejects blog articles with draft status in an array", () => {
+    const result = build({
+      "blog/candidate.md": "---\nblogpost: true\ndate: October 19, 2026\nstatus:\n  - Draft\n---\n\n# Candidate\n\nUnapproved article.\n",
     });
     expect(result.errors).toHaveLength(1);
     expect(result.errors[0]).toMatchObject({ file: "blog/candidate.md", line: 4 });
