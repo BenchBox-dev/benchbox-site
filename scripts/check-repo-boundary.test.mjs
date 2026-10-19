@@ -1,5 +1,10 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
+import { execFileSync, spawnSync } from "node:child_process";
+import { mkdtempSync, rmSync, unlinkSync, writeFileSync } from "node:fs";
+import os from "node:os";
+import path from "node:path";
+import { fileURLToPath } from "node:url";
 import { findingsFor } from "./check-repo-boundary.mjs";
 
 test("Python files and Python or uv calls are refused", () => {
@@ -21,4 +26,24 @@ test("the production origin is allowed only on the allowlist", () => {
   assert.equal(findingsFor("website/src/lib/a.ts", 'const o = "https://benchbox.dev";\n').length, 1);
   assert.deepEqual(findingsFor("blog/post.md", "see https://benchbox.dev\n"), []);
   assert.deepEqual(findingsFor("website/src/lib/site-origin.ts", 'const o = "https://benchbox.dev";\n'), []);
+});
+
+test("tracked file deletions do not bypass checks on surviving files", () => {
+  const root = mkdtempSync(path.join(os.tmpdir(), "benchbox-boundary-"));
+  const script = fileURLToPath(new URL("./check-repo-boundary.mjs", import.meta.url));
+  try {
+    execFileSync("git", ["init", "--quiet"], { cwd: root });
+    writeFileSync(path.join(root, "removed.md"), "# Old draft\n");
+    writeFileSync(path.join(root, "kept.ts"), "export const value = 1;\n");
+    execFileSync("git", ["add", "removed.md", "kept.ts"], { cwd: root });
+    unlinkSync(path.join(root, "removed.md"));
+    const clean = spawnSync(process.execPath, [script], { cwd: root, encoding: "utf8" });
+    assert.equal(clean.status, 0, clean.stderr);
+    writeFileSync(path.join(root, "kept.ts"), 'export const origin = "https://benchbox.dev";\n');
+    const invalid = spawnSync(process.execPath, [script], { cwd: root, encoding: "utf8" });
+    assert.equal(invalid.status, 1, invalid.stderr);
+    assert.match(invalid.stdout, /kept\.ts:/);
+  } finally {
+    rmSync(root, { recursive: true, force: true });
+  }
 });

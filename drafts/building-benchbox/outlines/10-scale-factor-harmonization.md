@@ -340,7 +340,7 @@ under `benchbox/core/`.
 ## Reference
 
 - Changelog entry: `CHANGELOG.md` (`[0.2.1] - 2026-04-22`, "Scale factor harmonization" bullet)
-- Companion post: `09-v0-2-1-release-summary.md` (full release notes for v0.2.1)
+- Companion post: `../../../blog/2026-04-26-v0-2-1-release-summary.md` (full release notes for v0.2.1)
 - Test coverage: `tests/unit/generators/test_scale_factor_harmonization.py`
 - Per-benchmark generators: `benchbox/core/{coffeeshop,joinorder,amplab,h2odb,tsbs_devops,nyctaxi,flightdata}/`
 

@@ -69,35 +69,38 @@ Not "here's how to sign up" tutorials, but "here's how to extract maximum benchm
 
 ### Metadata Template
 
+Frontmatter follows `drafts/PUBLISHING.md`: no `title` field (the `#` heading carries the title) and no `status` field. Set the publication `date` for real on the publication branch.
+
 ```yaml
-title: "Free trial benchmarking: {Platform}"
+blogpost: true
+date: Month DD, YYYY
+author: Joe Harris
 series: free-trial-benchmarking
 post_number: N
-date: YYYY-MM-DD
-tags: [benchmarking, benchbox, tutorial, {platform}, free-trial, {cloud-provider}]
+type: tutorial
+tags: benchmarking, benchbox, tutorial, {platform}, free-trial, {cloud-provider}
+meta_description: "One-sentence summary of the post."
 ```
 
 ---
 
-## Planned Posts
+## Posts
 
-| # | Post | Status | Purpose |
-|---|------|--------|---------|
-| 0 | **Series intro: Free trials for cloud analytics in 2026** | PLANNED | Overview of all trials, comparison table, series roadmap |
+Location is the one maintained copy: published posts link their `blog/` canonical file, unpublished posts their draft file. Publication order is set in `drafts/PUBLICATION_SCHEDULE.md`, not here.
 
-### Platform-Specific Posts
-
-| # | Platform | Credits/Duration | Status | Key Insight |
-|---|----------|------------------|--------|-------------|
-| 1 | Snowflake | $400/30 days | PLANNED | Auto-suspend is critical; small warehouses stretch credits further |
-| 2 | Databricks | $400/14 days | PLANNED | Personal email limits hurt; business email unlocks full trial |
-| 3 | BigQuery | $300 + 1TB/mo free | PLANNED | Permanent free tier means ongoing testing possible |
-| 4 | MotherDuck | 10 CU-hrs/mo free | PLANNED | Permanent free tier; DuckDB compatibility enables local+cloud |
-| 5 | Redshift Serverless | $300/90 days | PLANNED | Longer trial = more methodical testing possible |
-| 6 | Starburst Galaxy | $500/30 days | PLANNED | Generous credits; Trino compatibility for federated testing |
-| 7 | ClickHouse Cloud | $300/30 days | PLANNED | Per-minute billing; auto-stop essential |
-| 8 | Microsoft Fabric | 64 CU/60 days | PLANNED | No upfront credits; capacity-based throttling |
-| 9 | Firebolt | $200/30 days | PLANNED | FBU system requires understanding before starting |
+| # | Post | Location | Key Insight |
+|---|------|----------|-------------|
+| 0 | **Series intro: Free trials for cloud analytics in 2026** | [Draft](../drafts/00-series-intro.md) | Overview of all trials, comparison table, series roadmap |
+| 1 | Snowflake | [Draft](../drafts/01-snowflake.md) | Auto-suspend is critical; small warehouses stretch credits further |
+| 2 | Databricks | [Draft](../drafts/02-databricks.md) | Personal email limits hurt; business email unlocks full trial |
+| 3 | BigQuery | [Draft](../drafts/03-bigquery.md) | Permanent free tier means ongoing testing possible |
+| 4 | MotherDuck | [Draft](../drafts/04-motherduck.md) | Permanent free tier; DuckDB compatibility enables local+cloud |
+| 5 | Redshift Serverless | [Draft](../drafts/05-redshift-serverless.md) | Longer trial = more methodical testing possible |
+| 6 | Starburst Galaxy | [Draft](../drafts/06-starburst-galaxy.md) | Generous credits; Trino compatibility for federated testing |
+| 7 | ClickHouse Cloud | [Draft](../drafts/07-clickhouse-cloud.md) | Per-minute billing; auto-stop essential |
+| 8 | Microsoft Fabric | [Draft](../drafts/08-microsoft-fabric.md) | No upfront credits; capacity-based throttling |
+| 9 | Firebolt | [Draft](../drafts/09-firebolt.md) | FBU system requires understanding before starting |
+| 10 | Athena | [Draft](../drafts/10-athena.md) | No dedicated trial; AWS Free Tier credits can be used |
 
 ---
 
@@ -149,11 +152,14 @@ tags: [benchmarking, benchbox, tutorial, {platform}, free-trial, {cloud-provider
 ### Metadata
 
 ```yaml
-title: "Free trials for cloud analytics in 2026: A benchmarker's guide"
+blogpost: true
+date: Month DD, YYYY
+author: Joe Harris
 series: free-trial-benchmarking
 post_number: 0
-date: YYYY-MM-DD
-tags: [benchmarking, benchbox, tutorial, cloud, free-trial, comparison]
+type: tutorial
+tags: benchmarking, benchbox, tutorial, cloud, free-trial, comparison
+meta_description: "One-sentence summary of the post."
 ```
 
 ### Stretch Posts (If Platform Trials Available)
@@ -227,20 +233,7 @@ Each post focuses on maximizing value from ONE platform's trial. We don't declar
 
 **Full research document**: [`research/platform-research.md`](../research/platform-research.md)
 
-### Research Status (All Posts)
-
-| Post | Platform | Trial | Pricing | BenchBox | Ready |
-|------|----------|-------|---------|----------|-------|
-| 0 | Intro | Done | Done | N/A | **Yes** |
-| 1 | Snowflake | Done | Done | Done | **Yes** |
-| 2 | Databricks | Done | Done | Done | **Yes** |
-| 3 | BigQuery | Done | Done | Done | **Yes** |
-| 4 | MotherDuck | Done | Done | Done | **Yes** |
-| 5 | Redshift | Done | Done | Done | **Yes** |
-| 6 | Starburst | Done | Partial | Done | **Yes** |
-| 7 | ClickHouse | Done | Done | Done | **Yes** |
-| 8 | Fabric | Done | Done | Done | **Yes** |
-| 9 | Firebolt | Done | Partial | Done | **Yes** |
+Trial terms go stale fast. Re-verify credits, durations, and pricing against current vendor terms during each post's editorial check (see `drafts/PUBLICATION_SCHEDULE.md`).
 
 ### Free Trial Comparison Table
 
@@ -378,5 +371,5 @@ This series avoids platform-vs-platform opinions, vendor criticism, and "which s
 ---
 
 *Series created: 2026-01-30*
-*Last updated: 2026-01-31*
+*Last updated: 2026-10-19 (locations replace the status matrix; queue lives in `drafts/PUBLICATION_SCHEDULE.md`)*
 *Research completed: 2026-01-31*

@@ -80,6 +80,15 @@ jobs:
       - run: npm test -w explorer
       - run: npm run build
       - run: npm test -w website
+      - name: Upload the rendered site for editorial review
+        if: github.event_name == 'pull_request'
+        uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f
+        with:
+          name: site-preview
+          path: website/dist
+          include-hidden-files: true
+          retention-days: 7
+          if-no-files-found: error
 
   e2e:
     name: Explorer browser suite
