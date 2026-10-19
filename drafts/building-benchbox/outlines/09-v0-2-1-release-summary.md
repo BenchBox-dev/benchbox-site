@@ -393,8 +393,8 @@ tour through every changelog bullet.
 ## Reference
 
 - Changelog entry: `CHANGELOG.md` (`[0.2.1] - 2026-04-22`)
-- Companion post: `10-scale-factor-harmonization.md` (deep dive on the SF=1 decision)
-- Previous release post: `08-v0-2-0-release-summary.md`
+- Companion post: `../../../blog/2026-04-26-scale-factor-harmonization.md` (deep dive on the SF=1 decision)
+- Previous release post: `../../../blog/2026-04-01-v0-2-0-release-summary.md`
 
 ---
 

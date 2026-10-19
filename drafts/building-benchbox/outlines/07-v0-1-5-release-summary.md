@@ -220,4 +220,4 @@ correctly.
 ## Reference
 
 - Changelog entry: `CHANGELOG.md` (`[0.1.5] - 2026-03-10`)
-- Post #6: `_blog/building-benchbox/drafts/06-extracting-textcharts.md`
+- Post #6: `../../../blog/2026-03-10-extracting-textcharts.md`
