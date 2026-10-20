@@ -59,6 +59,8 @@ jobs:
     timeout-minutes: 30
     steps:
       - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09
+        with:
+          fetch-depth: 2
       - uses: actions/setup-node@a0853c24544627f65ddf259abe73b1d18a591444
         with:
           node-version-file: .nvmrc
@@ -73,6 +75,7 @@ jobs:
       - run: npx tsc -p deploy
       - run: npm run lint:comments
       - run: npm run lint:guard
+      - run: npm run lint:blog
       - run: npm run bundle:verify -- --offline
       - run: npm run typecheck -w explorer
       - run: npm run typecheck:e2e -w explorer
@@ -80,8 +83,22 @@ jobs:
       - run: npm test -w explorer
       - run: npm run build
       - run: npm test -w website
-      - name: Upload the rendered site for editorial review
+      - name: Decide whether the pull request changes the rendered site
+        id: preview
         if: github.event_name == 'pull_request'
+        run: |
+          if git diff --name-only HEAD^1 HEAD | grep -qE '^(blog|website)/'; then
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+          fi
+      - name: Stamp the preview with its source commit
+        if: steps.preview.outputs.changed == 'true'
+        run: |
+          printf 'pull request head: %s\nbuilt merge commit: %s\nrun: %s attempt %s\n' \
+            "${{ github.event.pull_request.head.sha }}" "$GITHUB_SHA" "$GITHUB_RUN_ID" "$GITHUB_RUN_ATTEMPT" \
+            > website/dist/preview-source.txt
+      - name: Upload the rendered site for editorial review
+        if: steps.preview.outputs.changed == 'true'
+        continue-on-error: true
         uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f
         with:
           name: site-preview

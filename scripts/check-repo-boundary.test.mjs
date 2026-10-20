@@ -52,3 +52,59 @@ test("tracked file deletions do not bypass checks on surviving files", () => {
     rmSync(root, { recursive: true, force: true });
   }
 });
+
+function stagedRepository() {
+  const root = mkdtempSync(path.join(os.tmpdir(), "benchbox-boundary-staged-"));
+  execFileSync("git", ["init", "--quiet"], { cwd: root });
+  writeFileSync(path.join(root, "kept.ts"), "export const value = 1;\n");
+  execFileSync("git", ["add", "kept.ts"], { cwd: root });
+  return root;
+}
+
+const violation = 'export const origin = "https://benchbox.dev";\n';
+
+test("a staged violation is caught even when the worktree copy is clean", () => {
+  const root = stagedRepository();
+  const script = fileURLToPath(new URL("./check-repo-boundary.mjs", import.meta.url));
+  try {
+    writeFileSync(path.join(root, "kept.ts"), violation);
+    execFileSync("git", ["add", "kept.ts"], { cwd: root });
+    writeFileSync(path.join(root, "kept.ts"), "export const value = 1;\n");
+    const staged = spawnSync(process.execPath, [script, "--staged"], { cwd: root, encoding: "utf8" });
+    assert.equal(staged.status, 1, staged.stderr);
+    assert.match(staged.stdout, /kept\.ts:/);
+    const worktree = spawnSync(process.execPath, [script], { cwd: root, encoding: "utf8" });
+    assert.equal(worktree.status, 0, worktree.stderr);
+  } finally {
+    rmSync(root, { recursive: true, force: true });
+  }
+});
+
+test("a worktree-only fix does not hide a staged violation, and unstaged edits do not fail the staged check", () => {
+  const root = stagedRepository();
+  const script = fileURLToPath(new URL("./check-repo-boundary.mjs", import.meta.url));
+  try {
+    writeFileSync(path.join(root, "kept.ts"), violation);
+    const staged = spawnSync(process.execPath, [script, "--staged"], { cwd: root, encoding: "utf8" });
+    assert.equal(staged.status, 0, staged.stdout);
+  } finally {
+    rmSync(root, { recursive: true, force: true });
+  }
+});
+
+test("untracked files are scanned in the default mode and ignored files are not", () => {
+  const root = stagedRepository();
+  const script = fileURLToPath(new URL("./check-repo-boundary.mjs", import.meta.url));
+  try {
+    writeFileSync(path.join(root, ".gitignore"), "ignored.ts\n");
+    writeFileSync(path.join(root, "ignored.ts"), violation);
+    const ignored = spawnSync(process.execPath, [script], { cwd: root, encoding: "utf8" });
+    assert.equal(ignored.status, 0, ignored.stdout);
+    writeFileSync(path.join(root, "loose.ts"), violation);
+    const loose = spawnSync(process.execPath, [script], { cwd: root, encoding: "utf8" });
+    assert.equal(loose.status, 1, loose.stdout);
+    assert.match(loose.stdout, /loose\.ts:/);
+  } finally {
+    rmSync(root, { recursive: true, force: true });
+  }
+});

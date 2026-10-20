@@ -37,6 +37,18 @@ describe("front matter", () => {
     expect(result.files.size).toBe(0);
   });
 
+  it("rejects blog articles that carry a hold field and ignores it elsewhere", () => {
+    const held = build({
+      "blog/candidate.md": '---\nblogpost: true\ndate: October 19, 2026\nhold: "withheld"\n---\n\n# Candidate\n\nHeld article.\n',
+    });
+    expect(held.errors).toHaveLength(1);
+    expect(held.errors[0]).toMatchObject({ file: "blog/candidate.md", line: 4 });
+    expect(held.errors[0].message).toContain("on hold");
+    expect(held.files.size).toBe(0);
+    const docs = build({ "guide.md": "---\nhold: later\n---\n\n# Guide\n\nNotes.\n" });
+    expect(docs.errors).toEqual([]);
+  });
+
   it.each(["published", undefined])("allows %s blog articles alongside draft documentation", (status) => {
     const result = build({
       "guide.md": "---\nstatus: draft\n---\n\n# Guide\n\nWork in progress.\n",

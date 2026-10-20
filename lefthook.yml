@@ -5,7 +5,10 @@ pre-commit:
       glob: "*.{ts,tsx,js,jsx,mjs,cjs,astro,html}"
       run: node scripts/check-comments.mjs {staged_files}
     boundary:
-      run: node scripts/check-repo-boundary.mjs
+      run: node scripts/check-repo-boundary.mjs --staged
+    blog:
+      glob: "{blog,drafts}/**"
+      run: node scripts/check-blog-publication.mjs
     markdown:
       glob: "*.md"
       exclude:

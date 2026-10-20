@@ -1,5 +1,10 @@
 # "Free Trial Benchmarking" Content Plan
 
+> **Time-sensitive figures:** prices, credits and trial terms in this plan
+> are planning figures. The Facts verified column in
+> `../../PUBLICATION_SCHEDULE.md` records when each article's figures were
+> last checked.
+
 **Concept**: Hands-on guides for maximizing free trial value on commercial analytics platforms supported by BenchBox, with concrete methodology for running meaningful benchmarks before credits expire.
 
 **Audience**: Data engineers, analytics practitioners, and technical evaluators assessing cloud data platforms during free trial periods.

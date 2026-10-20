@@ -18,6 +18,7 @@
     "test": "node --test scripts/*.test.mjs && npm test -w explorer && npm test -w website",
     "lint:comments": "node scripts/check-comments.mjs",
     "lint:guard": "node scripts/check-repo-boundary.mjs",
+    "lint:blog": "node scripts/check-blog-publication.mjs",
     "prepare": "lefthook install",
     "charts": "node scripts/render-blog-charts.mjs",
     "deploy": "node --experimental-strip-types --disable-warning=ExperimentalWarning deploy/cli.ts",
