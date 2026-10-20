@@ -4,7 +4,7 @@ import { colonFenceSyntax } from "./colon-fence.ts";
 import { commentSyntax, htmlCommentSyntax } from "./comments.ts";
 import { deflistSyntax } from "./deflist.ts";
 import { evalRstDirective } from "./eval-rst.ts";
-import { descriptionFrontMatter, mystFrontMatter, passthroughFrontMatter, tagsFrontMatter, titleFrontMatter } from "./front-matter.ts";
+import { descriptionFrontMatter, holdFrontMatter, mystFrontMatter, passthroughFrontMatter, tagsFrontMatter, titleFrontMatter } from "./front-matter.ts";
 import { headingSyntax } from "./headings.ts";
 import { imageSyntax } from "./images.ts";
 import { labelSyntax } from "./labels.ts";
@@ -42,6 +42,7 @@ export function createDefaultRegistry(): HandlerRegistry {
     .register(headingSyntax)
     .register(linkSyntax)
     .register(passthroughFrontMatter)
+    .register(holdFrontMatter)
     .register(titleFrontMatter)
     .register(descriptionFrontMatter)
     .register(tagsFrontMatter)

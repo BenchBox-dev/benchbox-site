@@ -22,6 +22,16 @@ export const passthroughFrontMatter: FrontMatterHandler = {
   },
 };
 
+export const holdFrontMatter: FrontMatterHandler = {
+  kind: "front-matter",
+  keys: ["hold"],
+  handle(_key, value, at, context) {
+    if (context.collection === "blog") {
+      throw new ConverterError(at.file, at.line, `blog articles on hold cannot be published (${String(value)}); remove the hold field only when the owner releases the article`);
+    }
+  },
+};
+
 export const titleFrontMatter: FrontMatterHandler = {
   kind: "front-matter",
   keys: ["title"],

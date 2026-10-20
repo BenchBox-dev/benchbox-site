@@ -1,5 +1,9 @@
 # "Cloud Cost Controls for Benchmarking" Content Plan
 
+> **Time-sensitive figures:** prices and terms in this plan are planning
+> figures. The Facts verified column in `../../PUBLICATION_SCHEDULE.md`
+> records when each article's figures were last checked.
+
 **Concept**: Practical cost management strategies for running database benchmarks and experiments on cloud platforms
 **Audience**: Data engineers, database developers, researchers running benchmarks on AWS/GCP/Azure
 **Tone**: Direct, data-grounded, educational with concrete dollar amounts (per BenchBox Blog Style Guide v2.0)

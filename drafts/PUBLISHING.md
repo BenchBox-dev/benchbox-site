@@ -147,10 +147,18 @@ Check in particular:
   LLM writing tells. Ensure that agent work on the writing (reviews,
   style checks and similar) has not added LLM writing tells.
 
-There is no automated blog content validator in this repository.
-Editorial quality is a human check against `STYLE_GUIDE.md` and
-`VOICE_REFERENCE.md`, backed by the build and repository checks in
-step 5. Evidence behind every claim is reviewed by hand in this step.
+`npm run lint:blog` checks structure only: post file names and dates,
+required front matter, `blog/index.md` toctree coverage, queue and
+draft agreement, links in the queue and series plans, and hold and
+facts-verified marks. It does not judge content. Editorial quality is
+a human check against `STYLE_GUIDE.md` and `VOICE_REFERENCE.md`,
+backed by the build and repository checks in step 5. Evidence behind
+every claim is reviewed by hand in this step.
+
+Before cutting the branch for a time-sensitive article, re-check its
+prices, credits and trial terms against current vendor terms, and set
+its `Facts verified` date in `PUBLICATION_SCHEDULE.md`. `lint:blog`
+warns on dates older than 45 days and on `never`; it does not block.
 
 ### 3. Cut a named publication branch and move the post
 
@@ -171,6 +179,9 @@ moved file before anything else:
   `author`, `tags`). Older drafts may predate this schema.
 - Drop draft-only fields: a `title` field (the `#` heading carries
   the title) and any `status: draft` line (rejected under `blog/`).
+  A `hold:` field is different: the build rejects it under `blog/`
+  and only Joe releases it. Remove it, and the queue row's
+  `Publication withheld` note, only on his instruction.
 - Adapt relative links for the destination. Drafts use
   `../images/{image}.png`, while `blog/` uses `./images/{image}.png`.
   Copy each referenced image to `blog/images/` as well.
@@ -225,8 +236,13 @@ frontmatter and unknown `toctree` targets fail here. Open the preview
 and read the candidate post in place: the branch carrying a candidate
 in `blog/` is the previewable state. If the bundle cannot be fetched,
 the pull request's CI run uploads a `site-preview` artifact after the
-build and website tests pass. Download it and use the same preview
-server without rebuilding:
+build and website tests pass, but only when the pull request changes
+`blog/` or `website/`. The upload does not gate `ci`, and it finishes
+before the Explorer browser suite and dependency audit, so green
+`ci` is still required. The artifact carries `preview-source.txt`
+naming the pull request head commit and run; check it matches the
+commit under review. Download it and use the same preview server
+without rebuilding:
 
 ```bash
 gh run download <ci-run-id> --name site-preview --dir website/dist
@@ -243,12 +259,16 @@ Repository guards also run in CI and as pre-commit hooks via
 ```bash
 npm run lint:guard
 npm run lint:comments
+npm run lint:blog
 ```
 
 `lint:guard` runs `scripts/check-repo-boundary.mjs`, which fails on
 Python files or calls, hard-coded production origins outside the
-allowlist, and paths from the old core layout. `lint:comments` runs
-`scripts/check-comments.mjs`.
+allowlist, and paths from the old core layout. By default it scans
+tracked and untracked, non-ignored files from the worktree. The
+pre-commit hook runs it with `--staged`, which scans the index
+contents instead, so a staged violation cannot hide behind a clean
+worktree copy. `lint:comments` runs `scripts/check-comments.mjs`.
 
 ### 6. Open the pull request and hold for release
 
@@ -269,8 +289,8 @@ removal.
 
 The `ci` workflow (`.github/workflows/ci.yml`) fetches and verifies
 the core bundle, then runs the script tests, `lint:comments`,
-`lint:guard`, `bundle:verify`, the Explorer and website type checks,
-the unit tests and `npm run build`. All of it must pass.
+`lint:guard`, `lint:blog`, `bundle:verify`, the Explorer and website
+type checks, the unit tests and `npm run build`. All of it must pass.
 
 An approved pull request may stay unmerged until its release window.
 Merging authorizes the existing workflow; it is not proof the post is

@@ -77,28 +77,75 @@ function worktreeDeletedFiles(root) {
   );
 }
 
-function trackedFiles(root) {
-  const deleted = worktreeDeletedFiles(root);
-  return execFileSync("git", ["-C", root, "ls-files", "-z"], { encoding: "utf8" })
+function gitFiles(root, args) {
+  return execFileSync("git", ["-C", root, ...args, "-z"], { encoding: "utf8" })
     .split("\0")
-    .filter(Boolean)
-    .filter((file) => !deleted.has(file));
+    .filter(Boolean);
+}
+
+function worktreeFiles(root) {
+  const deleted = worktreeDeletedFiles(root);
+  const tracked = gitFiles(root, ["ls-files"]).filter((file) => !deleted.has(file));
+  return [...tracked, ...gitFiles(root, ["ls-files", "--others", "--exclude-standard"])];
+}
+
+function indexFiles(root) {
+  return gitFiles(root, ["ls-files", "--stage"])
+    .map((line) => {
+      const tab = line.indexOf("\t");
+      const [mode, oid] = line.slice(0, tab).split(" ");
+      return { mode, oid, file: line.slice(tab + 1) };
+    })
+    .filter((entry) => entry.mode !== "160000");
+}
+
+function readBlobs(root, oids) {
+  if (oids.length === 0) return [];
+  const output = execFileSync("git", ["-C", root, "cat-file", "--batch"], {
+    input: `${oids.join("\n")}\n`,
+    maxBuffer: 1 << 30,
+  });
+  const sources = [];
+  let offset = 0;
+  for (let index = 0; index < oids.length; index += 1) {
+    const headerEnd = output.indexOf(10, offset);
+    const size = Number(output.toString("latin1", offset, headerEnd).split(" ")[2]);
+    const start = headerEnd + 1;
+    sources.push(output.toString("utf8", start, start + size));
+    offset = start + size + 1;
+  }
+  return sources;
+}
+
+const BINARY_FILE = /\.(png|jpe?g|gif|webp|ico|svg|woff2?|duckdb|wasm|zst|gz|pdf)$/i;
+
+function collect(root, staged) {
+  const entries = staged
+    ? indexFiles(root)
+    : worktreeFiles(root).map((file) => ({ file }));
+  const textual = entries.filter((entry) => !BINARY_FILE.test(entry.file));
+  const sources = staged
+    ? readBlobs(root, textual.map((entry) => entry.oid))
+    : textual.map((entry) => readFileSync(path.join(root, entry.file), "utf8"));
+  return {
+    binary: entries.filter((entry) => BINARY_FILE.test(entry.file)).map((entry) => entry.file),
+    text: textual.map((entry, index) => ({ file: entry.file, source: sources[index] })),
+  };
+}
+
+export function boundaryFindings(root, { staged = false } = {}) {
+  const { binary, text } = collect(root, staged);
+  if (binary.length + text.length === 0) return null;
+  const findings = binary.filter((file) => PYTHON_FILES.test(file)).map((file) => `${file}: Python file in the repository`);
+  for (const { file, source } of text) findings.push(...findingsFor(file, source));
+  return findings;
 }
 
 function main() {
-  const root = repoRoot();
-  const files = trackedFiles(root);
-  if (files.length === 0) {
-    console.error("repository boundary: no tracked files found");
+  const findings = boundaryFindings(repoRoot(), { staged: process.argv.includes("--staged") });
+  if (findings === null) {
+    console.error("repository boundary: no files found");
     return 1;
-  }
-  const findings = [];
-  for (const file of files) {
-    if (/\.(png|jpe?g|gif|webp|ico|svg|woff2?|duckdb|wasm|zst|gz|pdf)$/i.test(file)) {
-      if (PYTHON_FILES.test(file)) findings.push(`${file}: Python file in the repository`);
-      continue;
-    }
-    findings.push(...findingsFor(file, readFileSync(path.join(root, file), "utf8")));
   }
   for (const finding of findings) console.log(finding);
   console.log(`repository boundary: ${findings.length} findings`);
