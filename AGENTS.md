@@ -52,6 +52,11 @@ itself plus one versioned core bundle; it reads nothing else from core.
   its digest on the GitHub Pages deployment. `npm run deploy -- deployed`
   prints the current one. If the probes fail after a deploy, the run
   dispatches at most one rollback to the last known good receipt.
+- The post-deploy probe compares served bytes with the artifact and repeats
+  every ten seconds for at most eleven minutes of monotonic elapsed time,
+  which covers the ten-minute `max-age` of the served pages while Pages and
+  its CDN still answer with the previous generation. The final probe runs at
+  the deadline, and a mismatch still present then fails the run.
 - A failed run opens or updates a site-local `site-deploy-failed` issue.
   Core-dispatched failures also relay to core under `site-bundle-undeployed`,
   classified as producer-not-concluded, contract-version-mismatch,

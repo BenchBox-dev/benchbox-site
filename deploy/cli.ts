@@ -174,10 +174,7 @@ async function recheck(): Promise<void> {
 async function runProbe(): Promise<void> {
   const baseUrl = process.env.PROBE_BASE_URL ?? "";
   if (!baseUrl) failWith(["PROBE_BASE_URL is required"]);
-  const outcome = await probe(baseUrl, checksumManifest(SITE_DIR), {
-    attempts: Number(process.env.PROBE_ATTEMPTS ?? 6),
-    delayMs: Number(process.env.PROBE_DELAY_MS ?? 10_000),
-  });
+  const outcome = await probe(baseUrl, checksumManifest(SITE_DIR));
   writeWork("probe.json", outcome);
   console.log(`probe ${outcome.ok ? "ok" : "FAILED"}: ${outcome.matched} matched, ${outcome.mismatched.length} mismatched, ${outcome.errors.length} errors, deep link ${outcome.deep_link.status}`);
   output("probes_ok", String(outcome.ok));
