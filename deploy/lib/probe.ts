@@ -86,17 +86,28 @@ export async function probeOnce(baseUrl: string, manifest: Record<string, string
   return { ok: mismatched.length === 0 && errors.length === 0 && deepLink.ok, base_url: baseUrl, matched, mismatched, mismatch_details: mismatchDetails, errors, deep_link: deepLink };
 }
 
-export async function probe(
-  baseUrl: string,
-  manifest: Record<string, string>,
-  options: { attempts?: number; delayMs?: number; fetchImpl?: Fetch } = {},
-): Promise<ProbeOutcome> {
-  const attempts = options.attempts ?? 6;
-  let last: Omit<ProbeOutcome, "attempts"> | null = null;
-  for (let attempt = 1; attempt <= attempts; attempt += 1) {
-    last = await probeOnce(baseUrl, manifest, options.fetchImpl);
-    if (last.ok) return { ...last, attempts: attempt };
-    if (attempt < attempts) await new Promise((resolve) => setTimeout(resolve, options.delayMs ?? 10_000));
+export const PROBE_WINDOW_MS = 660_000;
+export const PROBE_DELAY_MS = 10_000;
+
+export type ProbeOptions = {
+  windowMs?: number;
+  delayMs?: number;
+  fetchImpl?: Fetch;
+  now?: () => number;
+  sleep?: (ms: number) => Promise<void>;
+};
+
+export async function probe(baseUrl: string, manifest: Record<string, string>, options: ProbeOptions = {}): Promise<ProbeOutcome> {
+  const windowMs = options.windowMs ?? PROBE_WINDOW_MS;
+  const delayMs = options.delayMs ?? PROBE_DELAY_MS;
+  const now = options.now ?? (() => performance.now());
+  const sleep = options.sleep ?? ((ms: number) => new Promise<void>((resolve) => setTimeout(resolve, ms)));
+  const deadline = now() + windowMs;
+  for (let attempt = 1; ; attempt += 1) {
+    const outcome = await probeOnce(baseUrl, manifest, options.fetchImpl);
+    if (outcome.ok) return { ...outcome, attempts: attempt };
+    const remaining = deadline - now();
+    if (remaining <= 0) return { ...outcome, attempts: attempt };
+    await sleep(Math.min(delayMs, remaining));
   }
-  return { ...(last as Omit<ProbeOutcome, "attempts">), attempts };
 }

@@ -64,6 +64,24 @@ test("the deep link must fall back to the results redirect page", async () => {
   assert.deepEqual(outcome.deep_link, { ok: false, status: 200 });
 });
 
+function fakeClock() {
+  let elapsed = 0;
+  return {
+    now: () => elapsed,
+    sleep: async (ms: number) => {
+      elapsed += ms;
+    },
+  };
+}
+
+function servedFrom(clock: { now: () => number }, switchAtMs: number, before: string, after: string, fetched: number[] = []) {
+  return async (url: string) => {
+    fetched.push(clock.now());
+    if (new URL(url).pathname !== "/") return { status: 404, body: new TextEncoder().encode("benchbox.results.redirect") };
+    return { status: 200, body: new TextEncoder().encode(clock.now() < switchAtMs ? before : after) };
+  };
+}
+
 test("the probe retries until the site serves the artifact", async () => {
   let calls = 0;
   const flaky = async (url: string) => {
@@ -71,12 +89,40 @@ test("the probe retries until the site serves the artifact", async () => {
     if (new URL(url).pathname === "/") return { status: calls < 3 ? 503 : 200, body: new TextEncoder().encode("home") };
     return { status: 404, body: new TextEncoder().encode("benchbox.results.redirect") };
   };
-  const outcome = await probe("https://site.test", { "/": sha("home") }, { attempts: 4, delayMs: 0, fetchImpl: flaky });
+  const outcome = await probe("https://site.test", { "/": sha("home") }, { windowMs: 40_000, delayMs: 10_000, fetchImpl: flaky, ...fakeClock() });
   assert.equal(outcome.ok, true);
   assert.equal(outcome.attempts, 2);
-  const never = await probe("https://site.test", { "/": sha("home") }, { attempts: 2, delayMs: 0, fetchImpl: fakeFetch({ "/": { status: 500, body: "" } }) });
+  const never = await probe("https://site.test", { "/": sha("home") }, { windowMs: 20_000, delayMs: 10_000, fetchImpl: fakeFetch({ "/": { status: 500, body: "" } }), ...fakeClock() });
   assert.equal(never.ok, false);
-  assert.equal(never.attempts, 2);
+  assert.equal(never.attempts, 3);
+});
+
+test("the probe waits out a stale generation beyond the former fixed retry budget", async () => {
+  const clock = fakeClock();
+  const manifest = { "/": sha("new home") };
+  const outcome = await probe("https://site.test", manifest, {
+    delayMs: 10_000,
+    fetchImpl: servedFrom(clock, 150_000, "old home", "new home"),
+    ...clock,
+  });
+  assert.equal(outcome.ok, true);
+  assert.deepEqual(outcome.mismatched, []);
+  assert.ok(clock.now() >= 150_000);
+});
+
+test("the probe never accepts a mismatch that persists past its window", async () => {
+  const clock = fakeClock();
+  const fetched: number[] = [];
+  const outcome = await probe("https://site.test", { "/": sha("new home") }, {
+    windowMs: 660_000,
+    delayMs: 10_000,
+    fetchImpl: servedFrom(clock, 700_000, "old home", "new home", fetched),
+    ...clock,
+  });
+  assert.equal(outcome.ok, false);
+  assert.deepEqual(outcome.mismatched, ["/"]);
+  assert.equal(outcome.mismatch_details[0].served_sha256, sha("old home"));
+  assert.equal(Math.max(...fetched), 660_000);
 });
 
 test("persistent byte mismatches retain hashes and cache headers in the receipt", async () => {
@@ -94,7 +140,8 @@ test("persistent byte mismatches retain hashes and cache headers in the receipt"
   try {
     const address = server.address();
     assert.ok(address && typeof address !== "string");
-    const outcome = await probe(`http://127.0.0.1:${address.port}`, { "/": sha("new generation") }, { attempts: 2, delayMs: 0 });
+    const clock = fakeClock();
+    const outcome = await probe(`http://127.0.0.1:${address.port}`, { "/": sha("new generation") }, { windowMs: 10, delayMs: 10, ...clock });
     assert.equal(outcome.ok, false);
     assert.equal(outcome.attempts, 2);
     assert.deepEqual(outcome.mismatched, ["/"]);
