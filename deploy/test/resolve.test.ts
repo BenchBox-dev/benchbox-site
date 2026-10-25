@@ -26,6 +26,11 @@ test("an unverifiable bundle is refused", () => {
   assert.ok(verifyBundle(fixtureBundle({ attestationResult: "fail" })).errors.length > 0);
 });
 
+test("candidate schema bundles verify offline and an unsupported schema is refused", () => {
+  for (const schema of [3, 4, 5]) assert.deepEqual(verifyBundle(fixtureBundle({ schema })).errors, []);
+  assert.ok(verifyBundle(fixtureBundle({ schema: 2 })).errors.some((error: string) => error.startsWith("schema 2")));
+});
+
 test("a changed corpus needs validator parity from the deployed commit", () => {
   const candidate = (base: string | undefined, corpus = "9".repeat(40)) => ({
     core_sha: "b".repeat(40),

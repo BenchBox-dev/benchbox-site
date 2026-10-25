@@ -27,6 +27,7 @@
   },
   "devDependencies": {
     "@duckdb/duckdb-wasm": "1.32.0",
+    "ajv": "8.20.0",
     "ansi-to-html": "0.7.2",
     "cspell": "10.3.6",
     "lefthook": "2.2.1",

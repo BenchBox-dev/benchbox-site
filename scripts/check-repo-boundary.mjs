@@ -26,6 +26,7 @@ export const ORIGIN_ALLOWLIST = [
   /^explorer\/src\/components\/siteOrigin\.ts$/,
   /^website\/src\/lib\/site-origin\.ts$/,
   /^deploy\/gates\/(links|origin)\.ts$/,
+  /^scripts\/schemas\/[a-z-]+\.schema\.json$/,
   /^scripts\/check-repo-boundary(\.test)?\.mjs$/,
   /^AGENTS\.md$/,
 ];

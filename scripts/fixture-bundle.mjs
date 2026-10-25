@@ -3,7 +3,8 @@ import { mkdirSync, mkdtempSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import path from "node:path";
 import { pathToFileURL } from "node:url";
-import { memberDigest, membersFor } from "./bundle-lib.mjs";
+import { CANDIDATE_CERTIFIER, DOCS_DATA_FILE, SCHEMA_DIR, memberDigest, membersFor } from "./bundle-lib.mjs";
+import { minimalInstance } from "./schema-instance.mjs";
 
 export const FIXTURE_CORE = "a".repeat(40);
 export const FIXTURE_PARENT = "b".repeat(40);
@@ -13,12 +14,18 @@ function write(file, body) {
   writeFileSync(file, body);
 }
 
-export function fixtureBundle({ schema = 3, attestationResult = "pass", tamper = false, dir } = {}) {
+function schemaInstance(name) {
+  return `${JSON.stringify(minimalInstance(path.join(SCHEMA_DIR, `${name}.schema.json`)))}\n`;
+}
+
+export function fixtureBundle({ schema = 3, attestationResult = "pass", tamper = false, dir, certifiedBy, contractOverrides = {} } = {}) {
   const root = dir ?? mkdtempSync(path.join(tmpdir(), "bundle-fixture-"));
-  const required = membersFor(schema);
+  const required = membersFor(schema) ?? membersFor(3);
   for (const member of required) {
     if (member === "attestations.json") continue;
-    if (member.endsWith(".json") || member.endsWith(".duckdb")) write(path.join(root, member), `${member}\n`);
+    if (member === "docs-data") write(path.join(root, member, DOCS_DATA_FILE), contractOverrides["docs-data"] ?? schemaInstance("docs-data"));
+    else if (member === "doc-contracts.json") write(path.join(root, member), contractOverrides[member] ?? schemaInstance("doc-contracts"));
+    else if (member.endsWith(".json") || member.endsWith(".duckdb")) write(path.join(root, member), `${member}\n`);
     else write(path.join(root, member, "item.txt"), `${member}\n`);
   }
   const snapshot = memberDigest(path.join(root, "explorer/results.duckdb"));
@@ -40,7 +47,7 @@ export function fixtureBundle({ schema = 3, attestationResult = "pass", tamper =
       parent_source: "bundle",
       corpus_sha: "c".repeat(40),
       package_version: "0.0.0",
-      certified_by: "1",
+      certified_by: certifiedBy ?? (schema >= 4 ? CANDIDATE_CERTIFIER : "1"),
       members,
     }),
   );
