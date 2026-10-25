@@ -96,10 +96,18 @@ function schemaErrors(label, file, schemaName) {
   return validate.errors.slice(0, 5).map((error) => `${label} ${error.instancePath || "<root>"}: ${error.message}`);
 }
 
+const RUN_ID = /^\d+$/;
+const CERTIFIERS_BY_SCHEMA = { 4: "candidate or a run id", 5: CANDIDATE_CERTIFIER };
+
+function certifierAccepted(manifest) {
+  if (manifest.certified_by === CANDIDATE_CERTIFIER) return true;
+  return manifest.schema === 4 && typeof manifest.certified_by === "string" && RUN_ID.test(manifest.certified_by);
+}
+
 export function checkCandidate(dir, manifest) {
   const errors = [];
-  if (manifest.certified_by !== CANDIDATE_CERTIFIER) {
-    errors.push(`schema ${manifest.schema} requires certified_by ${CANDIDATE_CERTIFIER}, got ${JSON.stringify(manifest.certified_by)}`);
+  if (!certifierAccepted(manifest)) {
+    errors.push(`schema ${manifest.schema} requires certified_by ${CERTIFIERS_BY_SCHEMA[manifest.schema]}, got ${JSON.stringify(manifest.certified_by)}`);
   }
   const docsData = path.join(dir, "docs-data");
   if (existsSync(docsData) && statSync(docsData).isDirectory()) {

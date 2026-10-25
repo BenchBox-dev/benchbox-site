@@ -42,3 +42,74 @@ test("runs off the trunk path, branch, or verdict fail the predicate", () => {
   assert.equal(certificationErrors(trunkRun({ conclusion: "failure" }), manifest).length, 1);
   assert.equal(certificationErrors(trunkRun({ head_sha: "0".repeat(40) }), manifest).length, 1);
 });
+
+async function withRun(run, body) {
+  const original = globalThis.fetch;
+  const routes = [];
+  globalThis.fetch = async (url) => {
+    routes.push(String(url));
+    return { ok: true, status: 200, json: async () => run };
+  };
+  try {
+    return await body(routes);
+  } finally {
+    globalThis.fetch = original;
+  }
+}
+
+test("a candidate schema 4 or 5 bundle never passes online certification and never contacts the API", async () => {
+  for (const schema of [4, 5]) {
+    const dir = fixtureBundle({ schema });
+    await withRun(trunkRun(), async (routes) => {
+      const result = await verifyWithCertification(dir);
+      assert.equal(result.ok, false);
+      assert.deepEqual(result.errors, ["certified_by candidate is not a run id"]);
+      assert.deepEqual(routes, []);
+      assert.equal((await verifyWithCertification(dir, { offline: true })).ok, true);
+    });
+  }
+});
+
+test("a schema 4 bundle certified by a trunk run id passes online certification like schema 3", async () => {
+  for (const schema of [3, 4]) {
+    const dir = fixtureBundle({ schema, certifiedBy: "40239821240" });
+    await withRun(trunkRun(), async (routes) => {
+      const result = await verifyWithCertification(dir);
+      assert.deepEqual(result.errors, []);
+      assert.equal(routes.length, 1);
+      assert.ok(routes[0].endsWith("/actions/runs/40239821240"));
+    });
+  }
+});
+
+test("a certified schema 4 bundle is refused when its run is not a green trunk push on the bundle commit", async () => {
+  for (const overrides of [{ conclusion: "failure" }, { head_sha: "0".repeat(40) }, { head_branch: "main" }, { path: ".github/workflows/ci.yml" }]) {
+    const dir = fixtureBundle({ schema: 4, certifiedBy: "40239821240" });
+    await withRun(trunkRun(overrides), async () => {
+      const result = await verifyWithCertification(dir);
+      assert.equal(result.ok, false);
+      assert.equal(result.errors.length, 1);
+    });
+  }
+});
+
+test("a schema 5 bundle with a run id is refused online and offline", async () => {
+  const dir = fixtureBundle({ schema: 5, certifiedBy: "40239821240" });
+  await withRun(trunkRun(), async () => {
+    assert.equal((await verifyWithCertification(dir)).ok, false);
+    assert.equal((await verifyWithCertification(dir, { offline: true })).ok, false);
+  });
+});
+
+test("an API failure fails a certified schema 4 bundle closed", async () => {
+  const dir = fixtureBundle({ schema: 4, certifiedBy: "40239821240" });
+  const original = globalThis.fetch;
+  globalThis.fetch = async () => ({ ok: false, status: 503, json: async () => ({}) });
+  try {
+    const result = await verifyWithCertification(dir);
+    assert.equal(result.ok, false);
+    assert.match(result.errors[0], /certification check failed closed/);
+  } finally {
+    globalThis.fetch = original;
+  }
+});
