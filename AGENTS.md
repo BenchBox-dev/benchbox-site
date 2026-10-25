@@ -24,13 +24,18 @@ itself plus one versioned core bundle; it reads nothing else from core.
   certification before anything reads it.
 - The bundle schema is an integer major version. A schema change lands in
   core first, then the site adds support for it, then core may drop the
-  older schema. The verifier accepts exact schema 3 (the published bundle)
-  and the candidate schemas 4 and 5, each with its own exact member set.
-  Schemas 4 and 5 add `docs-data/docs-data.json` and `doc-contracts.json`,
-  validated against the schemas vendored in `scripts/schemas/`, and carry
-  `certified_by: candidate`, so they never pass certification. Schema 5
-  drops `docs` and `downloads`. Unknown schemas, member sets and extra
-  entries in `docs-data` fail.
+  older schema. The verifier accepts exact schemas 3, 4 and 5, each with
+  its own exact member set. Schemas 4 and 5 add
+  `docs-data/docs-data.json` and `doc-contracts.json`, validated against
+  the schemas vendored in `scripts/schemas/`. Schema 5 drops `docs` and
+  `downloads`. Unknown schemas, member sets and extra entries in
+  `docs-data` fail.
+- `certified_by` is the numeric id of the core `trunk.yml` push run on
+  `develop` for the bundle commit. Online certification requires that run
+  id for schemas 3 and 4 alike, with the same attestations. The value
+  `candidate` is valid for schemas 4 and 5 under `--offline` verification
+  only, and never passes online certification. Schema 5 accepts only
+  `candidate`, so it cannot be deployed yet.
 - Never read core files by any other route. A guard test fails the build on
   any path outside the repository other than `$SITE_INPUTS`.
 

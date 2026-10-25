@@ -68,11 +68,63 @@ test("member sets are exact for each schema", () => {
   assert.ok(verifyBundle(schema4WithoutContracts).errors.some((error) => error.startsWith("member set mismatch")));
 });
 
-test("candidate bundles require the candidate certifier", () => {
-  for (const certifiedBy of ["1", "local", "dispatch"]) {
-    const errors = verifyBundle(fixtureBundle({ schema: 4, certifiedBy })).errors;
-    assert.ok(errors.some((error) => error.startsWith("schema 4 requires certified_by candidate")));
+test("schema 4 accepts the candidate certifier or a run id and schema 5 only the candidate certifier", () => {
+  for (const certifiedBy of ["candidate", "1", "40239821240"]) {
+    assert.deepEqual(verifyBundle(fixtureBundle({ schema: 4, certifiedBy })).errors, [], certifiedBy);
   }
+  for (const certifiedBy of ["local", "dispatch", "12abc", " 1", "1.5", "-1", "0x1"]) {
+    const errors = verifyBundle(fixtureBundle({ schema: 4, certifiedBy })).errors;
+    assert.ok(errors.some((error) => error.startsWith("schema 4 requires certified_by candidate or a run id")), certifiedBy);
+  }
+  const numeric = rewriteManifest(fixtureBundle({ schema: 4 }), (manifest) => {
+    manifest.certified_by = 7;
+  });
+  assert.ok(verifyBundle(numeric).errors.some((error) => error.startsWith("schema 4 requires certified_by")));
+  for (const certifiedBy of ["1", "local", "dispatch"]) {
+    const errors = verifyBundle(fixtureBundle({ schema: 5, certifiedBy })).errors;
+    assert.ok(errors.some((error) => error.startsWith("schema 5 requires certified_by candidate, got")), certifiedBy);
+  }
+  assert.deepEqual(verifyBundle(fixtureBundle({ schema: 5 })).errors, []);
+});
+
+test("a certified schema 4 bundle fails closed on member set, tampering and invalid contracts", () => {
+  const certified = () => fixtureBundle({ schema: 4, certifiedBy: "40239821240" });
+  assert.deepEqual(verifyBundle(certified()).errors, []);
+
+  const missing = rewriteManifest(certified(), (manifest) => {
+    delete manifest.members["doc-contracts.json"];
+  });
+  assert.ok(verifyBundle(missing).errors.some((error) => error.startsWith("member set mismatch")));
+
+  const missingDocsData = rewriteManifest(certified(), (manifest) => {
+    delete manifest.members["docs-data"];
+  });
+  assert.ok(verifyBundle(missingDocsData).errors.some((error) => error.startsWith("member set mismatch")));
+
+  const extra = rewriteManifest(certified(), (manifest) => {
+    manifest.members["unexpected"] = "0".repeat(64);
+  });
+  assert.ok(verifyBundle(extra).errors.some((error) => error.startsWith("member set mismatch")));
+
+  const tampered = certified();
+  write(path.join(tampered, "doc-contracts.json"), "{}\n");
+  assert.deepEqual(verifyBundle(tampered).errors, ["digest mismatch: doc-contracts.json"]);
+
+  const contracts = JSON.parse(readFileSync(path.join(certified(), "doc-contracts.json"), "utf8"));
+  const rewritten = rewriteMember(certified(), "doc-contracts.json", JSON.stringify({ ...contracts, schema_version: 2 }));
+  assert.ok(verifyBundle(rewritten).errors.some((error) => error.startsWith("doc-contracts /schema_version")));
+
+  const docs = rewriteMember(certified(), "docs-data/docs-data.json", "{}\n");
+  rewriteManifest(docs, (manifest) => {
+    delete manifest.members["docs-data/docs-data.json"];
+    manifest.members["docs-data"] = memberDigest(path.join(docs, "docs-data"));
+  });
+  assert.ok(verifyBundle(docs).errors.some((error) => error.startsWith("docs-data <root>")));
+
+  const asSchema3 = rewriteManifest(certified(), (manifest) => {
+    manifest.schema = 3;
+  });
+  assert.ok(verifyBundle(asSchema3).errors.some((error) => error.startsWith("member set mismatch")));
 });
 
 test("docs-data holds exactly docs-data.json and validates against its schema", () => {
