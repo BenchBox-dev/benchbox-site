@@ -1,9 +1,9 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { mkdtempSync, mkdirSync, writeFileSync } from "node:fs";
+import { cpSync, existsSync, mkdtempSync, mkdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import path from "node:path";
-import { memberDigest, verifyBundle } from "./bundle-lib.mjs";
+import { SCHEMA_DIR, SUPPORTED_SCHEMAS, memberDigest, membersFor, verifyBundle } from "./bundle-lib.mjs";
 import { certificationErrors } from "./bundle-verify.mjs";
 import { fixtureBundle, FIXTURE_CORE as CORE, FIXTURE_PARENT as PARENT } from "./fixture-bundle.mjs";
 
@@ -12,18 +12,143 @@ function write(file, body) {
   writeFileSync(file, body);
 }
 
-test("schema 3 and schema 2 bundles verify and schema 1 is no longer supported", () => {
-  assert.deepEqual(verifyBundle(fixtureBundle()).errors, []);
-  assert.deepEqual(verifyBundle(fixtureBundle({ schema: 2 })).errors, []);
-  assert.ok(verifyBundle(fixtureBundle({ schema: 1 })).errors.some((error) => error.startsWith("schema 1")));
+test("schemas 3, 4 and 5 verify and retired or unknown schemas fail", () => {
+  assert.deepEqual(SUPPORTED_SCHEMAS, [3, 4, 5]);
+  for (const schema of SUPPORTED_SCHEMAS) assert.deepEqual(verifyBundle(fixtureBundle({ schema })).errors, []);
+  for (const schema of [1, 2, 6]) {
+    assert.ok(verifyBundle(fixtureBundle({ schema })).errors.some((error) => error.startsWith(`schema ${schema}`)));
+  }
 });
 
 test("a changed member fails its digest", () => {
   assert.ok(verifyBundle(fixtureBundle({ tamper: true })).errors.includes("digest mismatch: docs"));
 });
 
-test("an unsupported schema fails", () => {
-  assert.ok(verifyBundle(fixtureBundle({ schema: 4 })).errors.some((error) => error.startsWith("schema 4")));
+test("a consumer that supports only schema 3 rejects candidate bundles", () => {
+  for (const schema of [4, 5]) {
+    const result = verifyBundle(fixtureBundle({ schema }), { supportedSchemas: [3] });
+    assert.ok(result.errors.some((error) => error.startsWith(`schema ${schema} is not supported`)));
+  }
+});
+
+function rewriteManifest(dir, change) {
+  const manifestPath = path.join(dir, "manifest.json");
+  const manifest = JSON.parse(readFileSync(manifestPath, "utf8"));
+  change(manifest);
+  writeFileSync(manifestPath, JSON.stringify(manifest));
+  return dir;
+}
+
+function rewriteMember(dir, name, body) {
+  write(path.join(dir, name), body);
+  return rewriteManifest(dir, (manifest) => {
+    manifest.members[name] = memberDigest(path.join(dir, name));
+  });
+}
+
+test("member sets are exact for each schema", () => {
+  assert.ok(!membersFor(5).includes("docs") && !membersFor(5).includes("downloads"));
+  assert.ok(membersFor(4).includes("docs") && membersFor(4).includes("docs-data"));
+  assert.ok(!membersFor(3).includes("docs-data"));
+  const withExtra = rewriteManifest(fixtureBundle({ schema: 3 }), (manifest) => {
+    manifest.members["docs-data"] = "0".repeat(64);
+  });
+  assert.ok(verifyBundle(withExtra).errors.some((error) => error.startsWith("member set mismatch")));
+  const schema4AsSchema3 = rewriteManifest(fixtureBundle({ schema: 4 }), (manifest) => {
+    manifest.schema = 3;
+  });
+  assert.ok(verifyBundle(schema4AsSchema3).errors.some((error) => error.startsWith("member set mismatch")));
+  const schema5WithDocs = rewriteManifest(fixtureBundle({ schema: 5 }), (manifest) => {
+    manifest.members.docs = "0".repeat(64);
+  });
+  assert.ok(verifyBundle(schema5WithDocs).errors.some((error) => error.startsWith("member set mismatch")));
+  const schema4WithoutContracts = rewriteManifest(fixtureBundle({ schema: 4 }), (manifest) => {
+    delete manifest.members["doc-contracts.json"];
+  });
+  assert.ok(verifyBundle(schema4WithoutContracts).errors.some((error) => error.startsWith("member set mismatch")));
+});
+
+test("candidate bundles require the candidate certifier", () => {
+  for (const certifiedBy of ["1", "local", "dispatch"]) {
+    const errors = verifyBundle(fixtureBundle({ schema: 4, certifiedBy })).errors;
+    assert.ok(errors.some((error) => error.startsWith("schema 4 requires certified_by candidate")));
+  }
+});
+
+test("docs-data holds exactly docs-data.json and validates against its schema", () => {
+  const extra = fixtureBundle({ schema: 4 });
+  write(path.join(extra, "docs-data/other.json"), "{}\n");
+  rewriteManifest(extra, (manifest) => {
+    manifest.members["docs-data"] = memberDigest(path.join(extra, "docs-data"));
+  });
+  assert.ok(verifyBundle(extra).errors.some((error) => error.startsWith("docs-data must hold exactly docs-data.json")));
+
+  const wrongVersion = rewriteMember(fixtureBundle({ schema: 5 }), "docs-data/docs-data.json", "{}\n");
+  rewriteManifest(wrongVersion, (manifest) => {
+    delete manifest.members["docs-data/docs-data.json"];
+    manifest.members["docs-data"] = memberDigest(path.join(wrongVersion, "docs-data"));
+  });
+  assert.ok(verifyBundle(wrongVersion).errors.some((error) => error.startsWith("docs-data <root>: must have required property")));
+
+  const notJson = fixtureBundle({ schema: 4 });
+  write(path.join(notJson, "docs-data/docs-data.json"), "not json");
+  rewriteManifest(notJson, (manifest) => {
+    manifest.members["docs-data"] = memberDigest(path.join(notJson, "docs-data"));
+  });
+  assert.ok(verifyBundle(notJson).errors.some((error) => error.startsWith("docs-data is not readable JSON")));
+});
+
+test("doc-contracts validate against their schema and fail closed on a changed contract version", () => {
+  const contracts = JSON.parse(readFileSync(path.join(fixtureBundle({ schema: 4 }), "doc-contracts.json"), "utf8"));
+  const bumped = rewriteMember(fixtureBundle({ schema: 4 }), "doc-contracts.json", JSON.stringify({ ...contracts, schema_version: 2 }));
+  assert.ok(verifyBundle(bumped).errors.some((error) => error.startsWith("doc-contracts /schema_version")));
+  const unknownKey = rewriteMember(fixtureBundle({ schema: 5 }), "doc-contracts.json", JSON.stringify({ ...contracts, surprise: 1 }));
+  assert.ok(verifyBundle(unknownKey).errors.some((error) => error.startsWith("doc-contracts <root>")));
+  const missing = rewriteMember(fixtureBundle({ schema: 5 }), "doc-contracts.json", "[]\n");
+  assert.ok(verifyBundle(missing).errors.length > 0);
+});
+
+test("a digest mismatch in a candidate member is reported before its contents are trusted", () => {
+  const dir = fixtureBundle({ schema: 4 });
+  write(path.join(dir, "doc-contracts.json"), "{}\n");
+  assert.deepEqual(verifyBundle(dir).errors, ["digest mismatch: doc-contracts.json"]);
+});
+
+const GENUINE = process.env.SITE_CANDIDATE_BUNDLES;
+const CORE_TREE = process.env.CORE_TREE;
+
+test("genuine core candidate bundles verify and are rejected by a schema 3 consumer", { skip: !GENUINE }, () => {
+  for (const schema of [4, 5]) {
+    const dir = path.join(GENUINE, `candidate${schema}`);
+    assert.ok(existsSync(dir), `${dir} is missing`);
+    const result = verifyBundle(dir);
+    assert.deepEqual(result.errors, []);
+    assert.equal(result.manifest.schema, schema);
+    assert.equal(result.manifest.certified_by, "candidate");
+    const old = verifyBundle(dir, { supportedSchemas: [3] });
+    assert.ok(old.errors.some((error) => error.startsWith(`schema ${schema} is not supported`)));
+  }
+});
+
+test("genuine candidate bundles fail on a tampered contract", { skip: !GENUINE }, () => {
+  const source = path.join(GENUINE, "candidate4");
+  const copy = mkdtempSync(path.join(tmpdir(), "candidate-copy-"));
+  try {
+    cpSync(source, copy, { recursive: true });
+    const contracts = JSON.parse(readFileSync(path.join(copy, "doc-contracts.json"), "utf8"));
+    delete contracts.cli;
+    rewriteMember(copy, "doc-contracts.json", JSON.stringify(contracts));
+    assert.ok(verifyBundle(copy).errors.some((error) => error.startsWith("doc-contracts <root>")));
+  } finally {
+    rmSync(copy, { recursive: true, force: true });
+  }
+});
+
+test("vendored schemas equal core's schemas", { skip: !CORE_TREE }, () => {
+  for (const name of ["docs-data", "doc-contracts"]) {
+    const vendored = readFileSync(path.join(SCHEMA_DIR, `${name}.schema.json`), "utf8");
+    assert.equal(vendored, readFileSync(path.join(CORE_TREE, "quality", `${name}.schema.json`), "utf8"));
+  }
 });
 
 test("a failed or skipped required attestation fails", () => {

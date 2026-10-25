@@ -1,9 +1,13 @@
 import { createHash } from "node:crypto";
 import { readFileSync, readdirSync, statSync, existsSync } from "node:fs";
 import path from "node:path";
+import Ajv2020 from "ajv/dist/2020.js";
 
-export const SUPPORTED_SCHEMAS = [2, 3];
-const SCHEMA_1_MEMBERS = [
+export const SUPPORTED_SCHEMAS = [3, 4, 5];
+export const CANDIDATE_CERTIFIER = "candidate";
+export const DOCS_DATA_FILE = "docs-data.json";
+export const SCHEMA_DIR = path.join(import.meta.dirname, "schemas");
+const BASE_MEMBERS = [
   "docs",
   "repo-files.json",
   "explorer/results.duckdb",
@@ -14,15 +18,17 @@ const SCHEMA_1_MEMBERS = [
   "api-public-symbols.json",
   "attestations.json",
 ];
+const CONTRACT_MEMBERS = ["docs-data", "doc-contracts.json"];
+const SCHEMA_3_MEMBERS = [...BASE_MEMBERS, "downloads", "explorer/bundles"];
 const MEMBERS_BY_SCHEMA = {
-  1: SCHEMA_1_MEMBERS,
-  2: [...SCHEMA_1_MEMBERS, "downloads"],
-  3: [...SCHEMA_1_MEMBERS, "downloads", "explorer/bundles"],
+  3: SCHEMA_3_MEMBERS,
+  4: [...SCHEMA_3_MEMBERS, ...CONTRACT_MEMBERS],
+  5: [...SCHEMA_3_MEMBERS.filter((name) => name !== "docs" && name !== "downloads"), ...CONTRACT_MEMBERS],
 };
 export const REQUIRED_MEMBERS = MEMBERS_BY_SCHEMA[3];
 
 export function membersFor(schema) {
-  return MEMBERS_BY_SCHEMA[schema] ?? REQUIRED_MEMBERS;
+  return MEMBERS_BY_SCHEMA[schema];
 }
 export const REQUIRED_ATTESTATIONS = ["privacy", "explorer_compat", "snapshot_invariants", "corpus_bijection"];
 export const OPTIONAL_ATTESTATIONS = ["validator_parity"];
@@ -68,6 +74,54 @@ export function readJson(file) {
   return JSON.parse(readFileSync(file, "utf8"));
 }
 
+const contractValidators = {};
+
+function contractValidator(name) {
+  if (!contractValidators[name]) {
+    const ajv = new Ajv2020({ allErrors: true, allowUnionTypes: true, validateFormats: false });
+    contractValidators[name] = ajv.compile(readJson(path.join(SCHEMA_DIR, `${name}.schema.json`)));
+  }
+  return contractValidators[name];
+}
+
+function schemaErrors(label, file, schemaName) {
+  let instance;
+  try {
+    instance = readJson(file);
+  } catch (error) {
+    return [`${label} is not readable JSON: ${error.message}`];
+  }
+  const validate = contractValidator(schemaName);
+  if (validate(instance)) return [];
+  return validate.errors.slice(0, 5).map((error) => `${label} ${error.instancePath || "<root>"}: ${error.message}`);
+}
+
+export function checkCandidate(dir, manifest) {
+  const errors = [];
+  if (manifest.certified_by !== CANDIDATE_CERTIFIER) {
+    errors.push(`schema ${manifest.schema} requires certified_by ${CANDIDATE_CERTIFIER}, got ${JSON.stringify(manifest.certified_by)}`);
+  }
+  const docsData = path.join(dir, "docs-data");
+  if (existsSync(docsData) && statSync(docsData).isDirectory()) {
+    const entries = readdirSync(docsData).sort();
+    if (JSON.stringify(entries) !== JSON.stringify([DOCS_DATA_FILE])) {
+      errors.push(`docs-data must hold exactly ${DOCS_DATA_FILE}: ${entries.join(", ")}`);
+    }
+    if (entries.includes(DOCS_DATA_FILE)) {
+      errors.push(...schemaErrors("docs-data", path.join(docsData, DOCS_DATA_FILE), "docs-data"));
+    }
+  } else {
+    errors.push("docs-data is not a directory");
+  }
+  const contracts = path.join(dir, "doc-contracts.json");
+  if (existsSync(contracts) && statSync(contracts).isFile()) {
+    errors.push(...schemaErrors("doc-contracts", contracts, "doc-contracts"));
+  } else {
+    errors.push("doc-contracts.json is not a file");
+  }
+  return errors;
+}
+
 export function checkManifest(dir, { supportedSchemas = SUPPORTED_SCHEMAS } = {}) {
   const errors = [];
   const manifestPath = path.join(dir, "manifest.json");
@@ -88,8 +142,11 @@ export function checkManifest(dir, { supportedSchemas = SUPPORTED_SCHEMAS } = {}
   }
   const members = manifest.members ?? {};
   const names = Object.keys(members).sort();
-  if (JSON.stringify(names) !== JSON.stringify([...membersFor(manifest.schema)].sort())) {
+  const expectedMembers = membersFor(manifest.schema);
+  if (!expectedMembers) return { errors, manifest };
+  if (JSON.stringify(names) !== JSON.stringify([...expectedMembers].sort())) {
     errors.push(`member set mismatch: ${names.join(", ")}`);
+    return { errors, manifest };
   }
   for (const name of names) {
     if (!members[name]) {
@@ -102,6 +159,7 @@ export function checkManifest(dir, { supportedSchemas = SUPPORTED_SCHEMAS } = {}
       errors.push(error.message);
     }
   }
+  if (errors.length === 0 && manifest.schema !== 3) errors.push(...checkCandidate(dir, manifest));
   return { errors, manifest };
 }
 
