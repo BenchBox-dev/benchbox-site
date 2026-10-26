@@ -1,0 +1,43 @@
+# External URLs that are known to be flaky, rate-limited or login-gated.
+# Keep this list focused and prune entries when upstream stability improves.
+exclude = [
+  # The site's own origins are checked by the deploy gates.
+  '^https://(next\.)?benchbox\.dev',
+  # TPC pages are frequently unavailable to automated checks.
+  '^https?://www\.tpc\.org/',
+  # Newsletter and archive host intermittently blocks bots.
+  '^https://buttondown\.com/',
+  # Login-protected or interactive portals.
+  '^https://app\.motherduck\.com/',
+  # ISO standards pages may block automated requests.
+  '^https://www\.iso\.org/standard/',
+  # SIGMOD intermittently refuses automated link checks.
+  '^https://sigmod\.org/',
+  # VLDB host intermittently times out on connect and read from CI runners.
+  '^https?://www\.vldb\.org/',
+  # SelectDB portal intermittently drops connections.
+  '^https://selectdb\.com',
+  # Okabe-Ito color palette page intermittently returns 500.
+  '^https://jfly\.uni-koeln\.de/',
+  # NO_COLOR spec host is unresolvable from CI runners.
+  '^https://no-color\.org/',
+  # AWS documentation rejects automated CI requests with HTTP 403.
+  '^https://docs\.aws\.amazon\.com/(redshift|s3)/',
+  # H2O documentation rejects automated CI requests with HTTP 403.
+  '^https://docs\.h2o\.ai/',
+  # AMPLab pages reject automated CI requests with HTTP 403.
+  '^https://amplab\.cs\.berkeley\.edu/',
+  # HammerDB site intermittently returns 502 and connect timeouts.
+  '^https://www\.hammerdb\.com/',
+  # Historical links under the former owner redirect and then fail for
+  # unauthenticated CI. Current BenchBox-dev links stay checked.
+  '^https://github\.com/joeharris76/BenchBox/(blob|issues)',
+  # Results Explorer deep links are served through the root fallback with
+  # HTTP 404; only the published two-result comparison receipts are exempt.
+  '^https://benchbox\.dev/results/compare\?ids=[0-9a-f]{8},[0-9a-f]{8}$',
+  # Geekbench Browser serves a bot challenge to automated requests.
+  '^https://browser\.geekbench\.com/',
+  # Geekbench blog pages reject automated CI requests with HTTP 403.
+  '^https://www\.geekbench\.com/blog/2023/06/geekbench-61/',
+  '^https://www\.geekbench\.com/blog/2026/07/geekbench-7/',
+]
