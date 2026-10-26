@@ -36,6 +36,22 @@ itself plus one versioned core bundle; it reads nothing else from core.
   `candidate` is valid for schemas 4 and 5 under `--offline` verification
   only, and never passes online certification. Schema 5 accepts only
   `candidate`, so it cannot be deployed yet.
+- `npm run docs:check` (`docs-contracts/`, TypeScript) checks the bundle's
+  documentation against the `doc-contracts.json` facts core exports: registry
+  and platform counts, the benchmark API surface, the quickstart commands,
+  `--platform-option` examples, the MCP reference, SF1 sizes, sketch bounds,
+  version markers, the Python API headings and the publication boundary. The
+  contract-internal consistency checks always block. The page checks block
+  with `--docs-mode block` (the default) and only print with
+  `--docs-mode report`; CI and the deploy build pass `report` until the
+  documentation moves into this repository, and that move changes them to
+  block. A schema 3 bundle has no `doc-contracts.json`: `--allow-schema3`
+  skips the contract checks and runs only the negative publication guard,
+  without the flag the run fails, and a schema 4 or 5 bundle without the
+  member always fails. `--docs <dir>` checks a documentation tree other than
+  the bundle's `docs` member. `npm run test:docs-contracts` runs the seeded
+  drift tests; `DOC_CONTRACTS_SCHEMA4_BUNDLE=<bundle dir>` adds a run
+  against a real schema 4 bundle.
 - Never read core files by any other route. A guard test fails the build on
   any path outside the repository other than `$SITE_INPUTS`.
 - `npm run docs:parity -w website` runs the TypeScript generators on the
