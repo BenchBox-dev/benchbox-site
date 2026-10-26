@@ -93,7 +93,7 @@ for (const consumer of ["bundle", "receipt"]) {
       const archive = path.join(work, "bundle.tar.zst");
       const preload = path.join(work, "fetch.mjs");
       if (consumer === "bundle") {
-        fixtureBundle({ dir: path.join(work, "site-inputs-bundle") });
+        fixtureBundle({ dir: path.join(work, "site-inputs-bundle"), certifiedBy: "1" });
         writeFileSync(archive, zstdCompressSync(execFileSync("tar", ["-cf", "-", "-C", work, "site-inputs-bundle"])));
         writeFileSync(preload, `
 Atomics.wait = () => 'timed-out';

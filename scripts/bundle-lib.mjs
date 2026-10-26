@@ -3,7 +3,7 @@ import { readFileSync, readdirSync, statSync, existsSync } from "node:fs";
 import path from "node:path";
 import Ajv2020 from "ajv/dist/2020.js";
 
-export const SUPPORTED_SCHEMAS = [3, 4, 5];
+export const SUPPORTED_SCHEMAS = [4, 5];
 export const CANDIDATE_CERTIFIER = "candidate";
 export const DOCS_DATA_FILE = "docs-data.json";
 export const SCHEMA_DIR = path.join(import.meta.dirname, "schemas");
@@ -19,13 +19,11 @@ const BASE_MEMBERS = [
   "attestations.json",
 ];
 const CONTRACT_MEMBERS = ["docs-data", "doc-contracts.json"];
-const SCHEMA_3_MEMBERS = [...BASE_MEMBERS, "downloads", "explorer/bundles"];
+const SCHEMA_4_MEMBERS = [...BASE_MEMBERS, "downloads", "explorer/bundles", ...CONTRACT_MEMBERS];
 const MEMBERS_BY_SCHEMA = {
-  3: SCHEMA_3_MEMBERS,
-  4: [...SCHEMA_3_MEMBERS, ...CONTRACT_MEMBERS],
-  5: [...SCHEMA_3_MEMBERS.filter((name) => name !== "docs" && name !== "downloads"), ...CONTRACT_MEMBERS],
+  4: SCHEMA_4_MEMBERS,
+  5: SCHEMA_4_MEMBERS.filter((name) => name !== "docs" && name !== "downloads"),
 };
-export const REQUIRED_MEMBERS = MEMBERS_BY_SCHEMA[3];
 
 export function membersFor(schema) {
   return MEMBERS_BY_SCHEMA[schema];
@@ -167,7 +165,7 @@ export function checkManifest(dir, { supportedSchemas = SUPPORTED_SCHEMAS } = {}
       errors.push(error.message);
     }
   }
-  if (errors.length === 0 && manifest.schema !== 3) errors.push(...checkCandidate(dir, manifest));
+  if (errors.length === 0) errors.push(...checkCandidate(dir, manifest));
   return { errors, manifest };
 }
 

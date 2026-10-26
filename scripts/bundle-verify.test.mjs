@@ -28,7 +28,7 @@ test("dispatch-certified bundles are refused without contacting the API", async 
   withCertifiedBy(dir, "dispatch");
   const result = await verifyWithCertification(dir);
   assert.equal(result.ok, false);
-  assert.deepEqual(result.errors, ["certified_by dispatch is not a run id"]);
+  assert.deepEqual(result.errors, ['schema 4 requires certified_by candidate or a run id, got "dispatch"', "certified_by dispatch is not a run id"]);
 });
 
 test("a numeric run id for the bundle commit passes the predicate", () => {
@@ -70,8 +70,8 @@ test("a candidate schema 4 or 5 bundle never passes online certification and nev
   }
 });
 
-test("a schema 4 bundle certified by a trunk run id passes online certification like schema 3", async () => {
-  for (const schema of [3, 4]) {
+test("a schema 4 bundle certified by a trunk run id passes online certification", async () => {
+  for (const schema of [4]) {
     const dir = fixtureBundle({ schema, certifiedBy: "40239821240" });
     await withRun(trunkRun(), async (routes) => {
       const result = await verifyWithCertification(dir);
