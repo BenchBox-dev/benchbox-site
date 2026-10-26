@@ -54,6 +54,7 @@ The TPC-DI (Transaction Processing Performance Council - Data Integration) bench
 ### Database Support
 
 **Currently Supported**:
+
 - **DuckDB**: 0.8.0+ (recommended for analytics)
 - **SQLite**: 3.25+ (included with Python)
 - **ClickHouse**: 20.0+
@@ -63,6 +64,7 @@ The TPC-DI (Transaction Processing Performance Council - Data Integration) bench
 - **Redshift**: Latest
 
 **Planned Support** (see [Development Roadmap](../../development/roadmap.md)):
+
 - **PostgreSQL**: 12+
 - **MySQL**: 8.0+
 - **SQL Server**: 2019+
@@ -1018,11 +1020,13 @@ if __name__ == "__main__":
 #### 1. Memory Issues
 
 **Problem**: Out of memory errors during large scale factor runs
-```
+
+```text
 MemoryError: Unable to allocate array
 ```
 
 **Solutions**:
+
 ```python
 benchmark = TPCDIBenchmark(scale_factor=0.1)
 
@@ -1041,11 +1045,13 @@ Use a scale factor of 0.1 instead of 1.0. Reduce workers and set `chunk_size=500
 #### 2. Performance Issues
 
 **Problem**: Slow execution times
-```
+
+```text
 ETL pipeline taking hours to complete
 ```
 
 **Solutions**:
+
 ```python
 import multiprocessing
 
@@ -1062,11 +1068,13 @@ benchmark = TPCDIBenchmark(config=config)
 #### 3. File Permission Issues
 
 **Problem**: Permission denied errors
-```
+
+```text
 PermissionError: [Errno 13] Permission denied: '/data/tpcdi'
 ```
 
 **Solutions**:
+
 ```bash
 sudo mkdir -p /data/tpcdi
 sudo chown -R $USER:$USER /data/tpcdi
@@ -1080,11 +1088,13 @@ Fix the directory permissions as shown, or point `TPCDI_DATA_DIR` at a user-writ
 #### 4. Database Connection Issues
 
 **Problem**: Database connection failures
-```
+
+```text
 psycopg.OperationalError: could not connect to server
 ```
 
 **Solutions**:
+
 ```python
 import os
 import psycopg
@@ -1100,11 +1110,13 @@ except psycopg.OperationalError as e:
 #### 5. Query Execution Errors
 
 **Problem**: SQL syntax errors
-```
+
+```text
 ProgrammingError: syntax error at or near "LIMIT"
 ```
 
 **Solutions**:
+
 ```python
 from benchbox.core.tpcdi.benchmark import TPCDIBenchmark
 

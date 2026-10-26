@@ -17,7 +17,7 @@ This guide covers the improved ETL features, configuration options, best practic
 
 The TPC-DI ETL implementation consists of several key components:
 
-```
+```text
 ┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐
 │   Source Data   │    │   Staging Area  │    │ Data Warehouse  │
 │                 │    │                 │    │                 │
@@ -39,7 +39,7 @@ The TPC-DI ETL implementation consists of several key components:
 
 When ETL mode is enabled, the following directory structure is created:
 
-```
+```text
 tpcdi_data/
 ├── source/           # Source data files by format and batch type
 │   ├── csv/
@@ -135,6 +135,7 @@ tpcdi_prod = TPCDI(
 The ETL implementation supports multiple source data formats to simulate real-world data integration scenarios:
 
 #### 1. CSV Format
+
 - **Use case**: Traditional database exports, flat file feeds
 - **Characteristics**: Delimited text, header rows, standard data types
 - **Example tables**: Customer data, account information
@@ -147,6 +148,7 @@ csv_files = tpcdi.generate_source_data(
 ```
 
 #### 2. XML Format
+
 - **Use case**: Web services, enterprise application integration
 - **Characteristics**: Hierarchical structure, nested elements
 - **Example tables**: Company data, reference information
@@ -159,6 +161,7 @@ xml_files = tpcdi.generate_source_data(
 ```
 
 #### 3. Fixed-Width Format
+
 - **Use case**: Legacy mainframe systems, financial data feeds
 - **Characteristics**: Fixed column positions, no delimiters
 - **Example tables**: Security data, market information
@@ -171,6 +174,7 @@ fixed_width_files = tpcdi.generate_source_data(
 ```
 
 #### 4. JSON Format
+
 - **Use case**: NoSQL databases, REST APIs, modern applications
 - **Characteristics**: Schema-flexible, nested objects
 - **Example tables**: Account data, transaction logs
@@ -185,6 +189,7 @@ json_files = tpcdi.generate_source_data(
 ### Batch Types
 
 #### Historical Batch
+
 - **Purpose**: Initial data warehouse population
 - **Characteristics**: Full data set, no incremental logic required
 - **Volume**: 100% of scale factor data
@@ -197,6 +202,7 @@ historical_files = tpcdi.generate_source_data(
 ```
 
 #### Incremental Batch
+
 - **Purpose**: Regular updates, new records
 - **Characteristics**: Subset of data, append-only operations
 - **Volume**: ~10-20% of scale factor data
@@ -209,6 +215,7 @@ incremental_files = tpcdi.generate_source_data(
 ```
 
 #### SCD (Slowly Changing Dimension) Batch
+
 - **Purpose**: Dimension updates, historical tracking
 - **Characteristics**: Changed records requiring SCD Type 2 processing
 - **Volume**: ~5-10% of scale factor data
@@ -327,6 +334,7 @@ if successful_batches:
 ### Pipeline Phase Details
 
 #### Extract Phase
+
 - Generates source data files in specified formats
 - Handles multiple batch types simultaneously
 - Tracks file generation metrics
@@ -338,6 +346,7 @@ print(f"Extract duration: {extract_results['duration']:.2f}s")
 ```
 
 #### Transform Phase
+
 - Converts source data to staging format
 - Applies data type conversions and business rules
 - Handles schema mapping between formats
@@ -350,6 +359,7 @@ print(f"Transform duration: {transform_results['duration']:.2f}s")
 ```
 
 #### Load Phase
+
 - Inserts data into target warehouse tables
 - Handles SCD Type 2 logic for dimension tables
 - Maintains referential integrity
@@ -368,6 +378,7 @@ print(f"Load duration: {load_results['duration']:.2f}s")
 The TPC-DI implementation includes systematic validation queries:
 
 #### Validation Queries (V1-V5)
+
 - **V1**: Customer dimension validation
 - **V2**: Account dimension validation
 - **V3**: Trade fact validation
@@ -382,6 +393,7 @@ for query_id in ['V1', 'V2', 'V3']:
 ```
 
 #### Analytical Queries (A1-A6)
+
 - **A1**: Customer trading analysis
 - **A2**: Company performance analysis
 - **A3**: Broker commission analysis
@@ -1178,6 +1190,7 @@ sources:
 **Error**: `TypeError: TPCDI.run_etl_pipeline() missing 1 required positional argument: 'connection'`
 
 **Solution**: always pass a connection. The first call below is incorrect because it omits it; the second is correct.
+
 ```python
 tpcdi = TPCDI(scale_factor=1.0)
 
@@ -1191,6 +1204,7 @@ tpcdi.run_etl_pipeline(connection=conn)
 **Error**: Database schema not found or table does not exist
 
 **Solution**: always create the schema before running ETL.
+
 ```python
 schema_sql = tpcdi.get_create_tables_sql()
 if isinstance(connection, sqlite3.Connection):
@@ -1208,6 +1222,7 @@ else:
 **Error**: Out of memory during ETL processing
 
 **Solutions**: (1) reduce the scale factor, for example to 0.1 instead of 1.0 or more; (2) use an in-memory database for testing; (3) process in smaller batches by splitting a large batch into several smaller incremental batches.
+
 ```python
 tpcdi = TPCDI(scale_factor=0.1)
 
@@ -1226,6 +1241,7 @@ for i in range(5):
 **Error**: Low data quality scores or validation failures
 
 **Investigation**: run detailed validation to identify issues, then check the specific validation queries, the data quality issues, and completeness.
+
 ```python
 validation_results = tpcdi.validate_etl_results(conn)
 
@@ -1246,6 +1262,7 @@ for table, completeness in validation_results['completeness_checks'].items():
 **Symptoms**: ETL pipeline takes too long to complete
 
 **Solutions**: (1) skip the time-consuming validation for performance testing; (2) use a faster database engine, such as in-memory DuckDB instead of SQLite; (3) monitor resource usage.
+
 ```python
 pipeline_result = tpcdi.run_etl_pipeline(
     connection=conn,
@@ -1264,6 +1281,7 @@ print(f"CPU usage: {process.cpu_percent():.1f}%")
 ### Debugging ETL Pipeline Issues
 
 #### Enable Detailed Logging
+
 ```python
 import logging
 
@@ -1280,6 +1298,7 @@ tpcdi = TPCDI(scale_factor=0.1, verbose=True)
 ```
 
 #### Inspect Generated Source Files
+
 ```python
 source_files = tpcdi.generate_source_data(
     formats=['csv'],
@@ -1302,6 +1321,7 @@ for format_type, files in source_files.items():
 ```
 
 #### Validate Database State
+
 ```python
 def inspect_database_state(connection):
 
@@ -1326,6 +1346,7 @@ inspect_database_state(conn)
 ### Error Recovery Patterns
 
 #### Graceful Pipeline Recovery
+
 ```python
 def robust_etl_pipeline(tpcdi, connection, batch_type, max_retries=3):
 
@@ -1374,7 +1395,9 @@ except Exception as e:
 ### 1. Environment Configuration
 
 #### Development Environment
+
 Use a minimal scale factor for fast iteration, verbose logging, and an in-memory database for speed.
+
 ```python
 tpcdi_dev = TPCDI(
     scale_factor=0.01,
@@ -1386,7 +1409,9 @@ conn = duckdb.connect(':memory:')
 ```
 
 #### Testing Environment
+
 Use a reasonable data size, reduce log noise with `verbose=False`, and use a persistent database for test reproducibility.
+
 ```python
 tpcdi_test = TPCDI(
     scale_factor=0.1,
@@ -1398,7 +1423,9 @@ conn = duckdb.connect('test_warehouse.duckdb')
 ```
 
 #### Production-like Environment
+
 Use the full scale factor and a production database connection.
+
 ```python
 tpcdi_prod = TPCDI(
     scale_factor=1.0,
@@ -1412,7 +1439,9 @@ conn = your_production_db_connection()
 ### 2. Data Quality Best Practices
 
 #### Comprehensive Validation Strategy
+
 The strategy runs pre-ETL environment checks, then the ETL pipeline, then post-ETL validation and business rule validation, and finally calculates an overall validation score. The disk space check requires at least 1 GB free.
+
 ```python
 def systematic_etl_validation(tpcdi, connection):
 
@@ -1499,7 +1528,9 @@ def calculate_business_rule_score(business_rules):
 ### 3. Performance Optimization
 
 #### Batch Processing Optimization
+
 The function pre-warms the database cache (`PRAGMA cache_size`, a SQLite optimization) and processes batches in a fixed order. It validates only the historical batch, records time and memory (in MB) per batch, and runs `VACUUM` with a brief pause between batches for system recovery.
+
 ```python
 def configured_batch_processing(tpcdi, connection, batch_types):
 
@@ -1556,6 +1587,7 @@ for metrics in performance_results:
 ### 4. Error Handling and Monitoring
 
 #### Production-Grade Error Handling
+
 ```python
 import logging
 from datetime import datetime
@@ -1703,6 +1735,7 @@ except Exception as e:
 ### 5. Testing and Quality Assurance
 
 #### Comprehensive Test Suite
+
 ```python
 import unittest
 from pathlib import Path

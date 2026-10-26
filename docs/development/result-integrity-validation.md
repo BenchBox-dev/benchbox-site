@@ -128,18 +128,18 @@ Specs exist for 21 of 22 registered benchmarks: `tpch`, `tpcds`, `tpchavoc`, `tp
 1. Run the benchmark at SF1 on DuckDB to produce a reference result file
 2. Add a new entry to the `BENCHMARK_SPECS` dict in `benchmark_specs.py`:
 
-```python
-BENCHMARK_SPECS["my_benchmark"] = BenchmarkSpec(
-    benchmark_id="my_benchmark",
-    unique_query_ids=frozenset(["q1", "q2", "q3"]),
-    min_success_rate=1.0,
-    requires_tables_object=True,
-    sf1_row_counts={
-        "table_a": 100_000,
-        "table_b": 50_000,
-    },
-)
-```
+   ```python
+   BENCHMARK_SPECS["my_benchmark"] = BenchmarkSpec(
+       benchmark_id="my_benchmark",
+       unique_query_ids=frozenset(["q1", "q2", "q3"]),
+       min_success_rate=1.0,
+       requires_tables_object=True,
+       sf1_row_counts={
+           "table_a": 100_000,
+           "table_b": 50_000,
+       },
+   )
+   ```
 
 3. If the benchmark has legacy aliases, add them to `LEGACY_ALIASES`
 4. Run the test suite: `uv run -- python -m pytest tests/unit/core/results/test_integrity_validator.py`
@@ -171,6 +171,7 @@ The fields are:
 - `summary`: counts by status (PASS, WARN, FAIL).
 
 **Helper methods:**
+
 - `report.passed()` - Returns `True` if overall status is PASS
 - `report.has_warnings()` - Returns `True` if any check has WARN status
 

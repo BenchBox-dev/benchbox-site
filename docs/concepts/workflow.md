@@ -20,6 +20,7 @@ benchbox results --limit 1
 ```
 
 **What happens**:
+
 1. BenchBox generates TPC-H data at scale factor 0.1 (~100MB)
 2. Loads data into DuckDB (stored in a database file in the runs root)
 3. Executes all 22 TPC-H queries
@@ -46,11 +47,13 @@ benchbox run --benchmark tpch --platform duckdb --scale 0.01 \
 ```
 
 **Benefits**:
+
 - Data generation happens once (can be slow for large scale factors)
 - Iterate quickly on specific queries
 - Full validation before committing changes
 
 **Use Cases**:
+
 - Testing query modifications
 - Debugging platform adapter issues
 - Developing custom benchmarks
@@ -73,6 +76,7 @@ benchbox results --limit 2
 Find the two result files with `benchbox results` and pass them to `benchbox compare`.
 
 **Output**:
+
 - Side-by-side query timing comparison
 - Geometric mean calculations
 - Performance regression detection
@@ -112,6 +116,7 @@ data loading. See the
 [Platform Comparison Guide](../guides/platform-comparison.md) for supported platforms.
 
 **Cost Control**:
+
 - Use `--dry-run` to preview queries before execution
 - Start with small scale factors (0.1, 1)
 - Set platform-specific cost limits (BigQuery `maximum_bytes_billed`)
@@ -133,6 +138,7 @@ ls ./preview
 The dry run writes generated queries and configuration into `./preview/`: one `.sql` file per query under `<benchmark>_<platform>_queries_<timestamp>/` (such as `query_18.sql`), a matching schema file, the DDL preview, and timestamped JSON/YAML run previews.
 
 **Use Cases**:
+
 - Query validation before cloud execution
 - Cost estimation (query complexity, data scanned)
 - Debugging query generation logic
@@ -172,6 +178,7 @@ jobs:
 ```
 
 **Benefits**:
+
 - Catch performance regressions before merge
 - Validate query compatibility across platforms
 - Track performance trends over time
@@ -208,12 +215,14 @@ for the full accepted option list (`--test-type` was never a real option —
 official test selection is via `--phases`).
 
 **Requirements**:
+
 - Specific scale factors (1, 10, 30, 100, 300, 1000, 3000, 10000, 30000, 100000)
 - Random seed management
 - Refresh function execution
 - Full validation
 
 See:
+
 - [TPC-H Official Benchmark Guide](../guides/tpc/tpc-h-official-guide.md)
 - [TPC-DS Official Benchmark Guide](../guides/tpc/tpc-ds-official-guide.md)
 - [TPC Validation Guide](../guides/tpc/tpc-validation-guide.md)
@@ -236,6 +245,7 @@ benchbox results --limit 2
 The first run is the baseline with no tunings. The second applies tunings, and `benchbox compare` (with the two result files from `benchbox results`) compares them. List built-in templates with `benchbox tuning list` or generate a starter file with `benchbox tuning init --platform clickhouse`.
 
 **Example Tuning Config** (`tunings/clickhouse_tpcds.yaml`, excerpt — see `examples/tunings/clickhouse/tpcds_tuned.yaml` for the full file):
+
 ```yaml
 table_tunings:
   STORE_SALES:
@@ -268,6 +278,7 @@ benchbox run --benchmark tpch --platform duckdb --scale 1 \
 ```
 
 **Benefits**:
+
 - Generate data once, use many times
 - Share data across team members
 - Version control data generation parameters
@@ -287,6 +298,7 @@ benchbox run --benchmark tpch --platform duckdb --scale 0.1 \
 Validation compares query row counts against expected values:
 
 **Validation Modes**:
+
 - `disabled`: No validation (fastest)
 - `loose`: Row-count checks with scale tolerance
 - `exact`: Exact row-count match
@@ -311,6 +323,7 @@ benchbox visualize benchmark_runs/results/*.json
 ```
 
 **Metrics Tracked**:
+
 - Query execution times (p50, p95, p99)
 - Geometric mean
 - Total execution time
@@ -339,6 +352,7 @@ benchbox shell --platform duckdb --last
 The first command enables debug logging and uses the shell to redirect output to a file. The second runs a single query with maximum detail, and `--show-plans` shows the query plan. The last command opens an interactive SQL shell on the most recent database to inspect its state.
 
 **Common Issues**:
+
 - Data generation failures → Check disk space, permissions
 - Query failures → Check SQL dialect compatibility
 - Performance issues → Check scale factor vs. available memory

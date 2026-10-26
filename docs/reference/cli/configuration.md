@@ -1,4 +1,5 @@
 (cli-configuration)=
+
 # Configuration
 
 ```{tags} reference, cli, configuration
@@ -16,6 +17,7 @@ BenchBox supports configuration through multiple sources with the following prec
 BenchBox uses YAML configuration files. Default location: `~/.benchbox/config.yaml`
 
 Example configuration:
+
 ```yaml
 output:
   compression:
@@ -45,6 +47,7 @@ tuning:
 Each platform can have specific configuration options:
 
 **Databricks:**
+
 ```yaml
 platforms:
   databricks:
@@ -54,6 +57,7 @@ platforms:
 ```
 
 **BigQuery:**
+
 ```yaml
 platforms:
   bigquery:
@@ -63,6 +67,7 @@ platforms:
 ```
 
 **Snowflake:**
+
 ```yaml
 platforms:
   snowflake:
@@ -73,6 +78,7 @@ platforms:
 ```
 
 (cli-env-vars)=
+
 ## Environment Variables
 
 BenchBox recognizes these environment variables:
@@ -117,27 +123,33 @@ These variables control lower-level behaviors, useful for CI, offline environmen
 ### Platform Authentication
 
 **Databricks:**
+
 - `DATABRICKS_TOKEN`: Authentication token
 - `DATABRICKS_HOST`: Workspace URL
 
 **BigQuery:**
+
 - `GOOGLE_APPLICATION_CREDENTIALS`: Service account key file path
 
 **Snowflake:**
+
 - `SNOWFLAKE_USER`: Username
 - `SNOWFLAKE_PASSWORD`: Password
 - `SNOWFLAKE_ACCOUNT`: Account identifier
 
 **Redshift:**
+
 - `AWS_ACCESS_KEY_ID`: AWS access key
 - `AWS_SECRET_ACCESS_KEY`: AWS secret key
 
 **ClickHouse:**
+
 - `CLICKHOUSE_HOST`: Server hostname
 - `CLICKHOUSE_USER`: Username
 - `CLICKHOUSE_PASSWORD`: Password
 
 (cli-platform-options)=
+
 ## Platform-Specific Options
 
 Each platform supports specific options via `--platform-option KEY=VALUE`:
@@ -159,6 +171,7 @@ version. See {ref}`driver-version-management` for the full guide.
 ```
 
 Example: pin DuckDB driver and auto-install it:
+
 ```bash
 benchbox run --platform duckdb --benchmark tpch \
   --platform-option driver_version=1.2.0 \
@@ -166,6 +179,7 @@ benchbox run --platform duckdb --benchmark tpch \
 ```
 
 Example: pin Snowflake connector version:
+
 ```bash
 benchbox run --platform snowflake --benchmark tpch \
   --platform-option driver_version=3.12.0 \
@@ -237,6 +251,7 @@ The `mode` option is a deprecated alias for this choice.
 - `optimize_after_load=true`: As above
 
 Examples:
+
 ```bash
 benchbox run --platform clickhouse-local --benchmark tpch \
   --platform-option data_path=./chdb-data
@@ -256,6 +271,7 @@ benchbox platforms status databricks
 ```
 
 (cli-config-sections)=
+
 ## Configuration Sections Reference
 
 Complete reference for all settings in `~/.benchbox/config.yaml` (or `./benchbox.yaml`). Unset values fall back to the defaults shown here.

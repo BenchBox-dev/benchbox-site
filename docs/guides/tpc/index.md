@@ -10,12 +10,15 @@ Comprehensive guides for running official TPC benchmarks with BenchBox.
 ## Official Benchmark Guides
 
 ### TPC-H
+
 - [TPC-H Official Benchmark Guide](tpc-h-official-guide.md) - Complete guide for running TPC-H derived benchmarks
 
 ### TPC-DS
+
 - [TPC-DS Official Benchmark Guide](tpc-ds-official-guide.md) - Complete guide for running TPC-DS derived benchmarks
 
 ### TPC-DI
+
 - [TPC-DI Deployment Guide](tpc-di-deployment-guide.md) - Deployment and configuration for TPC-DI
 - [TPC-DI ETL Guide](tpc-di-etl-guide.md) - Extract, Transform, Load processes for TPC-DI
 

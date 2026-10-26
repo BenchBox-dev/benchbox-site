@@ -34,6 +34,7 @@ The first command uses self-hosted mode, the default: PostgreSQL with the pg_duc
 ### Self-Hosted Mode (Default)
 
 Connect to a PostgreSQL server with pg_duckdb extension installed:
+
 - pg_duckdb 1.0+ extension must be installed on the server
 - Full database management (CREATE/DROP database) available
 - DuckDB execution engine handles analytical queries on heap tables
@@ -41,6 +42,7 @@ Connect to a PostgreSQL server with pg_duckdb extension installed:
 ### MotherDuck Mode
 
 Connect pg_duckdb to MotherDuck for hybrid queries:
+
 - Requires MOTHERDUCK_TOKEN for authentication
 - Enables queries that join local PostgreSQL tables with MotherDuck cloud data
 - Sign up at [motherduck.com](https://app.motherduck.com/token)

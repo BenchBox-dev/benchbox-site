@@ -19,10 +19,12 @@ In a source checkout, BenchBox can build the TPC-H and TPC-DS tools automaticall
 The auto-compilation system supports the following TPC binary tools:
 
 ### TPC-H Tools
+
 - **dbgen**: Data generation tool for TPC-H benchmark
 - **qgen**: Query generation tool for TPC-H benchmark
 
 ### TPC-DS Tools
+
 - **dsdgen**: Data generation tool for TPC-DS benchmark
 - **dsqgen**: Query generation tool for TPC-DS benchmark
 
@@ -38,13 +40,16 @@ The auto-compilation system supports the following TPC binary tools:
 ### Required Dependencies
 
 #### All Platforms
+
 - **make**: Build system (GNU Make or compatible)
 - **gcc**: C compiler (or equivalent like clang)
 
 #### TPC-DS Specific
+
 - **yacc/bison**: Parser generator (required for TPC-DS query templates)
 
 ### Platform Support
+
 - **macOS**: Full support with Xcode Command Line Tools or Homebrew
 - **Linux**: Full support with build-essential package
 - **Windows**: Full TPC-H support via Docker cross-compilation (MinGW), TPC-DS has cross-compilation limitations
@@ -52,6 +57,7 @@ The auto-compilation system supports the following TPC binary tools:
 ## Installation Instructions
 
 ### macOS
+
 Install the Xcode Command Line Tools, or install the tools through Homebrew.
 
 ```bash
@@ -61,12 +67,14 @@ brew install make gcc bison
 ```
 
 ### Ubuntu/Debian Linux
+
 ```bash
 sudo apt update
 sudo apt install build-essential bison flex
 ```
 
 ### CentOS/RHEL/Fedora Linux
+
 ```bash
 sudo yum groupinstall "Development Tools"
 sudo yum install bison flex
@@ -78,6 +86,7 @@ sudo dnf install bison flex
 The first two commands are for CentOS/RHEL and the last two are for Fedora.
 
 ### Windows
+
 ```bash
 
 sudo apt update
@@ -110,6 +119,7 @@ The first call enables auto-compilation (the default). The second disables it.
 ### Environment Variables
 
 The system respects standard build environment variables:
+
 - `CC`: C compiler (defaults to gcc)
 - `CFLAGS`: Compiler flags
 - `MAKE`: Make command (defaults to make)
@@ -151,44 +161,55 @@ for binary, info in report['binaries'].items():
 ### Common Issues
 
 #### 1. Missing Dependencies
+
 **Error**: "Missing dependencies: make, gcc, yacc"
 
 **Solution**: Install required build tools for your platform (see Installation Instructions above)
 
 #### 2. Compilation Timeout
+
 **Error**: "Compilation timed out after X minutes"
 
 **Solution**:
+
 - Check system resources (CPU, memory)
 - Try compiling manually to diagnose issues
 - Increase timeout if needed (contact support)
 
 #### 3. Source Directory Not Found
+
 **Error**: "TPC-H dbgen source not found"
 
 **Solution**:
+
 - Auto-compilation needs a source checkout; installed packages do not include `_sources/`
 - Ensure TPC source files are properly extracted in `_sources/tpc-h/dbgen/` or `_sources/tpc-ds/tools/`
 - Check that source files include the necessary .c files (dbgen.c, driver.c, etc.)
 
 #### 4. Permission Issues
+
 **Error**: "Permission denied" or "executable not found after build"
 
 **Solution**:
+
 - Check filesystem permissions
 - Ensure build directory is writable
 - On Unix systems, verify execute permissions: `chmod +x binary_name`
 
 #### 5. Platform-Specific Compilation Issues
+
 **macOS**:
+
 - Install Xcode Command Line Tools: `xcode-select --install`
 - For M1/M2 Macs, ensure ARM64 compatibility
 
 **Linux**:
+
 - Install development packages: `sudo apt install build-essential`
 - Check for missing system libraries
 
 **Windows**:
+
 - Windows binaries are pre-compiled via Docker cross-compilation
 - TPC-H binaries (dbgen.exe, qgen.exe) available for x86_64 and ARM64
 - TPC-DS has limited Windows support due to cross-compilation constraints
@@ -199,12 +220,14 @@ for binary, info in report['binaries'].items():
 If auto-compilation fails, you can compile manually from a source checkout:
 
 #### TPC-H
+
 ```bash
 cd _sources/tpc-h/dbgen
 make -f makefile.suite MACHINE=LINUX DATABASE=SQLSERVER CC=gcc
 ```
 
 #### TPC-DS
+
 ```bash
 cd _sources/tpc-ds/tools
 make dsdgen dsqgen
@@ -216,10 +239,12 @@ BenchBox includes patches to the TPC source code that enable additional features
 and fix compatibility issues:
 
 #### TPC-H Patches
+
 - **Stdout output (`-z` flag)**: Enables streaming data to stdout for compression pipelines
 - See `_sources/tpc-h/PATCHES.md` for details
 
 #### TPC-DS Patches
+
 - **Stdout output (`-FILTER Y` flag)**: Enables streaming data to stdout
 - **Linux build fixes**: MAXINT definition and GCC 10+ compatibility
 - See `_sources/tpc-ds/PATCHES.md` for details
@@ -230,6 +255,7 @@ and [tpcds-kit](https://github.com/gregrahn/tpcds-kit) by Greg Rahn.
 ### Debugging
 
 #### Enable Verbose Output
+
 ```python
 from benchbox.utils.tpc_compilation import get_tpc_compiler
 
@@ -237,9 +263,11 @@ compiler = get_tpc_compiler(verbose=True)
 ```
 
 #### Check Compilation Logs
+
 The system captures stdout and stderr from compilation attempts. Check the `CompilationResult` objects for detailed error information.
 
 #### Validate Dependencies
+
 ```python
 compiler = get_tpc_compiler()
 deps_available, missing = compiler.check_dependencies("dbgen")
@@ -264,18 +292,21 @@ if not deps_available:
 ## Windows Compilation Support
 
 ### TPC-H Windows Support
+
 - **Full support** for Windows x86_64 and ARM64 platforms
 - Pre-compiled Windows binaries available via Docker cross-compilation
 - Automatic MinGW integer literal compatibility fixes applied during compilation
 - Binaries: `dbgen.exe`, `qgen.exe`, and support files
 
 ### TPC-DS Windows Support
+
 - **Partial support** due to cross-compilation limitations
 - Wine emulation used for `mkheader.exe` tool during build process
 - Data files (`tpcds.dst`) and query templates successfully compiled
 - Limited executable generation due to cross-compilation constraints
 
 ### Technical Implementation
+
 - **Docker-based compilation**: Uses Ubuntu 22.04 with MinGW cross-compiler
 - **Wine integration**: Headless Wine emulation for Windows tools during build
 - **Automatic fixes**: Integer literal compatibility patches for MinGW
@@ -344,9 +375,11 @@ For compilation issues:
 ### Classes
 
 #### `TPCCompiler`
+
 Main class for TPC binary compilation management.
 
 **Methods**:
+
 - `is_binary_available(binary_name: str) -> bool`
 - `needs_compilation(binary_name: str) -> bool`
 - `compile_binary(binary_name: str) -> CompilationResult`
@@ -354,18 +387,22 @@ Main class for TPC binary compilation management.
 - `get_status_report() -> Dict[str, Any]`
 
 #### `CompilationResult`
+
 Result object containing compilation status and details.
 
 **Attributes**:
+
 - `status: CompilationStatus` - Compilation status enum
 - `binary_path: Optional[Path]` - Path to compiled binary
 - `error_message: Optional[str]` - Error message if failed
 - `compilation_time: Optional[float]` - Time taken to compile
 
 #### `CompilationStatus`
+
 Enum representing compilation status.
 
 **Values**:
+
 - `SUCCESS` - Compilation succeeded
 - `FAILED` - Compilation failed
 - `SKIPPED` - Compilation skipped
@@ -375,14 +412,17 @@ Enum representing compilation status.
 ### Functions
 
 #### `ensure_tpc_binaries(binaries: List[str], auto_compile: bool = True) -> Dict[str, CompilationResult]`
+
 Ensure specified TPC binaries are available, compiling if needed.
 
 #### `get_tpc_compiler(auto_compile: bool = True, verbose: bool = False) -> TPCCompiler`
+
 Get TPC compiler instance with specified configuration.
 
 ## Examples
 
 ### Integration Example
+
 ```python
 from benchbox.utils.tpc_compilation import ensure_tpc_binaries
 
@@ -397,6 +437,7 @@ def initialize_tpc_h():
 ```
 
 ### Status Check Example
+
 ```python
 from benchbox.utils.tpc_compilation import get_tpc_compiler
 

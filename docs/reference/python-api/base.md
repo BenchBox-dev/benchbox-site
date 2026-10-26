@@ -219,11 +219,11 @@ The built-in TPC-H and TPC-DS classes take integer IDs: `get_query(1)` works, `g
 
 ```python
 query_sql = benchmark.get_query(1)
-print(query_sql[:30])
+print(query_sql[:20])
 ```
 
 ```text
-SELECT l_returnflag, l_linesta
+SELECT l_returnflag,
 ```
 
 ### Database Setup
@@ -368,12 +368,12 @@ from benchbox import TPCH
 
 benchmark = TPCH(scale_factor=0.01, output_dir="tpch_data")
 print(benchmark.translate_query(6, "snowflake"))
-print(benchmark.translate_query(6, "bigquery")[:40])
+print(benchmark.translate_query(6, "bigquery")[:28])
 ```
 
 ```text
 SELECT SUM("l_extendedprice" * "l_discount") AS "revenue" FROM "lineitem" WHERE "l_shipdate" >= CAST('1994-01-01' AS DATE) AND "l_shipdate" < CAST('1994-01-01' AS DATE) + INTERVAL '1 YEAR' AND "l_discount" BETWEEN 0.06 - 0.01 AND 0.06 + 0.01 AND "l_quantity" < 24
-SELECT SUM(`l_extendedprice` * `l_discou
+SELECT SUM(`l_extendedprice`
 ```
 
 ### Results Creation

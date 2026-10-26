@@ -20,15 +20,15 @@ queries:
 
 In the real catalog the SQL for `aggregation_distinct` is a distinct count of a high-cardinality key on a large table.
 
-* `id` - unique identifier referenced by benchmarks and tests.
-* `category` - lower-case grouping used for `get_queries_by_category`; omit to
+- `id` - unique identifier referenced by benchmarks and tests.
+- `category` - lower-case grouping used for `get_queries_by_category`; omit to
 default to the `id` prefix.
-* `sql` - literal SQL string (keep the leading newline so comparisons remain
+- `sql` - literal SQL string (keep the leading newline so comparisons remain
   stable).
-* `description` (optional) - free-form text for future tooling.
-* `variants` (optional) - dict mapping dialect names to platform-specific SQL.
-* `skip_on` (optional) - list of dialects where this query should be skipped.
-* `result_contract` (required for every active variant query) - machine-readable
+- `description` (optional) - free-form text for future tooling.
+- `variants` (optional) - dict mapping dialect names to platform-specific SQL.
+- `skip_on` (optional) - list of dialects where this query should be skipped.
+- `result_contract` (required for every active variant query) - machine-readable
   result shape and measured capability metadata.
 
 ## Platform-Specific Variants
@@ -79,12 +79,14 @@ Define alternative SQL for specific platforms using the `variants` field:
 The base `sql` uses standard MySQL syntax.
 
 **When to use variants:**
+
 - Platform uses different function names (e.g., `JSON_ARRAYAGG` vs `JSON_GROUP_ARRAY`)
 - Platform requires different syntax for the same functionality
 - Query needs structural changes but tests same capability (e.g., CTE to avoid nested aggregates)
 - Output columns, row identity, nested shape, and measured capability remain comparable
 
 **How it works:**
+
 1. When `get_query(query_id, dialect="duckdb")` is called, the query manager returns the DuckDB variant if it exists
 2. If no variant exists for the requested dialect, returns the base `sql` query
 3. Variant SQL is authored as final target SQL; `ReadPrimitivesBenchmark.get_queries()` does not rerun it through SQLGlot
@@ -109,14 +111,14 @@ result_contract:
 
 Contract fields:
 
-* `capability` - the database capability the query measures. Variants that
+- `capability` - the database capability the query measures. Variants that
   produce the same values by testing a different capability should be skipped.
-* `row_identity` - result columns that identify a row for cross-platform
+- `row_identity` - result columns that identify a row for cross-platform
   alignment. If the query has `LIMIT`, order deterministically by this identity.
-* `columns` - projected columns in exact output order. Use mappings when a
+- `columns` - projected columns in exact output order. Use mappings when a
   nested type or order sensitivity matters.
-* `type_class` - one of `scalar`, `json`, `array`, `struct`, or `map`.
-* `order_sensitive` - set `true` when array/list order is part of the result
+- `type_class` - one of `scalar`, `json`, `array`, `struct`, or `map`.
+- `order_sensitive` - set `true` when array/list order is part of the result
   semantics.
 
 ### Skipping Queries
@@ -137,6 +139,7 @@ Some queries cannot be meaningfully tested on certain platforms due to data limi
 ```
 
 **When to use skip_on:**
+
 - Data quality issues make query meaningless (e.g., JSON functions on non-JSON data)
 - Platform fundamentally lacks required feature and no reasonable alternative exists
 - Query would always fail due to platform limitations, not bugs
@@ -147,6 +150,7 @@ Some queries cannot be meaningfully tested on certain platforms due to data limi
 For a complete reference of all current skips, their root causes, and instructions on how to re-enable them, see {doc}`read-primitives-skips-reference`.
 
 **How it works:**
+
 1. When `get_queries(dialect="duckdb")` is called, queries with `skip_on: [duckdb]` are excluded
 2. `get_query(query_id, dialect="duckdb")` raises `ValueError` if query is in skip_on list
 3. Benchmark treats this as expected behavior, not a failure
@@ -154,21 +158,25 @@ For a complete reference of all current skips, their root causes, and instructio
 ### Best Practices
 
 **Prefer variants over skip_on:**
+
 - Only skip when no comparable alternative exists
 - Most syntax differences can be handled with variants, but capability changes cannot
 
 **Keep variants semantically equivalent:**
+
 - Variants should test the same database capability
 - Results must have comparable columns, nested shape, row identity, and ordering
 - Document why variant is needed in comments
 - Do not keep runnable but non-comparable fallbacks in benchmark scoring
 
 **Dialect names:**
+
 - Use lowercase: `duckdb`, `bigquery`, `snowflake`, `postgres`
 - Must match `dialect` parameter passed to `get_queries()`
 - Case-insensitive matching during query retrieval
 
 **Validation:**
+
 - Run static contracts: `uv run -- python -m pytest tests/unit/core/read_primitives/test_read_primitives_variant_contracts.py -q`
 - Run focused runtime parity: `uv run -- python -m pytest tests/integration/validation/test_read_primitives_variant_parity.py -q`
 - Run the platform query at SF=0.01 before removing a skip
@@ -209,6 +217,7 @@ For a complete reference of all current skips, their root causes, and instructio
 The base `sql` is standard SQL with a nested aggregate inside `REGR_SLOPE`.
 
 This example shows:
+
 - Structural changes (base query → CTE with window function)
 - Same capability tested (linear regression on time series data)
 - Clear comment explaining why variant is needed
@@ -251,14 +260,16 @@ catalog has been updated.
 The Read Primitives catalog combines queries from multiple sources:
 
 #### 1. Apache Impala targeted-perf (majority of queries)
-- **Source**: https://github.com/apache/impala/tree/master/testdata/workloads/targeted-perf
+
+- **Source**: <https://github.com/apache/impala/tree/master/testdata/workloads/targeted-perf>
 - **License**: Apache License 2.0
 - **Original format**: ~47 .test files covering database primitives
 - **Categories covered**: aggregation, broadcast joins, filters, groupby, exchange, orderby, shuffle, string operations
 
 #### 2. Optimizer Sniff Tests (13 optimizer_* queries)
+
 - **Author**: Justin Jaffray
-- **Source**: https://buttondown.com/jaffray/archive/a-sniff-test-for-some-query-optimizers/
+- **Source**: <https://buttondown.com/jaffray/archive/a-sniff-test-for-some-query-optimizers/>
 - **Purpose**: Systematic testing of query optimizer capabilities
 - **Tests covered**: subquery decorrelation, predicate pushdown, join reordering, constant folding, etc.
 
@@ -267,6 +278,7 @@ The Read Primitives catalog combines queries from multiple sources:
 **Apache Impala targeted-perf + Optimizer Sniff Tests** → **BenchBox Read Primitives**
 
 Changes from source materials:
+
 1. **Format conversion**: Impala `.test` format + blog concepts → unified YAML catalog
 2. **Naming standardization**: Dropped `primitive_` prefix for cleaner query IDs
 3. **Query modernization**: Added SQL:2016+ features (window functions, QUALIFY, MIN_BY/MAX_BY)

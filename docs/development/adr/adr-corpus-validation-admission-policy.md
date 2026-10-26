@@ -144,7 +144,7 @@ accordingly; this ADR does not propose one.
 
 ## Consequences
 
-**Positive**
+**Positive:**
 
 - The corpus can carry an honest label for 43 DataFrame bundles (52 legacy
   bundles when `not_run` was admitted) that ran but were never validated,
@@ -157,7 +157,7 @@ accordingly; this ADR does not propose one.
   gate (`is_ranking_eligible`, `ranking_exclusion_reason`,
   `compareExclusionReasons.ts`).
 
-**Negative**
+**Negative:**
 
 - The published corpus's DataFrame coverage is mostly non-ranking capability
   evidence rather than validated measurement: 41 of 43 DataFrame bundles are

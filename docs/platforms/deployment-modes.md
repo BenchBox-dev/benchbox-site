@@ -170,6 +170,7 @@ benchbox run --platform clickhouse-local --benchmark tpch --scale 0.1
 Installing the extra pulls in chDB.
 
 **Characteristics:**
+
 - No server installation required
 - In-process execution using chDB
 - Same query engine as ClickHouse server
@@ -240,6 +241,7 @@ benchbox run --platform clickhouse-cloud --benchmark tpch --scale 1.0 \
 | `database` | - | `default` | Target database |
 
 **Notes:**
+
 - Always uses HTTPS (port 8443)
 - Compression enabled by default for network efficiency
 - Result cache disabled by default for accurate benchmarking
@@ -278,6 +280,7 @@ The `docker run` command starts Firebolt Core, `uv add` installs the SDK, and th
 | `database` | `benchbox` | Database name (auto-created) |
 
 **Characteristics:**
+
 - No authentication required
 - Same vectorized query engine as cloud
 - Ideal for development and local testing
@@ -319,6 +322,7 @@ The `SERVICE_ACCOUNT_ID` and `SERVICE_ACCOUNT_SECRET` variables are alternative 
 | `api_endpoint` | `FIREBOLT_API_ENDPOINT` | No | API endpoint (default: `api.app.firebolt.io`) |
 
 **Notes:**
+
 - Create service account credentials in Firebolt console: Settings > Service Accounts
 - Result cache disabled by default for accurate benchmarking
 - Cloud mode requires all four credential parameters
@@ -381,11 +385,13 @@ Set either the service URL (preferred) or the individual host and password varia
 | `database` | `TIMESCALE_DATABASE` / `PGDATABASE` | `tsdb` | Database name |
 
 **Service URL Format:**
-```
+
+```text
 postgres://username:password@hostname:port/database?sslmode=require
 ```
 
 **Notes:**
+
 - Cloud mode always uses SSL (`sslmode=require`)
 - Database management (DROP/CREATE) disabled in cloud mode
 - Find your service URL in the Timescale Cloud console
@@ -418,6 +424,7 @@ The DuckDB package includes MotherDuck support. BenchBox reads the token from `M
 Visit [app.motherduck.com/token-request](https://app.motherduck.com/token-request)
 
 **Characteristics:**
+
 - Uses DuckDB SQL dialect
 - Supports hybrid local/cloud queries
 - Automatic data transfer to MotherDuck cloud
@@ -452,13 +459,15 @@ Starburst has no platform options for these settings; set them in the environmen
 | `port` | `STARBURST_PORT` | No | Port (default: 443) |
 
 **Username Format:**
-```
+
+```text
 email/role (e.g., joe@example.com/accountadmin)
 ```
 
 If you provide the role separately via `STARBURST_ROLE`, it will be automatically appended to the username.
 
 **Characteristics:**
+
 - Uses Trino SQL dialect
 - Always uses HTTPS (port 443)
 - Supports Iceberg, Hive, and Delta table formats
@@ -515,6 +524,7 @@ adapter = LakeSailAdapter(
 See [LakeSail Platform Guide](lakesail.md) for the full option reference.
 
 **Characteristics:**
+
 - No JVM on the execution path - Rust/DataFusion engine only
 - Zero-rewrite migration from PySpark - standard PySpark client
 - SQL and DataFrame modes share the same engine and configuration
@@ -716,22 +726,28 @@ benchbox run --platform snowflake --benchmark tpch --scale 1.0
 
 ### Common Errors
 
-**"Invalid deployment mode"**
-```
+#### "Invalid deployment mode"
+
+```text
 ValueError: Invalid ClickHouse deployment mode 'cluster'. Valid modes: local, server
 ```
+
 Solution: Use one of the valid modes for the platform.
 
-**"Missing required credentials"**
-```
+#### "Missing required credentials"
+
+```text
 ValueError: ClickHouse Cloud requires host configuration.
 ```
+
 Solution: Set the required environment variables or use `--platform-option`.
 
-**"Connection refused"**
-```
+#### "Connection refused"
+
+```text
 ConnectionRefusedError: Cannot connect to Firebolt Core at http://localhost:3473
 ```
+
 Solution: Ensure the local service (Docker container) is running.
 
 ### Debug Mode

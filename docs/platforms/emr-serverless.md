@@ -219,21 +219,25 @@ Also add a trust relationship for EMR Serverless:
 ### Common Issues
 
 **Application fails to start:**
+
 - Verify IAM role has correct trust relationship
 - Check region has EMR Serverless available
 - Review application configuration in console
 
 **Job fails immediately:**
+
 - Check S3 bucket permissions
 - Verify execution role has required permissions
 - Review job logs in S3 or CloudWatch
 
 **Slow startup:**
+
 - Configure pre-initialized capacity for warm workers
 - Check application auto-start is enabled
 - Review network configuration (VPC settings)
 
 **Query timeout:**
+
 - Increase `timeout_minutes` for large scale factors
 - Check for data skew in queries
 - Review Spark configuration

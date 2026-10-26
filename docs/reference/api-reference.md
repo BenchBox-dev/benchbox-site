@@ -24,11 +24,13 @@ class BaseBenchmark(ABC):
 #### Methods
 
 ##### `generate_data() -> List[Path]`
+
 Generate benchmark data files.
 
 **Returns**: List of Path objects pointing to generated data files.
 
 **Example**:
+
 ```python
 from benchbox import TPCH
 
@@ -42,11 +44,13 @@ for file_path in data_files:
 `generate_data()` returns a list of paths, such as `Path("customer.tbl")`, `Path("orders.tbl")` and `Path("lineitem.tbl")`.
 
 ##### `get_queries() -> Dict[Union[int, str], str]`
+
 Get all queries for this benchmark.
 
 **Returns**: Dictionary mapping query IDs to SQL query strings.
 
 **Example**:
+
 ```python
 queries = tpch.get_queries()
 ```
@@ -54,14 +58,17 @@ queries = tpch.get_queries()
 The result is a dictionary such as `{1: "SELECT l_returnflag...", 2: "SELECT s_acctbal...", ...}`.
 
 ##### `get_query(query_id: Union[int, str]) -> str`
+
 Get a specific query by ID.
 
 **Parameters**:
+
 - `query_id`: Query identifier (integer or string)
 
 **Returns**: SQL query string.
 
 **Example**:
+
 ```python
 query_1 = tpch.get_query(1)
 
@@ -71,15 +78,18 @@ primitives_query = primitives.get_query("aggregation_basic")
 The first call is a basic query by integer ID. String IDs, as in the second call, are used by some benchmarks.
 
 ##### `translate_query(query_id: Union[int, str], dialect: str) -> str`
+
 Translate query to specific SQL dialect.
 
 **Parameters**:
+
 - `query_id`: Query identifier
 - `dialect`: Target SQL dialect ("postgres", "mysql", "sqlite", "duckdb", etc.)
 
 **Returns**: Translated SQL query string.
 
 **Example**:
+
 ```python
 postgres_query = tpch.translate_query(1, "postgres")
 mysql_query = tpch.translate_query(1, "mysql")
@@ -89,11 +99,13 @@ duckdb_query = tpch.translate_query(1, "duckdb")
 DuckDB is the recommended default dialect.
 
 ##### `get_create_tables_sql() -> str`
+
 Get DDL statements to create benchmark tables.
 
 **Returns**: DDL statements as string in standard SQL format.
 
 **Example**:
+
 ```python
 ddl = tpch.get_create_tables_sql()
 import duckdb
@@ -104,11 +116,13 @@ conn.execute(ddl)
 This example uses DuckDB (recommended).
 
 ##### `get_schema() -> List[Dict[str, Any]]`
+
 Get benchmark schema information.
 
 **Returns**: List of dictionaries describing tables and columns.
 
 **Example**:
+
 ```python
 schema = tpch.get_schema()
 for table in schema:
@@ -187,11 +201,13 @@ read_primitives = ReadPrimitives(scale_factor=1.0, output_dir=None)
 #### Additional Methods
 
 ##### `get_query_categories() -> List[str]`
+
 Get list of available query categories.
 
 **Returns**: List of category names.
 
 **Example**:
+
 ```python
 categories = read_primitives.get_query_categories()
 ```
@@ -199,14 +215,17 @@ categories = read_primitives.get_query_categories()
 The result is a list such as `["aggregation", "filter", "groupby", "orderby", ...]`.
 
 ##### `get_queries_by_category(category: str) -> Dict[str, str]`
+
 Get queries filtered by category.
 
 **Parameters**:
+
 - `category`: Category name ("aggregation", "filter", "groupby", etc.)
 
 **Returns**: Dictionary mapping query IDs to SQL strings.
 
 **Example**:
+
 ```python
 agg_queries = read_primitives.get_queries_by_category("aggregation")
 filter_queries = read_primitives.get_queries_by_category("filter")

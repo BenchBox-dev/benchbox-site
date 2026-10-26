@@ -58,12 +58,14 @@ erDiagram
 ### Key Columns
 
 **LINEITEM** (Fact Table):
+
 - `L_ORDERKEY`, `L_LINENUMBER` (Composite Primary Key)
 - `L_PARTKEY`, `L_SUPPKEY` (Foreign Keys)
 - `L_QUANTITY`, `L_EXTENDEDPRICE`, `L_DISCOUNT`, `L_TAX` (Measures)
 - `L_SHIPDATE`, `L_COMMITDATE`, `L_RECEIPTDATE` (Temporal)
 
 **ORDERS** (Order Header):
+
 - `O_ORDERKEY` (Primary Key)
 - `O_CUSTKEY` (Foreign Key to Customer)
 - `O_ORDERDATE`, `O_TOTALPRICE`, `O_ORDERSTATUS`
@@ -269,7 +271,7 @@ for i, stream_info in enumerate(tpch.get_all_streams_info()):
 > [DuckDB multi-thread guide](https://duckdb.org/docs/stable/guides/python/multiple_threads).
 > If you run BenchBox throughput tests from your own harness against DuckDB,
 > follow the same pattern: one connection, one cursor per thread.
-
+>
 > **GIL / result-materialization note:** for embedded engines (DuckDB,
 > SQLite, DataFusion, ...) that release the GIL during native query
 > execution but not while converting result rows into Python objects,
@@ -290,19 +292,22 @@ for i, stream_info in enumerate(tpch.get_all_streams_info()):
 > under this GIL constraint doing so measures Python object materialization
 > throughput as much as it measures the database engine.
 
-## Query Characteristics
+## Query Complexity
 
 ### Query Complexity Categories
 
 **Simple Queries (low complexity):**
+
 - [Q1](queries/tpch/q1.md), [Q6](queries/tpch/q6.md): Single-table aggregation with simple predicates
 - [Q14](queries/tpch/q14.md): Simple join with CASE expression
 
 **Moderate Queries (medium complexity):**
+
 - [Q3](queries/tpch/q3.md), [Q5](queries/tpch/q5.md), [Q7](queries/tpch/q7.md), [Q10](queries/tpch/q10.md), [Q12](queries/tpch/q12.md): Multi-table joins with moderate complexity
 - [Q4](queries/tpch/q4.md), [Q13](queries/tpch/q13.md): EXISTS/outer join patterns
 
 **Complex Queries (high complexity):**
+
 - [Q2](queries/tpch/q2.md), [Q15](queries/tpch/q15.md), [Q17](queries/tpch/q17.md), [Q20](queries/tpch/q20.md), [Q21](queries/tpch/q21.md): Complex nested subqueries
 - [Q8](queries/tpch/q8.md), [Q9](queries/tpch/q9.md): Multi-year analytical queries
 - [Q16](queries/tpch/q16.md), [Q18](queries/tpch/q18.md), [Q19](queries/tpch/q19.md), [Q22](queries/tpch/q22.md): Complex filtering and ranking
@@ -419,18 +424,21 @@ for query_id, stats in results.items():
 ## Best Practices
 
 ### Data Generation
+
 1. **Use appropriate scale factors** for your testing needs
 2. **Generate data once** and reuse for multiple test runs
 3. **Parallel generation** for large scale factors (SF ≥ 10)
 4. **Validate data integrity** after generation
 
 ### Query Execution
+
 1. **Warm up queries** before timing measurements
 2. **Use consistent seeds** for reproducible parameter generation
 3. **Test incremental complexity** (start with simple queries)
 4. **Monitor resource usage** during execution
 
 ### Performance Testing
+
 1. **Run multiple iterations** to account for variance
 2. **Clear caches** between runs for cold performance
 3. **Use representative scale factors** for your use case
@@ -440,33 +448,37 @@ for query_id, stats in results.items():
 
 ### Data Generation Issues
 
-**Issue: Out of memory during generation**
+#### Issue: Out of memory during generation
 
 Solution: use a smaller scale factor or increase the number of parallel processes.
+
 ```python
 tpch = TPCH(scale_factor=1.0, parallel=8)
 ```
 
-**Issue: Slow data generation**
+#### Issue: Slow data generation
 
 Solution: check disk I/O and use SSD storage.
+
 ```python
 tpch = TPCH(output_dir="/fast/ssd/path")
 ```
 
 ### Query Execution Issues
 
-**Issue: Query timeout on large scale factors**
+#### Issue: Query timeout on large scale factors
 
 Solution: start with a smaller scale factor and optimize queries.
+
 ```python
 tpch = TPCH(scale_factor=0.1)
 query = tpch.get_query(21, dialect="duckdb")
 ```
 
-**Issue: Parameter substitution errors**
+#### Issue: Parameter substitution errors
 
 Solution: use explicit seeds for reproducible parameters.
+
 ```python
 query = tpch.get_query(1, seed=42)
 ```

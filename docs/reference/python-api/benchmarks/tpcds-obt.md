@@ -47,7 +47,7 @@ for scale_factor in (0.5, 1.5):
     try:
         TPCDSOBT(scale_factor=scale_factor)
     except ValueError as error:
-        print(scale_factor, str(error)[:70])
+        print(scale_factor, str(error)[:53])
 print(TPCDSOBT(scale_factor=1).output_dir.relative_to(Path.cwd()))
 custom = TPCDSOBT(scale_factor=1, output_dir="obt_out", tpcds_source_dir="tpcds_src", output_format="dat")
 print(custom.output_dir)
@@ -56,8 +56,8 @@ print(custom.output_dir)
 Output on 0.4.1:
 
 ```text
-0.5 TPC-DS-OBT requires scale_factor >= 1.0 to align with TPC-DS generatio
-1.5 Scale factors >= 1 must be whole integers. Got: 1.5. Use values like 1
+0.5 TPC-DS-OBT requires scale_factor >= 1.0 to align with
+1.5 Scale factors >= 1 must be whole integers. Got: 1.5.
 benchmark_runs/datagen/tpcds_obt_sf1
 obt_out
 ```

@@ -1,4 +1,5 @@
 (cli-convert)=
+
 # `convert` - Convert Data Formats
 
 ```{tags} reference, cli
@@ -24,13 +25,16 @@ Converting TPC benchmark data to columnar formats provides benefits:
 ## Core Options
 
 **Required:**
+
 - `--input PATH`: Input directory containing benchmark data and `_datagen_manifest.json`
 - `--format FORMAT`: Target format (`parquet`, `vortex`, `delta`, `iceberg`, `ducklake`)
 
 **Output:**
+
 - `--output PATH`: Output directory (default: same as input)
 
 **Compression:**
+
 - `--compression CODEC`: Compression algorithm (default: `snappy`)
   - `snappy` - Fast compression, moderate ratio (default)
   - `gzip` - Better ratio, slower compression
@@ -38,19 +42,23 @@ Converting TPC benchmark data to columnar formats provides benefits:
   - `none` - No compression
 
 **Partitioning:**
+
 - `--partition COLUMN`: Column(s) to partition by (can be specified multiple times)
   - Creates Hive-style partitioning (`column=value/` directories)
   - Enables partition pruning for filtered queries
 
 **Schema:**
+
 - `--benchmark NAME`: Benchmark name for schema lookup (auto-detected from manifest if not specified)
 
 **Validation:**
+
 - `--validate/--no-validate`: Validate row counts after conversion (default: enabled)
   - Ensures data integrity and TPC compliance
   - Disable with `--no-validate` for faster conversion (not TPC compliant)
 
 **Debugging:**
+
 - `--verbose, -v`: Enable verbose output
 
 ## Supported Formats
@@ -64,6 +72,7 @@ benchbox convert --input ./data/tpch_sf1 --format parquet
 ```
 
 **Characteristics:**
+
 - Single file per table (or partitioned directory)
 - Excellent query engine support (DuckDB, Spark, Polars, etc.)
 - Row group statistics for predicate pushdown
@@ -78,6 +87,7 @@ benchbox convert --input ./data/tpch_sf1 --format vortex
 ```
 
 **Characteristics:**
+
 - Single file per table
 - Optimized for analytical scan workloads
 - Excellent compression ratio
@@ -93,6 +103,7 @@ benchbox convert --input ./data/tpch_sf1 --format delta
 ```
 
 **Characteristics:**
+
 - Directory-based format with `_delta_log/` transaction log
 - ACID transactions and concurrent writes
 - Time travel (query historical versions)
@@ -108,6 +119,7 @@ benchbox convert --input ./data/tpch_sf1 --format iceberg
 ```
 
 **Characteristics:**
+
 - Directory-based format with `metadata/` directory
 - Hidden partitioning (partition columns not exposed in schema)
 - Schema evolution without rewriting data
@@ -123,6 +135,7 @@ benchbox convert --input ./data/tpch_sf1 --format ducklake
 ```
 
 **Characteristics:**
+
 - Directory-based format with `metadata.ducklake` catalog and `data/` directory
 - Full ACID transactions with snapshot isolation
 - Time travel (query historical versions)
@@ -194,7 +207,7 @@ This writes the converted data to a different directory.
 
 The convert command displays progress and summary information:
 
-```
+```text
 Converting to PARQUET
 Input: ./benchmark_runs/tpch_sf1
 Compression: snappy

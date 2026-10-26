@@ -56,16 +56,19 @@ The first command runs TPC-H on the Pandas DataFrame platform. The second uses t
 ### dtype_backend Options
 
 **`numpy`** - Classic NumPy backend
+
 - Fastest for numeric-only data
 - No native nullable integer/boolean support
 - Uses `NaN` for missing values
 
 **`numpy_nullable`** (Default) - Nullable extension types
+
 - Native nullable `Int64`, `boolean`, `string` types
 - Good balance of performance and correctness
 - Recommended for most use cases
 
 **`pyarrow`** - Apache Arrow backend
+
 - Best memory efficiency
 - Native string type (not object dtype)
 - Excellent for mixed-type data
@@ -108,16 +111,19 @@ Pandas loads entire datasets into memory with eager evaluation:
 ### Performance Tips
 
 1. **Use PyArrow backend** for string-heavy workloads:
+
    ```bash
    --platform-option dtype_backend=pyarrow
    ```
 
 2. **Reduce scale factor** for faster iteration (start small):
+
    ```bash
    --scale 0.01
    ```
 
 3. **Consider Polars** for larger datasets, because it uses lazy evaluation and automatic parallelization:
+
    ```bash
    --platform polars-df
    ```
@@ -172,11 +178,12 @@ This is TPC-H Q1, the Pricing Summary Report. The implementation filters with bo
 
 ### MemoryError
 
-```
+```text
 MemoryError: Unable to allocate array with shape (N,) and dtype float64
 ```
 
 **Solutions:**
+
 1. Reduce scale factor: `--scale 0.1`
 2. Use PyArrow backend: `--platform-option dtype_backend=pyarrow`
 3. Switch to Polars: `--platform polars-df`
@@ -193,7 +200,7 @@ PyArrow handles strings efficiently.
 
 ### Type Conversion Warnings
 
-```
+```text
 FutureWarning: Downcasting object dtype arrays...
 ```
 

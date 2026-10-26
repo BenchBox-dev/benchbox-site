@@ -28,7 +28,7 @@ Delta Lake stores data in Parquet files, just like plain Parquet. The difference
 - Table schema and metadata
 - Transaction history (enabling time travel)
 
-```
+```text
 delta_table/
 ├── _delta_log/
 │   ├── 00000000000000000000.json  # Transaction 0: create table

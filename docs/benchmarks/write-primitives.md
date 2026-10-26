@@ -160,17 +160,20 @@ dimension maintenance, and incremental data loading scenarios.
 The Write Primitives benchmark is designed for **broad platform compatibility** by focusing on individual write operations rather than multi-statement transactions.
 
 **Architecture Decisions**:
+
 - **Platform Compatibility**: Works across analytical databases (ClickHouse, BigQuery, Snowflake, Databricks, Redshift) and embedded databases (DuckDB, SQLite)
 - **Focused Testing**: Tests write operation performance and correctness independently from transaction semantics
 - **Clear Separation**: Transaction testing is handled by the separate [Transaction Primitives](transaction-primitives.md) benchmark
 
 **Key Features**:
+
 - **Category-based isolation**: 18 dedicated staging tables (one per operation category)
 - **Non-transactional cleanup**: Explicit DELETE/DROP statements work across all platforms
 - **Dynamic data partitioning**: Works with any dataset size (3 rows to 10M rows)
 - **Optional dependencies**: Graceful handling of missing tables (e.g., supplier)
 
 **Operation Count**:
+
 - **Write Primitives**: 112 operations (INSERT, UPDATE, DELETE, MERGE, BULK_LOAD, DDL)
 - **Transaction Primitives**: 8 operations (COMMIT, ROLLBACK, SAVEPOINT, isolation levels)
 
@@ -187,20 +190,24 @@ The Write Primitives benchmark is designed for **broad platform compatibility** 
 Each operation category has dedicated staging tables:
 
 **INSERT category**:
+
 - `insert_ops_lineitem` - Target for lineitem inserts
 - `insert_ops_orders` - Target for order inserts
 - `insert_ops_orders_summary` - Target for aggregated inserts
 - `insert_ops_lineitem_enriched` - Target for joined inserts
 
 **UPDATE category**:
+
 - `update_ops_orders` - Copy of orders for update testing
 
 **DELETE category**:
+
 - `delete_ops_orders` - Copy of orders for delete testing
 - `delete_ops_lineitem` - Copy of lineitem for delete testing
 - `delete_ops_supplier` - Copy of supplier for GDPR deletion testing (optional)
 
 **MERGE category**:
+
 - `merge_ops_target` - First 50% of orders (merge target)
 - `merge_ops_source` - Second 50% of orders (merge source)
 - `merge_ops_lineitem_target` - First 50% of lineitems
@@ -209,12 +216,15 @@ Each operation category has dedicated staging tables:
 - `scd2_ops_stage_customer` - Incoming change batch (changed/unchanged/new) derived dynamically from customer
 
 **BULK_LOAD category**:
+
 - `bulk_load_ops_target` - Target for bulk load testing
 
 **DDL category**:
+
 - `ddl_truncate_target` - Target for TRUNCATE testing
 
 **Metadata**:
+
 - `write_ops_log` - Audit log for operations
 - `batch_metadata` - Tracks batch operations
 
@@ -231,6 +241,7 @@ DELETE FROM insert_ops_orders WHERE o_orderkey = ...;
 The first statement is the write operation. The second is the explicit cleanup.
 
 **Benefits**:
+
 - Works on databases without transaction support (ClickHouse, BigQuery)
 - Clear, predictable cleanup behavior
 - Easier debugging and validation
@@ -249,6 +260,7 @@ WHERE o_orderkey <= (SELECT CAST(MAX(o_orderkey) * 0.5 AS INTEGER) FROM orders);
 This dynamic approach works with any data size.
 
 **Benefits**:
+
 - Works with test data (3 rows) and production data (10M rows)
 - Consistent 50/50 splits for MERGE testing
 - No hard-coded assumptions about key ranges
@@ -265,20 +277,24 @@ This dynamic approach works with any data size.
 ### Staging Tables (18 total)
 
 **INSERT category** (4 tables):
+
 - `insert_ops_lineitem`
 - `insert_ops_orders`
 - `insert_ops_orders_summary`
 - `insert_ops_lineitem_enriched`
 
 **UPDATE category** (1 table):
+
 - `update_ops_orders`
 
 **DELETE category** (3 tables):
+
 - `delete_ops_orders`
 - `delete_ops_lineitem`
 - `delete_ops_supplier` (optional)
 
 **MERGE category** (6 tables):
+
 - `merge_ops_target`
 - `merge_ops_source`
 - `merge_ops_lineitem_target`
@@ -287,12 +303,15 @@ This dynamic approach works with any data size.
 - `scd2_ops_stage_customer` (SCD Type 2 change batch)
 
 **BULK_LOAD category** (1 table):
+
 - `bulk_load_ops_target`
 
 **DDL category** (1 table):
+
 - `ddl_truncate_target`
 
 **Metadata** (2 tables):
+
 - `write_ops_log`
 - `batch_metadata`
 
@@ -310,6 +329,7 @@ benchbox run --benchmark write_primitives --platform duckdb \
 The first command lists available benchmarks, the second runs Write Primitives, and the third runs specific operations. There are no `--categories` or `--operations` options. Select individual operations with `--queries`.
 
 **Important Notes**:
+
 - Requires TPC-H data to be loaded first
 - Staging tables automatically created during setup
 - Each operation includes automatic validation and cleanup
@@ -329,6 +349,7 @@ WritePrimitives(
 ```
 
 **Parameters**:
+
 - `scale_factor`: TPC-H scale factor (must match TPC-H data)
 - `output_dir`: Directory for data files. Defaults to the shared TPC-H data
   directory, `benchmark_runs/datagen/tpch_<scale>` (or under
@@ -411,6 +432,7 @@ Get SQL to create staging tables.
 Result object returned by `execute_operation` and `run_benchmark`.
 
 **Fields**:
+
 - `operation_id: str` - Operation identifier
 - `success: bool` - Whether operation succeeded
 - `write_duration_ms: float` - Write execution time in milliseconds
@@ -599,6 +621,7 @@ result = bench.execute_operation("insert_single_row", conn)
 **Issue**: Operations succeed but validation fails.
 
 **Possible causes**:
+
 1. **Data-dependent operations**: Some operations depend on TPC-H data distribution
 2. **Platform differences**: Different databases may return different rowcounts
 
@@ -618,11 +641,13 @@ if not result.validation_passed:
 **Issue**: Operations running slower than expected.
 
 **Checks**:
+
 1. **Scale factor**: Larger scale factors = more data = slower operations
 2. **Indexes**: Ensure TPC-H tables have proper indexes
 3. **Hardware**: Check disk I/O and memory
 
 **Optimization**:
+
 ```python
 bench = WritePrimitives(scale_factor=0.001)
 ```

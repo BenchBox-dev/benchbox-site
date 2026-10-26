@@ -10,12 +10,14 @@ How BenchBox works internally.
 ## Contents
 
 ### [Architecture Design](architecture.md)
+
 System components and design patterns.
 
 ### [Project Structure](structure.md)
+
 Code organization and directories.
 
-##  Design Principles
+## Design Principles
 
 **Self-contained** - No external dependencies.
 
@@ -27,7 +29,7 @@ Code organization and directories.
 
 ## Architecture Overview
 
-```
+```text
 ┌─────────────────────────────────────────────────────────────┐
 │                    BenchBox Architecture                    │
 ├─────────────────────────────────────────────────────────────┤
@@ -50,17 +52,20 @@ Code organization and directories.
 
 ## Component Overview
 
-**Core Framework**
+**Core Framework:**
+
 - BaseBenchmark - Base class for all benchmarks
 - QueryManager - SQL query storage
 - DataGenerator - Data generation
 - Schema - Database schemas
 
-**Benchmarks**
+**Benchmarks:**
+
 - TPC-H, TPC-DS, Join Order, Primitives
 - Custom benchmark support
 
-**Infrastructure**
+**Infrastructure:**
+
 - SQL Translation - Cross-dialect support
 - Caching - Performance optimization
 - File I/O - Data management
@@ -73,7 +78,7 @@ Code organization and directories.
 
 **Template Method** - Standardized execution workflow.
 
-##  Getting Started
+## Getting Started
 
 1. Read [Architecture Design](architecture.md)
 2. Review [Project Structure](structure.md)

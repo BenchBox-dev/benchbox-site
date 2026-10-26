@@ -67,6 +67,7 @@ All previously planned platform additions through Phase 4 have shipped. The plat
 Dedicated benchmark for spatial SQL operations (`ST_*` functions) across platforms. NYC Taxi already includes some spatial queries; this would be a standalone primitives suite covering the full spatial SQL surface.
 
 **Scope**:
+
 - Point-in-polygon, distance, bounding box
 - Spatial indexing and predicate pushdown
 - Cross-platform dialect coverage (PostGIS, DuckDB spatial, ClickHouse, BigQuery)
@@ -104,12 +105,14 @@ Web traffic time-series patterns from Wikimedia pageview dumps.
 DataFrame benchmarking is supported for 21 benchmarks across two API families:
 
 **Expression Family** (Polars, PySpark, DataFusion, LakeSail):
+
 - TPC-H, TPC-DS, TPC-DS OBT, TPC-DI, TPC-H Skew, TPC-Havoc, DataVault
 - SSB, ClickBench, AMPLab, CoffeeShop, H2ODB, TSBS DevOps
 - NYC Taxi, Flight Data, JoinOrder, JoinOrder Synthetic
 - Read Primitives, Write Primitives, AI Primitives, Metadata Primitives
 
 **Pandas Family** (Pandas, cuDF, Dask):
+
 - Full coverage matching the Expression Family above
 
 **Transaction Primitives** — restricted to ACID-capable table-format adapters only:
@@ -171,6 +174,7 @@ The DataFrame initiative is substantially complete. The one remaining gap is:
 ### Requesting Platforms or Benchmarks
 
 Open an issue with:
+
 - Use case description
 - Scale factors needed
 - Platform/benchmark specifics
@@ -193,4 +197,4 @@ See the [Platform Development Guide](platform-development.md) and [Adding New Pl
 
 ---
 
-*Last updated: 2026-06-05*
+*Last updated: 2026-06-05.*

@@ -34,6 +34,7 @@ ClickBench uses a single table called **HITS** that represents web analytics dat
 The HITS table contains ~100 columns covering all aspects of web analytics:
 
 #### Core Event Data
+
 | Column | Type | Description |
 |--------|------|-------------|
 | `WatchID` | BIGINT | Unique event identifier |
@@ -43,6 +44,7 @@ The HITS table contains ~100 columns covering all aspects of web analytics:
 | `UserID` | BIGINT | User identifier |
 
 #### User and Session Information
+
 | Column | Type | Description |
 |--------|------|-------------|
 | `UserAgent` | SMALLINT | Browser user agent ID |
@@ -53,6 +55,7 @@ The HITS table contains ~100 columns covering all aspects of web analytics:
 | `Income` | SMALLINT | User income bracket |
 
 #### Browser and Device Data
+
 | Column | Type | Description |
 |--------|------|-------------|
 | `ResolutionWidth` | SMALLINT | Screen resolution width |
@@ -65,6 +68,7 @@ The HITS table contains ~100 columns covering all aspects of web analytics:
 | `CookieEnable` | SMALLINT | Cookies enabled flag |
 
 #### Page and Navigation Data
+
 | Column | Type | Description |
 |--------|------|-------------|
 | `URL` | TEXT | Page URL |
@@ -74,6 +78,7 @@ The HITS table contains ~100 columns covering all aspects of web analytics:
 | `IsNotBounce` | SMALLINT | Not a bounce flag |
 
 #### Search and Advertising Data
+
 | Column | Type | Description |
 |--------|------|-------------|
 | `SearchEngineID` | SMALLINT | Search engine identifier |
@@ -81,6 +86,7 @@ The HITS table contains ~100 columns covering all aspects of web analytics:
 | `AdvEngineID` | SMALLINT | Advertising engine ID |
 
 #### Technical and Performance Data
+
 | Column | Type | Description |
 |--------|------|-------------|
 | `SendTiming` | INTEGER | Send timing in milliseconds |
@@ -93,6 +99,7 @@ The HITS table contains ~100 columns covering all aspects of web analytics:
 ### Data Characteristics
 
 The HITS table contains realistic web analytics distributions:
+
 - **Temporal patterns**: Realistic time-of-day and seasonal usage patterns
 - **Geographic distribution**: Global user base with regional concentrations
 - **Device diversity**: Mixed desktop, mobile, and tablet usage
@@ -112,56 +119,69 @@ statement for your platform and scale.
 ### Basic Aggregation Queries (Q1-Q7)
 
 **[Q1](queries/clickbench/q1.md): Simple Count**
+
 ```sql
 SELECT COUNT(*) FROM hits;
 ```
+
 - **Purpose**: Test basic table scanning performance
 - **Performance focus**: Sequential scan optimization
 
 **[Q2](queries/clickbench/q2.md): Filtered Count**
+
 ```sql
 SELECT COUNT(*) FROM hits WHERE AdvEngineID <> 0;
 ```
+
 - **Purpose**: Test filtering with aggregation
 - **Performance focus**: Predicate evaluation during scan
 
 **[Q3](queries/clickbench/q3.md): Multiple Aggregations**
+
 ```sql
 SELECT SUM(AdvEngineID), COUNT(*), AVG(ResolutionWidth) FROM hits;
 ```
+
 - **Purpose**: Test multiple aggregation functions
 - **Performance focus**: Aggregation pipeline efficiency
 
 **[Q5](queries/clickbench/q5.md): Distinct Count**
+
 ```sql
 SELECT COUNT(DISTINCT UserID) FROM hits;
 ```
+
 - **Purpose**: Test cardinality estimation and distinct operations
 - **Performance focus**: Hash table efficiency for high cardinality
 
 ### Grouping and Ordering Queries (Q8-Q19)
 
 **[Q8](queries/clickbench/q8.md): Basic GROUP BY**
+
 ```sql
 SELECT AdvEngineID, COUNT(*) FROM hits
 WHERE AdvEngineID <> 0
 GROUP BY AdvEngineID
 ORDER BY COUNT(*) DESC;
 ```
+
 - **Purpose**: Test basic grouping with ordering
 - **Performance focus**: Hash aggregation and sorting
 
 **[Q9](queries/clickbench/q9.md): Distinct Users by Region**
+
 ```sql
 SELECT RegionID, COUNT(DISTINCT UserID) AS u FROM hits
 GROUP BY RegionID
 ORDER BY u DESC
 LIMIT 10;
 ```
+
 - **Purpose**: Test complex aggregation with TOP-N
 - **Performance focus**: Distinct counting within groups
 
 **[Q13](queries/clickbench/q13.md): Search Phrase Analysis**
+
 ```sql
 SELECT SearchPhrase, COUNT(*) AS c FROM hits
 WHERE SearchPhrase <> ''
@@ -169,19 +189,23 @@ GROUP BY SearchPhrase
 ORDER BY c DESC
 LIMIT 10;
 ```
+
 - **Purpose**: Test string grouping with high cardinality
 - **Performance focus**: String hash performance
 
 ### String Operations Queries (Q20-Q29)
 
 **[Q21](queries/clickbench/q21.md): String Pattern Matching**
+
 ```sql
 SELECT COUNT(*) FROM hits WHERE URL LIKE '%google%';
 ```
+
 - **Purpose**: Test string pattern matching performance
 - **Performance focus**: Text search optimization
 
 **[Q22](queries/clickbench/q22.md): Complex String Analysis**
+
 ```sql
 SELECT SearchPhrase, MIN(URL), COUNT(*) AS c FROM hits
 WHERE URL LIKE '%google%' AND SearchPhrase <> ''
@@ -189,10 +213,12 @@ GROUP BY SearchPhrase
 ORDER BY c DESC
 LIMIT 10;
 ```
+
 - **Purpose**: Test combined string operations with grouping
 - **Performance focus**: String processing with aggregation
 
 **[Q29](queries/clickbench/q29.md): Regex Operations**
+
 ```sql
 SELECT REGEXP_REPLACE(Referer, '^https?://(?:www\\.)?([^/]+)/.*$', '\\1') AS k,
        AVG(LENGTH(Referer)) AS l,
@@ -205,20 +231,24 @@ HAVING COUNT(*) > 100000
 ORDER BY l DESC
 LIMIT 25;
 ```
+
 - **Purpose**: Test complex regex and string functions
 - **Performance focus**: Regex engine performance
 
 ### Complex Analytics Queries (Q30-Q43)
 
 **[Q30](queries/clickbench/q30.md): Wide Aggregation**
+
 ```sql
 SELECT SUM(ResolutionWidth), SUM(ResolutionWidth + 1), ..., SUM(ResolutionWidth + 89)
 FROM hits;
 ```
+
 - **Purpose**: Test wide query processing (89 aggregation columns)
 - **Performance focus**: Expression evaluation and vectorization
 
 **[Q37](queries/clickbench/q37.md): Time Series Analysis**
+
 ```sql
 SELECT SUM(ResolutionWidth),
        SUM(ResolutionWidth + 1),
@@ -228,10 +258,12 @@ GROUP BY AdvEngineID, DATE_TRUNC('minute', EventTime)
 ORDER BY SUM(ResolutionWidth) DESC
 LIMIT 10;
 ```
+
 - **Purpose**: Test temporal grouping with expressions
 - **Performance focus**: Time-based aggregation optimization
 
 **[Q43](queries/clickbench/q43.md): Advanced-level Analytics**
+
 ```sql
 SELECT CounterID,
        AVG(LENGTH(URL)) AS l,
@@ -243,6 +275,7 @@ HAVING COUNT(*) > 100000
 ORDER BY l DESC
 LIMIT 25;
 ```
+
 - **Purpose**: Test complex analytical patterns with HAVING
 - **Performance focus**: Two-phase aggregation optimization
 
@@ -706,30 +739,35 @@ if successful_queries:
 ### Query Performance Patterns
 
 **Scan Queries ([Q1](queries/clickbench/q1.md), [Q2](queries/clickbench/q2.md), [Q7](queries/clickbench/q7.md)):**
+
 - **Primary bottleneck**: Sequential scan speed and basic filtering
 - **Optimization targets**: Column scanning, SIMD operations, predicate pushdown
 - **Typical performance**: Milliseconds to seconds
 - **Scaling characteristics**: Linear with data size
 
 **Aggregation Queries ([Q3](queries/clickbench/q3.md)-[Q6](queries/clickbench/q6.md)):**
+
 - **Primary bottleneck**: Aggregation function computation
 - **Optimization targets**: Vectorized aggregation, parallel execution
 - **Typical performance**: Seconds for large datasets
 - **Scaling characteristics**: Sub-linear with good optimization
 
 **Grouping Queries ([Q8](queries/clickbench/q8.md)-[Q19](queries/clickbench/q19.md)):**
+
 - **Primary bottleneck**: Hash table construction and group management
 - **Optimization targets**: Hash aggregation algorithms, memory efficiency
 - **Typical performance**: Seconds to tens of seconds
 - **Scaling characteristics**: Depends on cardinality and memory
 
 **String Operations ([Q20](queries/clickbench/q20.md)-[Q29](queries/clickbench/q29.md)):**
+
 - **Primary bottleneck**: String processing and pattern matching
 - **Optimization targets**: String function optimization, regex engines
 - **Typical performance**: Highly variable, can be slow
 - **Scaling characteristics**: Often super-linear for complex operations
 
 **Complex Analytics ([Q30](queries/clickbench/q30.md)-[Q43](queries/clickbench/q43.md)):**
+
 - **Primary bottleneck**: Multiple complex operations combined
 - **Optimization targets**: Query plan optimization, vectorization
 - **Typical performance**: Minutes for large datasets
@@ -741,7 +779,7 @@ if successful_queries:
 |-------------|------------------|-------------|----------|------------|------------------|
 | **Columnar** | Column scanning | Vectorized ops | Column-wise hash | String columns | Vector processing |
 | **Row-based** | Index usage | Row aggregation | Row-wise groups | String indexes | Traditional optimization |
-| **In-Memory** | Memory bandwidth | Fast aggregation | In-memory hash | String caching | Memory-configured | <!-- content-ok: cliche -->
+| **In-Memory** | Memory bandwidth | Fast aggregation | In-memory hash | String caching | Memory-configured <!-- content-ok: cliche --> |
 | **GPU** | Parallel scanning | GPU aggregation | GPU hash tables | Limited support | Mixed CPU/GPU |
 
 ## Configuration Options
@@ -771,18 +809,21 @@ clickbench = ClickBench(
 ## Best Practices
 
 ### Data Generation
+
 1. **Scale appropriately** - Use realistic scale factors for your testing needs
 2. **Consider compression** - ClickBench data compresses well
 3. **Partition strategy** - Partition by date for temporal queries
 4. **Index planning** - Create indices on frequently filtered columns
 
 ### Query Optimization
+
 1. **Column store optimization** - Use columnar storage for scans
 2. **String optimization** - Optimize string operations and pattern matching
 3. **Memory management** - Monitor memory usage for large aggregations
 4. **Parallel execution** - Use parallel query execution where available
 
 ### Performance Testing
+
 1. **Multiple iterations** - Run queries multiple times for stable timings
 2. **Cold vs. warm runs** - Test both cold and warm query performance
 3. **Resource monitoring** - Monitor CPU, memory, and I/O during execution
@@ -792,10 +833,11 @@ clickbench = ClickBench(
 
 ### Performance Issues
 
-**Issue: Slow string operations**
+#### Issue: Slow string operations
 
 Solution: create appropriate indices and use configured string functions. The last statement shows a
 database-specific string optimization: `ILIKE` is a case-insensitive match.
+
 ```sql
 CREATE INDEX idx_hits_search_phrase ON hits(SearchPhrase);
 CREATE INDEX idx_hits_url ON hits USING hash(URL);
@@ -803,11 +845,12 @@ CREATE INDEX idx_hits_url ON hits USING hash(URL);
 SELECT COUNT(*) FROM hits WHERE SearchPhrase ILIKE '%google%';
 ```
 
-**Issue: Memory exhaustion on complex queries**
+#### Issue: Memory exhaustion on complex queries
 
 Solution: optimize memory usage and use incremental processing. `max_memory_usage` sets a 10GB limit, and
 `max_bytes_before_external_group_by` enables external aggregation (spilling to disk) above 5GB. You can also break
 down complex queries, as the final example does.
+
 ```sql
 SET max_memory_usage = 10000000000;
 SET max_bytes_before_external_group_by = 5000000000;
@@ -819,9 +862,10 @@ SELECT * FROM (
 
 ### Data Loading Issues
 
-**Issue: Slow data loading**
+#### Issue: Slow data loading
 
 Solution: load with a single `COPY`/`INSERT ... SELECT` per file instead of row-by-row inserts, and generate once at the target scale rather than regenerating per run.
+
 ```python
 clickbench = ClickBench(
     scale_factor=1.0,
@@ -829,10 +873,11 @@ clickbench = ClickBench(
 )
 ```
 
-**Issue: Schema mismatches across databases**
+#### Issue: Schema mismatches across databases
 
 Solution: use database-specific schema adaptations. The first statement is for PostgreSQL, the second for MySQL and
 the third for DuckDB.
+
 ```sql
 ALTER TABLE hits ALTER COLUMN EventTime TYPE TIMESTAMP;
 

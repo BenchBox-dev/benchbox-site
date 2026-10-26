@@ -44,6 +44,7 @@ tracks compatibility shims and deprecated/internal lifecycle surfaces that keep
 old behavior working.
 
 A code element belongs in this registry if it keeps old behavior working, including:
+
 - Legacy parameter or field handling
 - Backward-compatible aliases or re-exports
 - Legacy schema or format handling

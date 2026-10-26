@@ -31,19 +31,19 @@ These operations support common warehouse workflows:
 
 ## When to Use Maintenance Tests
 
-### Use Maintenance Tests When You Need To:
+### Use Maintenance Tests When You Need To
 
-* ✅ **Test data warehouse ETL performance** - Measure how the database handles data refresh operations
-* ✅ **Evaluate write performance under analytical workloads** - Understand the cost of data modifications
-* ✅ **Simulate mixed read/write workloads** - TPC-H Throughput can run its opt-in refresh stream concurrently with query streams
-* ✅ **Benchmark data maintenance windows** - Measure how long it takes to process data refreshes
+- ✅ **Test data warehouse ETL performance** - Measure how the database handles data refresh operations
+- ✅ **Evaluate write performance under analytical workloads** - Understand the cost of data modifications
+- ✅ **Simulate mixed read/write workloads** - TPC-H Throughput can run its opt-in refresh stream concurrently with query streams
+- ✅ **Benchmark data maintenance windows** - Measure how long it takes to process data refreshes
 
-### Skip Maintenance Tests When:
+### Skip Maintenance Tests When
 
-* ❌ **Only measuring query performance** - Power and Throughput tests are sufficient for read-only benchmarks
-* ❌ **Running quick exploratory tests** - Maintenance tests require database reload, adding operational overhead
-* ❌ **Comparing read-only OLAP systems** - Some analytical databases are immutable and don't support data modifications
-* ❌ **Working in production environments** - Never run Maintenance tests against production data (they permanently modify it!)
+- ❌ **Only measuring query performance** - Power and Throughput tests are sufficient for read-only benchmarks
+- ❌ **Running quick exploratory tests** - Maintenance tests require database reload, adding operational overhead
+- ❌ **Comparing read-only OLAP systems** - Some analytical databases are immutable and don't support data modifications
+- ❌ **Working in production environments** - Never run Maintenance tests against production data (they permanently modify it!)
 
 ## TPC-H Refresh Functions
 
@@ -234,6 +234,7 @@ Understanding why you must reload after Maintenance tests is critical for valid 
 All INSERT, UPDATE, and DELETE operations are **committed transactions**. The changes persist in the database permanently. There is no automatic rollback or cleanup.
 
 **What this means:**
+
 - New rows exist in ORDERS, LINEITEM, catalog_sales, etc.
 - Existing rows have modified values
 - Some rows have been permanently deleted
@@ -244,6 +245,7 @@ All INSERT, UPDATE, and DELETE operations are **committed transactions**. The ch
 Power and Throughput queries execute against the **modified dataset**, producing different results:
 
 **Affected query patterns:**
+
 - `COUNT(*)` returns different row counts
 - `SUM(revenue)` calculates different totals
 - `AVG(price)` computes different averages
@@ -251,6 +253,7 @@ Power and Throughput queries execute against the **modified dataset**, producing
 - Date range filters include/exclude different records
 
 **Example:**
+
 ```sql
 SELECT COUNT(*) FROM orders;
 
@@ -284,6 +287,7 @@ The official TPC specifications explicitly require:
 > "The database must be in its initial loaded state before each Performance Test (Power or Throughput). Maintenance operations must not affect the database state for Performance Tests."
 
 **What this means:**
+
 - Official TPC results require clean data for Power/Throughput
 - Running tests on modified data **violates the specification**
 - Results become non-comparable to other published benchmarks
@@ -432,6 +436,7 @@ print(f"Before: {before}, After: {after}, Difference: {after - before}")
 ### "Can I skip Maintenance tests?"
 
 ✅ **Yes, if you only need query performance metrics.** Maintenance tests are only required for:
+
 - Full TPC specification coverage
 - Complete benchmark suite
 - ETL/data modification performance evaluation
@@ -439,6 +444,7 @@ print(f"Before: {before}, After: {after}, Difference: {after - before}")
 ### "What if my database doesn't support DELETE?"
 
 Some immutable analytical databases (like certain columnar stores) don't support data modifications. In this case:
+
 - Skip Maintenance tests entirely
 - Document this limitation in your results
 - Note that the run will not cover the full TPC specification
@@ -454,7 +460,7 @@ Some immutable analytical databases (like certain columnar stores) don't support
 
 ### Correct Sequences
 
-```
+```text
 ✓ generate → load → power → throughput
 ✓ generate → load → power → throughput → maintenance using next unused set
 ✓ generate → load → maintenance
@@ -463,7 +469,7 @@ Some immutable analytical databases (like certain columnar stores) don't support
 
 ### Incorrect Sequences
 
-```
+```text
 ✗ generate → load → power → maintenance → throughput ❌
   (Throughput runs on modified data!)
 
@@ -490,6 +496,7 @@ A: Yes, for TPC-H when `tpch_refresh_functions=true`; one RF1/RF2 stream runs co
 
 **Q: How long does database reload take?**
 A: Depends on scale factor and platform:
+
 - SF=1 on DuckDB: ~30 seconds to 2 minutes
 - SF=10 on DuckDB: ~5-15 minutes
 - SF=100 on cloud warehouse: ~30 minutes to 2 hours
@@ -514,6 +521,7 @@ Check your platform's documentation for snapshot support.
 
 **Q: What if my Maintenance test fails?**
 A: The database may be in an inconsistent state. Reload and investigate:
+
 - Check database logs for errors
 - Verify sufficient disk space
 - Confirm write permissions

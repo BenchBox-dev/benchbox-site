@@ -31,13 +31,17 @@ separate from public discovery visibility and from DataFrame capability.
 ### Roadmap & Research
 
 #### [Development Roadmap](../development/roadmap.md)
+
 Planned platform and benchmark additions, including DataFrame support expansion and upcoming workloads.
 
 ### TPC Standards
-*Official industry standards for comparing databases*
+
+*Official industry standards for comparing databases.*
 
 #### [TPC-H](tpc-h.md)
-**TPC-H Decision Support Benchmark**
+
+**TPC-H Decision Support Benchmark.**
+
 - **CLI name**: `tpch`
 - **Purpose**: Standard decision support and analytical query performance
 - **Queries**: 22 business-oriented analytical queries
@@ -46,7 +50,9 @@ Planned platform and benchmark additions, including DataFrame support expansion 
 - **Use Cases**: General analytical performance, database comparison, regression testing
 
 #### [TPC-DS](tpc-ds.md)
-**TPC-DS Decision Support Benchmark**
+
+**TPC-DS Decision Support Benchmark.**
+
 - **CLI name**: `tpcds`
 - **Purpose**: Complex analytical workloads with advanced SQL features
 - **Queries**: 99 complex analytical queries with CTEs, window functions
@@ -55,7 +61,9 @@ Planned platform and benchmark additions, including DataFrame support expansion 
 - **Use Cases**: Advanced-level analytics, complex query optimization, modern SQL feature testing
 
 #### [TPC-DI](tpc-di.md)
-**TPC-DI Data Integration Benchmark**
+
+**TPC-DI Data Integration Benchmark.**
+
 - **CLI name**: `tpcdi`
 - **Purpose**: Data integration and ETL performance testing
 - **Queries**: Data transformation and loading operations
@@ -64,10 +72,13 @@ Planned platform and benchmark additions, including DataFrame support expansion 
 - **Use Cases**: ETL performance, data pipeline testing, integration workflows
 
 ### Data Modeling Variants
-*Alternative schema designs derived from TPC standards*
+
+*Alternative schema designs derived from TPC standards.*
 
 #### [TPC-H Data Vault](datavault.md)
-**TPC-H Data Vault Benchmark**
+
+**TPC-H Data Vault Benchmark.**
+
 - **CLI name**: `datavault`
 - **Purpose**: TPC-H adapted for Data Vault 2.0 modeling pattern performance testing
 - **Queries**: 22 TPC-H queries adapted for Hub-Link-Satellite joins
@@ -76,10 +87,13 @@ Planned platform and benchmark additions, including DataFrame support expansion 
 - **Use Cases**: Data Vault architecture evaluation, hub-link-satellite join performance, enterprise DWH patterns
 
 ### Academic Benchmarks
-*Research benchmarks from academia*
+
+*Research benchmarks from academia.*
 
 #### [Star Schema Benchmark (SSB)](ssb.md)
-**Star Schema Benchmark**
+
+**Star Schema Benchmark.**
+
 - **CLI name**: `ssb`
 - **Purpose**: Star schema analytical query performance
 - **Queries**: 13 queries across 4 query flights
@@ -88,7 +102,9 @@ Planned platform and benchmark additions, including DataFrame support expansion 
 - **Use Cases**: OLAP performance, dimensional modeling validation, columnar database testing
 
 #### [AMPLab](amplab.md)
-**AMPLab Big Data Benchmark**
+
+**AMPLab Big Data Benchmark.**
+
 - **CLI name**: `amplab`
 - **Purpose**: Big data processing and analytics performance
 - **Queries**: 8 web analytics and user behavior queries
@@ -97,7 +113,9 @@ Planned platform and benchmark additions, including DataFrame support expansion 
 - **Use Cases**: Big data performance, distributed computing, web analytics
 
 #### [Join Order Benchmark](join-order.md)
-**Join Order Optimization Benchmark**
+
+**Join Order Optimization Benchmark.**
+
 - **CLI name**: `joinorder`
 - **Purpose**: Query optimizer join order evaluation
 - **Queries**: 113 complex multi-table join queries
@@ -106,10 +124,13 @@ Planned platform and benchmark additions, including DataFrame support expansion 
 - **Use Cases**: Query optimizer testing, join algorithm evaluation, cardinality estimation
 
 ### Industry Benchmarks
-*Real-world benchmarks from practitioners*
+
+*Real-world benchmarks from practitioners.*
 
 #### [ClickBench](clickbench.md)
-**ClickHouse Analytical Benchmark**
+
+**ClickHouse Analytical Benchmark.**
+
 - **CLI name**: `clickbench`
 - **Purpose**: High-performance analytical query testing
 - **Queries**: 43 analytical queries from real web analytics
@@ -118,7 +139,9 @@ Planned platform and benchmark additions, including DataFrame support expansion 
 - **Use Cases**: Analytical database performance, real-time analytics, columnar storage
 
 #### [H2ODB](h2odb.md)
-**H2O Database Benchmark**
+
+**H2O Database Benchmark.**
+
 - **CLI name**: `h2odb`
 - **Purpose**: Data science and machine learning workloads
 - **Queries**: 10 aggregation and groupby operations
@@ -127,7 +150,9 @@ Planned platform and benchmark additions, including DataFrame support expansion 
 - **Use Cases**: Data science performance, in-memory analytics, aggregation optimization
 
 #### [CoffeeShop](coffeeshop.md)
-**CoffeeShop Point-of-Sale Benchmark**
+
+**CoffeeShop Point-of-Sale Benchmark.**
+
 - **CLI name**: `coffeeshop`
 - **Purpose**: Real-world transactional and analytical workloads
 - **Queries**: 11 point-of-sale and reporting queries
@@ -136,10 +161,13 @@ Planned platform and benchmark additions, including DataFrame support expansion 
 - **Use Cases**: Hybrid workload testing, real-world performance validation
 
 ### Real-World Data
-*Benchmarks built on public real-world datasets*
+
+*Benchmarks built on public real-world datasets.*
 
 #### [NYC Taxi](nyctaxi.md)
-**NYC Taxi OLAP Benchmark**
+
+**NYC Taxi OLAP Benchmark.**
+
 - **CLI name**: `nyctaxi`
 - **Purpose**: Real-world transportation data analytics
 - **Queries**: 25 OLAP queries across 9 categories
@@ -148,7 +176,9 @@ Planned platform and benchmark additions, including DataFrame support expansion 
 - **Use Cases**: Geospatial analytics, temporal aggregation, multi-dimensional OLAP
 
 #### [Flight Data](flightdata.md)
-**US Aviation On-Time Performance Benchmark**
+
+**US Aviation On-Time Performance Benchmark.**
+
 - **CLI name**: `flightdata`
 - **Purpose**: Real-world aviation analytics - delays, routes, carriers, seasonality
 - **Queries**: 20 OLAP queries across 5 categories (ontime, delay, routes, temporal, carriers)
@@ -157,10 +187,13 @@ Planned platform and benchmark additions, including DataFrame support expansion 
 - **Use Cases**: Temporal analytics, categorical aggregation, carrier comparisons
 
 ### Time-Series Benchmarks
-*Workloads built for time-series databases and columnar monitoring engines*
+
+*Workloads built for time-series databases and columnar monitoring engines.*
 
 #### [TSBS DevOps](tsbs-devops.md)
-**Time Series Benchmark Suite for DevOps**
+
+**Time Series Benchmark Suite for DevOps.**
+
 - **CLI name**: `tsbs_devops`
 - **Purpose**: Infrastructure monitoring and observability workloads
 - **Queries**: 18 DevOps monitoring queries across 10 categories
@@ -169,10 +202,13 @@ Planned platform and benchmark additions, including DataFrame support expansion 
 - **Use Cases**: Time-series database evaluation, monitoring dashboards, alerting queries
 
 ### BenchBox Primitives
-*Fundamental database operation testing*
+
+*Fundamental database operation testing.*
 
 #### [Read Primitives](read-primitives.md)
-**Database Read Primitives Benchmark**
+
+**Database Read Primitives Benchmark.**
+
 - **CLI name**: `read_primitives`
 - **Purpose**: Individual database operation testing
 - **Queries**: 157 primitive operation queries across 31 categories
@@ -181,7 +217,9 @@ Planned platform and benchmark additions, including DataFrame support expansion 
 - **Use Cases**: Unit testing, regression detection, optimizer sniff tests, development validation
 
 #### [Write Primitives](write-primitives.md)
-**Database Write Operations Benchmark (v2)**
+
+**Database Write Operations Benchmark (v2).**
+
 - **CLI name**: `write_primitives`
 - **Purpose**: Comprehensive non-transactional write operation testing
 - **Queries**: 12 write operations across 7 categories (INSERT, UPDATE, DELETE, BULK_LOAD, MERGE, DDL, TRANSACTION)
@@ -191,7 +229,9 @@ Planned platform and benchmark additions, including DataFrame support expansion 
 - **Use Cases**: Write performance testing, MERGE/UPSERT optimization, CDC workloads, ETL validation
 
 #### [Transaction Primitives](transaction-primitives.md)
-**Database Transaction Testing Benchmark**
+
+**Database Transaction Testing Benchmark.**
+
 - **CLI name**: `transaction_primitives`
 - **Purpose**: ACID transaction guarantees and isolation level testing
 - **Queries**: 12 transaction operations (COMMIT, ROLLBACK, SAVEPOINT, isolation levels)
@@ -201,7 +241,9 @@ Planned platform and benchmark additions, including DataFrame support expansion 
 - **Use Cases**: Transaction isolation testing, ACID compliance validation, concurrency testing
 
 #### [Metadata Primitives](metadata-primitives.md)
-**Database Catalog Introspection Benchmark**
+
+**Database Catalog Introspection Benchmark.**
+
 - **CLI name**: `metadata_primitives`
 - **Purpose**: Catalog introspection performance via INFORMATION_SCHEMA, SHOW, DESCRIBE, PRAGMA
 - **Queries**: 62 catalog queries across 10 categories
@@ -210,7 +252,9 @@ Planned platform and benchmark additions, including DataFrame support expansion 
 - **Use Cases**: Data catalog integration, BI tool responsiveness, IDE autocomplete, data governance
 
 #### [AI Primitives](ai-primitives.md)
-**SQL-Based AI Functions Benchmark**
+
+**SQL-Based AI Functions Benchmark.**
+
 - **CLI name**: `ai_primitives`
 - **Purpose**: Evaluate built-in AI functions in cloud databases
 - **Queries**: 16 queries across 4 categories (generative, nlp, transform, embedding)
@@ -221,10 +265,13 @@ Planned platform and benchmark additions, including DataFrame support expansion 
 - **Registry category**: `Primitives` (grouped with the other `*_primitives` benchmarks)
 
 ### AI & ML Benchmarks
-*Vector similarity and other AI-shaped analytical workloads*
+
+*Vector similarity and other AI-shaped analytical workloads.*
 
 #### [Vector Search](vector-search.md)
-**Vector Similarity Search Benchmark**
+
+**Vector Similarity Search Benchmark.**
+
 - **CLI name**: `vector_search`
 - **Purpose**: Exact and approximate similarity search over embedding vectors
 - **Queries**: 6 queries - exact kNN (cosine + L2), filtered kNN, ground truth, ANN, multi-category
@@ -233,14 +280,17 @@ Planned platform and benchmark additions, including DataFrame support expansion 
 - **Use Cases**: Vector database evaluation, ANN recall testing, embedding store comparison
 
 ### BenchBox Experimental
-*Experimental benchmarks for specialized testing*
+
+*Experimental benchmarks for specialized testing.*
 
 See also [TPC-H Data Vault](datavault.md) under *Data Modeling Variants* above -
 shipped in the experimental toctree but documented alongside the other TPC-H
 schema variants.
 
 #### [TPC-DS-OBT](tpc-ds-obt.md)
-**TPC-DS One Big Table Benchmark**
+
+**TPC-DS One Big Table Benchmark.**
+
 - **CLI name**: `tpcds_obt`
 - **Purpose**: Denormalized wide-table analytical workloads
 - **Queries**: 17 TPC-DS queries adapted for single-table schema
@@ -249,7 +299,9 @@ schema variants.
 - **Use Cases**: Wide-table analytics, columnar database testing, denormalization trade-off analysis
 
 #### [TPC-Havoc](tpc-havoc.md)
-**TPC-H Syntax Variants Benchmark**
+
+**TPC-H Syntax Variants Benchmark.**
+
 - **CLI name**: `tpchavoc`
 - **Purpose**: Query optimizer stress testing through syntax variations
 - **Queries**: 220 variants (22 TPC-H queries × 10 syntax variants each)
@@ -258,7 +310,9 @@ schema variants.
 - **Use Cases**: Optimizer robustness testing, syntax transformation analysis, performance variance evaluation
 
 #### [TPC-H Skew](tpch-skew.md)
-**TPC-H Data Skew Benchmark**
+
+**TPC-H Data Skew Benchmark.**
+
 - **CLI name**: `tpch_skew`
 - **Purpose**: Test optimizer behavior on non-uniform data distributions
 - **Queries**: 22 TPC-H queries with configurable skew parameters
@@ -266,11 +320,12 @@ schema variants.
 - **Scale**: Same as TPC-H (0.01 to 10+)
 - **Use Cases**: Skew handling, cardinality estimation testing, join strategy evaluation under data imbalance
 
-##  Benchmark Selection Guide
+## Benchmark Selection Guide
 
 ### By Use Case
 
 #### **General Performance Testing**
+
 - **Primary**: [TPC-H](tpc-h.md) - Industry standard, widely comparable
 - **Secondary**: [SSB](ssb.md) - Simpler star schema alternative
 - **Advanced**: [TPC-DS](tpc-ds.md) - Complex modern analytical workloads
@@ -278,12 +333,14 @@ schema variants.
 - **Enterprise DWH**: [Data Vault](datavault.md) - Hub-Link-Satellite modeling patterns
 
 #### **Query Optimizer Testing**
+
 - **Join Optimization**: [Join Order Benchmark](join-order.md)
 - **General Optimization**: [Read Primitives](read-primitives.md) optimizer tests
 - **Syntax Robustness**: [TPC-Havoc](tpc-havoc.md)
 - **Skew Handling**: [TPC-H Skew](tpch-skew.md) - Non-uniform data distributions
 
 #### **Specific Operation Testing**
+
 - **Read Operations**: [Read Primitives](read-primitives.md)
 - **Write Operations**: [Write Primitives](write-primitives.md)
 - **Transaction Operations**: [Transaction Primitives](transaction-primitives.md)
@@ -305,11 +362,13 @@ queries/index
 ```
 
 #### **Development and CI/CD**
+
 - **Unit Testing**: [Read Primitives](read-primitives.md) with micro scale factors
 - **Regression Testing**: [TPC-H](tpc-h.md) with small scale factors
 - **Feature Validation**: Category-specific [Read Primitives](read-primitives.md) queries
 
 #### **Research and Analysis**
+
 - **Optimizer Research**: [Join Order Benchmark](join-order.md)
 - **Performance Analysis**: [TPC-DS](tpc-ds.md) complex queries
 - **Syntax Impact**: [TPC-Havoc](tpc-havoc.md) variants
@@ -317,22 +376,26 @@ queries/index
 ### By Database Type
 
 #### **OLTP Databases**
+
 - [TPC-H](tpc-h.md) queries 1, 6, 12 (simple aggregations)
 - [Read Primitives](read-primitives.md) focused read operations
 - [Write Primitives](write-primitives.md) for UPSERT and write workloads
 - [Transaction Primitives](transaction-primitives.md) for ACID compliance testing
 
 #### **OLAP/Analytical Databases**
+
 - [TPC-DS](tpc-ds.md) for complex analytics
 - [ClickBench](clickbench.md) for high-performance analytics
 - [SSB](ssb.md) for dimensional modeling
 
 #### **Distributed/Big Data Systems**
+
 - [AMPLab](amplab.md) for big data workloads
 - [TPC-DS](tpc-ds.md) for complex distributed queries
 - [H2ODB](h2odb.md) for data science workloads
 
 #### **In-Memory Databases**
+
 - [H2ODB](h2odb.md) for memory-intensive operations
 - [Read Primitives](read-primitives.md) for focused operation testing
 - [TPC-H](tpc-h.md) with larger scale factors
@@ -340,16 +403,19 @@ queries/index
 ### By Performance Characteristics
 
 #### **CPU-Intensive Workloads**
+
 - [TPC-DS](tpc-ds.md) complex queries (Q67, Q78, Q98)
 - [Join Order Benchmark](join-order.md) multi-table joins
 - [Read Primitives](read-primitives.md) aggregation category
 
 #### **I/O-Intensive Workloads**
+
 - [TPC-H](tpc-h.md) with large scale factors
 - [ClickBench](clickbench.md) analytical scans
 - [AMPLab](amplab.md) big data operations
 
 #### **Memory-Intensive Workloads**
+
 - [H2ODB](h2odb.md) groupby operations
 - [TPC-DS](tpc-ds.md) with window functions
 - Canonical [Join Order Benchmark](join-order.md) at fixed `--scale 1`
@@ -357,7 +423,9 @@ queries/index
 ## Common Patterns
 
 ### Quick Performance Test
+
 Run a representative subset of TPC-H queries for standard analytical performance, and use Read Primitives for focused operation testing:
+
 ```python
 from benchbox import TPCH, ReadPrimitives
 
@@ -369,6 +437,7 @@ perf_critical = read_primitives.get_queries_by_category("aggregation")
 ```
 
 ### Comprehensive Evaluation
+
 ```python
 from benchbox import TPCH, TPCDS, JoinOrder
 
@@ -384,7 +453,9 @@ for name, benchmark in benchmarks.items():
 ```
 
 ### Regression Testing
+
 Use a small scale factor for fast execution, and allow 10% variance against the baseline:
+
 ```python
 from benchbox import ReadPrimitives
 
@@ -429,6 +500,7 @@ for query_id in regression_queries:
 ## Integration Examples
 
 Each benchmark documentation includes:
+
 - **Setup instructions** for popular databases
 - **Performance tuning** recommendations
 - **Common pitfalls** and troubleshooting
@@ -438,11 +510,13 @@ Each benchmark documentation includes:
 ## Getting Help
 
 ### Benchmark-Specific Issues
+
 - Check individual benchmark documentation for known issues
 - Review database-specific integration examples
 - Validate scale factor and configuration settings
 
 ### General Support
+
 - [Usage Guide](../usage/README.md) for general BenchBox usage
 - [API Reference](../reference/api-reference.md) for detailed API documentation
 - [GitHub Issues](https://github.com/BenchBox-dev/benchbox/issues) for bug reports

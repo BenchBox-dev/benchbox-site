@@ -346,7 +346,6 @@ Unity Catalog must stage the data in external cloud storage, as shown above.
 
 Configure warehouses to auto-stop. Set this in the UI or API, under Warehouse Settings > Auto Stop > 10 minutes.
 
-
 ### Serverless Warehouses
 
 For variable workloads, save the serverless warehouse's HTTP path with

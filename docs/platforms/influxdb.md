@@ -42,6 +42,7 @@ pip install benchbox[influxdb]
 The first command installs the `influxdb` extra with uv. The second does the same with pip.
 
 This installs:
+
 - `influxdb3-python` - Official InfluxDB 3.x Python client
 - `pyarrow` - Apache Arrow data handling
 
@@ -129,6 +130,7 @@ benchbox run --platform influxdb --benchmark tsbs-devops --scale 1
 ```
 
 TSBS DevOps simulates a DevOps monitoring scenario with:
+
 - **CPU metrics**: Usage, user, system, idle, etc.
 - **Memory metrics**: Total, available, used, etc.
 - **Disk metrics**: IOPS, throughput, latency
@@ -192,6 +194,7 @@ docker run -d \
 This starts InfluxDB Core with Docker.
 
 Core limitations:
+
 - No data compaction for historical queries
 - No delete capabilities via SQL
 - Optimized for "leading edge" (recent) data

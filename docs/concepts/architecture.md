@@ -17,7 +17,7 @@ BenchBox is built on three core principles:
 
 ## Architecture Diagram
 
-```
+```text
 ┌─────────────────────────────────────────────────────────────┐
 │                       CLI / Python API                       │
 │                    (User Entry Points)                       │
@@ -70,6 +70,7 @@ Core implementations live under `benchbox/core/{benchmark}/`.
 **Responsibility**: Encapsulates benchmark-specific logic
 
 **Key Classes**:
+
 - `BaseBenchmark`: Public wrapper base in `benchbox/base.py` for benchmark
   construction and the `run_with_platform` API. It remains a supported public
   base; it is not a retired execution model.
@@ -81,6 +82,7 @@ A benchmark class knows how to generate data (the `dbgen` invocation), how to re
 substitution), its schema definitions, and its validation rules.
 
 **Example**:
+
 ```python
 from benchbox import TPCH
 ```
@@ -94,6 +96,7 @@ See: [Custom Benchmarks Guide](../advanced/custom-benchmarks.md)
 **Responsibility**: Abstracts database-specific connection and execution logic
 
 **Key Classes**:
+
 - `{Platform}Adapter`: Main adapter class (e.g., `DuckDBAdapter`)
 - `{Platform}Connection`: Connection wrapper implementing `DatabaseConnection`
 - Platform-specific optimizations (bulk loading, query hints)
@@ -102,11 +105,13 @@ An adapter handles connection management, data loading strategies (COPY, INSERT,
 error handling, and result collection and formatting.
 
 **Example**:
+
 ```python
 from benchbox.platforms.duckdb import DuckDBAdapter
 ```
 
 **Supported Adapters**:
+
 - DuckDB (embedded, local files)
 - ClickHouse (native protocol)
 - Databricks (SQL Warehouse, Unity Catalog)
@@ -124,6 +129,7 @@ See: [Platform Selection Guide](../platforms/platform-selection-guide.md)
 **Responsibility**: Structured representation of benchmark execution results
 
 **Key Classes**:
+
 - `QueryResult`: Schema-facing query row model used by compatibility and
   validation boundaries (`benchbox/core/schemas.py`); it is not the canonical
   in-memory execution object.
@@ -136,6 +142,7 @@ See: [Platform Selection Guide](../platforms/platform-selection-guide.md)
 - `ValidationResult`: Data quality and correctness checks
 
 **Schema**:
+
 ```python
 {
     "benchmark_name": "TPC-H",
@@ -166,6 +173,7 @@ See: [Result Schema Reference](../reference/result-schema-v1.md)
 **Responsibility**: Unified interface for database operations
 
 **Key Interface**:
+
 ```python
 class DatabaseConnection(ABC):
     @abstractmethod
@@ -190,12 +198,14 @@ class DatabaseConnection(ABC):
 **Responsibility**: Create synthetic benchmark data
 
 **Mechanisms**:
+
 - **TPC Benchmarks**: Invoke official C binaries (`dbgen`, `dsdgen`, `datagen`)
 - **Custom Benchmarks**: Python-based generation using Faker, NumPy, Pandas
 - **Output Formats**: Parquet (default), CSV, JSON
 
 **Example**: TPC-H uses the official `dbgen` binary, and `generate()` returns a list of `.parquet` files. Custom
 benchmarks use Python, and the coffee shop generator generates data with Faker.
+
 ```python
 generator = TPCHGenerator(scale_factor=1.0, output_dir="./data")
 file_paths = generator.generate()
@@ -214,6 +224,7 @@ See: [Data Generation Guide](../usage/data-generation.md)
 
 **Commands**: the examples run a benchmark end-to-end, generate data only, do a dry run that previews queries, and check
 dependencies.
+
 ```bash
 benchbox run --benchmark tpch --platform duckdb --scale 1
 
@@ -225,6 +236,7 @@ benchbox check-deps --matrix
 ```
 
 **Orchestrator Flow**:
+
 1. Parse CLI arguments and config files
 2. Validate platform dependencies
 3. Initialize benchmark and platform adapter
@@ -238,7 +250,7 @@ See: [CLI Quick Start](../usage/cli-quick-start.md)
 
 ### End-to-End Execution Flow
 
-```
+```text
 1. User Command
    ├── benchbox run --benchmark tpch --platform duckdb --scale 1
    └── Parsed by CLI → creates RunConfiguration

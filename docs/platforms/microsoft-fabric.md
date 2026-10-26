@@ -50,11 +50,13 @@ The first command installs BenchBox with the Fabric dependencies using uv, and t
 ### System Requirements
 
 **macOS:**
+
 ```bash
 brew install unixodbc msodbcsql18
 ```
 
 **Ubuntu/Debian:**
+
 ```bash
 curl https://packages.microsoft.com/keys/microsoft.asc | sudo apt-key add -
 curl https://packages.microsoft.com/config/ubuntu/$(lsb_release -rs)/prod.list | sudo tee /etc/apt/sources.list.d/mssql-release.list
@@ -123,6 +125,7 @@ adapter = FabricWarehouseAdapter(
 ```
 
 **Prerequisites:**
+
 - Azure CLI logged in: `az login`
 - Or running on Azure with managed identity
 - Or set environment variables:
@@ -146,6 +149,7 @@ adapter = FabricWarehouseAdapter(
 ```
 
 **Required Permissions:**
+
 - Fabric workspace member (Contributor or Admin)
 - OneLake data access for staging
 
@@ -184,7 +188,7 @@ Opens browser for Entra ID login.
 
 Microsoft Fabric Warehouse uses OneLake for data staging during bulk loads:
 
-```
+```text
 https://onelake.dfs.fabric.microsoft.com/{workspace}/{warehouse}.Warehouse/Files/benchbox-staging/
 ```
 
@@ -272,6 +276,7 @@ Fabric uses Capacity Units (CUs) for billing:
 - **F128+**: Large-scale analytics
 
 **Recommendations:**
+
 - Use F4+ for TPC-H scale factor > 1
 - Use F16+ for TPC-DS
 - Consider pausing capacity between benchmark runs
@@ -290,8 +295,9 @@ Use the Azure CLI to pause Fabric capacity between runs, and resume it when you 
 
 ### Connection Errors
 
-**"Login timeout expired"**
-```
+#### "Login timeout expired"
+
+```bash
 # Check ODBC driver installation
 odbcinst -q -d
 
@@ -299,28 +305,33 @@ odbcinst -q -d
 az fabric workspace list
 ```
 
-**"Cannot open server"**
+#### "Cannot open server"
+
 - Verify workspace GUID is correct
 - Check network connectivity to `*.datawarehouse.fabric.microsoft.com`
 - Ensure same-region deployment (cross-region not supported)
 
 ### Authentication Errors
 
-**"AADSTS700016: Application not found"**
+#### "AADSTS700016: Application not found"
+
 - Verify service principal exists in correct tenant
 - Check client ID is correct
 
-**"AADSTS7000215: Invalid client secret"**
+#### "AADSTS7000215: Invalid client secret"
+
 - Regenerate client secret
 - Check for expired credentials
 
 ### Data Loading Errors
 
-**"Access to OneLake denied"**
+#### "Access to OneLake denied"
+
 - Verify service principal has OneLake access
 - Check workspace permissions include data access
 
-**"COPY INTO failed"**
+#### "COPY INTO failed"
+
 - Verify staging path exists
 - Check file format matches data
 - Ensure column count matches table schema

@@ -26,9 +26,11 @@ The CoffeeShop example dataset provides a realistic point-of-sale and retail ana
 ### Tables
 
 #### `dim_locations`
+
 Geographic metadata and regional weights for store locations.
 
 **Columns:**
+
 - `record_id` - Surrogate key
 - `location_id` - Business key
 - `city` - City name
@@ -37,9 +39,11 @@ Geographic metadata and regional weights for store locations.
 - `regional_weight` - Weight for regional sales distribution
 
 #### `dim_products`
+
 Canonical product catalog with seasonal availability.
 
 **Columns:**
+
 - `record_id` - Surrogate key
 - `product_id` - Business key
 - `name` - Product name
@@ -48,9 +52,11 @@ Canonical product catalog with seasonal availability.
 - `to_date` - Product availability end date
 
 #### `order_lines`
+
 Exploded fact table with 1-5 lines per order.
 
 **Columns:**
+
 - `order_id` - Order identifier
 - `order_date` - Transaction date
 - `location_record_id` - FK to dim_locations
@@ -138,20 +144,26 @@ benchbox run --benchmark coffeeshop --platform duckdb --queries SA1,SA2,SA3
 ## Use Cases
 
 ### Retail Analytics
+
 Test queries for:
+
 - Sales performance tracking
 - Product mix optimization
 - Regional performance comparison
 - Trend analysis and forecasting
 
 ### Hybrid Workloads
+
 The benchmark combines:
+
 - **Transactional patterns**: Order entry and updates
 - **Analytical queries**: Aggregations and trends
 - **Mixed complexity**: Simple lookups to complex analytics
 
 ### Real-World Validation
+
 Validate performance with:
+
 - Realistic data distributions
 - Seasonal patterns
 - Regional variations
@@ -198,6 +210,7 @@ ORDER BY revenue DESC;
 ## Platform Support
 
 ### Fully Supported
+
 - DuckDB
 - SQLite
 - ClickHouse

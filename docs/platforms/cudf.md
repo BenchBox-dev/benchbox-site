@@ -211,11 +211,12 @@ Verify the CUDA installation, then set the CUDA path.
 
 ### Out of GPU Memory
 
-```
+```text
 cudf.errors.MemoryError: std::bad_alloc: out of memory
 ```
 
 **Solutions:**
+
 1. Reduce scale factor: `--scale 0.1`
 2. Enable spill to host: `--platform-option spill_to_host=true`
 3. Use RMM memory pool (pre-allocated pool reduces fragmentation)

@@ -1,4 +1,5 @@
 (cli-shell)=
+
 # `shell` - Interactive SQL Shell
 
 ```{tags} reference, cli, intermediate
@@ -15,6 +16,7 @@ benchbox shell [OPTIONS]
 ## Core Options
 
 **Database Discovery:**
+
 - `--list`: List available databases and exit
 - `--last`: Connect to last modified database
 - `--benchmark TEXT`: Filter by benchmark name when discovering databases
@@ -22,10 +24,12 @@ benchbox shell [OPTIONS]
 - `--output PATH`: Output directory to search for databases (default: benchmark_runs)
 
 **Direct Connection:**
+
 - `--platform TEXT`: Platform type (duckdb, sqlite, clickhouse) - auto-detected if not specified
 - `--database PATH`: Database file path or connection string
 
 **Remote Connection (ClickHouse):**
+
 - `--host TEXT`: Database host
 - `--port INTEGER`: Database port
 - `--user TEXT`: Database username
@@ -34,10 +38,12 @@ benchbox shell [OPTIONS]
 ## Supported Platforms
 
 **Local Databases:**
+
 - **DuckDB** - Full interactive shell with `.tables`, `.schema`, `.info` commands
 - **SQLite** - Full interactive shell with SQLite-specific commands
 
 **Remote Databases:**
+
 - **ClickHouse** - Connection guidance (native client integration coming soon)
 
 ## Usage Examples
@@ -166,12 +172,14 @@ duckdb> SELECT COUNT(*) FROM orders;
 ## Database Discovery
 
 BenchBox automatically discovers databases in standard locations:
+
 - `{output}/datagen/**/*.{duckdb,db}` (recursive search)
 - `{output}/databases/*.{duckdb,db}` (flat search)
 
 Default output directory: `benchmark_runs/`
 
 Discovery includes:
+
 - Platform detection from file extension
 - Metadata parsing from filename (benchmark, scale factor, tuning mode)
 - File size and modification time
@@ -180,6 +188,7 @@ Discovery includes:
 ## Interactive Selection
 
 When multiple databases match your criteria:
+
 1. BenchBox displays a table with all matching databases
 2. Shows: benchmark, scale factor, platform, tuning mode, size, modification date, path
 3. Prompts you to select by number
@@ -195,6 +204,7 @@ When multiple databases match your criteria:
 ## Troubleshooting
 
 **No databases found:** verify that databases exist, then run a benchmark first to create one.
+
 ```bash
 ls benchmark_runs/datagen/
 
@@ -202,6 +212,7 @@ benchbox run --benchmark tpch --scale 0.1 --platform duckdb
 ```
 
 **Wrong database selected:** use more specific filters, or connect directly.
+
 ```bash
 benchbox shell --benchmark tpch --scale 1.0 --platform duckdb
 
@@ -209,6 +220,7 @@ benchbox shell --database /path/to/specific/database.duckdb
 ```
 
 **Connection errors:**
+
 - Ensure platform dependencies are installed (`benchbox check-deps`)
 - Verify database file exists and is not corrupted
 - Check file permissions

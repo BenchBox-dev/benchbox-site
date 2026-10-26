@@ -32,7 +32,7 @@ By default every BenchBox runtime artefact lands under the shared
 for a clone at `<checkout-parent>/BenchBox`, and the same root for every sibling
 linked worktree:
 
-```
+```text
 <checkout-parent>/benchmark_runs/
 ├── datagen/                       # generated source data; preserved across runs
 ├── databases/                     # loaded DBs; pruned at safe reuse boundaries
@@ -74,12 +74,12 @@ definition).
 The guardrails are **report-only** — they detect and name the offending paths
 but never delete or move artifacts.
 
-* The UAT runner (`tests/uat/runner.py`) snapshots the worktree-local
+- The UAT runner (`tests/uat/runner.py`) snapshots the worktree-local
   `benchmark_runs/` before each external-root cell and fails loudly if it
   grows, naming both the unexpected local path and the configured external
   root. The guard resolves the enclosing Git worktree, so launching UAT from a
   nested directory does not create a second, misleading local boundary.
-* `make uat-artifact-hygiene` audits the live worktree and is wired into `make
+- `make uat-artifact-hygiene` audits the live worktree and is wired into `make
   pr-preflight`. It is a no-op when the resolved root is inside the worktree,
   or when the run starts outside a Git work tree with no explicit external
   root configured (the cwd-local default is preserved). An explicit external

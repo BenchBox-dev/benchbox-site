@@ -148,16 +148,19 @@ Fabric uses Capacity Units (CU) for billing:
 ### Finding IDs
 
 **Workspace ID**: Found in the workspace URL:
-```
+
+```text
 https://app.fabric.microsoft.com/groups/{WORKSPACE_ID}/...
 ```
 
 **Lakehouse ID**: Found in the lakehouse URL:
-```
+
+```text
 https://app.fabric.microsoft.com/groups/.../lakehouses/{LAKEHOUSE_ID}
 ```
 
 Or via PowerShell:
+
 ```powershell
 Get-FabricWorkspace
 
@@ -169,21 +172,25 @@ Get-FabricLakehouse -WorkspaceId $workspaceId
 ### Common Issues
 
 **Authentication fails:**
+
 - Run `az login` for interactive authentication
 - Check service principal credentials if using automation
 - Verify tenant ID is correct
 
 **Workspace not found:**
+
 - Verify workspace ID is a valid GUID
 - Check you have access to the workspace
 - Ensure workspace has Fabric capacity assigned
 
 **Session creation fails:**
+
 - Check Fabric capacity is running (not paused)
 - Verify Spark pool is enabled in workspace
 - Review Fabric capacity limits
 
 **Query timeout:**
+
 - Increase `timeout_minutes` for large scale factors
 - Check for data skew in queries
 - Consider using larger capacity SKU

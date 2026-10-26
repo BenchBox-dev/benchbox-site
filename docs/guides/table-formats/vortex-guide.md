@@ -90,7 +90,7 @@ These are significant claims. Our initial testing shows:
 
 ### File Structure
 
-```
+```text
 file.vortex
 ├── Magic: VTXF (4 bytes)
 ├── Data segments (compressed column chunks)
@@ -111,11 +111,13 @@ The postscript design is notable: complete footer information loads within 64KB,
 Vortex differs from Parquet in how it encodes data:
 
 **Parquet approach:**
+
 - Fixed encoding schemes per logical type
 - Dictionary, RLE, delta encoding
 - Compression applied after encoding
 
 **Vortex approach:**
+
 - Composable encodings that chain together
 - Type-aware compressors (FSST for strings, ALP for integers)
 - Per-segment compression selection

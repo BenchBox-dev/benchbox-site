@@ -8,6 +8,7 @@ Learn how to interpret BenchBox output and what the metrics mean.
 ## Result Overview
 
 After running a benchmark, BenchBox produces:
+
 - **Console summary** - Quick overview of timing and validation
 - **JSON results** - Detailed metrics for each query
 - **Manifest files** - Data generation metadata
@@ -76,12 +77,13 @@ A failed query carries an `ERROR` status and an error message instead of timing 
 
 For TPC-H/TPC-DS, BenchBox calculates Power@Size and Throughput@Size:
 
-```
+```text
 Power@Size      = (SF × 3600) / geometric_mean(query times, final iteration)
 Throughput@Size = (Q × SF × 3600) / T_throughput
 ```
 
 Where:
+
 - `SF` = Scale Factor (0.01, 0.1, 1, 10, etc.)
 - `Q` = queries scored in the throughput test: 22 × streams for TPC-H, 99 × streams for TPC-DS
 - `T_throughput` = wall-clock duration of the throughput test, from the first stream's first query to the last stream's last query (connection setup is excluded)
@@ -94,7 +96,7 @@ BenchBox exports QphH@Size only for an official TPC-H run with all 22 power quer
 
 Not calculated by BenchBox (requires cost data), but you can derive it:
 
-```
+```text
 Price/Performance = (Platform Cost) / Throughput@Size
 ```
 
@@ -108,6 +110,7 @@ benchbox run --platform sqlite --benchmark tpch --output ./benchmark_runs
 Find the two result files with `benchbox results --limit 2` and pass them to `benchbox compare`.
 
 The comparison shows:
+
 - Per-query timing differences
 - Relative speedup/slowdown
 - Validation status alignment
@@ -116,7 +119,7 @@ The comparison shows:
 
 BenchBox stores results in the runs root: `BENCHBOX_OUTPUT_DIR` when set, otherwise `benchmark_runs/` next to your checkout:
 
-```
+```text
 benchmark_runs/
 ├── results/                                  # JSON result files
 │   └── tpch_sf001_duckdb_sql_<timestamp>_<id>.json

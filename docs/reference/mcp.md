@@ -109,7 +109,7 @@ The inspector provides a web UI to browse tools, test calls, and view responses.
 
 `benchbox-mcp` supports explicit flags and environment-variable fallback.
 
-**CLI flags**
+**CLI flags:**
 
 | Flag | Description |
 |------|-------------|
@@ -122,7 +122,7 @@ The inspector provides a web UI to browse tools, test calls, and view responses.
 | `--streamable-http-path` | Streamable HTTP endpoint path (default `/mcp`) |
 | `--security-config` | Remote-only JSON policy for SDK auth, tenancy, authorization, admission, and audit |
 
-**Environment variables**
+**Environment variables:**
 
 | Variable | Default | Description |
 |----------|---------|-------------|
@@ -141,7 +141,7 @@ immediately stale. BenchBox exports only bounded allow-listed MCP span fields;
 tool arguments, result payloads, identities, authorization data, credentials,
 and raw database URLs are excluded.
 
-**Precedence**
+**Precedence:**
 
 1. Explicit MCP flag (`--results-dir`, `--charts-dir`, `--log-level`)
 2. Specific env var (`BENCHBOX_RESULTS_DIR`, `BENCHBOX_CHARTS_DIR`, `BENCHBOX_LOG_LEVEL`)
@@ -217,7 +217,7 @@ does not expose `dry_run` or `validate_only`. In remote mode, a normal
 `run_benchmark` call is rejected immediately; its `dry_run` and `validate_only`
 modes remain available because they do not hold the request for execution.
 
-**MCP run parameter schema**
+**MCP run parameter schema:**
 
 | Name | Type | Required | Default | Description |
 |---|---|---:|---|---|
@@ -234,7 +234,7 @@ modes remain available because they do not hold the request for execution.
 | `link_probe` | boolean | No | `true` | Measure post-benchmark statement overhead (6 metered `SELECT 1` statements on billable warehouses). Set `false` to skip; equivalent to the CLI `--no-link-probe` flag. |
 | `platform_options` | object or null | No | `null` | Typed, bounded, non-secret settings approved for the selected platform; credentials, endpoints, paths, and package-install controls are rejected. |
 
-**Behavior**
+**Behavior:**
 
 - `validate_only=true` returns configuration validity, resolved execution mode,
   errors, and warnings.
@@ -323,7 +323,7 @@ modes remain available because they do not hold the request for execution.
   different trust boundary, so `run_benchmark`, durable job publication, and
   `analyze_results` comparisons all export with anonymization enabled there.
 
-**Scoped-surface omission ledger**
+**Scoped-surface omission ledger:**
 
 Some CLI commands and `benchbox run` controls are not available over MCP. The
 tables below list each one with one of three reasons:
@@ -346,7 +346,7 @@ The first table maps each of the 12 local MCP tools to its CLI counterparts, or
 `none`. The second lists the CLI command families that have no MCP tool, with
 the reason.
 
-**MCP tool → CLI mapping (12 local tools)**
+**MCP tool → CLI mapping (12 local tools):**
 
 | MCP Tool | Category | CLI counterpart(s) | Notes |
 |---|---|---|---|
@@ -363,7 +363,7 @@ the reason.
 | `suggest_charts` | visualization | `benchbox visualize` | Suggests semantic chart types for result files. |
 | `generate_chart` | visualization | `benchbox visualize` | Generates ASCII charts; MCP is inline-only by contract, CLI may write files. |
 
-**CLI command families with no MCP tool**
+**CLI command families with no MCP tool:**
 
 | CLI command family | Tier | Reason |
 |---|---|---|
@@ -595,12 +595,14 @@ and are discoverable at runtime.
 Analyze benchmark results and identify performance patterns.
 
 **Arguments (positional):**
+
 1. `benchmark` (default: "tpch")
 2. `platform` (default: "duckdb")
 3. `focus` (optional): Focus area like 'slowest_queries', 'memory', 'io'
 
 **Usage:**
-```
+
+```text
 /mcp__benchbox__analyze_results tpch duckdb slowest_queries
 ```
 
@@ -611,12 +613,14 @@ Analyze benchmark results and identify performance patterns.
 Compare benchmark performance across multiple platforms.
 
 **Arguments (positional):**
+
 1. `benchmark` (default: "tpch")
 2. `platforms` (default: "duckdb,polars-df"): Comma-separated platform names
 3. `scale_factor` (default: 0.01)
 
 **Usage:**
-```
+
+```text
 /mcp__benchbox__compare_platforms tpch "duckdb,polars-df,sqlite" 0.1
 ```
 
@@ -627,12 +631,14 @@ Compare benchmark performance across multiple platforms.
 Identify performance regressions between benchmark runs.
 
 **Arguments (positional):**
+
 1. `baseline_run` (optional): Baseline result file
 2. `comparison_run` (optional): Comparison result file
 3. `threshold_percent` (default: 10.0)
 
 **Usage:**
-```
+
+```text
 /mcp__benchbox__identify_regressions run1.json run2.json 5
 ```
 
@@ -643,12 +649,14 @@ Identify performance regressions between benchmark runs.
 Help plan a benchmark strategy for a specific use case.
 
 **Arguments (positional):**
+
 1. `use_case` (default: "testing"): One of 'testing', 'production', 'comparison', 'regression'
 2. `platforms` (optional): Comma-separated platform list
 3. `time_budget_minutes` (default: 30)
 
 **Usage:**
-```
+
+```text
 /mcp__benchbox__benchmark_planning comparison "duckdb,snowflake" 60
 ```
 
@@ -659,12 +667,14 @@ Help plan a benchmark strategy for a specific use case.
 Diagnose and resolve benchmark failures.
 
 **Arguments (positional):**
+
 1. `error_message` (optional): Error message from failed run
 2. `platform` (optional): Platform where failure occurred
 3. `benchmark` (optional): Benchmark that failed
 
 **Usage:**
-```
+
+```text
 /mcp__benchbox__troubleshoot_failure "Connection refused" snowflake tpch
 ```
 
@@ -675,18 +685,21 @@ Diagnose and resolve benchmark failures.
 Execute a planned benchmark with validation and dependency checks.
 
 **Arguments (positional):**
+
 1. `platform` (default: "duckdb"): Target platform
 2. `benchmark` (default: "tpch"): Benchmark to run
 3. `scale_factor` (default: 0.01): Data scale factor
 4. `queries` (optional): Query subset (e.g., "1,5,10")
 
 **Usage:**
-```
+
+```text
 /mcp__benchbox__benchmark_run duckdb tpch 0.1
 /mcp__benchbox__benchmark_run snowflake tpcds 1 "1,5,10"
 ```
 
 This prompt:
+
 1. Validates the configuration
 2. Checks dependencies
 3. Runs the benchmark
@@ -699,16 +712,19 @@ This prompt:
 Get tuning recommendations for a specific platform.
 
 **Arguments (positional):**
+
 1. `platform` (default: "duckdb"): Platform to tune
 2. `workload` (optional): Workload characteristics description
 
 **Usage:**
-```
+
+```text
 /mcp__benchbox__platform_tuning duckdb
 /mcp__benchbox__platform_tuning snowflake "heavy aggregation workload"
 ```
 
 This prompt provides:
+
 1. Memory configuration recommendations
 2. Parallelism settings
 3. I/O optimization
@@ -733,6 +749,7 @@ All tools return structured error information:
 ```
 
 Common error types:
+
 - **ConfigurationError**: Invalid platform or benchmark configuration
 - **DependencyError**: Missing required dependencies
 - **FileNotFoundError**: Result file not found

@@ -214,6 +214,7 @@ benchbox run --platform trino --benchmark tpch \
 ```
 
 Trino provides detailed EXPLAIN output including:
+
 - Distributed query plan fragments
 - Data exchange patterns
 - Join strategies

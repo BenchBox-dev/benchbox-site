@@ -77,7 +77,7 @@ For `pg-duckdb` the call returns `["pg-mooncake"]`.
 
 All PostgreSQL extensions follow the same adapter pattern:
 
-```
+```text
 PostgreSQLAdapter (base)
 ├── TimescaleDBAdapter (hypertables, compression)
 ├── PgDuckDBAdapter (DuckDB execution, MotherDuck)

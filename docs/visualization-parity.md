@@ -35,6 +35,7 @@ Each file is a JSON contract for one chart math helper:
 **New chart types are added to `chart_types.py` first; the explorer follows.**
 
 When you add a new chart type:
+
 1. Register it in `benchbox/core/visualization/chart_types.py`.
 2. Add the corresponding Python math helper to `generate_visualization_fixtures.py`.
 3. Run `make parity-fixtures` to regenerate fixtures.
@@ -97,16 +98,19 @@ When `make parity-check` fails in CI, use this decision tree:
 Check `git diff` to see if the Python function or the TS helper was modified.
 
 **2. Python changed intentionally** (you updated the math in `generate_visualization_fixtures.py` or the referenced Python module): regenerate the fixtures from the new Python source, confirm that no drift remains, and check that the TS side still passes.
+
 ```bash
 make parity-fixtures
 make parity-check
 ```
 
 **3. TypeScript changed intentionally** (you updated a helper in `chartMath.ts`):
+
 - The fixture is the Python source of truth - do NOT regenerate fixtures.
 - Fix the TS helper in the site repository until its parity suite passes.
 - If the TS change was intentional AND correct, update the Python reference to match, then regenerate.
 
 **4. Neither changed (CI flake)**:
+
 - Re-run the job.
 - If persistent: check for float platform differences (rare; tolerance is 1e-9).

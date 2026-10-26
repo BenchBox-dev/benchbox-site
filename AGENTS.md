@@ -84,6 +84,9 @@ versioned core bundle; it reads nothing else from core.
 - Edit links point at this repository. Generated pages (`benchmarks/queries/`,
   `compat/`, `reference/tuning-platform-support.md`) and renderer pages carry
   none.
+- `npm run lint:docs` runs markdown lint and spelling over `docs/`. Fix
+  findings; add a genuine word to `cspell-words.txt` instead of exempting a
+  page. `ci` runs it.
 
 ## Deploys
 

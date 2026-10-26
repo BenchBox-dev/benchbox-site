@@ -48,27 +48,27 @@ benchbox run \
 
 1. Run baseline:
 
-```bash
-benchbox run --platform snowflake --benchmark tpch --scale 1 --tuning notuning
-```
+   ```bash
+   benchbox run --platform snowflake --benchmark tpch --scale 1 --tuning notuning
+   ```
 
 2. Run platform-native tuning:
 
-```bash
-benchbox run --platform snowflake --benchmark tpch --scale 1 --tuning ./snowflake-native.yaml
-```
+   ```bash
+   benchbox run --platform snowflake --benchmark tpch --scale 1 --tuning ./snowflake-native.yaml
+   ```
 
 3. Run deep-sorted ingestion:
 
-```bash
-benchbox run --platform snowflake --benchmark tpch --scale 1 --tuning ./snowflake-sorted.yaml
-```
+   ```bash
+   benchbox run --platform snowflake --benchmark tpch --scale 1 --tuning ./snowflake-sorted.yaml
+   ```
 
 4. Compare result files:
 
-```bash
-benchbox compare <baseline.json> <native.json> <sorted.json>
-```
+   ```bash
+   benchbox compare <baseline.json> <native.json> <sorted.json>
+   ```
 
 ## Platform Notes
 

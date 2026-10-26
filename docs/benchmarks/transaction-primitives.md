@@ -18,6 +18,7 @@ This benchmark is designed for databases with robust transaction support (Postgr
 > **Platform Availability**
 >
 > Transaction Primitives is designed for ACID-compliant OLTP databases. BenchBox supports:
+>
 > - **PostgreSQL**: Full transaction support including savepoints (`--platform postgresql`)
 > - **TimescaleDB**: PostgreSQL-based with time-series extensions (`--platform timescaledb`)
 > - **DuckDB**: Basic transactions but no savepoints (`--platform duckdb`)
@@ -139,18 +140,22 @@ Unlike Write Primitives (which focuses on write operations without strict transa
 ### Platform Requirements
 
 **Fully Supported Platforms**:
+
 - PostgreSQL ✓ (Full transaction support including savepoints)
 - TimescaleDB ✓ (PostgreSQL-based with time-series extensions)
 
 **Limited Transaction Support**:
+
 - DuckDB ⚠️ (Supports basic transactions in single-connection mode, but no savepoints)
 - SQLite ⚠️ (Supports transactions but limited concurrency)
 
 **Planned Platforms** (adapters not yet available):
+
 - MySQL (see [Development Roadmap](../development/roadmap.md))
 - SQL Server
 
 **Not Suitable For**:
+
 - ClickHouse ❌ (No multi-statement transactions)
 - BigQuery ❌ (Limited transaction support)
 - Snowflake ❌ (Implicit transactions only)
@@ -166,6 +171,7 @@ Unlike Write Primitives (which focuses on write operations without strict transa
 ### Validation Approach
 
 Each operation includes:
+
 1. **Pre-execution validation**: Check initial state
 2. **Transaction execution**: Run multi-statement transaction
 3. **Post-execution validation**: Verify expected state changes
@@ -198,6 +204,7 @@ benchbox run --benchmark transaction_primitives --platform duckdb \
 ```
 
 **Important Notes**:
+
 - Requires TPC-H data to be loaded first
 - Requires database with full transaction support
 - Some operations (savepoints) may not work on all platforms
@@ -217,6 +224,7 @@ TransactionPrimitives(
 ```
 
 **Parameters**:
+
 - `scale_factor`: TPC-H scale factor (must match TPC-H data)
 - `output_dir`: Directory for data files. Defaults to the shared TPC-H data
   directory, `benchmark_runs/datagen/tpch_<scale>` (or under
@@ -303,6 +311,7 @@ when no auxiliary files were produced.
 Result object returned by `execute_operation` and `run_benchmark`.
 
 **Fields**:
+
 - `operation_id: str` - Operation identifier
 - `success: bool` - Whether operation succeeded
 - `write_duration_ms: float` - Execution time in milliseconds
@@ -497,6 +506,7 @@ results = bench.run_benchmark(conn, operation_ids=supported_ops)
 **Issue**: Transaction commits but validation fails.
 
 **Possible causes**:
+
 1. **Concurrent modifications**: Other connections modifying data
 2. **Timing issues**: Validation running before commit completes
 3. **Isolation level effects**: Different isolation levels affecting visibility
@@ -508,11 +518,13 @@ results = bench.run_benchmark(conn, operation_ids=supported_ops)
 **Issue**: Transaction operations running slower than expected.
 
 **Checks**:
+
 1. **Transaction log size**: Large transaction logs can slow commits
 2. **Lock contention**: Concurrent transactions causing waits
 3. **Disk I/O**: Transaction durability requires disk writes
 
 **Optimization**: Use smaller scale factors for faster testing.
+
 ```python
 bench = TransactionPrimitives(scale_factor=0.001)
 ```
@@ -536,6 +548,7 @@ Transaction Primitives was split from Write Primitives v2 to separate concerns:
 - **Operations**: 23 operations focused on transaction behavior
 
 **Use both benchmarks together** for comprehensive database testing:
+
 - Write Primitives for individual operation performance
 - Transaction Primitives for ACID guarantees and transaction control
 

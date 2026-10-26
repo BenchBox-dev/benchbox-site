@@ -6,6 +6,7 @@
 Commands for creating and managing tuning configurations for SQL and DataFrame platforms.
 
 (cli-tuning-resolution)=
+
 ## How `--tuning` is resolved
 
 `benchbox run --tuning VALUE` accepts the keywords `notuning`, `tuned`, `auto`,
@@ -96,6 +97,7 @@ environment variables that affect resolution; see
 [Configuration - Environment Variables](configuration.md#cli-env-vars).
 
 (cli-tuning-init)=
+
 ## `tuning init` - Create Tuning Configuration
 
 Generate sample unified tuning configurations for specific platforms.
@@ -122,6 +124,7 @@ benchbox tuning init --platform snowflake \
 The first command creates a sample tuning configuration for Databricks and writes `databricks_tuning.yaml`. The second creates one for Snowflake at a custom output path.
 
 (cli-tuning-dataframe)=
+
 ## DataFrame Tuning via `tuning` Commands
 
 The unified `tuning` command group handles both SQL and DataFrame platforms.
@@ -210,6 +213,7 @@ DataFrame tuning supports these configuration sections:
 For complete configuration reference, see [DataFrame Platforms - Tuning](../../platforms/dataframe.md#dataframe-tuning).
 
 (cli-tuning-list)=
+
 ## `tuning list` - List Available Templates
 
 List the tuning templates found under `examples/tunings/` (cwd-relative,
@@ -234,6 +238,7 @@ benchbox tuning list --benchmark tpcds
 - `--benchmark TEXT`: Filter to a specific benchmark (e.g. `tpch`, `tpcds`)
 
 (cli-tuning-show)=
+
 ## `tuning show` - Show Resolved Tuning Configuration
 
 Show what a given `--tuning` value would actually resolve to for a
@@ -254,6 +259,7 @@ benchbox tuning show notuning
 - `--benchmark TEXT`: Target benchmark, used for template discovery
 
 (cli-tuning-platforms)=
+
 ## `tuning platforms` - List Platform Tuning Capabilities
 
 Show which SQL and DataFrame platforms support tuning and a summary of their

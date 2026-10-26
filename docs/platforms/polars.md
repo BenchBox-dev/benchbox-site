@@ -182,6 +182,7 @@ df = (
 Polars optimizes the entire query plan, and `.collect()` executes the optimized plan.
 
 Optimizations include:
+
 - Predicate pushdown
 - Projection pushdown
 - Common subexpression elimination

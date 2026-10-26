@@ -122,11 +122,12 @@ The `singlestoredb` connection is created with `local_infile=True` to enable loc
 
 ## Dependencies
 
-```
+```text
 singlestoredb>=1.0.0
 ```
 
 Install via:
+
 ```bash
 uv add benchbox --extra singlestore
 ```
@@ -134,16 +135,19 @@ uv add benchbox --extra singlestore
 ## Troubleshooting
 
 **`ImportError: singlestoredb not available`** - Install the dependency:
+
 ```bash
 uv add singlestoredb
 ```
 
 **Connection refused on port 3306** - Verify SingleStore is running and the host/port are correct:
+
 ```bash
 mysql -h $SINGLESTORE_HOST -P $SINGLESTORE_PORT -u $SINGLESTORE_USER -p -e "SELECT 1"
 ```
 
 **`LOAD DATA LOCAL INFILE` disabled** - Ensure the server has `local_infile` enabled:
+
 ```sql
 SET GLOBAL local_infile = ON;
 ```

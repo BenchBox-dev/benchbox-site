@@ -66,7 +66,7 @@ row/column locators; the rest are counted.
 
 ## Running locally
 
-```
+```bash
 uv run -- python -m pytest tests/unit/core/test_cross_platform_validation.py -q
 ```
 

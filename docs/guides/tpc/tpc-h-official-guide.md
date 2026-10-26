@@ -5,7 +5,7 @@
 ```{tags} advanced, guide, tpc-h, validation
 ```
 
-This guide documents BenchBox's TPC-H Power@Size and Throughput@Size phases and its opt-in RF1/RF2 integration. QphH@Size is emitted only when the required evidence is present; see [QphH@Size](#qphh-size).
+This guide documents BenchBox's TPC-H Power@Size and Throughput@Size phases and its opt-in RF1/RF2 integration. QphH@Size is emitted only when the required evidence is present; see [QphH@Size](tpc-h-official-guide.md#qphh-size).
 
 > **Derived results.** Derived from TPC-H. Results produced by BenchBox do not comply with the TPC-H Specification and must not be compared with official TPC-H results. The TPC publishes official TPC-H results only after an audit.
 
@@ -96,6 +96,7 @@ print(f"Success: {raw['summary']['validation']}")
 ### Creating a Benchmark Instance
 
 The parameters are:
+
 - `scale_factor`: the scale factor (1.0 is about 1 GB).
 - `output_dir`: the directory for generated data.
 
@@ -127,6 +128,7 @@ result = official.run_official_benchmark(connection_factory, config, adapter=ada
 ```
 
 The parameters are:
+
 - `connection_factory`: the database connection factory.
 - `config`: a `TPCHOfficialBenchmarkConfig` (stream count, seed, validation, audit trail).
 - `adapter`: the platform adapter (required for stream isolation).
@@ -192,17 +194,19 @@ This example modifies the database in both phases. The next run must use the nex
 
 ## Power@Size and Throughput@Size Calculation
 
-Power@Size and Throughput@Size are calculated separately. QphH@Size is emitted only when the official-run and refresh-evidence gates in [QphH@Size](#qphh-size) pass.
+Power@Size and Throughput@Size are calculated separately. QphH@Size is emitted only when the official-run and refresh-evidence gates in [QphH@Size](tpc-h-official-guide.md#qphh-size) pass.
 
 ### Component Calculations
 
 **Power@Size:**
-```
+
+```text
 Power@Size = 3600 × Scale_Factor / geometric_mean(22 query times [+ RF1 and RF2 when enabled])
 ```
 
 **Throughput@Size:**
-```
+
+```text
 Throughput@Size = 22 × Num_Streams × 3600 × Scale_Factor / Throughput_Test_Time
 ```
 
@@ -211,6 +215,7 @@ When refresh is enabled, `Throughput_Test_Time` includes the concurrent refresh 
 ### Example Calculation
 
 For a throughput test with:
+
 - Scale Factor: 1.0
 - Throughput Test Time: 150 seconds
 - Number of Streams: 2

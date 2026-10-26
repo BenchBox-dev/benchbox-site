@@ -22,6 +22,7 @@ uv add benchbox --extra cloud-spark-gcp
 ```
 
 This installs `google-cloud-dataproc` and `google-cloud-storage`.
+
 ## Prerequisites
 
 1. **GCP project** with Dataproc Serverless API enabled
@@ -160,7 +161,7 @@ Dataproc Serverless uses consumption-based billing:
 
 Required roles for the executing identity:
 
-```
+```text
 roles/dataproc.worker        # Submit and manage batches
 roles/storage.objectAdmin    # Read/write GCS staging
 ```
@@ -197,21 +198,25 @@ adapter = DataprocServerlessAdapter(
 ### Common Issues
 
 **Authentication fails:**
+
 - Run `gcloud auth application-default login`
 - Check service account permissions
 - Verify project ID is correct
 
 **Batch fails to start:**
+
 - Check Dataproc Serverless API is enabled
 - Verify IAM permissions
 - Review GCP quotas
 
 **Storage access denied:**
+
 - Check `roles/storage.objectAdmin` permission
 - Verify GCS bucket exists
 - Check bucket is in same project or cross-project permissions
 
 **Batch timeout:**
+
 - Increase `timeout_minutes` for large scale factors
 - Check for data skew issues
 - Review batch logs in GCP Console

@@ -1,4 +1,5 @@
 (cli-query-plans)=
+
 # `show-plan` / `plan-history` - Query Plans
 
 ```{tags} reference, cli, query-plans
@@ -19,10 +20,12 @@ benchbox show-plan --run <results.json> --query-id <id> [OPTIONS]
 ### Options
 
 **Required:**
+
 - `--run PATH`: Path to benchmark results JSON file
 - `--query-id TEXT`: Query ID to show plan for (e.g., `q05`, `1`)
 
 **Optional:**
+
 - `--format [tree|summary|json]`: Output format (default: `tree`)
 - `--no-properties`: Hide operator properties in tree view
 - `--compact`: Use compact tree format
@@ -62,10 +65,12 @@ benchbox plan-history --query-id <id> --history-dir <path> [OPTIONS]
 ### Options
 
 **Required:**
+
 - `--query-id TEXT`: Query ID to show history for (e.g., `q05`, `1`)
 - `--history-dir PATH`: Directory containing plan history files
 
 **Optional:**
+
 - `--limit INT`: Maximum number of entries to show (default: 20)
 - `--check-flapping`: Detect plan flapping (plans that change frequently between runs)
 

@@ -78,6 +78,7 @@ The first command runs TPC-H in ClickHouse local mode. The second runs it with a
 ### CLI Arguments
 
 #### Platform Selection
+
 - `--platform clickhouse-local` - Use ClickHouse local mode via chDB
 - `--platform clickhouse-server` - Use ClickHouse server (see [ClickHouse Server](clickhouse-server.md))
 - `--platform clickhouse-cloud` - Use ClickHouse Cloud (see [ClickHouse Cloud](clickhouse-cloud.md))
@@ -87,9 +88,11 @@ The bare `clickhouse` selector has been removed and now raises an error naming t
 ```
 
 #### Local Mode Specific Arguments
+
 - `--platform-option data_path=PATH` - Optional data path for file operations
 
 #### Server Mode Arguments
+
 - `--platform-option host=HOST` - ClickHouse server host
 - `--platform-option port=PORT` - ClickHouse server port
 - `--platform-option username=USER` - Username for server authentication
@@ -99,6 +102,7 @@ The bare `clickhouse` selector has been removed and now raises an error naming t
 ## Performance Characteristics
 
 ### Local Mode
+
 - **Memory Usage**: Lower baseline memory (~50-200MB)
 - **Startup Time**: No network connection setup required
 - **Query Execution**: Columnar engine for analytical workloads
@@ -106,6 +110,7 @@ The bare `clickhouse` selector has been removed and now raises an error naming t
 - **Concurrency**: Single-process, sequential query execution
 
 ### Server Mode
+
 - **Memory Usage**: Higher baseline (server overhead)
 - **Startup Time**: Network connection overhead
 - **Query Execution**: Same columnar engine, distributed architecture available
@@ -114,7 +119,8 @@ The bare `clickhouse` selector has been removed and now raises an error naming t
 
 ## When to Use Each Mode
 
-### Use Local Mode When:
+### Use Local Mode When
+
 - **Development & Testing**: Quick benchmark development and validation
 - **CI/CD Pipelines**: Automated testing without infrastructure setup
 - **Data Analysis**: Interactive data exploration and analysis
@@ -122,7 +128,8 @@ The bare `clickhouse` selector has been removed and now raises an error naming t
 - **Small to Medium Data**: Datasets under 10GB
 - **Single-User Scenarios**: Personal analysis and development
 
-### Use Server Mode When:
+### Use Server Mode When
+
 - **Production Benchmarking**: Large-scale production environment testing
 - **Large Datasets**: Working with multi-TB datasets
 - **Multi-User Access**: Shared benchmark environments
@@ -130,10 +137,10 @@ The bare `clickhouse` selector has been removed and now raises an error naming t
 - **Performance Testing**: Maximum throughput and scalability testing
 - **Cluster Configurations**: Testing distributed ClickHouse setups
 
-
 ## Examples
 
 ### TPC-H Benchmark
+
 ```bash
 benchbox run --platform clickhouse-local --benchmark tpch --scale 0.01
 
@@ -143,11 +150,13 @@ benchbox run --platform clickhouse-local --benchmark tpch --scale 1.0
 Scale 0.01 is a small scale for development. Scale 1.0 is a medium scale for testing.
 
 ### ClickBench Benchmark
+
 ```bash
 benchbox run --platform clickhouse-local --benchmark clickbench
 ```
 
 ### Custom Data Directory
+
 ```bash
 benchbox run --platform clickhouse-local --benchmark tpch --scale 0.1 \
   --platform-option data_path=/path/to/benchmark/data
@@ -158,41 +167,49 @@ benchbox run --platform clickhouse-local --benchmark tpch --scale 0.1 \
 ### Common Issues and Solutions
 
 #### 1. chDB Not Installed
-```
+
+```text
 Error: ClickHouse local mode requires chDB but it is not installed.
 ```
 
 **Solution:**
+
 ```bash
 uv add chdb
 ```
 
 #### 2. Platform Not Supported
-```
+
+```text
 Error: chDB installation failed or not compatible with your platform
 ```
 
 **Solution:**
+
 - Ensure you're on macOS or Linux (x86_64/ARM64)
 - Ensure your environment is synced with `uv sync --group dev`
 - Check Python version: `uv run -- python --version` (3.11+ required)
 
 #### 3. Memory Issues with Large Datasets
-```
+
+```text
 Error: Memory limit exceeded or system running out of memory
 ```
 
 **Solution:**
+
 - Use smaller scale factors for testing
 - Switch to server mode for large datasets
 - Monitor system memory usage
 
 #### 4. Query Performance Issues
-```
+
+```text
 Queries running slower than expected in local mode
 ```
 
 **Solution:**
+
 - Local mode is optimized for small-medium datasets
 - For large datasets or maximum performance, use server mode
 - Consider data partitioning or smaller scale factors
@@ -200,16 +217,19 @@ Queries running slower than expected in local mode
 ### Getting Help
 
 1. **Check Installation**: Verify chDB is properly installed
+
    ```bash
    uv run -- python -c "import chdb; print('chDB version:', chdb.chdb_version())"
    ```
 
 2. **Verbose Output**: Run with verbose logging
+
    ```bash
    benchbox run --platform clickhouse-local --benchmark tpch --scale 0.01 -v
    ```
 
 3. **Compare Deployments**: Test both platforms to isolate issues
+
    ```bash
    benchbox run --platform clickhouse-local --benchmark tpch --scale 0.01
 
@@ -284,6 +304,7 @@ benchmarks.
 ### File Formats
 
 Local mode supports all standard formats:
+
 - CSV, TSV (tab-separated)
 - Parquet (future enhancement)
 - JSON (future enhancement)
@@ -328,17 +349,20 @@ For full migration details from the legacy `clickhouse` selector, see the [Migra
 To contribute to ClickHouse local mode support:
 
 1. **Testing**: Run the ClickHouse local mode test suite
+
    ```bash
    uv run -- python -m pytest tests/unit/platforms/test_clickhouse_local.py -q
    ```
 
 2. **Development**: Set up development environment
+
    ```bash
    uv sync --group dev
    uv add chdb
    ```
 
 3. **Bug Reports**: Include system information and chDB version
+
    ```bash
    uv run -- python -c "import chdb, platform; print(f'chDB: {chdb.chdb_version()}, Platform: {platform.platform()}')"
    ```

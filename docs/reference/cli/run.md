@@ -1,4 +1,5 @@
 (cli-run)=
+
 # `run` - Run Benchmarks
 
 ```{tags} reference, cli, intermediate
@@ -15,6 +16,7 @@ benchbox run [OPTIONS]
 ## Core Options
 
 **Platform and Benchmark Selection:**
+
 - `--platform TEXT`: Platform type
   - SQL platforms: `duckdb`, `sqlite`, `databricks`, `bigquery`, `snowflake`, `redshift`, `clickhouse`, `datafusion`, `polars`, `trino`, `presto`
   - DataFrame platforms: `polars-df`, `pandas-df`, `pyspark-df`, `datafusion-df` (see [DataFrame Platforms](../../platforms/dataframe.md))
@@ -22,6 +24,7 @@ benchbox run [OPTIONS]
 - `--scale FLOAT`: Scale factor for data generation (default: 0.01)
 
 **Execution Control:**
+
 - `--phases TEXT`: Benchmark phases to run (default: "power")
   - Available phases:
     - `generate` - Generate benchmark data files
@@ -42,10 +45,12 @@ benchbox run [OPTIONS]
 - `--non-interactive`: Use defaults for all prompts (useful for automation)
 
 **Output and Paths:**
+
 - `--output TEXT`: Output directory (supports local paths and cloud storage: s3://, gs://, abfss://)
 - `--dry-run OUTPUT_DIR`: Preview configuration and queries without execution
 
 **Query Configuration:**
+
 - `--seed INTEGER`: An RNG seed for query parameter generation (power/throughput tests)
 - `--queries TEXT`: Run specific queries in specified order (comma-separated IDs: "1,6,17")
   - **Constraints**:
@@ -57,6 +62,7 @@ benchbox run [OPTIONS]
   - **TPC Compliance**: Breaks official TPC-H/TPC-DS compliance (overrides stream permutations)
   - **Valid Ranges**: TPC-H (1-22), TPC-DS (1-99), SSB (1-13)
   - **Examples**:
+
     ```bash
     benchbox run --platform duckdb --benchmark tpch --queries "Q6"
 
@@ -64,9 +70,11 @@ benchbox run [OPTIONS]
 
     benchbox run --platform duckdb --benchmark tpcds --queries "Q42" --verbose --phases power
     ```
+
     The first example runs a single query for debugging. The second runs several queries in the order given. The third adds verbose logging for development.
 
 **Tuning and Optimization:**
+
 - `--tuning TEXT`: Tuning mode (default: "notuning")
   - `tuned`: Enable optimizations (constraints for SQL, parallelism for DataFrame)
   - `notuning`: Disable for baseline comparison
@@ -74,12 +82,14 @@ benchbox run [OPTIONS]
   - Path to config file: Custom tuning configuration (YAML)
 
 **Data Compression (Advanced):**
+
 - `--compression TEXT`: Compression configuration (e.g., `zstd`, `zstd:9`, `gzip:6`, `none`)
   - Format: `TYPE` or `TYPE:LEVEL`
   - Types: `zstd` (default), `gzip`, `none`
   - Levels: 1-9 for gzip, 1-22 for zstd
 
 **Validation (Advanced):**
+
 - `--validation TEXT`: Validation mode
   - `exact`: Exact row count validation (default)
   - `loose`: Loose validation (±5% tolerance)
@@ -93,6 +103,7 @@ benchbox run [OPTIONS]
 - `--no-link-probe`: Disable the post-benchmark statement overhead probe (6 metered `SELECT 1` statements on billable warehouses)
 
 **Platform-Specific Configuration:**
+
 - `--platform-option KEY=VALUE`: Platform-specific option (can be used multiple times)
 - Use `benchbox platforms status <name>` to view platform details
 - Universal keys available on all platforms:
@@ -102,6 +113,7 @@ benchbox run [OPTIONS]
 - Athena Spark only: `runtime_version` - record the Spark engine version you expect (e.g. `PySpark engine version 3`); the workgroup sets the version and BenchBox records this value as requested
 
 **Benchmark-Specific Configuration:**
+
 - `--benchmark-option KEY=VALUE`: Benchmark-specific option (can be used multiple times)
 - Run `benchbox run --help-topic benchmarks` to see all available options per benchmark
 - Selected benchmarks and their options:
@@ -141,10 +153,12 @@ benchbox run [OPTIONS]
   Most options also accept a hyphenated alias (e.g. `taxi-types` for `taxi_types`).
 
 **Logging and Output:**
+
 - `--verbose`, `-v`: Enable verbose logging (use `-vv` for very verbose)
 - `--quiet`, `-q`: Suppress all output (overrides verbose flags)
 
 **Help System:**
+
 - `-h, --help`: Show common options
 - `--help-topic all`: Show all options including advanced
 - `--help-topic examples`: Show categorized usage examples
@@ -284,18 +298,21 @@ The examples, in order:
 ## Table Storage Options
 
 **Table Mode:**
+
 - `--table-mode [native|external]`: How tables are created (default: `native`)
   - `native`: Standard materialized tables in the target database
   - `external`: External table or view references (e.g., Parquet-backed)
   - **Note:** Incompatible with `--tuning tuned` when set to `external`
 
 **Table Format:**
+
 - `--table-format TEXT`: Open table format for data files
   - Format: `FORMAT[:COMPRESSION[:PARTITION:COLS...]]`
   - Examples: `parquet`, `delta:snappy`, `iceberg:zstd`, `vortex`
   - Supported formats depend on the platform adapter
 
 **Pre-sorted Data:**
+
 - `--presort [parquet-sorted|delta-sorted|iceberg-sorted]`: Pre-sort data into open table formats
   - Only valid for TPC-H and TPC-DS benchmarks
   - TPC-H sorts on `lineitem.l_shipdate`; TPC-DS sorts on `store_sales.ss_sold_date_sk`
@@ -391,6 +408,7 @@ These flags control monitoring, progress display, memory handling, and caching b
 > [Query Plan Analysis → Literal normalization](../../features/query-plan-analysis.md#literal-normalization-seed-independent-fingerprints).
 
 (deprecated-run-official)=
+
 ## Deprecated: `run-official`
 
 `run-official {tpch|tpcds} [OPTIONS]` is a hidden, deprecated compatibility

@@ -28,13 +28,15 @@ benchbox run --platform duckdb --benchmark tpch --scale 0.01
 ```
 
 This command:
+
 - Generates TPC-H data at scale factor 0.01 (~10MB)
 - Loads data into DuckDB (stored in a database file inside the run output directory)
 - Executes all 22 TPC-H queries
 - Reports timing and validation results
 
 **Example output (your numbers will differ):**
-```
+
+```text
 Running TPC-H Power Test (Scale Factor: 0.01, Stream ID: 0)
 Warm-up runs: 1, Measurement runs: 3
 ...

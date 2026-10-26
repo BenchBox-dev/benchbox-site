@@ -183,7 +183,6 @@ Two tradeoffs were accepted when the envelope landed:
    `n_workers`/`threads_per_worker` with `use_distributed=false`) rather than
    silently skipping the envelope, so no bypass is introduced.
 
-
 ## Durable remote benchmark jobs
 
 Remote clients should use `start_benchmark` instead of holding a

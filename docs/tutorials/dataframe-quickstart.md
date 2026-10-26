@@ -43,6 +43,7 @@ The first command runs SQL execution on DuckDB. The second runs DataFrame execut
 BenchBox translates TPC-H queries into DataFrame operations:
 
 **SQL (TPC-H Q1):**
+
 ```sql
 SELECT l_returnflag, l_linestatus,
        SUM(l_quantity), SUM(l_extendedprice)
@@ -53,6 +54,7 @@ ORDER BY l_returnflag, l_linestatus
 ```
 
 **DataFrame (Polars):**
+
 ```python
 lineitem.filter(
     pl.col("l_shipdate") <= date(1998, 9, 2)

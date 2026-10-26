@@ -23,18 +23,23 @@ Conceptual documentation explaining BenchBox architecture, terminology, and desi
 BenchBox is designed around a few key concepts:
 
 ### Benchmarks
+
 Standard workloads that test database performance across different dimensions (analytics, transactions, data loading).
 
 ### Platforms
+
 Database adapters that execute benchmarks on specific database systems (DuckDB, Databricks, Snowflake, etc.).
 
 ### Execution Modes
+
 Different ways to run benchmarks:
+
 - **Power Test**: Sequential query execution measuring single-user performance
 - **Throughput Test**: Concurrent query streams measuring multi-user scalability
 - **Data Generation**: Creating benchmark datasets at various scale factors
 
 ### Results & Validation
+
 Structured output capturing execution metrics, query timings, and optional validation against expected results.
 
 ## Related Documentation

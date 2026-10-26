@@ -72,6 +72,7 @@ decision point. The inventory output was reviewed against the provisional taxono
 list was frozen before the engine was scaffolded.
 
 Acceptance criteria for freezing: the inventory must successfully classify at minimum:
+
 - The `benchmark_gate` site at `cli/commands/run.py:804`
 - The `QUERY_VARIANTS` / version-gated site at `core/vector_search/queries.py`
 
@@ -298,7 +299,7 @@ CompatibilityDecision(
 
 ## rule_id Format
 
-```
+```text
 {phase}.{platform}.{scope}.{slug}
 ```
 
@@ -310,6 +311,7 @@ CompatibilityDecision(
 | `slug` | Snake-case description of the rule | `first_n_columns_only`, `q9_percentile_syntax`, `lock_bypass` |
 
 Examples:
+
 - `schema_emit.starrocks.pk.first_n_columns_only`
 - `query_source.clickhouse.h2odb.q9_percentile_syntax`
 - `query_source.starrocks.h2odb.q9_percentile_syntax`
@@ -408,6 +410,7 @@ parity baseline for dual-run shadow-mode divergence review.
 ```
 
 Fields:
+
 - `schema_version`: integer; increment when the shape changes
 - `source_sql_hash`: SHA-256 of the query text before any compatibility decision
 - `decision`: one of the `SupportLevel` enum values
@@ -418,6 +421,7 @@ Fields:
 ### Version-Bump Protocol
 
 When the baseline schema changes:
+
 1. Rename old file: `baseline.v{N}.jsonl` → archived
 2. Create `baseline.v{N+1}.jsonl` with the new shape
 3. Update `baseline_tool.py` to emit the new version
@@ -427,6 +431,7 @@ When the baseline schema changes:
 ### Refresh Protocol
 
 The baseline is regenerated whenever:
+
 - A new platform is added to the test suite
 - A new benchmark is onboarded that has compatibility decisions
 - A rule is registered that changes an existing decision's `SupportLevel`
@@ -442,7 +447,7 @@ diff to detect drift.
 `_check_benchmark_platform_compatibility()` (`cli/commands/run.py:804`), **before** the SQL or
 DataFrame pipeline runs. This is the only place where `block_benchmark` fires.
 
-```
+```text
 CLI run command
     │
     └── _check_benchmark_platform_compatibility()
@@ -463,7 +468,7 @@ receives a `CompatibilityContext` and consults the registry before running a que
 query-execution phases only (`query_source`, `query_compile`, `query_adapter`,
 `execution_filter`); `benchmark_gate` is handled at CLI preflight above.
 
-```
+```text
 ┌──────────────┐    CompatibilityContext     ┌─────────────┐
 │ execution.py │ ──────────────────────────▶ │   Resolver  │
 │ (SQL head)   │ ◀── CompatibilityDecision── │             │
@@ -506,6 +511,7 @@ When multiple rules match the same `CompatibilityContext`, the most specific rul
 3. `platform` (most general)
 
 Within the same specificity tier:
+
 - Version-gated rules (rules with a `platform_version` constraint satisfying
   `context.platform_version`) take precedence over rules without a version constraint.
 - If `context.platform_version is None`, no version-gated rule fires for that context; the
@@ -520,7 +526,7 @@ a registry error and the resolver raises `CompatibilityRegistryConflict`.
 **A query may require multiple compatibility actions in a single execution pass - one per phase.**
 The pipeline calls the resolver independently at each phase, so actions compose sequentially:
 
-```
+```text
 query_source    → SELECT_VARIANT (pick H2O Q9 ClickHouse constant)
 query_compile   → NATIVE (variant is already in target dialect, skip sqlglot)
 query_adapter   → SET_SESSION_POLICY (joined_subquery_requires_alias=0)
@@ -679,6 +685,7 @@ Fabric Warehouse is **not** in this list - see resolution below.
 `schema=self.schema` (runtime adapter configuration, not SQL content) to `translate_ddl`.
 
 This is **operational context injection**, not a DDL compatibility rewrite:
+
 - It depends on `self.schema`, which is adapter state set from connection configuration.
 - The decision mirrors how catalog/schema setup is handled in other adapters: it stays in
   `create_schema()` as an operational responsibility.
@@ -689,6 +696,7 @@ It stays adapter state passed to `translate_ddl`. No `RewriteDDLPayload` extensi
 ### Config-Dependent Transforms (Databricks, Spark, Velox)
 
 Some DDL hooks depend on adapter config:
+
 - **Databricks** `translate_ddl` options: `TBLPROPERTIES` block conditional on `self.delta_auto_optimize`
 - **Spark** `translate_ddl` default layout: `USING DELTA|ICEBERG|ORC|PARQUET` selected by `self.table_format`
 - **Velox** `translate_ddl` default layout: `USING ORC|PARQUET` selected by `self.table_format`

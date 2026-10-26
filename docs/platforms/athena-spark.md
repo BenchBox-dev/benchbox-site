@@ -226,21 +226,25 @@ Athena Spark uses DPU-hour billing:
 ### Common Issues
 
 **Workgroup not Spark-enabled:**
+
 - Athena Spark requires a workgroup with Apache Spark engine
 - SQL workgroups will not work
 - Create a new Spark-enabled workgroup
 
 **Session fails to start:**
+
 - Check workgroup DPU limits
 - Verify IAM permissions for Athena and S3
 - Check service quotas
 
 **Calculation timeout:**
+
 - Increase `timeout_minutes` for large scale factors
 - Check session hasn't auto-terminated
 - Review calculation logs in CloudWatch
 
 **S3 access denied:**
+
 - Check S3 bucket permissions
 - Verify IAM role has S3 read/write access
 - Ensure bucket is in same region

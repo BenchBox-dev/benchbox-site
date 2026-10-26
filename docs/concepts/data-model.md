@@ -10,6 +10,7 @@ Understanding BenchBox's result schema, data structures, and serialization forma
 ## Overview
 
 BenchBox produces structured, machine-readable results that enable:
+
 - **Reproducibility**: Complete execution metadata for result verification
 - **Comparison**: Standardized format for cross-platform and temporal analysis
 - **Integration**: JSON schema compatible with analysis tools and databases
@@ -19,7 +20,7 @@ BenchBox produces structured, machine-readable results that enable:
 
 Result files use schema v2 (`"result_schema_version": "2.2"`):
 
-```
+```text
 Result file
 ├── run (id, timestamp, total_duration_ms, query_time_ms, iterations, streams)
 ├── benchmark (id, name, scale_factor, test_type, compliance_class)
@@ -45,6 +46,7 @@ Older files use schema v1; see [Result Schema v1 Reference](../reference/result-
 Top-level timing and counts.
 
 **Key Fields**:
+
 - `run.total_duration_ms`: end-to-end wall-clock time.
 - `run.query_time_ms`: time spent executing queries.
 - `run.iterations` / `run.streams`: measurement iterations and concurrent streams.
@@ -57,6 +59,7 @@ Top-level timing and counts.
 
 **Example** (trimmed from a real TPC-H SF0.01 DuckDB run; `tpc_metrics` shows the form current releases write for a
 subscale run):
+
 ```json
 {
   "result_schema_version": "2.2",
@@ -87,6 +90,7 @@ See: [Result Formats](../reference/result-formats.md)
 One entry per query execution (22 queries × (1 warm-up + 3 measurement) iterations = 88 entries here).
 
 **Structure**:
+
 ```python
 {
     "id": str,
@@ -103,6 +107,7 @@ One entry per query execution (22 queries × (1 warm-up + 3 measurement) iterati
 Field meanings: `id` is the query id (for example `"Q1"`); `ms` is execution time in milliseconds; `rows` is rows returned; `status` is SUCCESS, ERROR, or TIMEOUT; `run_type` is warmup or measurement; `test_type` is power or throughput.
 
 **Example**:
+
 ```json
 {
   "id": "Q1",
@@ -115,7 +120,6 @@ Field meanings: `id` is the query id (for example `"Q1"`); `ms` is execution tim
   "test_type": "power"
 }
 ```
-
 
 ### Execution Phases
 
@@ -132,6 +136,7 @@ Hardware and software context for reproducibility lives in `environment` (`os`, 
 Platform-specific metadata lives in `platform`: `driver_package`, resolved and actual driver versions, `execution_mode` (`sql` or `dataframe`), and the effective `config` (connection mode, memory limit, thread limit, and any `--platform-option` values).
 
 **Example** (trimmed from a real DuckDB run):
+
 ```json
 {
   "driver_package": "duckdb",
@@ -156,11 +161,13 @@ Correctness verification is the run-level `summary.validation` verdict (`passed`
 **Default output format** for all benchmark results.
 
 **Features**:
+
 - Human-readable
 - Standard library support (Python `json` module)
 - Compatible with analysis tools (jq, pandas, etc.)
 
 **Example**:
+
 ```bash
 cat results.json | jq '.queries[] | {id, ms}'
 ```
@@ -184,7 +191,8 @@ benchbox export results.json --format csv --output-dir ./
 This exports the query results to CSV.
 
 **CSV Columns** (from a real export):
-```
+
+```csv
 query_id,execution_time_ms,rows_returned,status,error_message,iteration,stream
 14,21.4,1,SUCCESS,,0,0
 2,12.8,4,SUCCESS,,0,0
@@ -217,6 +225,7 @@ df.to_parquet("results.parquet", compression="snappy")
 This converts results to Parquet using pandas. It loads the JSON results, extracts the query results, and saves them as a DataFrame in Parquet format.
 
 **Benefits**:
+
 - Compressed (smaller file size)
 - Column-oriented (fast analytical queries)
 - Schema evolution support
@@ -313,6 +322,7 @@ BenchBox uses schema versioning to manage result format evolution.
 **Current Version**: v2 (`result_schema_version: "2.2"`)
 
 **Schema Rules**:
+
 - New fields may be added (with defaults)
 - Existing fields won't be removed or renamed
 - Type changes are breaking (trigger major version)

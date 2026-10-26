@@ -64,7 +64,7 @@ visible per-row.
 
 A typical headline read of the footer:
 
-```
+```text
 # overall: total=376 submittable=364 clean=205 warning_only=0 error=159 refused-by-cli=12 validator_clean_rate=56.3%
 # platform=DuckDB: total=42 submittable=42 clean=9 validator_clean_rate=21.4%
 # benchmark=tpcds: total=84 submittable=72 clean=22 validator_clean_rate=30.6%

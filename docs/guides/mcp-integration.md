@@ -315,7 +315,7 @@ Claude will use `get_results()` to list recent runs, then `get_results(result_fi
 
 BenchBox provides reusable prompt templates for common analysis tasks. These are invoked as slash commands:
 
-```
+```text
 /mcp__benchbox__analyze_results tpch duckdb
 /mcp__benchbox__compare_platforms tpch "duckdb,polars-df" 0.1
 /mcp__benchbox__identify_regressions
@@ -326,7 +326,7 @@ BenchBox provides reusable prompt templates for common analysis tasks. These are
 
 MCP prompts use **positional arguments**, not named parameters:
 
-```
+```text
 # Correct - positional arguments separated by spaces
 /mcp__benchbox__compare_platforms tpch "duckdb,polars" 1
 
@@ -365,6 +365,7 @@ claude mcp add --transport stdio benchbox --scope project -- uv run python -m be
 ### Other Clients
 
 Most clients support:
+
 - **Project-level**: Configuration file in project root (e.g., `.opencode.json`)
 - **User-level**: Configuration in home directory (e.g., `~/.opencode/config.json`)
 
@@ -373,14 +374,17 @@ Most clients support:
 ### Server Not Starting
 
 1. Verify MCP dependencies are installed:
+
    ```bash
    uv sync --extra mcp
    ```
 
 2. Test the server directly:
+
    ```bash
    uv run python -m benchbox.mcp
    ```
+
    The server should start and wait for JSON-RPC input. Press Ctrl+C to exit.
 
 3. Check for import errors in the output.
@@ -407,6 +411,7 @@ If the client can't connect to the server:
 
 1. Ensure `uv` is in your PATH
 2. Try using absolute paths in configuration:
+
    ```json
    {
      "command": "/path/to/uv",
@@ -414,6 +419,7 @@ If the client can't connect to the server:
      "cwd": "/path/to/benchbox/project"
    }
    ```
+
 3. Check client logs for connection errors
 
 ## Related Documentation

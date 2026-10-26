@@ -116,7 +116,7 @@ schema_sql = benchmark.get_create_tables_sql(dialect="duckdb")
 print(schema_sql.splitlines()[:3])
 ```
 
-This prints the first three lines of the script: `CREATE TABLE trips (`, `  vendor_id INTEGER,` and `  pickup_datetime TIMESTAMP,`.
+This prints the first three lines of the script: `CREATE TABLE trips (`, `vendor_id INTEGER,` and `pickup_datetime TIMESTAMP,`.
 
 #### `H2ODB.get_schema`
 

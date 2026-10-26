@@ -1,4 +1,5 @@
 (cli-metrics)=
+
 # `metrics` - Performance Metrics
 
 ```{tags} reference, cli, metrics
@@ -20,7 +21,7 @@ Calculate Power@Size, Throughput@Size, and QphH@Size from TPC-H power and throug
 
 **Formula:**
 
-```
+```text
 Power@Size       = 3600 × SF / geometric_mean(RF1, final power iteration's 22 query times, RF2)
 Throughput@Size  = Queries × 3600 × SF / Throughput_Phase_Wall_Time
 QphH@Size        = sqrt(Power@Size × Throughput@Size), rounded to 0.1
@@ -35,10 +36,12 @@ benchbox metrics qphh --power-results <path> --throughput-results <path> [OPTION
 ```
 
 **Required:**
+
 - `--power-results PATH`: Path to power test results JSON file
 - `--throughput-results PATH`: Path to throughput test results JSON file
 
 **Optional:**
+
 - `--scale-factor FLOAT`: Scale factor (auto-detected from results if not provided)
 - `--format [text|json]`: Output format (default: `text`)
 - `--output PATH`: Save output to file

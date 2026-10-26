@@ -68,21 +68,21 @@ benchbox run \
 
 1. Z-ORDER run:
 
-```bash
-benchbox run --platform databricks --benchmark tpch --scale 1 --tuning ./databricks-zorder.yaml
-```
+   ```bash
+   benchbox run --platform databricks --benchmark tpch --scale 1 --tuning ./databricks-zorder.yaml
+   ```
 
 2. Liquid clustering run:
 
-```bash
-benchbox run --platform databricks --benchmark tpch --scale 1 --tuning ./databricks-liquid.yaml
-```
+   ```bash
+   benchbox run --platform databricks --benchmark tpch --scale 1 --tuning ./databricks-liquid.yaml
+   ```
 
 3. Compare outputs:
 
-```bash
-benchbox compare <zorder.json> <liquid.json>
-```
+   ```bash
+   benchbox compare <zorder.json> <liquid.json>
+   ```
 
 ## Result Metadata
 

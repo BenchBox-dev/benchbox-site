@@ -28,6 +28,7 @@ Modern data engineering teams face a choice between two paradigms:
 2. **DataFrame libraries** (Pandas, Polars, PySpark) - Query using native APIs
 
 Traditionally, comparing these approaches required:
+
 - Writing queries twice (SQL + DataFrame)
 - Custom benchmarking infrastructure
 - Non-standardized measurement methodologies
@@ -332,12 +333,14 @@ def q1_pandas_impl(ctx: DataFrameContext) -> Any:
 ### Polars DataFrame
 
 **Strengths:**
+
 - Lazy evaluation with query optimization
 - Excellent memory efficiency
 - Parallel execution by default
 - Fast file scanning with predicate pushdown
 
 **Best for:**
+
 - Medium to large datasets (up to ~100GB)
 - Complex analytical queries
 - Memory-constrained environments
@@ -345,11 +348,13 @@ def q1_pandas_impl(ctx: DataFrameContext) -> Any:
 ### Pandas DataFrame
 
 **Strengths:**
+
 - Familiar API for Python developers
 - Extensive ecosystem
 - Good for prototyping
 
 **Best for:**
+
 - Smaller datasets (up to ~10GB)
 - Quick iteration
 - Compatibility with existing codebases
@@ -363,7 +368,8 @@ python -c "from benchbox.platforms.dataframe import format_platform_status_table
 ```
 
 Example output:
-```
+
+```text
 DataFrame Platform Status
 ============================================================
 Platform        Family       Available  Version
@@ -587,21 +593,25 @@ BenchBox automatically detects:
 #### Platform-Specific Smart Defaults
 
 **Polars:**
+
 - Smart defaults no longer select an execution engine: `--tuning auto` and
   `--tuning tuned` leave the engine at `default` on every host. Pass
   `--execution-engine streaming` to stream explicitly.
 - Low memory: `chunk_size=50000`; high memory: `lazy_evaluation=true`
 
 **Pandas:**
+
 - Low memory: `dtype_backend="numpy_nullable"`, `memory_map=true`
 - Medium+ memory: `dtype_backend="pyarrow"` (2-5x faster for aggregations)
 
 **Dask:**
+
 - Workers set to CPU cores / 2
 - Threads per worker: 2
 - Memory limit per worker: available RAM / workers
 
 **cuDF:**
+
 - Small GPU (<8GB): `pool_type="managed"`, `spill_to_host=true`
 - Large GPU (≥8GB): `pool_type="pool"`, `spill_to_host=false`
 
@@ -629,7 +639,7 @@ benchbox tuning validate my_config.yaml --platform polars
 
 ### Platform Not Available
 
-```
+```text
 ValueError: Unknown DataFrame platform: polars-df
 ```
 
@@ -637,11 +647,12 @@ ValueError: Unknown DataFrame platform: polars-df
 
 ### Memory Errors with Pandas
 
-```
+```text
 MemoryError: Unable to allocate array
 ```
 
 **Solutions:**
+
 1. Reduce scale factor: `--scale 0.1`
 2. Switch to Polars: `--platform polars-df`
 3. Use PyArrow backend: `--platform-option dtype_backend=pyarrow`
@@ -651,6 +662,7 @@ MemoryError: Unable to allocate array
 For scale factors > 10:
 
 1. **Polars:** Run with the streaming engine
+
    ```bash
    --execution-engine streaming
    ```

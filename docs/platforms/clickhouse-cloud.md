@@ -195,33 +195,36 @@ benchbox run --platform clickhouse-cloud --benchmark tpch --scale 1.0
 
 ### Connection Refused
 
-```
+```text
 Error: Cannot connect to ClickHouse Cloud
 ```
 
 **Solutions:**
+
 1. Verify your host URL is correct (should end with `.clickhouse.cloud`)
 2. Check that your IP is allowed in the ClickHouse Cloud console
 3. Ensure the service is running (not paused)
 
 ### Authentication Failed
 
-```
+```text
 Error: Authentication failed for user 'default'
 ```
 
 **Solutions:**
+
 1. Verify your password is correct
 2. Check if the user has the required permissions
 3. Try resetting the password in the ClickHouse Cloud console
 
 ### Missing Host Configuration
 
-```
+```text
 Error: ClickHouse Cloud requires host configuration.
 ```
 
 **Solutions:**
+
 1. Set `CLICKHOUSE_CLOUD_HOST` environment variable
 2. Or use `--platform-option host=your-host.clickhouse.cloud`
 

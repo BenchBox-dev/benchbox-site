@@ -132,6 +132,7 @@ Before implementing a new platform adapter, ensure you have:
 ### DB API 2.0 Requirement
 
 BenchBox platform selection is based on the availability of a **robust Python library using DB API 2.0** (PEP 249). This standardized interface enables universal database access and simplifies platform integration. See the [DB API 2.0 documentation](db-api-2.md) for detailed information on:
+
 - Why DB API 2.0 is fundamental to BenchBox
 - How BenchBox uses DB API 2.0 protocols and patterns
 - Platform compliance levels and requirements
@@ -245,6 +246,7 @@ class NewDatabaseAdapter(PlatformAdapter):
 ```
 
 Declaring `driver_isolation_capability` is required, and CI tests validate it. Choose one of:
+
 - `SUPPORTED`: full driver isolation (DuckDB, DataFusion).
 - `FEASIBLE_CLIENT_ONLY`: the client can be isolated, but the engine version is external.
 - `NOT_FEASIBLE`: technical constraints prevent isolation (JVM, C libraries).
@@ -255,6 +257,7 @@ The remaining required methods are implemented in the following steps.
 ### Step 2: Implement Connection Management
 
 **Important**: Ensure the returned connection object is DB API 2.0 compliant. It must support either:
+
 1. Standard cursor pattern: `connection.cursor()` returning a cursor with `execute()` method
 2. Direct execute pattern: `connection.execute()` method available directly
 
@@ -487,6 +490,7 @@ family model below before deciding to consolidate logic.
 
 Engine-specific outliers should remain separate unless their full contracts are
 aligned:
+
 - `bigquery`: query jobs with bytes billed/slot metrics and table qualification.
 - `datafusion`: `SessionContext.sql().collect()` plus SQL compatibility rewrite
   pipeline.
@@ -496,6 +500,7 @@ aligned:
   (`execution_time`, `row_count`, `query_plan`).
 
 **Rule of thumb**:
+
 - Consolidate only within the same family and same output contract.
 - Keep different transport/protocol families distinct, even if control flow
   looks superficially similar.

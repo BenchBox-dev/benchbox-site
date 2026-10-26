@@ -124,29 +124,37 @@ These platforms are included in the base BenchBox installation with no additiona
 ### By Installation Complexity
 
 **Zero Config** (included in base install):
+
 - DuckDB, SQLite
 
 **Single Extra** (one `pip install` command):
+
 - DataFusion, Polars, PostgreSQL, ClickHouse
 
 **Cloud SDK Required** (authentication setup needed):
+
 - Databricks SQL, Databend, BigQuery, Redshift, Snowflake, Amazon Athena, Firebolt, Azure Synapse Analytics
 
 **Infrastructure Required** (external cluster needed):
+
 - Trino, Presto, Spark, LakeSail, Gluten+Velox (Linux/Docker), StarRocks, Doris, QuestDB, ClickHouse (server mode)
 
 ### By Use Case
 
 **Local Development & Testing:**
+
 - DuckDB (recommended), SQLite, DataFusion, Polars
 
 **Production Benchmarking:**
+
 - Databricks, Snowflake, BigQuery, Redshift
 
 **Self-Hosted Analytics:**
+
 - ClickHouse, StarRocks, Doris, QuestDB, PostgreSQL, Trino, Presto, Spark, LakeSail, Gluten+Velox
 
 **GPU Workloads:**
+
 - CUDF (NVIDIA GPUs required)
 
 ## Quick Start by Platform

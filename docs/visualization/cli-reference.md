@@ -7,7 +7,7 @@ Generate ASCII charts directly from benchmark result JSON files.
 
 ## Synopsis
 
-```
+```text
 benchbox visualize [SOURCES...] [OPTIONS]
 ```
 
@@ -80,6 +80,7 @@ benchbox visualize results/*.json --chart-type performance_bar --chart-type dist
 ```bash
 benchbox visualize results/*.json --theme dark
 ```
+
 Default: `light`
 
 `--no-color`

@@ -22,6 +22,7 @@ The default wheel includes a `benchbox.experimental` namespace (nl2sql, aiml-fun
 ### Which databases does BenchBox support?
 
 BenchBox supports:
+
 - **Local**: DuckDB, SQLite, ClickHouse (local mode)
 - **Cloud**: Databricks, Snowflake, BigQuery, Redshift
 
@@ -30,6 +31,7 @@ See the [Platform Selection Guide](../platforms/platform-selection-guide.md) and
 ### Which benchmarks are available?
 
 BenchBox includes **22** public-discovery benchmarks, with examples across:
+
 - **TPC Standards**: TPC-H, TPC-DS, TPC-DI, TPC-DS-OBT, TPC-H Skew, TPC-Havoc
 - **Academic Benchmarks**: SSB, AMPLab, JoinOrder
 - **Industry and real-world workloads**: ClickBench, H2ODB, NYC Taxi, FlightData, TSBS DevOps, CoffeeShop
@@ -41,7 +43,7 @@ See the [Benchmarks Catalog](../benchmarks/index.md) for feature details and sel
 
 BenchBox is MIT-licensed open-source software. When citing BenchBox in academic papers:
 
-```
+```text
 Harris, Joe. (2025). BenchBox: A Benchmarking Toolbox for Analytical Databases.
 GitHub repository: https://github.com/BenchBox-dev/benchbox
 ```
@@ -106,6 +108,7 @@ The first command checks the BenchBox version. The second profiles your environm
 ### What scale factor should I use?
 
 It depends on your goal:
+
 - **Quick testing**: `0.01` or `0.1` (completes in seconds/minutes)
 - **Development**: `1` (standard size, ~1GB for TPC-H)
 - **Performance testing**: `10`, `100`, or higher (requires more time and resources)
@@ -116,6 +119,7 @@ Use `benchbox profile` to get scale factor recommendations for your system.
 ### How long does a benchmark take?
 
 Time varies significantly based on scale factor, platform, hardware, and benchmark complexity:
+
 - **Scale factor**: Larger scale factors = more data = longer runtimes
 - **Query complexity**: TPC-DS has 99 complex queries; TPC-H has 22 simpler queries
 - **Platform**: Cloud platforms add network latency and cluster startup time
@@ -158,7 +162,7 @@ See [CI/CD Integration](../advanced/ci-cd-integration.md) for complete examples.
 
 By default, results are stored in `benchmark_runs/` with timestamped subdirectories:
 
-```
+```text
 benchmark_runs/
 ├── 20250103_143022_tpch_duckdb_sf1/
 │   ├── manifest.json
@@ -190,6 +194,7 @@ Generated data is stored in `benchmark_runs/*/data/` by default.
 Use environment variables (recommended) or the interactive setup wizard:
 
 **Environment variables**:
+
 ```bash
 export DATABRICKS_HOST="https://your-workspace.cloud.databricks.com"
 export DATABRICKS_TOKEN="your-token"
@@ -199,6 +204,7 @@ export SNOWFLAKE_PASSWORD="your-password"
 ```
 
 **Setup wizard**:
+
 ```bash
 benchbox platforms setup
 ```
@@ -208,6 +214,7 @@ See the [Platform Selection Guide](../platforms/platform-selection-guide.md) for
 ### Why is my cloud benchmark slow?
 
 Common causes:
+
 - **Cold start**: First query on cloud warehouses is often slower (cluster startup)
 - **Small warehouse**: Increase warehouse/cluster size (e.g., XSmall to Small)
 - **Network latency**: Data transfer between cloud storage and compute
@@ -218,6 +225,7 @@ See [Performance Optimization](../advanced/performance-optimization.md) for tuni
 ### Can I use BenchBox with self-hosted databases?
 
 Yes! BenchBox currently supports:
+
 - **ClickHouse**: Fully supported via `--platform clickhouse-server` (local or remote)
 - **DuckDB**: Fully supported for local/embedded use via `--platform duckdb`
 - **SQLite**: Fully supported for local/embedded use via `--platform sqlite`
@@ -228,6 +236,7 @@ You can also create custom platform adapters - see [Adding New Platforms](../dev
 ### Do cloud benchmarks cost money?
 
 Yes. Running benchmarks on cloud platforms incurs costs for:
+
 - Compute (warehouse/cluster runtime)
 - Storage (data stored)
 - Data transfer (network egress)
@@ -241,6 +250,7 @@ Start with small scale factors and monitor costs. Use `--dry-run` to plan resour
 BenchBox implements TPC-H and TPC-DS queries and data generation according to specifications, but **BenchBox is not TPC-certified** and results cannot be published as official TPC results.
 
 For official TPC compliance and publication:
+
 - Results must be audited by the TPC
 - Specific hardware and configuration requirements apply
 - See [TPC.org](https://www.tpc.org/) for official benchmarking
@@ -250,6 +260,7 @@ BenchBox is designed for **internal performance testing and comparison**.
 ### Can I modify the queries?
 
 Yes, but be aware that modifying standard benchmark queries defeats the purpose of standardized benchmarking. For custom workloads, consider:
+
 - Creating custom benchmarks (see [Custom Benchmarks](../advanced/custom-benchmarks.md))
 - Using query variants (some benchmarks support this)
 - Forking queries for experimentation
@@ -259,6 +270,7 @@ Query files are located in `benchbox/core/{benchmark}/queries/`.
 ### How does query translation work?
 
 BenchBox automatically translates queries to platform-specific SQL dialects using SQLGlot. The translation handles:
+
 - Function name differences (e.g., `SUBSTRING` vs `SUBSTR`)
 - Date/time functions
 - Type casting
@@ -269,6 +281,7 @@ In rare cases, manual tuning may be needed for platform-specific SQL syntax.
 ### Can I use compressed data formats?
 
 Yes! BenchBox supports multiple compression formats:
+
 - Parquet (recommended for most platforms)
 - CSV with compression (gzip, zstd)
 - Platform-native formats
@@ -280,6 +293,7 @@ Configure with tuning files or command-line options. See the [Data Generation](d
 ### I get "command not found: benchbox"
 
 The `benchbox` CLI is not in your PATH. Solutions:
+
 1. Ensure your virtual environment is activated
 2. Add Python's scripts directory to PATH
 3. Run with `uv run -- benchbox` instead
@@ -299,6 +313,7 @@ Run `benchbox check-deps --matrix` to see all platform dependencies and their st
 ### Queries fail with syntax errors
 
 This may indicate a query translation issue. Try:
+
 1. Check the platform is officially supported
 2. Review query logs in `benchmark_runs/*/logs/`
 3. Report the issue with query details
@@ -334,6 +349,7 @@ See [Power Run & Concurrent Queries](../advanced/power-run-concurrent-queries.md
 ### How do I compare results across runs?
 
 BenchBox stores results in JSON format with full run metadata. You can:
+
 - Parse JSON files programmatically
 - Use the Python API for analysis
 - Build custom comparison tools
@@ -358,6 +374,7 @@ See [Custom Benchmarks Guide](../advanced/custom-benchmarks.md) for complete ins
 ### How do I automate performance regression detection?
 
 BenchBox integrates with CI/CD for automated regression detection:
+
 1. Run benchmarks in CI on each commit
 2. Compare results against baseline
 3. Fail builds when performance regresses
@@ -369,12 +386,14 @@ See [Performance Monitoring](../advanced/performance.md) for setup examples.
 ### How can I contribute?
 
 Contributions are welcome! See the root `CONTRIBUTING.md` file for:
+
 - Code contribution guidelines
 - Development setup
 - Testing requirements
 - Pull request process
 
 You can also contribute by:
+
 - Reporting bugs and issues
 - Improving documentation
 - Sharing feedback and use cases
@@ -382,6 +401,7 @@ You can also contribute by:
 ### Where do I report bugs?
 
 [Create an issue on GitHub](https://github.com/BenchBox-dev/benchbox/issues/new) with:
+
 - BenchBox version (`benchbox --version`)
 - Platform and benchmark being used
 - Complete error messages and logs
@@ -390,6 +410,7 @@ You can also contribute by:
 ### How do I request new features?
 
 [Open a feature request](https://github.com/BenchBox-dev/benchbox/issues/new) on GitHub describing:
+
 - The use case and motivation
 - Proposed behavior or API
 - Alternative solutions you've considered
@@ -398,6 +419,7 @@ You can also contribute by:
 ### Where can I ask questions?
 
 For questions not covered in the documentation:
+
 1. Check existing [GitHub issues and discussions](https://github.com/BenchBox-dev/benchbox/issues)
 2. Open a new discussion or issue
 3. Provide context and specific details

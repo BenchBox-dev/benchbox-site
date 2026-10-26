@@ -113,16 +113,19 @@ DataFusion uses lazy evaluation and can handle larger datasets than eager framew
 ### Performance Tips
 
 1. **Enable parallelism** for large datasets:
+
    ```bash
    --platform-option target_partitions=16
    ```
 
 2. **Use Parquet format** for best performance:
+
    ```bash
    benchbox run --platform datafusion-df --benchmark tpch --scale 10
    ```
 
 3. **Compare with Polars** for single-node workloads:
+
    ```bash
    --platform polars-df
    ```
@@ -196,11 +199,12 @@ running_total = adapter.window_sum(
 
 ### Memory Issues
 
-```
+```text
 DataFusion error: Memory exhausted
 ```
 
 **Solutions:**
+
 1. Set a memory limit with spilling: `--platform-option memory_limit=8G`
 2. Reduce partitions: `--platform-option target_partitions=4`
 3. Reduce batch size: `--platform-option batch_size=4096`

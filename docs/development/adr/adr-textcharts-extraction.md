@@ -14,6 +14,7 @@ Extract the ASCII charting package into a standalone library called `textcharts`
 ### Ownership Boundaries
 
 **`textcharts` owns:**
+
 - Chart primitives: 15 chart classes (`BarChart`, `Histogram`, `Heatmap`, etc.)
 - Data models: typed dataclasses (`BarData`, `HistogramBar`, `BoxPlotSeries`, etc.)
 - Configuration: `ChartOptions` (width, height, color, unicode, theme, palette)
@@ -22,6 +23,7 @@ Extract the ASCII charting package into a standalone library called `textcharts`
 - Factory functions: `from_bar_data`, `from_matrix`, `from_metrics`, etc.
 
 **BenchBox owns:**
+
 - `ascii_runtime.py` - dispatch layer converting `NormalizedResult` into chart-specific data models
 - `exporters.py` - file export helpers
 - `post_run_summary.py` - post-run chart assembly from `BenchmarkResults`

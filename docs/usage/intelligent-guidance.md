@@ -55,6 +55,7 @@ Analyzing your system resources to provide smart recommendations...
 Based on your system specs, you'll receive tailored advice:
 
 **High-Performance System:**
+
 ```bash
  System Recommendations
 ✅ High-memory system detected: You can run large benchmarks (scale 1.0+)
@@ -63,6 +64,7 @@ Based on your system specs, you'll receive tailored advice:
 ```
 
 **Standard Development System:**
+
 ```bash
  System Recommendations
  Mid-range system detected: Moderate benchmarks recommended (scale 0.1-1.0)
@@ -100,6 +102,7 @@ Selection Guide:
 ### Database Display Order
 
 The system displays databases in this order (based on OLAP optimization):
+
 1. **DuckDB** - Columnar, in-process, included by default
 2. **ClickHouse** - Columnar, client-server architecture
 3. **SQLite** - Row-based, single-threaded

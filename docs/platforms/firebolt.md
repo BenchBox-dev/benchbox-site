@@ -39,6 +39,7 @@ docker run -i --rm \
 ```
 
 **Characteristics:**
+
 - No authentication required
 - Databases created implicitly on connection
 - Same vectorized query engine as cloud
@@ -47,6 +48,7 @@ docker run -i --rm \
 ### Firebolt Cloud
 
 Managed cloud service requiring OAuth authentication:
+
 - Sign up at [firebolt.io](https://www.firebolt.io)
 - Create service account credentials in Settings > Service Accounts
 - Configure engine and database

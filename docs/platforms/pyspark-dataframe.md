@@ -207,6 +207,7 @@ PySpark can handle very large datasets due to distributed execution:
 ### Performance Tips
 
 1. **Optimize shuffle partitions** for your workload (for local mode, match CPU cores):
+
    ```bash
    --platform-option shuffle_partitions=8
    ```
@@ -215,6 +216,7 @@ PySpark can handle very large datasets due to distributed execution:
    `enable_aqe=False`.
 
 3. **Allocate sufficient driver memory**:
+
    ```bash
    --platform-option driver_memory=8g
    ```
@@ -373,15 +375,16 @@ rank = adapter.window_rank(
 
 In each `order_by` entry, the boolean selects ascending (`True`) or descending (`False`) order, so the rank example orders by revenue descending.
 
-## Troubleshooting
+## Troubleshooting Topics
 
 ### JVM Memory Issues
 
-```
+```text
 java.lang.OutOfMemoryError: Java heap space
 ```
 
 **Solutions:**
+
 1. Increase driver memory: `--platform-option driver_memory=8g`
 2. Reduce shuffle partitions: `--platform-option shuffle_partitions=4`
 3. Reduce scale factor: `--scale 1`

@@ -1,4 +1,5 @@
 (driver-version-management)=
+
 # Driver Version Management
 
 ```{tags} intermediate, guide, driver, versioning
@@ -22,7 +23,7 @@ BenchBox follows this order:
 The version that actually ran is always recorded in the result JSON under
 `execution.driver_version_actual` and displayed in the CLI announcement line:
 
-```
+```text
 Running tpch on duckdb at scale 1.0 [driver 1.4.3]
 ```
 
@@ -95,7 +96,7 @@ environment rather than a one-off test.
 
 The CLI output shows the driver version immediately:
 
-```
+```text
 Running tpch on duckdb at scale 1.0 [driver 1.5.0]
 ```
 

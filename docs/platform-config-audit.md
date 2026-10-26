@@ -26,6 +26,7 @@ behavior and are standard practice for OLAP workloads with long-running queries.
   when database is locked; reasonable default for concurrent access scenarios.
 
 ## Justified Configurations (keep)
+
 - BigQuery - `use_legacy_sql=False` and `flatten_results=False` for OLAP
   (`benchbox/platforms/bigquery.py:1083-1106`): avoids legacy dialect and nested flattens that would
   break TPC-style SQL and row shape expectations.
@@ -59,6 +60,7 @@ behavior and are standard practice for OLAP workloads with long-running queries.
   durability when explicitly running OLTP-style tests.
 
 ## Excess Configurations (consider removal/opt-in)
+
 - Snowflake - `ERROR_ON_NONDETERMINISTIC_MERGE=FALSE` and `ERROR_ON_NONDETERMINISTIC_UPDATE=FALSE`
   (`benchbox/platforms/snowflake.py:774-778`). **RESOLVED**: Now opt-in via
   `suppress_nondeterministic_errors=True` in config (default: `False`). These settings are unnecessary

@@ -151,7 +151,7 @@ The StarRocks adapter is composed of four mixins plus the main adapter class:
 
 ### Connection Model
 
-```
+```text
 BenchBox CLI
     |
     v
@@ -226,11 +226,12 @@ benchbox run --platform starrocks --benchmark tpch --scale 10.0 \
 
 ### Connection Refused
 
-```
+```text
 Error: Failed to connect to StarRocks
 ```
 
 **Solutions:**
+
 1. Verify StarRocks FE is running and accessible on the configured host and port
 2. Check that port 9030 (MySQL protocol) is open and not blocked by a firewall
 3. For Docker deployments, ensure port mapping is correct (`-p 9030:9030`)
@@ -238,21 +239,23 @@ Error: Failed to connect to StarRocks
 
 ### Missing PyMySQL Dependency
 
-```
+```text
 Error: Missing dependencies for starrocks platform: pymysql
 ```
 
 **Solutions:**
+
 1. Install PyMySQL: `uv add pymysql`
 2. Or install the StarRocks extra: `uv add benchbox --extra starrocks`
 
 ### Schema Creation Failures
 
-```
+```text
 Error: Schema creation failed
 ```
 
 **Solutions:**
+
 1. Check that the StarRocks user has `CREATE TABLE` and `CREATE DATABASE` permissions
 2. Verify the target database exists or the user has `CREATE DATABASE` privilege
 3. Review StarRocks FE logs for detailed error messages
@@ -261,6 +264,7 @@ Error: Schema creation failed
 ### Slow Data Loading
 
 **Solutions:**
+
 1. Increase `batch_size` for larger datasets (default: 1,000 rows per batch)
 2. Consider using Stream Load directly for datasets larger than SF 10
 3. Ensure BE nodes have adequate memory and disk I/O capacity
@@ -268,11 +272,12 @@ Error: Schema creation failed
 
 ### Query Timeout
 
-```
+```text
 Error: Query execution exceeded timeout
 ```
 
 **Solutions:**
+
 1. Increase the timeout through the Python API: `StarRocksAdapter(max_execution_time=600)`
 2. Check StarRocks resource utilization (CPU, memory, disk I/O)
 3. Verify data distribution is balanced across BE nodes

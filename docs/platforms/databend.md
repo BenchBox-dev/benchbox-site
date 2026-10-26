@@ -75,7 +75,7 @@ benchbox run --platform databend --benchmark tpch --scale 0.01 \
 
 The DSN (Data Source Name) follows the format:
 
-```
+```text
 databend+https://user:password@host:port/database?warehouse=name
 databend+http://user:password@host:port/database?sslmode=disable
 ```
@@ -177,7 +177,7 @@ The Databend adapter is a single-file adapter with all functionality in one clas
 
 ### Connection Model
 
-```
+```text
 BenchBox CLI
     |
     v
@@ -264,11 +264,12 @@ benchbox run --platform databend --benchmark tpch --scale 10.0 \
 
 ### Connection Refused
 
-```
+```text
 Error: Databend configuration is incomplete
 ```
 
 **Solutions:**
+
 1. Verify Databend is running and accessible on the configured host and port
 2. For cloud: Set `DATABEND_HOST=tenant--warehouse.gw.databend.com`
 3. For self-hosted: Set `DATABEND_HOST=localhost` and `DATABEND_PORT=8000`
@@ -276,33 +277,36 @@ Error: Databend configuration is incomplete
 
 ### Missing databend-driver Dependency
 
-```
+```text
 Error: Missing dependencies for databend platform: databend-driver
 ```
 
 **Solutions:**
+
 1. Install databend-driver: `uv add databend-driver`
 2. Or install the Databend extra: `uv add benchbox --extra databend`
 3. Minimum version required: `>=0.28.0`
 
 ### SSL/TLS Errors
 
-```
+```text
 Error: SSL handshake failed
 ```
 
 **Solutions:**
+
 1. For self-hosted without TLS: `--platform-option ssl=false`
 2. For cloud: SSL is required; verify certificate chain
 3. Check that the port matches the SSL setting (443 for SSL, 8000 for non-SSL)
 
 ### Schema Creation Failures
 
-```
+```text
 Error: Schema creation failed
 ```
 
 **Solutions:**
+
 1. Check that the user has `CREATE TABLE` and `CREATE DATABASE` permissions
 2. Verify the database exists or the user has `CREATE DATABASE` privilege
 3. If tables already exist, the adapter will automatically drop and recreate them
@@ -311,6 +315,7 @@ Error: Schema creation failed
 ### Slow Data Loading
 
 **Solutions:**
+
 1. For large datasets (SF 10+), consider using Databend's native `COPY INTO` from staged files
 2. Ensure adequate network bandwidth between BenchBox host and Databend
 3. For self-hosted: verify object storage (MinIO/S3) performance
@@ -318,11 +323,12 @@ Error: Schema creation failed
 
 ### Query Result Cache Interference
 
-```
+```text
 Warning: Query results may be cached
 ```
 
 **Solutions:**
+
 1. Verify `disable_result_cache` is `true` (default): `--platform-option disable_result_cache=true`
 2. The adapter sets `enable_query_result_cache = 0` at session level
 3. For Databend Cloud: check that warehouse-level caching is not interfering

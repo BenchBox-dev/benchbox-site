@@ -155,6 +155,7 @@ platform and scale.
 | **[Q1.3](queries/ssb/q1-3.md)** | Week-based aggregation | Week granularity, refined quantity range |
 
 **Example Query ([Q1.1](queries/ssb/q1-1.md))**:
+
 ```sql
 SELECT sum(lo_extendedprice*lo_discount) as revenue
 FROM lineorder, date
@@ -175,6 +176,7 @@ WHERE lo_orderdate = d_datekey
 | **[Q2.3](queries/ssb/q2-3.md)** | Specific brand analysis | Single brand focus, supplier region |
 
 **Example Query ([Q2.1](queries/ssb/q2-1.md))**:
+
 ```sql
 SELECT sum(lo_revenue), d_year, p_brand1
 FROM lineorder, date, part, supplier
@@ -199,6 +201,7 @@ ORDER BY d_year, p_brand1;
 | **[Q3.4](queries/ssb/q3-4.md)** | Regional analysis | Customer and supplier regions |
 
 **Example Query ([Q3.1](queries/ssb/q3-1.md))**:
+
 ```sql
 SELECT c_nation, s_nation, d_year, sum(lo_revenue) as revenue
 FROM customer, lineorder, supplier, date
@@ -223,6 +226,7 @@ ORDER BY d_year asc, revenue desc;
 | **[Q4.3](queries/ssb/q4-3.md)** | City-specific profit | Customer city, part category, profit analysis |
 
 **Example Query ([Q4.1](queries/ssb/q4-1.md))**:
+
 ```sql
 SELECT d_year, c_nation, sum(lo_revenue - lo_supplycost) as profit
 FROM date, customer, supplier, part, lineorder
@@ -459,21 +463,25 @@ optimize_for_columnar(ssb, conn)
 ### Query Performance Patterns
 
 **Flight 1 (Simple Aggregation):**
+
 - **Fastest queries** - Single table scans with aggregation
 - **Performance depends on**: Fact table scan speed, aggregation efficiency
 - **Typical runtime**: Milliseconds to seconds
 
 **Flight 2 (Basic Star Joins):**
+
 - **Medium complexity** - 2-3 table joins with aggregation
 - **Performance depends on**: Join algorithm efficiency, dimension table size
 - **Typical runtime**: Seconds
 
 **Flight 3 (Complex Star Joins):**
+
 - **Higher complexity** - 4 table joins with grouping
 - **Performance depends on**: Join order optimization, hash table construction
 - **Typical runtime**: Seconds to tens of seconds
 
 **Flight 4 (Analytical Queries):**
+
 - **Most complex** - Multi-table joins with calculations
 - **Performance depends on**: Query optimization, parallel execution
 - **Typical runtime**: Seconds to minutes
@@ -643,18 +651,21 @@ for query_id in ["Q1.1", "Q1.2", "Q1.3"]:
 ## Best Practices
 
 ### Data Generation
+
 1. **Use appropriate scale factors** - Start small for development, scale up for performance testing
 2. **Consider data distribution** - SSB data follows specific distribution patterns
 3. **Optimize for target system** - Generate data formats suited to your database
 4. **Partition fact tables** - Consider date-based partitioning for large scale factors
 
 ### Query Optimization
+
 1. **Start with Flight 1** - Test basic aggregation performance first
 2. **Optimize join orders** - Ensure smallest dimension tables are accessed first
 3. **Use column indices** - Create indices on commonly filtered columns
 4. **Test with different parameters** - Vary selectivity to understand performance characteristics
 
 ### Performance Testing
+
 1. **Warm-up queries** - Run queries multiple times to account for caching
 2. **Monitor resource usage** - Track CPU, memory, and I/O during execution
 3. **Test incremental complexity** - Progress through flights methodically
@@ -664,18 +675,20 @@ for query_id in ["Q1.1", "Q1.2", "Q1.3"]:
 
 ### Performance Issues
 
-**Issue: Slow fact table scans in Flight 1**
+#### Issue: Slow fact table scans in Flight 1
 
 Solution: ensure proper indexing and partitioning.
+
 ```sql
 CREATE INDEX idx_lineorder_orderdate ON lineorder(lo_orderdate);
 CREATE INDEX idx_lineorder_discount ON lineorder(lo_discount);
 CREATE INDEX idx_lineorder_quantity ON lineorder(lo_quantity);
 ```
 
-**Issue: Inefficient joins in Flight 3**
+#### Issue: Inefficient joins in Flight 3
 
 Solution: optimize join order by listing the smallest tables first, from small to large. The other join conditions are omitted here.
+
 ```sql
 SELECT c_nation, s_nation, d_year, sum(lo_revenue) as revenue
 FROM date, customer, supplier, lineorder
@@ -686,9 +699,10 @@ WHERE lo_orderdate = d_datekey
 
 ### Data Loading Issues
 
-**Issue: Memory issues with large scale factors**
+#### Issue: Memory issues with large scale factors
 
 Solution: use streaming data generation. `stream_generation=True` generates data in chunks, and `chunk_size=1000000` sets 1M rows per chunk.
+
 ```python
 ssb = SSB(
     scale_factor=100,
@@ -698,9 +712,10 @@ ssb = SSB(
 )
 ```
 
-**Issue: Incorrect query results**
+#### Issue: Incorrect query results
 
 Solution: validate data generation and parameterization.
+
 ```python
 validation_queries = [
     "SELECT COUNT(*) FROM lineorder",

@@ -10,6 +10,7 @@ BenchBox provides chart types optimized for benchmarking narratives, rendered as
 **Purpose:** Compare execution times across platforms, runs, or configurations. The most common chart for "which platform is fastest?" questions.
 
 **Key Features:**
+
 - Automatic best/worst highlighting (green for fastest, red for slowest)
 - Fractional-block precision (Unicode ▏▎▍▌▋▊▉█ characters)
 - Automatic sorting by performance (configurable)
@@ -26,13 +27,15 @@ Pandas      ██████████████████████�
 Legend: ■ Best  ■ Worst
 ```
 
-*TPC-H SF1 comparison across 4 platforms showing Polars as fastest (green) and Pandas as slowest (red)*
+*TPC-H SF1 comparison across 4 platforms showing Polars as fastest (green) and Pandas as slowest (red).*
 
 **Data Requirements:**
+
 - `total_time_ms` or `avg_time_ms` per result
 - At least 1 result (multiple for comparison)
 
 **Best For:**
+
 - Platform shootouts ("DuckDB vs Snowflake")
 - Before/after optimization comparisons
 - Multi-benchmark summaries
@@ -44,6 +47,7 @@ Legend: ■ Best  ■ Worst
 **Purpose:** Compare TPC Power@Size scores across platforms or versions. Power@Size is a TPC-defined throughput metric expressed in queries-per-hour at a given scale factor - higher is better.
 
 **Key Features:**
+
 - Automatic best/worst highlighting (highest score = green, lowest = red)
 - Longer bars indicate better throughput performance (inverted vs execution time)
 - Silently excluded for non-TPC benchmarks (no Power@Size in result)
@@ -59,13 +63,15 @@ DuckDB 1.2.2     █████████████████████
 DuckDB 1.0.0     ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓               385.8K
 ```
 
-*TPC-DS SF=10 version comparison showing Power@Size progression from v1.0.0 to v1.5.0-dev*
+*TPC-DS SF=10 version comparison showing Power@Size progression from v1.0.0 to v1.5.0-dev.*
 
 **Data Requirements:**
+
 - `summary.tpc_metrics.power_at_size` in result JSON (present in TPC-H and TPC-DS runs)
 - At least 1 result (multiple for comparison)
 
 **Best For:**
+
 - TPC-H and TPC-DS version-over-version comparisons
 - Tracking throughput improvement across platform upgrades
 - Executive summaries of TPC benchmark results
@@ -77,6 +83,7 @@ DuckDB 1.0.0     ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓
 **Purpose:** Track performance evolution over time, across versions, or across sequential runs. Essential for regression detection and trend analysis.
 
 **Key Features:**
+
 - Multi-line support for comparing platforms over time
 - Least-squares regression trend overlay
 - Unique marker per series (*, +, o, x, ^, v)
@@ -103,13 +110,15 @@ Legend:
   ─+─ Polars
 ```
 
-*DuckDB and Polars performance over 6 releases showing improvement trends*
+*DuckDB and Polars performance over 6 releases showing improvement trends.*
 
 **Data Requirements:**
+
 - At least 2 results with timestamps or execution IDs
 - `total_time_ms` per result
 
 **Best For:**
+
 - Version-over-version performance tracking
 - Regression detection in CI/CD
 - Long-term platform evolution stories
@@ -121,6 +130,7 @@ Legend:
 **Purpose:** Visualize the price/performance tradeoff with Pareto frontier highlighting. Critical for cloud platform ROI analysis.
 
 **Key Features:**
+
 - Pareto frontier highlighting (optimal cost-performance points marked with ◆)
 - Platform labels positioned at data points
 - Performance score calculation (queries/hour or inverse latency)
@@ -144,13 +154,15 @@ Perf │
                      Cost (USD)
 ```
 
-*Platform comparison showing Pareto frontier highlighting cost-efficient options*
+*Platform comparison showing Pareto frontier highlighting cost-efficient options.*
 
 **Data Requirements:**
+
 - `cost_summary.total_cost` per result
 - Performance metric (`avg_time_ms` or `total_time_ms`)
 
 **Best For:**
+
 - Cloud platform cost comparisons
 - ROI analysis for platform selection
 - "Bang for your buck" narratives
@@ -162,6 +174,7 @@ Perf │
 **Purpose:** Show per-query performance patterns across platforms. Reveals which queries each platform handles well or poorly.
 
 **Key Features:**
+
 - Query (rows) × Platform (columns) grid
 - 5-level intensity scale (░ ▒ ▓ █) from fast to slow
 - Color gradient: green (fast) → yellow (medium) → red (slow)
@@ -182,13 +195,15 @@ Scale: ░ ▒ ▓ █ (fast → slow)
 Range: 4.8 - 120.1 ms
 ```
 
-*TPC-H per-query heatmap showing performance patterns across platforms*
+*TPC-H per-query heatmap showing performance patterns across platforms.*
 
 **Data Requirements:**
+
 - At least 2 platforms with per-query `execution_time_ms`
 - Query results with `query_id` identifiers
 
 **Best For:**
+
 - Identifying problematic queries per platform
 - TPC-H/TPC-DS per-query analysis
 - Query optimization targeting
@@ -200,6 +215,7 @@ Range: 4.8 - 120.1 ms
 **Purpose:** Show latency distributions to understand variance, outliers, and consistency beyond simple averages.
 
 **Key Features:**
+
 - Box plot with quartiles (Q1, median, Q3)
 - Whiskers at min/max with cap characters (╷ ╵)
 - Outlier markers (o) at actual scaled positions
@@ -226,13 +242,15 @@ Statistics:
   Pandas: median=210.8, mean=225.4, std=78.5
 ```
 
-*Latency distribution comparison showing Polars as most consistent (tightest box)*
+*Latency distribution comparison showing Polars as most consistent (tightest box).*
 
 **Data Requirements:**
+
 - Per-query `execution_time_ms` values
 - Multiple queries per platform for meaningful distribution
 
 **Best For:**
+
 - Consistency analysis (low variance = predictable performance)
 - Outlier detection
 - SLA compliance stories (P95/P99 analysis)
@@ -244,6 +262,7 @@ Statistics:
 **Purpose:** Display per-query execution latency with one bar per query. Short query IDs render as vertical bars; long descriptive query names render as horizontal bars so labels remain readable. Provides immediate visual insight into which queries are fastest/slowest and the overall latency distribution pattern.
 
 **Key Features:**
+
 - One bar per query showing execution time
 - Horizontal layout for long labels such as Primitives query names
 - Automatic best/worst highlighting (green for fastest, orange for slowest)
@@ -270,11 +289,13 @@ Legend: ■ Best  ■ Worst
 ```
 
 **Data Requirements:**
+
 - Per-query `execution_time_ms` values
 - Query results with `query_id` identifiers
 - Aggregates multiple iterations per query (mean latency)
 
 **Best For:**
+
 - Quick identification of slow/fast queries
 - TPC-DS (99 queries) and ClickBench (43 queries) analysis
 - Spotting outlier queries that need optimization
@@ -297,6 +318,7 @@ For large benchmarks, the histogram automatically splits into readable chunks:
 **Purpose:** Side-by-side paired bars per query showing baseline vs comparison performance. Essential for before/after analysis.
 
 **Key Features:**
+
 - Paired rows per query: baseline bar + comparison bar
 - Inline percentage change (green for improvement, red for regression)
 - Scale note showing value per block character
@@ -317,10 +339,12 @@ each █ ≈ 10.0ms
 ```
 
 **Data Requirements:**
+
 - Two result files (baseline + comparison)
 - Per-query `execution_time_ms` values
 
 **Best For:**
+
 - Before/after optimization comparisons
 - SQL vs DataFrame API performance
 - Version-over-version per-query analysis
@@ -332,6 +356,7 @@ each █ ≈ 10.0ms
 **Purpose:** Percentage change bars centered on zero, showing improvements to the left and regressions to the right. Sorted by magnitude for quick triage.
 
 **Key Features:**
+
 - Left side (green): improvements; right side (red): regressions
 - Fill intensity based on magnitude (░ weak, ▒ medium, ▓ strong)
 - Overflow arrows (──►) for extreme outliers beyond clipping threshold
@@ -352,10 +377,12 @@ Q21                       | ▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒──�
 ```
 
 **Data Requirements:**
+
 - Two result files (baseline + comparison)
 - Per-query `execution_time_ms` values
 
 **Best For:**
+
 - Regression triage after upgrades
 - Identifying queries that improved vs degraded
 - Quick visual summary of change distribution
@@ -367,6 +394,7 @@ Q21                       | ▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒──�
 **Purpose:** Key statistics in a bordered panel providing an at-a-glance overview of benchmark results or a comparison between two runs.
 
 **Key Features:**
+
 - Bordered box with Unicode box-drawing characters
 - Comparison mode: baseline → comparison with percentage change
 - Color-coded percentages (green for improvement, red for regression)
@@ -388,10 +416,12 @@ Q21                       | ▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒──�
 ```
 
 **Data Requirements:**
+
 - At least 1 result file (2 for comparison mode)
 - `total_time_ms` and/or per-query `execution_time_ms`
 
 **Best For:**
+
 - Executive summaries at the top of reports
 - CI/CD log output (quick pass/fail context)
 - Pairing with detailed charts for full analysis

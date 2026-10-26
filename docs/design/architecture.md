@@ -53,7 +53,7 @@ pins this claim to `list_public_benchmark_ids()`).
 
 A run flows through one shared engine, no matter which surface starts it:
 
-```
+```text
 CLI (`benchbox run`) or MCP (`run_benchmark`)
   → benchbox.core.run_service (shared engine, internal)
     → run_benchmark_lifecycle() (benchbox/core/runner/runner.py)
@@ -101,7 +101,7 @@ SQL/DataFrame comparisons all read the same shape, guarded by the schema
 policy. SQL and DataFrame bundles for one benchmark must preserve the
 cross-mode parity invariants.
 
-```
+```text
 run → BenchmarkResults → bundle JSON (beta-public data)
   → validate-submission (deterministic errors, privacy/trust handling)
   → published corpus (results-data/, trust labels + provenance)

@@ -19,11 +19,12 @@ This guide helps diagnose and resolve common issues when running BenchBox benchm
 | "permission denied" | Access rights | [Permission Errors](#permission-errors) |
 | "timeout" | Slow query/network | [Timeouts](#query-timeouts) |
 | "out of memory" | Scale too large | [Memory Issues](#memory-issues) |
-| "ImportError" | Missing package | [Dependencies](#missing-dependencies) |
+| "ImportError" | Missing package | [Dependencies](#missing-platform-dependencies) |
 | "file not found" | Data loading | [Data Loading](#data-loading-issues) |
 | "command not found: benchbox" | PATH issue | [Installation Issues](#installation-issues) |
 
 (installation-issues)=
+
 ## Installation Issues
 
 ### `command not found: benchbox`
@@ -32,7 +33,7 @@ This guide helps diagnose and resolve common issues when running BenchBox benchm
 
 **Solution**:
 
-1.  **Check your PATH**: Ensure that the Python scripts directory is in your system's `PATH`. You can find the directory by running:
+1. **Check your PATH**: Ensure that the Python scripts directory is in your system's `PATH`. You can find the directory by running:
 
     ```bash
     python -m site --user-base
@@ -40,7 +41,7 @@ This guide helps diagnose and resolve common issues when running BenchBox benchm
 
     Add the `bin` subdirectory of that path to your `PATH`.
 
-2.  **Reactivate your virtual environment**: If you installed BenchBox in a virtual environment, make sure it's activated:
+2. **Reactivate your virtual environment**: If you installed BenchBox in a virtual environment, make sure it's activated:
 
     ```bash
     source .venv/bin/activate
@@ -93,7 +94,8 @@ python -m pip install "benchbox[cloud,clickhouse]"
 ### Connection Refused
 
 **Symptoms:**
-```
+
+```text
 ConnectionRefusedError: [Errno 111] Connection refused
 OperationalError: could not connect to server
 ```
@@ -112,6 +114,7 @@ The first `curl` checks Firebolt Core on port 3473. The second checks Trino or P
 **Solutions:**
 
 1. **Start the platform:**
+
    ```bash
    docker run -d -p 8080:8080 trinodb/trino
 
@@ -121,16 +124,19 @@ The first `curl` checks Firebolt Core on port 3473. The second checks Trino or P
    ```
 
 2. **Check port availability:**
+
    ```bash
    lsof -i :8080
    netstat -an | grep 8080
    ```
+
    The `lsof` command shows whether the port is already in use.
 
 3. **Verify host/port in config:**
    Trino and Presto do not accept `host` or `port` as `--platform-option`
    keys. BenchBox reads them from the platform's section of
    `~/.benchbox/credentials.yaml`, and defaults to `localhost:8080`:
+
    ```yaml
    trino:
      host: localhost
@@ -140,7 +146,8 @@ The first `curl` checks Firebolt Core on port 3473. The second checks Trino or P
 ### Network Timeout
 
 **Symptoms:**
-```
+
+```text
 TimeoutError: Connection timed out
 socket.timeout: timed out
 ```
@@ -148,6 +155,7 @@ socket.timeout: timed out
 **Solutions:**
 
 1. **Cloud platforms - check firewall:**
+
    ```bash
    aws ec2 describe-security-groups --group-ids sg-xxx
 
@@ -159,7 +167,8 @@ socket.timeout: timed out
 ### Invalid Credentials
 
 **Symptoms:**
-```
+
+```text
 AuthenticationError: Invalid credentials
 401 Unauthorized
 Access Denied
@@ -168,6 +177,7 @@ Access Denied
 **Platform-Specific Solutions:**
 
 #### Snowflake
+
 ```bash
 snowsql -a $SNOWFLAKE_ACCOUNT -u $SNOWFLAKE_USER
 
@@ -177,6 +187,7 @@ echo $SNOWFLAKE_ACCOUNT
 The account should use the `account_locator.region` format. Correct values look like `xy12345.us-east-1` or `xy12345.us-east-1.aws`.
 
 #### Databricks
+
 ```bash
 curl -H "Authorization: Bearer $DATABRICKS_TOKEN" \
   https://your-workspace.cloud.databricks.com/api/2.0/clusters/list
@@ -185,6 +196,7 @@ curl -H "Authorization: Bearer $DATABRICKS_TOKEN" \
 This call tests that the token is valid. If the token has expired (the default lifetime is 90 days), regenerate it under User Settings > Developer > Access Tokens.
 
 #### BigQuery
+
 ```bash
 gcloud auth activate-service-account --key-file=$GOOGLE_APPLICATION_CREDENTIALS
 gcloud auth application-default print-access-token
@@ -193,6 +205,7 @@ gcloud projects describe $BIGQUERY_PROJECT
 ```
 
 #### Redshift
+
 ```bash
 psql -h $REDSHIFT_HOST -p 5439 -U $REDSHIFT_USER -d dev
 
@@ -204,7 +217,8 @@ The `aws sts get-caller-identity` command verifies the role when you use IAM aut
 ### Token Expired
 
 **Symptoms:**
-```
+
+```text
 Token has expired
 Session expired
 ```
@@ -217,6 +231,7 @@ Session expired
    - BigQuery: `gcloud auth application-default login`
 
 2. **Use refresh tokens where supported:**
+
    ```bash
    gcloud auth application-default login
    ```
@@ -224,7 +239,8 @@ Session expired
 ## Catalog Not Found (Presto/Trino)
 
 **Symptoms:**
-```
+
+```text
 ConfigurationError: Catalog 'memory' not found
 CatalogNotFoundError: Catalog does not exist
 ```
@@ -234,15 +250,18 @@ CatalogNotFoundError: Catalog does not exist
 **Solutions:**
 
 1. **List available catalogs:**
+
    ```bash
    benchbox platforms check trino
    ```
 
 2. **Specify the correct catalog:**
+
    ```bash
    benchbox run --platform trino --benchmark tpch \
      --platform-option catalog=hive
    ```
+
    Replace `hive` with `iceberg`, `delta`, or another catalog name as needed.
 
 3. **Common catalog names:**
@@ -257,7 +276,8 @@ CatalogNotFoundError: Catalog does not exist
 ### Insufficient Privileges
 
 **Symptoms:**
-```
+
+```text
 PermissionDenied: User does not have permission
 AccessDenied: Access Denied
 ```
@@ -265,6 +285,7 @@ AccessDenied: Access Denied
 **Solutions by Platform:**
 
 #### Snowflake
+
 ```sql
 GRANT USAGE ON WAREHOUSE compute_wh TO ROLE benchbox_role;
 GRANT CREATE DATABASE ON ACCOUNT TO ROLE benchbox_role;
@@ -273,6 +294,7 @@ GRANT CREATE TABLE ON SCHEMA benchbox.public TO ROLE benchbox_role;
 ```
 
 #### Databricks
+
 ```sql
 GRANT USE CATALOG ON CATALOG benchmarks TO `user@company.com`;
 GRANT CREATE SCHEMA ON CATALOG benchmarks TO `user@company.com`;
@@ -280,6 +302,7 @@ GRANT USE SCHEMA ON SCHEMA benchmarks.default TO `user@company.com`;
 ```
 
 #### BigQuery
+
 ```bash
 gcloud projects add-iam-policy-binding $PROJECT_ID \
   --member="user:user@company.com" \
@@ -287,6 +310,7 @@ gcloud projects add-iam-policy-binding $PROJECT_ID \
 ```
 
 #### Redshift
+
 ```sql
 GRANT CREATE ON DATABASE dev TO benchbox_user;
 GRANT ALL ON SCHEMA public TO benchbox_user;
@@ -295,7 +319,8 @@ GRANT ALL ON SCHEMA public TO benchbox_user;
 ## Query Timeouts
 
 **Symptoms:**
-```
+
+```text
 QueryTimeoutError: Query exceeded time limit
 Statement timeout
 ```
@@ -309,27 +334,32 @@ Statement timeout
    - Redshift: `statement_timeout` (milliseconds) is not a `--platform-option`
      key. Set it in the `redshift` section of `~/.benchbox/credentials.yaml`,
      or pass it to `RedshiftAdapter` in the Python API:
+
      ```yaml
      redshift:
        statement_timeout: 3600000
      ```
 
 2. **Use larger compute resources:**
+
    ```bash
    benchbox run --platform snowflake --benchmark tpch --scale 10 \
      --platform-option compute_resource=LARGE_WH
    ```
+
    A `compute_resource` on the command line overrides the warehouse saved by
    `benchbox setup`.
 
    On Databricks, `compute_resource` names the SQL warehouse and replaces the
    saved `http_path` with `/sql/1.0/warehouses/<warehouse_id>`:
+
    ```bash
    benchbox run --platform databricks --benchmark tpch --scale 10 \
      --platform-option compute_resource=large_wh_id
    ```
 
 3. **Reduce scale factor for testing:**
+
    ```bash
    benchbox run --platform snowflake --benchmark tpch --scale 0.1
    ```
@@ -339,7 +369,8 @@ Statement timeout
 ### Out of Memory
 
 **Symptoms:**
-```
+
+```text
 MemoryError: Unable to allocate
 OutOfMemoryError
 java.lang.OutOfMemoryError: Java heap space
@@ -348,6 +379,7 @@ java.lang.OutOfMemoryError: Java heap space
 **Solutions by Platform:**
 
 #### DuckDB
+
 ```bash
 benchbox run --platform duckdb --benchmark tpch --scale 10 \
   --platform-option memory_limit=8GB \
@@ -357,6 +389,7 @@ benchbox run --platform duckdb --benchmark tpch --scale 10 \
 The memory limit caps usage, and the temp directory is where DuckDB spills to disk once it reaches that limit.
 
 #### Polars
+
 ```bash
 benchbox run --platform polars-df --benchmark tpch --scale 10 \
   --execution-engine streaming
@@ -365,6 +398,7 @@ benchbox run --platform polars-df --benchmark tpch --scale 10 \
 The streaming engine lets Polars process large datasets without holding them all in memory.
 
 #### Spark
+
 ```bash
 benchbox run --platform spark --benchmark tpch --scale 10 \
   --platform-option driver_memory=8g
@@ -374,6 +408,7 @@ benchbox run --platform spark --benchmark tpch --scale 10 \
 `executor_memory` is a `SparkAdapter` argument in the Python API.
 
 #### Cloud Platforms
+
 ```bash
 benchbox run --platform snowflake --benchmark tpch --scale 100 \
   --platform-option compute_resource=X_LARGE_WH
@@ -400,7 +435,7 @@ benchbox run --platform snowflake --benchmark tpch --scale 100 \
 
 BenchBox attempts to compile these tools automatically, but if that fails, you may need to compile them manually.
 
-1.  **Navigate to the tools directory**:
+1. **Navigate to the tools directory**:
 
     ```bash
     cd _sources/tpc-h/dbgen
@@ -410,7 +445,7 @@ BenchBox attempts to compile these tools automatically, but if that fails, you m
 
     Use the first directory for TPC-H and the second for TPC-DS.
 
-2.  **Compile the tools**:
+2. **Compile the tools**:
 
     ```bash
     make
@@ -434,7 +469,8 @@ BenchBox attempts to compile these tools automatically, but if that fails, you m
 ### File Not Found
 
 **Symptoms:**
-```
+
+```text
 FileNotFoundError: Data file not found
 No such file or directory
 ```
@@ -442,17 +478,20 @@ No such file or directory
 **Solutions:**
 
 1. **Generate data first:**
+
    ```bash
    benchbox run --platform duckdb --benchmark tpch --scale 0.1 \
      --phases generate
    ```
 
 2. **Check data directory:**
+
    ```bash
    ls -la ~/.cache/benchbox/tpch/sf0.1/
    ```
 
 3. **Force regeneration:**
+
    ```bash
    benchbox run --platform duckdb --benchmark tpch --scale 0.1 \
      --force datagen
@@ -461,7 +500,8 @@ No such file or directory
 ### Upload Failures
 
 **Symptoms:**
-```
+
+```text
 UploadError: Failed to upload file
 S3 upload failed
 Storage access denied
@@ -470,6 +510,7 @@ Storage access denied
 **Solutions:**
 
 #### Cloud Storage Staging
+
 ```bash
 aws s3 ls s3://your-bucket/benchbox/
 
@@ -480,6 +521,7 @@ benchbox run --platform redshift --benchmark tpch --scale 10 \
 ```
 
 #### Snowflake Stages
+
 ```bash
 snowsql -q "SHOW STAGES;"
 
@@ -487,6 +529,7 @@ snowsql -q "CREATE STAGE IF NOT EXISTS @~/benchbox_stage;"
 ```
 
 #### Databricks Volumes
+
 ```bash
 databricks volumes list /Volumes/catalog/schema/
 
@@ -498,6 +541,7 @@ databricks volumes create catalog.schema.benchbox_data
 ### Snowflake
 
 #### Warehouse Suspended
+
 ```bash
 snowsql -q "ALTER WAREHOUSE BENCHMARK_WH RESUME;"
 
@@ -509,6 +553,7 @@ The first command resumes the suspended warehouse, and the second sets auto-resu
 ### Databricks
 
 #### Cluster Not Running
+
 ```bash
 curl -X POST "https://workspace.cloud.databricks.com/api/2.0/clusters/start" \
   -H "Authorization: Bearer $DATABRICKS_TOKEN" \
@@ -520,6 +565,7 @@ Alternatively, use a SQL Warehouse, which has an always-on option.
 ### BigQuery
 
 #### Quota Exceeded
+
 ```bash
 gcloud compute project-info describe --project $PROJECT_ID
 ```
@@ -528,9 +574,9 @@ To request an increase, use the Console: BigQuery > Quotas > Request Increase.
 
 ## General Tips
 
--   **Use the `--verbose` flag**: The `-v` or `-vv` flag can provide more detailed output to help you diagnose issues.
--   **Check the logs**: BenchBox creates log files in the output directory. These can contain valuable information for troubleshooting.
--   **Start small**: When testing a new setup, start with a small scale factor (e.g., `0.01`) to quickly verify that everything is working correctly.
+- **Use the `--verbose` flag**: The `-v` or `-vv` flag can provide more detailed output to help you diagnose issues.
+- **Check the logs**: BenchBox creates log files in the output directory. These can contain valuable information for troubleshooting.
+- **Start small**: When testing a new setup, start with a small scale factor (e.g., `0.01`) to quickly verify that everything is working correctly.
 
 ## Getting Help
 

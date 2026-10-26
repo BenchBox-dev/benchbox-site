@@ -16,7 +16,7 @@ execution paths explicitly.
 
 ---
 
-##  Creating Custom Benchmarks
+## Creating Custom Benchmarks
 
 ### Basic Custom Benchmark
 
@@ -324,7 +324,7 @@ class DefaultQueryManager(QueryManager):
 
 ---
 
-##  Data Generation Strategies
+## Data Generation Strategies
 
 ### Realistic Data Generation
 

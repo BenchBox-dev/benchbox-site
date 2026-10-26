@@ -49,6 +49,7 @@ benchbox run --platform duckdb --benchmark tpch --scale 1 --table-mode external
 ```
 
 Key rules:
+
 - `native` remains the default.
 - `external` is incompatible with `--tuning tuned`.
 - Cloud platforms still upload/stage data in object storage during load; they skip COPY/CTAS materialization in external mode.
@@ -80,7 +81,7 @@ benchbox compare --list-platforms
 
 Output shows installed SQL and DataFrame platforms:
 
-```
+```text
 SQL Platforms:
   Installed:
     duckdb           (embedded, analytical)
@@ -136,6 +137,7 @@ benchbox compare
 ```
 
 The interactive wizard guides you through:
+
 1. Choosing comparison type (platforms or files)
 2. Selecting platforms from an interactive list
 3. Configuring benchmark options
@@ -209,7 +211,7 @@ benchbox compare \
 
 Example output:
 
-```
+```text
 SQL Platform Comparison
 Platforms: duckdb, sqlite, datafusion
 Benchmark: tpch @ SF 0.1
@@ -293,7 +295,7 @@ benchbox compare \
 
 Creates:
 
-```
+```text
 comparison_results/
 ├── comparison.md
 ├── comparison.json
@@ -522,6 +524,7 @@ benchbox compare \
 ### 4. Compare Similar Platforms
 
 For meaningful comparisons:
+
 - Compare platforms with similar deployment models
 - Use same hardware/resources
 - Run at the same scale factor
@@ -552,6 +555,7 @@ Percentage of queries that completed successfully. 100% expected for production-
 ### Query Winners
 
 Shows which platform was fastest for each query:
+
 - Different platforms excel at different query types
 - Aggregation vs joins vs filtering
 - Use for workload-specific decisions
@@ -559,6 +563,7 @@ Shows which platform was fastest for each query:
 ### Speedup Ratio
 
 Ratio between fastest and slowest platform:
+
 - `> 1.0`: Faster platform completed in less time
 - `~1.0`: Platforms are approximately equal
 - Large ratios (5x+) indicate major performance differences
@@ -567,7 +572,7 @@ Ratio between fastest and slowest platform:
 
 ### Data Not Found
 
-```
+```text
 Error: Data directory not found: benchmark_runs/tpch/sf001/data
 ```
 
@@ -579,7 +584,7 @@ benchbox run --platform duckdb --benchmark tpch --scale 0.01
 
 ### Platform Not Available
 
-```
+```text
 Warning: Platform clickhouse not available
 ```
 
@@ -591,17 +596,19 @@ uv add benchbox --extra clickhouse
 
 ### Mixed Platform Types
 
-```
+```text
 Error: Cannot mix SQL and DataFrame platforms. Use --type to specify.
 ```
 
 Either:
+
 1. Compare only same-type platforms
 2. Explicitly set `--type sql` or `--type dataframe`
 
 ### Memory Issues at Large Scale
 
 For large scale factors:
+
 - Use streaming-capable platforms (Polars, DuckDB)
 - Reduce concurrent platforms compared
 - Compare fewer platforms per invocation
@@ -636,6 +643,7 @@ The plan comparison section shows:
 ### Plan-Correlated Regressions
 
 The most valuable insight is **plan-correlated regressions**: queries where:
+
 1. The query plan changed (< 100% similarity)
 2. Performance degraded > 20%
 

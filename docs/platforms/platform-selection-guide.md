@@ -10,37 +10,49 @@ This guide helps you choose the optimal database platform for your BenchBox benc
 ## Quick Start: Choose Your Path
 
 ### I want to start immediately with minimal setup
+
 **Look for**: Embedded databases with no external dependencies
+
 - No additional installation or configuration required
 - In-process execution without network overhead
 - Suitable for learning and experimentation
 
 ### I want to minimize costs
+
 **Look for**: Open-source platforms
+
 - No licensing costs
 - Run on your own hardware
 - Minimal operational overhead
 
 ### I need fast analytical queries at scale
+
 **Look for**: Scalable architectures (cloud or self-hosted)
+
 - Column-oriented storage optimized for analytical workloads
 - Horizontal scaling capabilities
 - Advanced query optimization features
 
 ### I want fully managed cloud service
+
 **Look for**: Managed cloud platforms
+
 - No infrastructure management required
 - Auto-scaling capabilities
 - Enterprise support and SLAs available
 
 ### I need enterprise features and governance
+
 **Look for**: Platforms with governance capabilities
+
 - Advanced security and compliance features
 - Role-based access control
 - Audit logging and governance capabilities
 
 ### I want to benchmark DataFrame libraries (not SQL)
+
 **Look for**: DataFrame platform adapters
+
 - Native DataFrame API benchmarking (no SQL)
 - Compare libraries on identical workloads
 - Measure performance of data science workflows
@@ -166,6 +178,7 @@ See [LakeSail Platform Guide](lakesail.md), [Velox Platform Guide](velox.md), an
 ### 1. Data Scale Requirements
 
 #### Small Scale (< 1GB)
+
 **Platform Options**: DuckDB, DataFusion, SQLite
 
 ```python
@@ -187,6 +200,7 @@ results = adapter.run_benchmark(benchmark)
 Scale factor 0.1 is about 100MB of data. `DuckDBAdapter()` processes data in memory.
 
 **Characteristics**:
+
 - No additional setup or configuration required
 - Embedded databases suitable for small datasets
 - Free and lightweight
@@ -194,6 +208,7 @@ Scale factor 0.1 is about 100MB of data. `DuckDBAdapter()` processes data in mem
 - DataFusion offers PyArrow integration for Arrow-based workflows
 
 #### Medium Scale (1GB - 100GB)
+
 **Platform Options**: BigQuery, ClickHouse, DataFusion, DuckDB
 
 ```python
@@ -211,11 +226,13 @@ adapter = ClickHouseAdapter(
 ```
 
 **Characteristics**:
+
 - Balance of performance and cost
 - Support for complex analytical queries
 - Moderate resource requirements
 
 #### Large Scale (100GB+)
+
 **Platform Options**: BigQuery, Databricks SQL, Redshift, Snowflake
 
 ```python
@@ -233,6 +250,7 @@ adapter = BigQueryAdapter(
 ```
 
 **Characteristics**:
+
 - Support for petabyte-scale analytics
 - Auto-scaling infrastructure
 - Managed cloud data warehouse platforms
@@ -249,6 +267,7 @@ adapter = BigQueryAdapter(
 | **ClickHouse** | Open source     | Infrastructure costs |
 
 **Example Setup**:
+
 ```python
 adapter = DuckDBAdapter(
     database_path="cost_effective.duckdb",
@@ -272,6 +291,7 @@ The DuckDB example sets a memory limit so it uses available RAM efficiently, and
 | **Databricks SQL** | DBU consumption | Auto-termination    |
 
 **Cost-Optimized Configuration**:
+
 ```python
 adapter = BigQueryAdapter(
     maximum_bytes_billed=1000000000,
@@ -290,6 +310,7 @@ adapter = BigQueryAdapter(
 | **Redshift**  | Cluster hours  | Reserved instances  |
 
 **Cost-Optimized Configuration**:
+
 ```python
 adapter = SnowflakeAdapter(
     warehouse_size="MEDIUM",
@@ -322,6 +343,7 @@ adapter = ClickHouseAdapter(
 The DuckDB example keeps data in memory and uses all CPU cores (`thread_limit=None`). The ClickHouse example enables compression to reduce network I/O.
 
 **Characteristics**:
+
 - In-process or local execution reduces network overhead
 - Column-oriented storage optimized for analytical queries
 - Query latency depends on data volume, query complexity, and hardware resources
@@ -347,6 +369,7 @@ adapter = SnowflakeAdapter(
 BigQuery is serverless and scales automatically. Here `query_cache=False` forces fresh results on every run, and `location="US"` selects a multi-region deployment. The Snowflake example uses multi-cluster scaling and a 10-minute auto-suspend, which suits sustained workloads.
 
 **Performance Characteristics**:
+
 - Concurrent user support: Hundreds to thousands of users
 - Auto-scaling: Automatic resource adjustment available
 - Query queuing: Workload management capabilities
@@ -364,6 +387,7 @@ adapter = BigQueryAdapter()
 BigQuery is a fully managed serverless service with no infrastructure to manage, automatic optimization, and built-in monitoring.
 
 **Characteristics**:
+
 - No database administration required
 - Automatic updates and maintenance
 - Built-in monitoring and alerting
@@ -384,6 +408,7 @@ adapter = DatabricksAdapter(
 `auto_terminate_minutes=30` controls cost by stopping idle clusters, and `PHOTON` is the vectorized query engine.
 
 **Characteristics**:
+
 - Managed infrastructure with user control
 - Configurable performance settings
 - Access to advanced features
@@ -402,6 +427,7 @@ adapter = ClickHouseAdapter(
 A self-managed deployment gives you custom cluster configuration, your own monitoring and alerting, and complete control of the data.
 
 **Characteristics**:
+
 - Complete infrastructure control
 - Custom optimization opportunities
 - Data locality and privacy
@@ -420,6 +446,7 @@ results = adapter.run_benchmark(benchmark)
 ```
 
 **Characteristics**:
+
 - No database administration knowledge required
 - Comprehensive documentation and community
 - Reproducible results across environments
@@ -439,6 +466,7 @@ adapter = BigQueryAdapter(
 A shared Google Cloud project provides collaboration features and cost visibility and controls.
 
 **Characteristics**:
+
 - Shared access and collaboration capabilities
 - Cost transparency and controls
 - Minimal administrative overhead
@@ -455,6 +483,7 @@ adapter = SnowflakeAdapter()
 Snowflake offers role-based access control, multiple warehouses for different workloads, query result sharing, and usage monitoring and governance.
 
 **Characteristics**:
+
 - Advanced security and governance
 - Workload isolation capabilities
 - Resource management features
@@ -471,6 +500,7 @@ adapter = DatabricksAdapter()
 Databricks provides Unity Catalog for governance, multiple workspaces, advanced security features, and enterprise support with SLAs.
 
 **Characteristics**:
+
 - Enterprise security and compliance features
 - Advanced governance capabilities
 - Professional services and support
@@ -590,7 +620,7 @@ An on-premises deployment gives complete data control, no cloud dependencies, an
 
 ### By Primary Goal
 
-```
+```text
 Learning/Research
 ├── Small data (< 1GB): Embedded databases (DuckDB, SQLite)
 └── Large data (> 1GB): DuckDB or cloud platforms with free tiers
@@ -611,7 +641,7 @@ Performance Benchmarking
 
 ### By Key Decision Factors
 
-```
+```text
 1. Data scale considerations:
    ├── < 1GB → Embedded databases (DuckDB, SQLite)
    ├── 1-100GB → ClickHouse, DuckDB, or cloud platforms
@@ -741,28 +771,35 @@ Develop on DuckDB, validate the migration on any cloud platform (`auto_terminate
 ### ❌ Wrong Platform Choices
 
 1. **Using SQLite for large datasets**
+
    ```python
    adapter = SQLiteAdapter()
    benchmark = TPCH(scale_factor=10)
    ```
+
    SQLite with TPC-H at scale factor 10 will be extremely slow.
 
 2. **Using expensive platforms for development**
+
    ```python
    adapter = SnowflakeAdapter(warehouse_size="4X-LARGE")
    benchmark = TPCH(scale_factor=0.01)
    ```
+
    A 4X-Large Snowflake warehouse is expensive and wasted on a tiny dataset.
 
 3. **Ignoring cost controls**
+
    ```python
    adapter = BigQueryAdapter()
    ```
+
    This sets no `maximum_bytes_billed`, so pay-per-query platforms risk unexpectedly large bills.
 
 ### ✅ Better Alternatives
 
 1. **Progressive scaling approach**
+
    ```python
    if dataset_size < 1_000_000:
        adapter = DuckDBAdapter()
@@ -771,18 +808,22 @@ Develop on DuckDB, validate the migration on any cloud platform (`auto_terminate
    else:
        adapter = BigQueryAdapter()
    ```
+
    Start small and scale up as needed.
 
 2. **Cost-aware cloud usage**
+
    ```python
    adapter = BigQueryAdapter(
        maximum_bytes_billed=5_000_000_000,
        job_priority="BATCH"
    )
    ```
+
    Always set cost controls: here a 5GB billing limit and the lower-cost batch priority.
 
 3. **Environment-specific configurations**
+
    ```python
    import os
 
@@ -799,6 +840,7 @@ Develop on DuckDB, validate the migration on any cloud platform (`auto_terminate
 ### First-Time Users
 
 1. **DuckDB is included by default**
+
    ```bash
    uv add benchbox
    ```
@@ -870,6 +912,7 @@ Develop on DuckDB, validate the migration on any cloud platform (`auto_terminate
 Platform selection depends on your specific requirements. Common platform choices by use case:
 
 ### SQL Platforms
+
 - **Initial setup**: DuckDB (included by default, no dependencies)
 - **No-cost options**: ClickHouse (self-hosted), DuckDB, SQLite
 - **In-process execution**: ClickHouse, DuckDB (columnar architecture, no network overhead)
@@ -878,10 +921,12 @@ Platform selection depends on your specific requirements. Common platform choice
 - **Self-hosted deployments**: ClickHouse, DuckDB (full control)
 
 ### Spark-Compatible Engines
+
 - **Drop-in Spark replacement (no JVM)**: LakeSail Sail (`lakesail`, `lakesail-df`) - Rust/DataFusion engine via Spark Connect
 - **Accelerate existing Spark jobs**: Apache Gluten + Velox (`velox`) - native C++ operators, Linux-only local mode (Docker on macOS/Windows)
 
 ### DataFrame Platforms
+
 - **Single-node analytics**: Polars-df (multi-threaded, lazy evaluation)
 - **Data science prototyping**: Pandas-df (familiar API, ecosystem compatibility)
 - **Distributed big data**: PySpark-df (cluster-scale processing)

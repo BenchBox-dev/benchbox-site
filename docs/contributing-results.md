@@ -98,7 +98,7 @@ you prefer not to set git config or want a different attribution.
 
 Use this PR title format:
 
-```
+```text
 results: <benchmark> <platform> sf<scale>
 ```
 

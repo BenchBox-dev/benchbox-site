@@ -25,6 +25,7 @@ pipx install benchbox
 BenchBox installs a `benchbox` executable. If you use `uv`, prefer `uv run -- benchbox <command>` to ensure the project virtual environment is activated automatically.
 
 (installation-extras)=
+
 ## 2. Pick Optional Extras
 
 Extras keep the base install lean.

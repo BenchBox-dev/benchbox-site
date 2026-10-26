@@ -78,6 +78,7 @@ jobs:
       - run: npm run lint:comments
       - run: npm run lint:guard
       - run: npm run lint:blog
+      - run: npm run lint:docs
       - run: npm run bundle:verify -- --offline
       - run: npm run docs:parity -w website
       - name: Check the site documentation against the bundle's contracts

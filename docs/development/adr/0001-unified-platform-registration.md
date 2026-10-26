@@ -23,6 +23,7 @@ BenchBox had two parallel systems for platform registration that could drift apa
    - Used by CLI for platform discovery (`benchbox platforms list`)
 
 This led to bugs where:
+
 - New platforms were added to one system but not the other
 - Alias handling was only in `get_platform_adapter()`
 - Installation requirements were duplicated and could diverge
@@ -38,6 +39,7 @@ Make `PlatformRegistry` the single source of truth for all platform-related info
 4. **Metadata**: All platform metadata (requirements, capabilities) lives in `PlatformRegistry`
 
 The `get_platform_adapter()` function remains as a thin wrapper that:
+
 - Handles CLI-specific concerns (driver version resolution, error messages)
 - Delegates all platform lookup to PlatformRegistry
 

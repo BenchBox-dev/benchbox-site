@@ -113,7 +113,7 @@ Synapse Spark executes benchmarks via the Livy API:
 
 ### Auto-Pause and Auto-Scale
 
-```
+```text
 Auto-pause: Pool pauses after idle timeout (saves costs)
 Auto-scale: Pool scales nodes based on workload
 Min nodes: Minimum nodes to keep warm
@@ -189,21 +189,25 @@ Synapse Spark uses vCore-hour billing:
 ### Common Issues
 
 **Authentication fails:**
+
 - Run `az login` for interactive authentication
 - Check service principal credentials
 - Verify tenant ID is correct
 
 **Spark pool not starting:**
+
 - Check pool auto-start is enabled
 - Verify pool isn't at max capacity
 - Review Azure resource quotas
 
 **Storage access denied:**
+
 - Check Storage Blob Data Contributor role
 - Verify managed identity is configured
 - Check container exists and is accessible
 
 **Session timeout:**
+
 - Increase `timeout_minutes` for large scale factors
 - Check pool hasn't auto-paused
 - Review session idle timeout settings

@@ -148,6 +148,7 @@ SHA-256 of the TPC-DS template it derives from, and tests fail when a template o
 ### Example: Query 1
 
 **Standard TPC-DS [Q1](queries/tpcds/q1.md)** (with joins):
+
 ```sql
 SELECT c_customer_id, c_first_name, c_last_name, ...
 FROM customer, store_sales, date_dim, store
@@ -158,6 +159,7 @@ WHERE c_customer_sk = ss_customer_sk
 ```
 
 **TPC-DS-OBT [Q1](queries/tpcds_obt/q1.md)** (flat table):
+
 ```sql
 SELECT c_customer_id, c_first_name, c_last_name, ...
 FROM tpcds_obt

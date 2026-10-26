@@ -8,6 +8,7 @@ BenchBox supports Microsoft Fabric Lakehouse SQL for **read-only query benchmark
 ## Key Constraint
 
 Fabric Lakehouse SQL endpoint is read-only:
+
 - DDL is rejected (`CREATE`, `ALTER`, `DROP`)
 - DML is rejected (`INSERT`, `UPDATE`, `DELETE`, `MERGE`)
 - Query execution (`SELECT`) is supported

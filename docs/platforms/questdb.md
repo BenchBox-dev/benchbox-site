@@ -176,7 +176,7 @@ The QuestDB adapter is a single-module adapter:
 
 ### Connection Model
 
-```
+```text
 BenchBox CLI
     |
     v
@@ -266,11 +266,12 @@ QuestDB has a minimal constraint model:
 
 ### Connection Refused
 
-```
+```text
 Error: Failed to connect to QuestDB
 ```
 
 **Solutions:**
+
 1. Verify QuestDB is running and accessible on the configured host
 2. Check that port 8812 (PG wire protocol) is open and not blocked by a firewall
 3. For Docker deployments, ensure port mapping is correct (`-p 8812:8812`)
@@ -278,21 +279,23 @@ Error: Failed to connect to QuestDB
 
 ### Missing psycopg Dependency
 
-```
+```text
 Error: Missing dependencies for questdb platform: psycopg
 ```
 
 **Solutions:**
+
 1. Install the QuestDB extra: `uv add benchbox --extra questdb`
 2. Or install the driver directly: `uv add "psycopg[binary]"`
 
 ### REST API Import Failures
 
-```
+```text
 Error: REST API import failed
 ```
 
 **Solutions:**
+
 1. Verify the REST API is accessible on the HTTP port (default: 9000)
 2. Check that `requests` is installed: `uv add requests`
 3. Test the REST API directly: `curl http://<host>:9000/exec?query=SELECT%201`
@@ -301,11 +304,12 @@ Error: REST API import failed
 
 ### Schema Creation Failures
 
-```
+```text
 Error: critical CREATE TABLE statement(s) failed
 ```
 
 **Solutions:**
+
 1. Check QuestDB server logs for detailed error messages
 2. Verify the QuestDB user has sufficient privileges
 3. Ensure sufficient disk space on the QuestDB server
@@ -321,6 +325,7 @@ QuestDB requires autocommit mode on the PG wire protocol. The adapter sets `conn
 ### Slow Data Loading
 
 **Solutions:**
+
 1. Ensure the REST API port (9000) is accessible for bulk CSV import
 2. If falling back to COPY, check network latency between BenchBox host and QuestDB
 3. For large datasets, consider increasing the QuestDB server's memory allocation

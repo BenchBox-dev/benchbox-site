@@ -10,6 +10,7 @@ BenchBox provides systematic data generation capabilities for all supported benc
 ## Overview
 
 Data generation in BenchBox is designed to be:
+
 - **Scalable**: Generate data from small test datasets to production-scale benchmarks
 - **Intelligent**: Automatically validate and skip regeneration when valid data exists
 - **Fast**: Optimized generation algorithms and caching
@@ -144,7 +145,8 @@ tables = benchmark.generate_data()
 ```
 
 **Successful validation output:**
-```
+
+```text
 ✅ Valid TPC-H data found for scale factor 1.0
 ✅ Data validation PASSED
    Validated 8 tables
@@ -153,7 +155,8 @@ tables = benchmark.generate_data()
 ```
 
 **Failed validation output:**
-```
+
+```text
 ⚠️️  Data validation failed for scale factor 1.0
 ❌ Data validation FAILED
    Row count mismatches:
@@ -192,6 +195,7 @@ tables_info = {
 The `tables_info` mapping shows the expected tables and approximate row counts at SF=1.0. The `nation` and `region` tables have a fixed size.
 
 **TPC-H specific features:**
+
 - Minimum scale factor of 0.1 (dbgen limitation)
 - Fixed-size dimension tables (nation, region)
 - Standards-compliant data distribution
@@ -224,6 +228,7 @@ recommended operating ranges:
 | 1.0          | 50,000,000      | ~75,000,000         | ~5 GB        |
 
 **CoffeeShop specific highlights:**
+
 - Seasonal (monthly) weighting, regional bias, and linear growth trend.
 - Deterministic order-line explosion following the 60/30/5/4/1 distribution.
 - Vendored seed files for locations and products ensure deterministic IDs and pricing windows.
@@ -248,6 +253,7 @@ print(f"Generated {len(tables)} TPC-DS tables")
 TPC-DS generates 24 tables with complex relationships.
 
 **TPC-DS specific features:**
+
 - 24 interconnected tables
 - Complex dimension and fact table relationships
 - Time-series data with seasonal patterns
@@ -541,6 +547,7 @@ This is a GitHub Actions example.
 #### Scale Factor Mismatches
 
 **Problem**: Existing data was generated with different scale factor
+
 ```python
 benchmark = TPCH(scale_factor=0.5)
 
@@ -552,6 +559,7 @@ Solution 1 is to use a matching scale factor (here 0.5, to match the existing da
 #### Missing or Corrupted Files
 
 **Problem**: Some data files are missing or corrupted
+
 ```python
 benchmark = TPCH(scale_factor=1.0, verbose=True)
 tables = benchmark.generate_data()
@@ -562,6 +570,7 @@ Smart generation automatically detects the problem and regenerates the data. It 
 #### Permission Errors
 
 **Problem**: Cannot read/write data files
+
 ```bash
 chmod 755 ./data
 chown $USER:$USER ./data
@@ -572,6 +581,7 @@ These commands fix the directory permissions.
 #### Disk Space Issues
 
 **Problem**: Not enough space for large scale factors
+
 ```python
 def estimate_data_size(benchmark, scale_factor):
     base_size_mb = {

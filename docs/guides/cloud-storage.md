@@ -8,11 +8,13 @@ BenchBox provides minimal cloud storage path support, allowing you to specify cl
 ## Overview
 
 BenchBox supports cloud storage through the `cloudpathlib` library, which provides unified access to:
+
 - **AWS S3** (`s3://bucket/path`)
 - **Google Cloud Storage** (`gs://bucket/path`)
 - **Azure Blob Storage** (`abfss://container@account.dfs.core.windows.net/path`)
 
 The implementation follows a minimal abstraction approach:
+
 1. **Local Generation**: Data is generated locally using TPC tools
 2. **Cloud Upload**: Generated files are uploaded to specified cloud storage
 3. **Database Integration**: Platform adapters load data directly from cloud storage using native cloud features
@@ -46,6 +48,7 @@ export AWS_DEFAULT_REGION=us-west-2
 `AWS_DEFAULT_REGION` is optional.
 
 Alternative authentication methods:
+
 - AWS credentials file (`~/.aws/credentials`)
 - IAM roles (for EC2 instances)
 - AWS CLI profile (`aws configure`)
@@ -59,6 +62,7 @@ export GOOGLE_APPLICATION_CREDENTIALS=/path/to/service-account.json
 ```
 
 Alternative authentication methods:
+
 - Google Cloud SDK (`gcloud auth application-default login`)
 - Compute Engine default service account
 - Workload Identity (for GKE)
@@ -73,6 +77,7 @@ export AZURE_STORAGE_ACCOUNT_KEY=your_key
 ```
 
 Alternative authentication methods:
+
 - Azure CLI (`az login`)
 - Managed Service Identity
 - SAS tokens
@@ -82,6 +87,7 @@ Alternative authentication methods:
 Databricks Unity Catalog Volumes provide native file storage within the Databricks workspace. BenchBox automatically handles UC Volume uploads for seamless data loading.
 
 **What are UC Volumes?**
+
 - Native Databricks storage accessible via `dbfs:/Volumes/` paths
 - Three-level namespace: `catalog.schema.volume`
 - Available in all Databricks workspaces (including Free Edition)
@@ -99,6 +105,7 @@ benchbox run --platform databricks --benchmark tpch --scale 0.01 \
 ```
 
 This workflow:
+
 1. Generates TPC-H data files locally (TPC tools can't write directly to UC Volumes)
 2. **Automatically creates the schema and UC Volume if they don't exist**
 3. Automatically uploads files to UC Volume using Databricks Files API
@@ -106,6 +113,7 @@ This workflow:
 
 **Prerequisites:**
 Only one prerequisite - install `databricks-sdk` for file uploads:
+
 ```bash
 uv pip install databricks-sdk
 ```
@@ -142,7 +150,8 @@ Both the schema and UC Volume are automatically created if they don't exist - no
 
 **Permission Requirements:**
 If you don't have CREATE SCHEMA or CREATE VOLUME permissions, BenchBox will provide clear guidance:
-```
+
+```text
 Permission denied creating schema: workspace.benchbox
 Ensure you have CREATE SCHEMA permission on catalog workspace
 Or create it manually: CREATE SCHEMA IF NOT EXISTS workspace.benchbox
@@ -240,7 +249,7 @@ The cloud storage implementation follows this workflow:
 3. **Database Loading**: Platform adapters load data directly from cloud storage
 4. **Query Execution**: Benchmarks execute against cloud-loaded data
 
-```
+```text
 Local TPC Tools → Temp Directory → Cloud Upload → Database Loading → Query Execution
      └─────────────── Local ─────────────┘  └─────────── Cloud ──────────────┘
 ```
@@ -289,7 +298,7 @@ Snowflake uses S3 or GCS stages for data loading.
 
 Organize cloud storage with consistent naming:
 
-```
+```text
 s3://my-benchbox-bucket/
 ├── benchmarks/
 │   ├── tpch/
@@ -335,6 +344,7 @@ print(f'Error: {result[\"error\"]}')
 Ensure your cloud credentials have the following permissions:
 
 **AWS S3 Permissions:**
+
 ```json
 {
   "Version": "2012-10-17",
@@ -357,6 +367,7 @@ Ensure your cloud credentials have the following permissions:
 ```
 
 **Google Cloud Storage Permissions:**
+
 - `storage.objects.get`
 - `storage.objects.create`
 - `storage.objects.delete`
@@ -365,6 +376,7 @@ Ensure your cloud credentials have the following permissions:
 ### Large Scale Factors
 
 For large benchmarks (scale factor ≥ 1.0):
+
 - Monitor upload progress and costs
 - Consider using cloud compute near storage region
 - Implement upload retry logic for reliability
@@ -372,6 +384,7 @@ For large benchmarks (scale factor ≥ 1.0):
 ## Examples
 
 See the `examples/` directory for complete cloud storage examples:
+
 - `cloud_storage_s3.py` - AWS S3 integration
 - `cloud_storage_gcs.py` - Google Cloud Storage integration
 
@@ -399,6 +412,7 @@ Use `--force-upload` to bypass validation and force a re‑upload, even when the
 valid. This is helpful for debugging or refreshing remote data.
 
 Troubleshooting tips:
+
 - Ensure the remote path is correct (e.g., `dbfs:/Volumes/<catalog>/<schema>/<volume>`)
 - Verify permissions for reading and writing to the target location
 - Check logs for detailed validation messages (differences between local and remote manifest)

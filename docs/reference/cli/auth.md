@@ -1,4 +1,5 @@
 (cli-auth)=
+
 # `auth` - Hosted Submission Credentials
 
 ```{tags} reference, cli, results

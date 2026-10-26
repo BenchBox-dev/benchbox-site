@@ -1,4 +1,4 @@
-# Welcome to BenchBox's documentation!
+# Welcome to BenchBox's documentation
 
 BenchBox is a comprehensive database benchmarking toolkit supporting TPC-H, TPC-DS, TPC-DI, and other industry-standard benchmarks across SQL and DataFrame platforms.
 

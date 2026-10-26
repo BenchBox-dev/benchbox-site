@@ -80,7 +80,8 @@ result = conn.execute("""
 The most widely supported columnar format. Ideal for analytics workloads and data interchange.
 
 **Structure:**
-```
+
+```text
 customer.parquet
 ├── Row Group 0
 │   ├── Column: c_custkey (INT64, snappy)
@@ -92,6 +93,7 @@ customer.parquet
 ```
 
 **Usage:**
+
 ```bash
 benchbox convert --input ./data --format parquet
 
@@ -101,6 +103,7 @@ benchbox convert --input ./data --format parquet --partition l_shipdate
 ```
 
 **Reading Parquet:** the snippets below use DuckDB, PyArrow, Polars and Pandas, in that order.
+
 ```python
 conn.execute("SELECT * FROM read_parquet('customer.parquet')")
 
@@ -119,7 +122,8 @@ df = pd.read_parquet('customer.parquet')
 A high-performance columnar file format optimized for analytical workloads with excellent compression.
 
 **Structure:**
-```
+
+```text
 customer.vortex
 ├── Encoded column chunks
 │   ├── Column: c_custkey (INT64, compressed)
@@ -129,11 +133,13 @@ customer.vortex
 ```
 
 **Installation:**
+
 ```bash
 uv add vortex-data
 ```
 
 **Usage:**
+
 ```bash
 benchbox convert --input ./data --format vortex
 
@@ -141,6 +147,7 @@ benchbox convert --input ./data --format vortex --compression zstd
 ```
 
 **Reading Vortex:** the first snippet uses the Python `vortex` library. The DuckDB snippet needs the `vortex` extension.
+
 ```python
 import vortex
 array = vortex.io.read('customer.vortex')
@@ -155,7 +162,8 @@ conn.execute("SELECT * FROM read_vortex('customer.vortex')")
 Open table format with ACID transactions, built on Parquet files.
 
 **Structure:**
-```
+
+```text
 customer/
 ├── _delta_log/
 │   ├── 00000000000000000000.json  # Initial commit
@@ -165,17 +173,20 @@ customer/
 ```
 
 **Features:**
+
 - **ACID Transactions**: Concurrent reads/writes with isolation
 - **Time Travel**: Query historical versions of data
 - **Schema Evolution**: Add/remove columns without rewriting
 - **Unified Batch/Streaming**: Same table for both workloads
 
 **Installation:**
+
 ```bash
 uv add deltalake
 ```
 
 **Usage:**
+
 ```bash
 benchbox convert --input ./data --format delta
 
@@ -183,6 +194,7 @@ benchbox convert --input ./data --format delta --compression zstd
 ```
 
 **Reading Delta Lake:** the snippets below use the Python `deltalake` library, DuckDB (which needs the `delta` extension) and Spark, in that order.
+
 ```python
 from deltalake import DeltaTable
 dt = DeltaTable('./customer')
@@ -195,6 +207,7 @@ df = spark.read.format("delta").load("./customer")
 ```
 
 **Time Travel:** the first line queries a specific version and the second queries by timestamp.
+
 ```python
 dt = DeltaTable('./customer', version=0)
 
@@ -206,7 +219,8 @@ dt = DeltaTable('./customer', as_of='2024-01-15T10:00:00')
 Modern table format designed for large-scale data lakes with enterprise features.
 
 **Structure:**
-```
+
+```text
 customer/
 ├── metadata/
 │   ├── v1.metadata.json
@@ -217,17 +231,20 @@ customer/
 ```
 
 **Features:**
+
 - **Hidden Partitioning**: Partition columns not exposed in queries
 - **Schema Evolution**: Full schema changes without data rewrite
 - **Snapshot Isolation**: Consistent reads during writes
 - **Partition Evolution**: Change partitioning without rewriting data
 
 **Installation:**
+
 ```bash
 uv add pyiceberg
 ```
 
 **Usage:**
+
 ```bash
 benchbox convert --input ./data --format iceberg
 
@@ -235,6 +252,7 @@ benchbox convert --input ./data --format iceberg --partition l_shipdate
 ```
 
 **Reading Iceberg:** the first snippet uses PyIceberg and the last uses Spark.
+
 ```python
 from pyiceberg.catalog import load_catalog
 catalog = load_catalog("local", **{"type": "sql", "uri": "sqlite:///catalog.db"})
@@ -249,7 +267,8 @@ df = spark.read.format("iceberg").load("./customer")
 Open table format optimized for incremental processing and record-level operations.
 
 **Structure:**
-```
+
+```text
 customer/
 ├── .hoodie/
 │   ├── hoodie.properties      # Table metadata
@@ -259,6 +278,7 @@ customer/
 ```
 
 **Features:**
+
 - **Record-Level ACID**: Update and delete individual records efficiently
 - **Incremental Processing**: Query only changed data since last commit
 - **COPY_ON_WRITE**: Faster reads, better for analytics workloads
@@ -267,6 +287,7 @@ customer/
 
 **Installation:** Hudi requires PySpark with the `hudi-spark-bundle`. Install PySpark, then configure Spark with
 `spark.jars.packages=org.apache.hudi:hudi-spark3.5-bundle_2.12:0.14.0`.
+
 ```bash
 pip install pyspark
 ```
@@ -286,6 +307,7 @@ adapter = QuantonAdapter(
 ```
 
 **Reading Hudi:** the first query is a full read. The second is an incremental query that returns changes since the given commit time.
+
 ```python
 spark = SparkSession.builder \
     .config("spark.jars.packages", "org.apache.hudi:hudi-spark3.5-bundle_2.12:0.14.0") \
@@ -300,6 +322,7 @@ df = spark.read.format("hudi") \
 ```
 
 **Time Travel:** this query reads the table as of a specific timestamp.
+
 ```python
 df = spark.read.format("hudi") \
     .option("as.of.instant", "20240115100000") \
@@ -311,7 +334,8 @@ df = spark.read.format("hudi") \
 DuckDB's native open table format with full ACID transactions, time travel, and optimal DuckDB performance.
 
 **Structure:**
-```
+
+```text
 customer/
 ├── metadata.ducklake          # DuckLake metadata catalog
 └── data/
@@ -319,6 +343,7 @@ customer/
 ```
 
 **Features:**
+
 - **ACID Transactions**: Full transactional support with snapshot isolation
 - **Time Travel**: Query historical versions of data
 - **Schema Evolution**: Add/modify columns without rewriting data
@@ -329,6 +354,7 @@ customer/
 extension is installed automatically on first use.
 
 **Usage:**
+
 ```bash
 benchbox convert --input ./data --format ducklake
 
@@ -336,6 +362,7 @@ benchbox convert --input ./data --format ducklake --compression zstd
 ```
 
 **Reading DuckLake:**
+
 ```python
 import duckdb
 
@@ -353,6 +380,7 @@ result = conn.execute("SELECT * FROM ducklake_db.main.customer").fetchdf()
 
 **Time Travel:** DuckLake supports querying historical snapshots. Querying a specific version works when your DuckDB
 version supports it.
+
 ```python
 conn.execute("""
     SELECT * FROM ducklake_db.main.customer
@@ -361,6 +389,7 @@ conn.execute("""
 ```
 
 **When to Use DuckLake:**
+
 - **DuckDB-centric workflows**: When DuckDB is your primary analytics engine
 - **Local development**: Fast iteration with full ACID guarantees
 - **Single-engine scenarios**: When you don't need multi-engine compatibility
@@ -379,7 +408,7 @@ conn.execute("""
 
 ### Compression Benchmarks (TPC-H SF=10)
 
-```
+```text
 Format          | Algorithm | Size (MB) | Compress Time | Query Time
 ----------------|-----------|-----------|---------------|------------
 TBL (raw)       | -         | 10,240    | -             | baseline
@@ -407,6 +436,7 @@ benchbox convert --input ./data --format parquet --compression zstd
 ### When to Partition
 
 Partitioning is beneficial when:
+
 - Table has >1M rows
 - Queries frequently filter on specific columns (dates, regions, status)
 - Data has natural partitioning boundaries
@@ -414,11 +444,13 @@ Partitioning is beneficial when:
 ### Partition Column Selection
 
 **Good partition columns:**
+
 - Date/time columns (l_shipdate, o_orderdate)
 - Categorical columns with 10-1000 distinct values (l_returnflag, c_mktsegment)
 - Region/geography columns
 
 **Bad partition columns:**
+
 - High cardinality columns (customer_id, order_id)
 - Columns rarely used in filters
 
@@ -567,7 +599,7 @@ benchbox convert --input ./data --format parquet --no-validate
 
 ### 4. Directory Organization
 
-```
+```text
 benchmark_runs/
 ├── tpch_sf1_tbl/           # Raw TBL files
 ├── tpch_sf1_parquet/       # Parquet conversion
@@ -617,6 +649,7 @@ uv add "duckdb>=1.2.0"
 ### Row Count Mismatch
 
 If validation fails with row count mismatch:
+
 1. Check source TBL files for corruption
 2. Regenerate data with `--force datagen`
 3. If intentional, use `--no-validate`
@@ -625,6 +658,7 @@ If validation fails with row count mismatch:
 
 For very large scale factors (SF > 100), use Zstd for the best compression, and skip validation if conversion is
 slow:
+
 ```bash
 benchbox convert --input ./data --format parquet --compression zstd
 

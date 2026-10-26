@@ -15,6 +15,7 @@ BenchBox provides two execution modes:
 - **Concurrent Query Execution**: Execute queries in parallel to test throughput, scalability, and multi-user scenarios
 
 These features are essential for:
+
 - Production performance evaluation
 - Database stress testing
 - Scalability analysis
@@ -133,21 +134,25 @@ Iterations themselves are a caller loop over stream IDs (one
 single run. Size the loop to the decision:
 
 #### Quick
+
 - **Use Case**: Rapid development testing
 - **Iterations**: 1 (no statistical analysis)
 - **Best For**: Development, unit testing
 
 #### Standard
+
 - **Use Case**: Balanced performance testing
 - **Iterations**: 3
 - **Best For**: Regular performance evaluation
 
 #### Thorough
+
 - **Use Case**: Comprehensive analysis
 - **Iterations**: 5
 - **Best For**: Production evaluation, research
 
 #### Stress
+
 - **Use Case**: Maximum statistical confidence
 - **Iterations**: 10
 - **Best For**: Official benchmarking, publications
@@ -298,16 +303,19 @@ print(f"- Power run timeout: {summary['power_run']['settings']['timeout_per_iter
 ### Optimization Rules
 
 **CPU Core Optimization:**
+
 - `max_concurrent = min(8, max(2, cpu_cores // 4))`
 - Prevents over-subscription of CPU resources
 - Scales appropriately from 2-core to 32+ core systems
 
 **Memory Optimization:**
+
 - **< 8GB**: Extended timeouts (120min power, 600s queries)
 - **8-16GB**: Standard timeouts (60min power, 300s queries)
 - **> 16GB**: Reduced timeouts (45min power, 180s queries)
 
 **Storage Optimization:**
+
 - SSD systems: Higher concurrency, shorter timeouts
 - HDD systems: Lower concurrency, longer timeouts
 - Network storage: Conservative settings with retries
@@ -478,6 +486,7 @@ Results record this under `phases.throughput_test.stream_numbering`.
 ### Verification
 
 Check result compliance:
+
 ```python
 assert result.query_results[0]['query_id'] == 14
 assert result.query_results[0]['stream_id'] == 0
@@ -497,16 +506,19 @@ implementation used by both benchmarks).
 ### Common Issues
 
 **Power Run Failures:**
+
 - **Memory exhaustion**: Reduce scale factor or increase timeout
 - **High variability**: Check for system interference or thermal throttling
 - **Iteration failures**: Enable detailed logging to identify specific issues
 
 **Concurrent Execution Problems:**
+
 - **Deadlocks**: Reduce concurrency level or enable retries
 - **Resource contention**: Lower concurrent stream count
 - **Timeout errors**: Increase timeout values or optimize queries
 
 **Configuration Issues:**
+
 - **Invalid settings**: Use validation before execution
 - **System limitations**: Apply auto-optimization for current hardware
 - **Profile conflicts**: Reset to default before applying new profiles

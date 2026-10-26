@@ -8,6 +8,7 @@ Run the same benchmark on multiple databases to compare performance.
 ## Overview
 
 BenchBox makes it easy to compare platforms because:
+
 - Same benchmark runs identically on all platforms
 - Same data (shared generation)
 - Same validation criteria
@@ -51,7 +52,8 @@ benchbox compare ./benchmark_runs/results/<duckdb-result>.json ./benchmark_runs/
 The SQLite run reuses the same generated data as the DuckDB run.
 
 **Example output** (actual results vary based on hardware, configuration, and workload):
-```
+
+```text
 BenchBox Platform Comparison
 
 ...

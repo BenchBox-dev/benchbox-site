@@ -1,4 +1,5 @@
 (cli-report)=
+
 # `report` - Historical Analysis
 
 ```{tags} reference, cli, analysis
@@ -23,10 +24,12 @@ benchbox report rankings --benchmark <name> --scale-factor <sf> [OPTIONS]
 ```
 
 **Required:**
+
 - `--benchmark, -b TEXT`: Benchmark name (e.g., TPC-H, TPC-DS)
 - `--scale-factor, -s FLOAT`: Scale factor to rank
 
 **Optional:**
+
 - `--metric, -m [geometric_mean|power_at_size|cost_efficiency]`: Metric to rank by (default: `geometric_mean`)
 - `--min-samples INT`: Minimum samples required to include a platform (default: 1)
 - `--lookback-days INT`: Consider results from the last N days (default: 90)
@@ -46,11 +49,13 @@ benchbox report trends --platform <name> --benchmark <name> --scale-factor <sf> 
 ```
 
 **Required:**
+
 - `--platform, -p TEXT`: Platform name
 - `--benchmark, -b TEXT`: Benchmark name
 - `--scale-factor, -s FLOAT`: Scale factor
 
 **Optional:**
+
 - `--periods INT`: Number of periods to analyze (default: 6)
 - `--period-days INT`: Days per period (default: 30)
 - `--db-path PATH`: Path to result database
@@ -68,6 +73,7 @@ benchbox report regressions [OPTIONS]
 ```
 
 **Optional:**
+
 - `--threshold FLOAT`: Regression threshold percentage (default: 10.0)
 - `--lookback-days INT`: Comparison period in days (default: 30)
 - `--db-path PATH`: Path to result database
@@ -86,9 +92,11 @@ benchbox report import <directory> [OPTIONS]
 ```
 
 **Required:**
+
 - `DIRECTORY`: Path to directory containing result JSON files
 
 **Optional:**
+
 - `--pattern TEXT`: Glob pattern for result files (default: `**/*.json`)
 - `--db-path PATH`: Path to result database
 
@@ -106,6 +114,7 @@ benchbox report stats [OPTIONS]
 ```
 
 **Optional:**
+
 - `--db-path PATH`: Path to result database
 
 ### `list` - List Results
@@ -117,6 +126,7 @@ benchbox report list [OPTIONS]
 ```
 
 **Optional:**
+
 - `--platform, -p TEXT`: Filter by platform
 - `--benchmark, -b TEXT`: Filter by benchmark
 - `--limit INT`: Maximum results to show (default: 20)

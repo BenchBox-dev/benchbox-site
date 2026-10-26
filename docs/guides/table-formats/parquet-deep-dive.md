@@ -53,7 +53,7 @@ Parquet enables several optimizations for analytical queries:
 
 Parquet files are divided into row groups, chunks of rows stored together. Each row group is independently readable, enabling parallel processing.
 
-```
+```text
 lineitem.parquet
 ├── Row Group 0 (rows 0-999,999)
 │   ├── Column: l_orderkey (INT64, compressed)
@@ -88,7 +88,7 @@ Within each row group, data is stored by column. This is where columnar benefits
 
 Column chunks are further divided into data pages (typically ~1MB each). Pages are where Parquet's two-stage storage pipeline operates: values are first *encoded*, then *compressed*. Understanding this distinction matters because encoding and compression serve different purposes.
 
-```
+```text
 Column Chunk
 ├── Data Page 0
 │   ├── 1. Encode values (dictionary, delta, RLE, or plain)
@@ -291,23 +291,23 @@ The commands are, in order, a standard benchmark (reproducible and efficient), a
 
 ### Common Mistakes to Avoid
 
-**1. Using CSV for benchmarks**
+#### 1. Using CSV for benchmarks
 
 CSV parsing adds overhead that skews results. A "fast" platform might just be a better CSV parser, not a better query engine.
 
-**2. Ignoring compression settings**
+#### 2. Ignoring compression settings
 
 Different tools use different defaults. DuckDB might generate Snappy, while Spark uses Zstd. Specify compression explicitly for reproducible comparisons.
 
-**3. Comparing across formats**
+#### 3. Comparing across formats
 
 Parquet vs CSV isn't a fair comparison. If you're evaluating formats, compare Parquet to Parquet with different settings, or to other columnar formats like ORC or Vortex.
 
-**4. Forgetting about statistics**
+#### 4. Forgetting about statistics
 
 Queries that filter on columns with good min/max separation benefit from predicate pushdown. If your benchmark doesn't include filtering queries, you're missing a key Parquet optimization.
 
-**5. Not skipping dictionary encoding for high-cardinality columns**
+#### 5. Not skipping dictionary encoding for high-cardinality columns
 
 When dictionary encoding is applied to columns with millions of unique values (like `l_comment`), PyArrow builds a dictionary that exceeds the page size threshold and falls back to PLAIN encoding. The failed dictionary attempt adds write overhead. Use `skip_dictionary_columns` for columns known to have high cardinality.
 

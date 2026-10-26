@@ -5,7 +5,7 @@
 ```{tags} advanced, guide, tpc-ds, validation
 ```
 
-This guide provides systematic documentation for the TPC-DS official benchmark implementation in BenchBox, including Power@Size and Throughput@Size. BenchBox does not export the composite QphDS@Size; see [QphDS@Size (not exported)](#qphds-size-not-exported).
+This guide provides systematic documentation for the TPC-DS official benchmark implementation in BenchBox, including Power@Size and Throughput@Size. BenchBox does not export the composite QphDS@Size; see [QphDS@Size (not exported)](tpc-ds-official-guide.md#qphds-size-not-exported).
 
 > **Derived results.** Derived from TPC-DS. Results produced by BenchBox do not comply with the TPC-DS Specification and must not be compared with official TPC-DS results. The TPC publishes official TPC-DS results only after an audit.
 
@@ -67,7 +67,7 @@ The TPC-DS benchmark is the official Transaction Processing Performance Council 
 
 The **QphDS@Size** (Queries per Hour at Scale Factor) is the TPC-DS primary composite metric. The specification defines it as:
 
-```
+```text
 QphDS@Size = SF × Q / (T_PT × T_TT × T_DM × T_LD)^(1/4)
 ```
 
@@ -88,7 +88,7 @@ The TPC-DS official benchmark implementation consists of several key components:
 
 ### Core Components
 
-```
+```text
 benchbox/core/tpcds/
 ├── benchmark.py           # Main benchmark class
 ├── official_benchmark.py  # Official benchmark runner
@@ -102,7 +102,7 @@ benchbox/core/tpcds/
 
 ### Class Hierarchy
 
-```
+```text
 TPCDSBenchmark
 ├── run_official_benchmark(connection, ..., adapter=)
 └── TPCDSOfficialBenchmark
@@ -125,6 +125,7 @@ dialect; `dialect=` applies to the power and maintenance phases only. For suppor
 benchbox run --official --platform duckdb --benchmark tpcds --scale 10 --seed 42 \
   --phases power,throughput --streams 4 --output ./official_data
 ```
+
 ### Individual Phases
 
 The first command runs the Power Test only. The second runs the Throughput Test only.
@@ -183,6 +184,7 @@ benchbox run --official --platform duckdb --benchmark tpcds --scale 1 --seed 42 
 Read `Power@Size` from the result file's `summary.tpc_metrics` (see [Understanding Results](../../tutorials/understanding-results.md)).
 
 **Characteristics:**
+
 - Sequential execution of all 99 queries
 - Single database connection
 - Measures database query processing capability
@@ -199,6 +201,7 @@ benchbox run --official --platform duckdb --benchmark tpcds --scale 1 --seed 42 
 Read `Throughput@Size` from the result file's `summary.tpc_metrics`.
 
 **Characteristics:**
+
 - Multiple concurrent streams (default: 2)
 - Each stream executes queries in different order
 - Measures concurrent processing capability
@@ -220,6 +223,7 @@ The TPC-DS Maintenance Test simulates real-world data warehouse update operation
 #### What the Maintenance Test Does
 
 TPC-DS maintenance operations simulate ongoing warehouse activity such as:
+
 - **New sales transactions** arriving from retail channels
 - **Customer returns** being processed
 - **Inventory adjustments** based on physical counts
@@ -325,7 +329,7 @@ benchbox run \
 
 #### Workflow Summary
 
-```
+```text
 ✓ Correct:   generate → load → power → throughput → maintenance
 ✓ Correct:   generate → load → power → throughput → maintenance → [RELOAD] → power (if rerunning)
 ✗ Incorrect: generate → load → power → maintenance → throughput  ❌ (throughput runs on modified data!)
@@ -342,7 +346,7 @@ Maintenance results use the same result-file shape as power and throughput runs:
 
 ### TPC-DS Derived Metrics
 
-The implementation calculates Power@Size and Throughput@Size. It does not calculate the composite QphDS@Size (see [QphDS@Size (not exported)](#qphds-size-not-exported)):
+The implementation calculates Power@Size and Throughput@Size. It does not calculate the composite QphDS@Size (see [QphDS@Size (not exported)](tpc-ds-official-guide.md#qphds-size-not-exported)):
 
 ```python
 from benchbox.core.results.loader import load_result_file
@@ -356,12 +360,14 @@ print(f"Throughput@Size: {results.throughput_at_size}")
 ### Calculation Details
 
 #### Power@Size
-```
+
+```text
 Power@Size = (3600 × Scale_Factor) / geometric_mean(power query times in seconds)
 ```
 
 #### Throughput@Size
-```
+
+```text
 Throughput@Size = (99 × Num_Streams × 3600 × Scale_Factor) / Throughput_Test_Time
 ```
 
@@ -584,6 +590,7 @@ Enable verbose output with an official scale factor:
 ```bash
 benchbox run --official --platform duckdb --benchmark tpcds --scale 1 --seed 42 -vv --output ./official_data
 ```
+
 ### Error Recovery
 
 Retry a failed run from the shell, waiting 60 seconds between attempts:
@@ -675,8 +682,9 @@ done
 The TPC-DS official benchmark implementation coordinates the power, throughput, and maintenance phases with Power@Size and Throughput@Size reporting. It does not export the composite QphDS@Size. Results are derived from TPC-DS and carry the derived-results disclaimer above.
 
 For additional support:
+
 - Review the integration tests in `tests/integration/test_tpcds_official_benchmark.py`
-- Consult the TPC-DS specification at http://www.tpc.org/tpcds/
+- Consult the TPC-DS specification at <http://www.tpc.org/tpcds/>
 
 ## References
 

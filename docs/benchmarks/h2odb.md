@@ -86,26 +86,31 @@ platform and scale.
 ### Basic Aggregation Queries
 
 **[Q1](queries/h2odb/q1.md): Simple Count**
+
 ```sql
 SELECT COUNT(*) as count
 FROM trips;
 ```
+
 - **Purpose**: Test basic table scanning and counting
 - **Performance focus**: Sequential scan optimization
 
 **[Q2](queries/h2odb/q2.md): Sum and Mean**
+
 ```sql
 SELECT
     SUM(fare_amount) as sum_fare_amount,
     AVG(fare_amount) as mean_fare_amount
 FROM trips;
 ```
+
 - **Purpose**: Test numeric aggregation functions
 - **Performance focus**: Aggregation algorithm efficiency
 
 ### Grouping Queries
 
 **[Q3](queries/h2odb/q3.md): Single-Column Grouping**
+
 ```sql
 SELECT
     passenger_count,
@@ -114,10 +119,12 @@ FROM trips
 GROUP BY passenger_count
 ORDER BY passenger_count;
 ```
+
 - **Purpose**: Test basic GROUP BY performance
 - **Performance focus**: Hash aggregation vs. sort-based grouping
 
 **[Q4](queries/h2odb/q4.md): Multi-Aggregate Grouping**
+
 ```sql
 SELECT
     passenger_count,
@@ -127,10 +134,12 @@ FROM trips
 GROUP BY passenger_count
 ORDER BY passenger_count;
 ```
+
 - **Purpose**: Test multiple aggregation functions in single query
 - **Performance focus**: Aggregation pipeline efficiency
 
 **[Q5](queries/h2odb/q5.md): Two-Column Grouping**
+
 ```sql
 SELECT
     passenger_count,
@@ -140,12 +149,14 @@ FROM trips
 GROUP BY passenger_count, vendor_id
 ORDER BY passenger_count, vendor_id;
 ```
+
 - **Purpose**: Test multi-column grouping performance
 - **Performance focus**: Hash table size and collision handling
 
 ### Temporal Analysis Queries
 
 **[Q7](queries/h2odb/q7.md): Time-Based Grouping**
+
 ```sql
 SELECT
     EXTRACT(HOUR FROM pickup_datetime) as hour,
@@ -154,10 +165,12 @@ FROM trips
 GROUP BY EXTRACT(HOUR FROM pickup_datetime)
 ORDER BY hour;
 ```
+
 - **Purpose**: Test date/time function performance
 - **Performance focus**: Temporal extraction and grouping
 
 **[Q8](queries/h2odb/q8.md): Complex Temporal Analysis**
+
 ```sql
 SELECT
     DATE_TRUNC('day', pickup_datetime) as pickup_date,
@@ -171,12 +184,14 @@ WHERE pickup_datetime >= '{start_date}'
 GROUP BY DATE_TRUNC('day', pickup_datetime), passenger_count
 ORDER BY pickup_date, passenger_count;
 ```
+
 - **Purpose**: Test complex temporal aggregation with filtering
 - **Performance focus**: Date range filtering and multi-level grouping
 
 ### Advanced-level Analytics Queries
 
 **[Q9](queries/h2odb/q9.md): Statistical Analysis**
+
 ```sql
 SELECT
     vendor_id,
@@ -192,6 +207,7 @@ WHERE fare_amount > 0
 GROUP BY vendor_id
 ORDER BY total_revenue DESC;
 ```
+
 - **Purpose**: Test statistical function performance
 - **Performance focus**: Percentile calculations and complex aggregations
 
@@ -456,24 +472,28 @@ The example loads the data into pandas to simulate ML preprocessing, then times 
 ### Query Performance Patterns
 
 **Basic Queries ([Q1](queries/h2odb/q1.md)-[Q2](queries/h2odb/q2.md)):**
+
 - **Primary bottleneck**: Sequential scan speed and basic aggregation
 - **Optimization targets**: Column store scanning, SIMD operations
 - **Typical performance**: Sub-second (10ms-2s depending on data size)
 - **Scaling characteristics**: Linear with data size
 
 **Grouping Queries ([Q3](queries/h2odb/q3.md)-[Q6](queries/h2odb/q6.md)):**
+
 - **Primary bottleneck**: Hash table construction and aggregation algorithms
 - **Optimization targets**: Hash aggregation efficiency, memory management
 - **Typical performance**: Fast to medium, seconds to tens of seconds
 - **Scaling characteristics**: Sub-linear with good hash distribution
 
 **Temporal Queries ([Q7](queries/h2odb/q7.md)-[Q8](queries/h2odb/q8.md)):**
+
 - **Primary bottleneck**: Date/time function evaluation and temporal grouping
 - **Optimization targets**: Date extraction optimization, temporal indexing
 - **Typical performance**: Medium, seconds to minutes
 - **Scaling characteristics**: Depends on temporal selectivity
 
 **Advanced-level Analytics ([Q9](queries/h2odb/q9.md)-[Q10](queries/h2odb/q10.md)):**
+
 - **Primary bottleneck**: Statistical function computation, complex aggregations
 - **Optimization targets**: Statistical algorithm efficiency, sorting performance
 - **Typical performance**: Slower, minutes for large datasets
@@ -662,18 +682,21 @@ The table uses a MergeTree engine partitioned by month, and the queries use Clic
 ## Best Practices
 
 ### Data Generation
+
 1. **Scale appropriately** - Use realistic scale factors for your system capacity
 2. **Consider temporal distribution** - Generate realistic date ranges
 3. **Optimize data types** - Use appropriate precision for decimal fields
 4. **Partition strategy** - Partition by date for temporal query performance
 
 ### Query Optimization
+
 1. **Index strategy** - Create indices on frequently grouped columns
 2. **Aggregation optimization** - Use hash aggregation where possible
 3. **Memory management** - Monitor memory usage for large grouping operations
 4. **Parallel execution** - Use parallel aggregation for large datasets
 
 ### Performance Testing
+
 1. **Warm-up queries** - Run queries multiple times to account for caching
 2. **Resource monitoring** - Monitor CPU, memory, and I/O during execution
 3. **Baseline establishment** - Establish performance baselines for regression testing
@@ -683,7 +706,7 @@ The table uses a MergeTree engine partitioned by month, and the queries use Clic
 
 ### Performance Issues
 
-**Issue: Slow aggregation queries on large datasets**
+#### Issue: Slow aggregation queries on large datasets
 
 Solution: create appropriate indices and use columnar storage.
 
@@ -698,7 +721,7 @@ CREATE TABLE trips_columnar (
 PARTITIONED BY (DATE_TRUNC('month', pickup_datetime));
 ```
 
-**Issue: Memory issues with large GROUP BY operations**
+#### Issue: Memory issues with large GROUP BY operations
 
 Solution: use incremental aggregation or external sorting. The first `SET` statement is for PostgreSQL and the second is for ClickHouse. Alternatively, break large groups into smaller pieces, such as the monthly chunk below.
 
@@ -715,7 +738,7 @@ GROUP BY passenger_count, vendor_id;
 
 ### Data Quality Issues
 
-**Issue: Incorrect temporal analysis results**
+#### Issue: Incorrect temporal analysis results
 
 Solution: ensure proper timezone handling and date parsing. The `pickup_datetime >= '1900-01-01'` filter removes invalid dates.
 
@@ -730,7 +753,7 @@ GROUP BY EXTRACT(HOUR FROM pickup_datetime AT TIME ZONE 'UTC')
 ORDER BY hour;
 ```
 
-**Issue: Unexpected aggregation results**
+#### Issue: Unexpected aggregation results
 
 Solution: handle NULL values and outliers appropriately. The `passenger_count BETWEEN 0 AND 10` filter removes unrealistic values.
 

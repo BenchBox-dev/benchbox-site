@@ -54,6 +54,7 @@ benchbox visualize results/*.json --template flagship
 ```
 
 **Generates:**
+
 - Performance bar chart (platform comparison)
 - Query variance heatmap (per-query analysis)
 - Cost-performance scatter (ROI analysis, if cost data available)
@@ -68,6 +69,7 @@ benchbox visualize duckdb.json snowflake.json --template head_to_head
 ```
 
 **Generates:**
+
 - Performance bar chart (side-by-side comparison)
 - Distribution box plot (consistency comparison)
 - Query variance heatmap (per-query winners)
@@ -81,6 +83,7 @@ benchbox visualize runs/2024/*.json runs/2025/*.json --template trends
 ```
 
 **Generates:**
+
 - Time-series line chart
 - Latest snapshot bar chart
 
@@ -93,6 +96,7 @@ benchbox visualize cloud_results/*.json --template cost_optimization
 ```
 
 **Generates:**
+
 - Cost-performance scatter
 - Performance comparison bar chart
 
@@ -150,6 +154,7 @@ benchbox visualize results/*.json --chart-type performance_bar,cost_scatter
 ### Empty or Missing Charts
 
 Check that your result JSON includes the required fields:
+
 - Performance bar: `total_time_ms` or `avg_time_ms`
 - Distribution box: per-query `execution_time_ms` values
 - Heatmap: At least 2 platforms with query-level timings
@@ -158,6 +163,7 @@ Check that your result JSON includes the required fields:
 ### "No result sources provided"
 
 Either specify files explicitly or ensure `benchmark_runs/results/` contains JSON files:
+
 ```bash
 benchbox visualize benchmark_runs/results/my_result.json
 ```

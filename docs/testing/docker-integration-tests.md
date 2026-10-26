@@ -188,11 +188,12 @@ run cannot pass silently.
 
 Tests skip automatically when their Docker service isn't running:
 
-```
+```text
 SKIPPED [1] test_clickhouse_live.py:44: Skipping ClickHouse Docker test: service not reachable at localhost:9000
 ```
 
 This means:
+
 - `make test-fast` is never affected by Docker availability
 - CI pipelines can selectively enable Docker platforms
 - Developers only need Docker for the platforms they're working on

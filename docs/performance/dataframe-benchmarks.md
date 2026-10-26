@@ -10,6 +10,7 @@ This guide covers DataFrame performance profiling, optimization, and benchmarkin
 ## Overview
 
 BenchBox provides tools for:
+
 - Profiling DataFrame query execution
 - Comparing DataFrame vs SQL performance
 - Capturing and analyzing query plans
@@ -167,6 +168,7 @@ for comp in comparisons:
 | **Best For** | Medium-large datasets | Up to ~100GB on single node |
 
 **Optimization Tips:**
+
 - Use `.lazy()` for query optimization
 - Enable streaming for very large datasets: `--execution-engine streaming`
 - Minimize `.collect()` calls
@@ -182,6 +184,7 @@ for comp in comparisons:
 | **Best For** | Small-medium datasets | Up to ~10GB |
 
 **Optimization Tips:**
+
 - Use PyArrow backend: `--platform-option dtype_backend=pyarrow`
 - Minimize DataFrame copies
 - Use vectorized operations

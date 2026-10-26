@@ -74,7 +74,7 @@ print(f"Estimated memory: {result.estimated_resources.get('estimated_memory_usag
 
 When you run a dry run, BenchBox creates an output directory:
 
-```
+```text
 dry_run_output/
 ├── <prefix>_<timestamp>.json                    # Complete configuration summary
 ├── <prefix>_<timestamp>.yaml                    # Human-readable configuration
@@ -96,6 +96,7 @@ inside the JSON/YAML output, not separate files.
 ### Summary Files
 
 **`<prefix>_<timestamp>.json`** - Complete structured output (keys include `benchmark_config`, `database_config`, `system_profile`, `platform_config`, `queries`, `schema_sql`, `ddl_preview`, `post_load_statements`, `tuning_config`, `constraint_config`, `estimated_resources`, `query_preview`, `warnings`, and `timestamp`):
+
 ```json
 {
   "benchmark_config": {
@@ -127,6 +128,7 @@ inside the JSON/YAML output, not separate files.
 Individual SQL files are saved in the `<prefix>_queries_<timestamp>/` directory. Files contain the generated SQL with no header comments:
 
 **`<prefix>_queries_<timestamp>/query_1.sql`:**
+
 ```sql
 SELECT "l_returnflag", "l_linestatus", SUM("l_quantity") AS "sum_qty", ... FROM "lineitem" WHERE "l_shipdate" <= CAST('1998-12-01' AS DATE) - INTERVAL '90' DAY GROUP BY "l_returnflag", "l_linestatus" ORDER BY "l_returnflag", "l_linestatus"
 ```
@@ -134,6 +136,7 @@ SELECT "l_returnflag", "l_linestatus", SUM("l_quantity") AS "sum_qty", ... FROM 
 ### Schema File
 
 **`<prefix>_schema_<timestamp>.sql`** - Complete database schema (excerpt below is truncated; the file continues with all tables):
+
 ```sql
 CREATE TABLE region (
     r_regionkey INTEGER NOT NULL,
@@ -208,7 +211,7 @@ benchbox run --dry-run ./tuned_preview \
 
 Additional output includes a constraint table and per-table organization tunings (excerpt):
 
-```
+```text
 Tuning Configuration
 ┏━━━━━━━━━━━━━━━━━┳━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
 ┃ Constraint Type ┃ Enabled ┃ Configuration                     ┃
@@ -387,17 +390,20 @@ validate_queries("./my_dry_run", "duckdb")
 
 ### Common Issues
 
-**"No queries extracted"**
+#### "No queries extracted"
+
 - Check if benchmark name is correct
 - Verify benchmark supports the specified scale factor
 - Try a different scale factor (some benchmarks have minimum scales)
 
-**"Schema generation failed"**
+#### "Schema generation failed"
+
 - Ensure database platform is supported
 - Check if benchmark has schema definitions
 - Try without tuning options first
 
-**"Resource estimates unavailable"**
+#### "Resource estimates unavailable"
+
 - Some benchmarks don't support resource estimation
 - Check if benchmark has proper metadata
 - Estimates are approximate and may not be available for all benchmarks
@@ -405,6 +411,7 @@ validate_queries("./my_dry_run", "duckdb")
 ### Debugging with Dry Run
 
 **Configuration Issues:**
+
 ```bash
 benchbox run --dry-run ./debug \
   --platform problematic_db \
@@ -415,6 +422,7 @@ cat ./debug/*.json | jq '.warnings'
 ```
 
 **Query Issues:**
+
 ```bash
 benchbox run --dry-run ./query_check \
   --platform target_platform \
@@ -427,6 +435,7 @@ done
 ```
 
 **Platform Compatibility:**
+
 ```bash
 benchbox run --dry-run ./platform_test \
   --platform clickhouse-local \

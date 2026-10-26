@@ -7,7 +7,7 @@
 
 ## Top-Level Layout
 
-```
+```text
 BenchBox/
 ├── benchbox/              # Main package (see below)
 ├── tests/                 # Test suite
@@ -28,7 +28,7 @@ BenchBox/
 
 Benchmark wrapper classes that re-export core implementations:
 
-```
+```text
 benchbox/
 ├── __init__.py            # Package exports
 ├── base.py                # BaseBenchmark abstract base class
@@ -55,7 +55,7 @@ benchbox/
 
 ### `core/` - Core Infrastructure (39 subdirectories)
 
-```
+```text
 benchbox/core/
 ├── runner/                # Benchmark lifecycle execution
 │   ├── runner.py          #   run_benchmark_lifecycle(), LifecyclePhases
@@ -117,7 +117,7 @@ benchbox/core/
 
 ### `platforms/` - Database Adapters
 
-```
+```text
 benchbox/platforms/
 ├── base/                  # Base adapter classes
 │   ├── adapter.py         #   PlatformAdapter (abstract base, ~5000 lines)
@@ -178,7 +178,7 @@ benchbox/platforms/
 
 ### `cli/` - Command-Line Interface
 
-```
+```text
 benchbox/cli/
 ├── main.py                # CLI entry point and command registration
 ├── orchestrator.py        # BenchmarkOrchestrator (run lifecycle)
@@ -208,7 +208,7 @@ benchbox/cli/
 
 ### Other Top-Level Packages
 
-```
+```text
 benchbox/
 ├── mcp/                   # MCP server for AI assistant integration
 ├── utils/                 # Shared utilities (file I/O, formatting, clock)

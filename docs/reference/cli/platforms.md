@@ -1,4 +1,5 @@
 (cli-platforms)=
+
 # `platforms` - Platform Management
 
 ```{tags} reference, cli, sql-platform
@@ -7,6 +8,7 @@
 Manage database platform adapters, check availability, and configure platforms for use with BenchBox.
 
 The `platforms` command group provides tools for:
+
 - Discovering available database platforms
 - Enabling/disabling platforms for benchmark execution
 - Checking platform dependencies and installation status
@@ -20,6 +22,7 @@ The `platforms` command group provides tools for:
 List all database platforms with their current status and availability.
 
 **Options:**
+
 - `--all`: Show all platforms including those with missing dependencies
 - `--format [table|simple]`: Output format (default: table)
 
@@ -51,6 +54,7 @@ benchbox platforms status databricks
 Enable a platform for use in benchmark execution.
 
 **Options:**
+
 - `--force`: Enable platform even if dependencies are missing (not recommended)
 
 **Usage Examples:**
@@ -76,6 +80,7 @@ benchbox platforms disable sqlite
 Get step-by-step installation guidance for platform dependencies.
 
 **Options:**
+
 - `--dry-run`: Show installation commands without explaining
 
 **Usage Examples:**
@@ -91,6 +96,7 @@ benchbox platforms install databricks --dry-run
 Check platform availability and configuration status. Useful for CI/CD validation.
 
 **Options:**
+
 - `--enabled-only`: Check only enabled platforms
 
 **Usage Examples:**
@@ -104,6 +110,7 @@ benchbox platforms check duckdb databricks bigquery
 ```
 
 **Exit Codes:**
+
 - `0`: All checked platforms are ready
 - `1`: One or more platforms have issues
 
@@ -112,6 +119,7 @@ benchbox platforms check duckdb databricks bigquery
 Launch an interactive wizard to configure platforms. Guides you through enabling, disabling, and installing platforms.
 
 **Options:**
+
 - `--interactive` / `--non-interactive`: Setup mode (default: interactive)
 
 **Usage Examples:**

@@ -8,6 +8,7 @@ BenchBox provides comprehensive data compression support to reduce storage requi
 ## Overview
 
 The compression system offers:
+
 - **6-8x storage reduction** for typical benchmark data
 - **Multiple compression algorithms** (Gzip, Zstd, or no compression)
 - **Streaming compression** without intermediate uncompressed files
@@ -53,6 +54,7 @@ With compression enabled, files are saved as `.zst` files with automatic compres
 ## Compression Types
 
 ### Zstd (Default, Recommended)
+
 - **Best overall performance** and compression ratio
 - **Compression levels**: 1-22 (default: 3)
 - **Typical ratios**: 6-10:1 for benchmark data
@@ -63,6 +65,7 @@ benchbox run --platform duckdb --benchmark tpch --compression zstd
 ```
 
 ### Gzip (Universal Compatibility)
+
 - **Widely supported** across platforms
 - **Compression levels**: 1-9 (default: 6)
 - **Typical ratios**: 5-8:1 for benchmark data
@@ -73,6 +76,7 @@ benchbox run --platform duckdb --benchmark tpch --compression gzip
 ```
 
 ### None (No Compression)
+
 - **Standard uncompressed files**
 - **Use case**: When compression is not desired or supported
 
@@ -93,6 +97,7 @@ Based on testing with SSB benchmark data:
 ## Compression Levels
 
 ### Gzip Levels (1-9)
+
 - **Level 1**: Fastest compression, lower ratio
 - **Level 6**: Default, good balance
 - **Level 9**: Maximum compression, slower
@@ -106,6 +111,7 @@ benchbox run --platform duckdb --benchmark tpch --compression gzip:9
 `gzip:1` is fast compression and `gzip:9` is maximum compression.
 
 ### Zstd Levels (1-22)
+
 - **Level 1**: Fastest compression
 - **Level 3**: Default, excellent balance
 - **Level 19**: Maximum compression (higher levels exist but take 10x+ longer)
@@ -234,6 +240,7 @@ benchbox run --platform duckdb --benchmark tpch
 ### When to Use Compression
 
 **✅ Recommended for:**
+
 - Large scale factors (≥1.0)
 - Storage-constrained environments
 - CI/CD pipelines
@@ -241,6 +248,7 @@ benchbox run --platform duckdb --benchmark tpch
 - Repeated benchmark runs
 
 **❌ Consider avoiding for:**
+
 - Very small datasets (scale < 0.1)
 - Platforms that don't support compressed files
 - Time-critical scenarios where compression overhead matters
@@ -248,16 +256,19 @@ benchbox run --platform duckdb --benchmark tpch
 ### Compression Type Selection
 
 **Use Zstd when:**
+
 - You want the best compression ratio and speed
 - Storage space is a primary concern
 - You're using modern systems
 
 **Use Gzip when:**
+
 - You need maximum compatibility
 - Downstream tools only support gzip
 - You're working with legacy systems
 
 **Use None when:**
+
 - Dataset is very small
 - Platform adapters don't support decompression
 - Debugging file contents manually
@@ -265,16 +276,19 @@ benchbox run --platform duckdb --benchmark tpch
 ### Performance Tuning
 
 **For Speed:**
+
 ```bash
 benchbox run --platform duckdb --benchmark tpch --compression zstd:1
 ```
 
 **For Size:**
+
 ```bash
 benchbox run --platform duckdb --benchmark tpch --compression zstd:15
 ```
 
 **For Balance:**
+
 ```bash
 benchbox run --platform duckdb --benchmark tpch --compression zstd
 ```
@@ -291,12 +305,14 @@ uv pip install zstandard
 pip install zstandard
 ```
 
-**"Compressed file not found"**
+#### "Compressed file not found"
+
 - Check that `--compression <codec>` was used during generation
 - Verify file extensions (.gz, .zst)
 - Ensure compression completed successfully
 
-**"Decompression failed"**
+#### "Decompression failed"
+
 - File may be corrupted during transfer
 - Check compression/decompression compatibility
 - Verify sufficient disk space

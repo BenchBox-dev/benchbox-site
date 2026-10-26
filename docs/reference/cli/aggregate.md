@@ -1,4 +1,5 @@
 (cli-aggregate)=
+
 # `aggregate` - Aggregate Results
 
 ```{tags} reference, cli, analysis
@@ -15,10 +16,12 @@ benchbox aggregate --input-dir <path> --output-file <path> [OPTIONS]
 ## Options
 
 **Required:**
+
 - `--input-dir PATH`: Directory containing result JSON files (searched recursively)
 - `--output-file PATH`: Output CSV file path
 
 **Optional:**
+
 - `--benchmark TEXT`: Filter results by benchmark name
 - `--platform TEXT`: Filter results by platform name
 

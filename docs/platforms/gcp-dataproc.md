@@ -72,7 +72,7 @@ These are `DataprocAdapter` keyword arguments.
 | n2-highmem-8 | 8 | 64GB | ~$0.52 | Large joins/aggregations |
 | c2-standard-4 | 4 | 16GB | ~$0.21 | CPU-intensive |
 
-*Preemptible VMs: ~80% cheaper but can be interrupted*
+*Preemptible VMs: ~80% cheaper but can be interrupted.*
 
 ## Python API
 
@@ -163,7 +163,7 @@ For TPC-H at SF=10 with 4 workers, the settings include `spark.sql.shuffle.parti
 | 10.0 | ~10 GB | 4x n2-std-8 | ~4 hours | ~$6.24 |
 | 100.0 | ~100 GB | 8x n2-std-8 | ~8 hours | ~$24.96 |
 
-*With preemptible workers: reduce worker costs by ~80%*
+*With preemptible workers: reduce worker costs by ~80%.*
 
 ## IAM Configuration
 
@@ -190,22 +190,26 @@ The first two bindings are for the service account that runs BenchBox. The third
 ### Common Issues
 
 **Cluster creation fails:**
+
 - Verify Dataproc API is enabled
 - Check service account permissions
 - Ensure region has available quota
 
 **Job fails to start:**
+
 - Check cluster is in RUNNING state
 - Verify GCS bucket is accessible
 - Review job logs in Dataproc console
 
 **Slow performance:**
+
 - Increase number of workers
 - Use larger machine types
 - Enable preemptible secondary workers
 - Check for data skew in queries
 
 **GCS access denied:**
+
 - Verify service account has Storage Object Admin role
 - Check bucket and object permissions
 - Ensure bucket is in same project or cross-project access is configured

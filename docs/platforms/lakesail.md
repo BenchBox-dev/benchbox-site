@@ -177,7 +177,7 @@ LakeSail Sail replaces the Spark execution engine with a Rust-based runtime buil
 
 ### Spark Connect Integration
 
-```
+```text
 ┌──────────────────┐     Spark Connect     ┌──────────────────────┐
 │  PySpark Client   │ ──── Protocol ────>  │   LakeSail Sail       │
 │  (standard API)   │     (gRPC)           │   Server              │
@@ -262,6 +262,7 @@ benchbox run --platform lakesail:distributed --benchmark tpch --scale 100.0
 ### When to Use LakeSail
 
 **Use LakeSail when:**
+
 - You want Spark compatibility with native execution performance (avoiding JVM overhead)
 - Migrating from an existing PySpark/Spark SQL workload with no code changes
 - Running OLAP and analytics benchmarks where execution speed matters
@@ -269,6 +270,7 @@ benchbox run --platform lakesail:distributed --benchmark tpch --scale 100.0
 - You need both SQL and DataFrame benchmarking on the same engine
 
 **Use Apache Spark instead when:**
+
 - You need the broadest ecosystem of connectors and integrations
 - You require Delta Lake or Iceberg table format support
 - You depend on Spark-specific plugins or UDFs not yet supported by Sail
@@ -278,11 +280,12 @@ benchbox run --platform lakesail:distributed --benchmark tpch --scale 100.0
 
 ### Connection Refused
 
-```
+```text
 Failed to connect to LakeSail Sail: Connection refused
 ```
 
 **Solutions:**
+
 1. Verify the Sail server is running and accepting connections
 2. Check the endpoint URL format: `sc://host:port` (default: `sc://localhost:50051`)
 3. Verify the port is not blocked by a firewall
@@ -290,32 +293,35 @@ Failed to connect to LakeSail Sail: Connection refused
 
 ### PySpark Not Installed
 
-```
+```text
 PySpark not installed. Install with: uv add benchbox --extra lakesail
 ```
 
 **Solutions:**
+
 1. Install the Spark Connect-capable PySpark client: `uv add benchbox --extra lakesail`
 2. LakeSail uses the standard PySpark API through Spark Connect; no LakeSail-specific client is needed in BenchBox.
 
 ### Database Creation Failed
 
-```
+```text
 Failed to create database: ...
 ```
 
 **Solutions:**
+
 1. Verify the Sail server has write permissions
 2. Check that the database name uses only alphanumeric characters and underscores
 3. Try connecting with a simpler database name: `--platform-option database=test`
 
 ### Query Execution Timeout
 
-```
+```text
 Query execution timed out
 ```
 
 **Solutions:**
+
 1. Increase driver memory: `driver_memory="16g"`
 2. Adjust shuffle partitions: `shuffle_partitions=32`
 3. For large-scale benchmarks, point BenchBox at a larger Sail server that you run: `--platform lakesail:distributed`
@@ -323,11 +329,12 @@ Query execution timed out
 
 ### Table Already Exists
 
-```
+```text
 Table 'lineitem' already exists
 ```
 
 **Solutions:**
+
 1. The adapter handles this automatically by dropping and recreating tables
 2. Force data regeneration: `benchbox run --force all --platform lakesail ...`
 3. Manually drop the database: connect to the Sail server and run `DROP DATABASE <name> CASCADE`

@@ -17,6 +17,7 @@ Documentation for testing BenchBox functionality, including live integration tes
 ## Test Categories
 
 ### Unit Tests
+
 Fast, isolated tests for individual components without external dependencies.
 
 ```bash
@@ -27,6 +28,7 @@ uv run -- python -m pytest -m unit
 The two commands are alternatives.
 
 ### Integration Tests
+
 Tests that verify interaction between components, may use embedded databases.
 
 ```bash
@@ -37,6 +39,7 @@ uv run -- python -m pytest -m "integration and not live_integration"
 The two commands are alternatives.
 
 ### E2E Tests
+
 End-to-end tests that validate complete benchmark workflows through the CLI.
 
 ```bash
@@ -50,6 +53,7 @@ uv run -- python -m pytest tests/e2e/
 The `e2e_quick` marker runs quick E2E tests in dry-run mode, `e2e_local` runs local platform E2E tests with full execution, and the last command runs all E2E tests.
 
 E2E tests cover:
+
 - CLI option validation (`--benchmark`, `--scale`, `--phases`, `--queries`, etc.)
 - Error handling for invalid parameters
 - Result file validation and schema compliance
@@ -60,6 +64,7 @@ E2E tests cover:
 See [E2E Testing Guide](e2e-testing.md) for detailed information.
 
 ### Docker Integration Tests
+
 Tests that execute real queries against database engines running in Docker containers.
 No cloud credentials needed: just Docker.
 
@@ -74,6 +79,7 @@ The first command tests a single platform and the second tests all Docker platfo
 See [Docker Integration Tests](docker-integration-tests.md) for platform list and setup.
 
 ### Live Integration Tests (Cloud)
+
 Tests that require live database credentials and cloud platforms.
 
 ```bash

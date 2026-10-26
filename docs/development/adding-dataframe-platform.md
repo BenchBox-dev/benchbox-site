@@ -40,6 +40,7 @@ result = (
 ```
 
 **Key characteristics:**
+
 - `col()` function for column references
 - `lit()` function for literal values
 - Method chaining with expression composition
@@ -59,6 +60,7 @@ result = filtered.groupby('category').agg({'amount': 'sum'})
 ```
 
 **Key characteristics:**
+
 - String-based column names: `df['column']`
 - Boolean indexing for filtering
 - Dictionary-based aggregation specifications

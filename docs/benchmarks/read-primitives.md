@@ -30,6 +30,7 @@ The majority of queries derive from **Apache Impala's targeted-perf workload**, 
 - **Purpose**: Focused performance testing of database primitives without business logic complexity
 
 The targeted-perf workload provides systematic testing of:
+
 - Aggregation operations (simple, grouped, materialized)
 - Broadcast and shuffle joins
 - Filter predicates (selective, non-selective, conjunct ordering)
@@ -46,6 +47,7 @@ The 13 `optimizer_*` queries are based on **Justin Jaffray's optimizer sniff tes
 - **Purpose**: Evaluate query optimizer effectiveness across different databases
 
 These queries test optimizer capabilities including:
+
 - Subquery decorrelation (EXISTS to semijoin)
 - Redundant operation elimination (DISTINCT elimination)
 - Common subexpression elimination
@@ -64,6 +66,7 @@ See [Optimizer Tests Documentation](../advanced/optimizer-tests.md) for detailed
 ### BenchBox Extensions
 
 BenchBox extends these foundations with modern SQL capabilities:
+
 - **Window functions** (ROW_NUMBER, RANK, LAG, LEAD, aggregate windows)
 - **OLAP operations** (CUBE, ROLLUP, GROUPING SETS)
 - **Statistical functions** (PERCENTILE_CONT, VARIANCE, STDDEV, CORR)
@@ -168,6 +171,7 @@ The Read Primitives benchmark reuses the **TPC-H schema** for data generation, p
 ### Data Generation
 
 The benchmark leverages the existing TPC-H data generation infrastructure:
+
 - **No additional data files** required beyond TPC-H
 - **Consistent data patterns** across all primitive queries
 - **Referential integrity** maintained automatically
@@ -389,16 +393,19 @@ The categories are sorted by total time to identify bottlenecks.
 ### Query Execution Patterns
 
 **Fast Primitives (< 10ms on SF 0.01):**
+
 - Simple filters: Single-column predicates
 - Basic aggregations: COUNT, SUM without grouping
 - Limit queries: TOP-N without sorting
 
 **Medium Primitives (10-100ms on SF 0.01):**
+
 - Join operations: 2-3 table joins
 - Group by operations: Single-column grouping
 - Window functions: Basic ROW_NUMBER, RANK
 
 **Slower Primitives (> 100ms on SF 0.01):**
+
 - Complex joins: Multi-table joins with filters
 - Multi-column grouping: High cardinality groups
 - Advanced window functions: LAG, LEAD with partitioning
@@ -449,18 +456,21 @@ query_mysql = primitives.get_query("aggregation_sum_basic", dialect="mysql")
 ## Best Practices
 
 ### Data Generation
+
 1. **Reuse TPC-H data** - Generate once, use for all primitive queries
 2. **Use appropriate scale factors** - Start small for development
 3. **Cache generated data** - Avoid regeneration overhead
 4. **Validate data integrity** - Ensure referential integrity
 
 ### Query Execution
+
 1. **Category-based testing** - Focus on relevant primitive categories
 2. **Multiple iterations** - Run queries multiple times for stable timings
 3. **Clear caches** - Between runs for cold performance testing
 4. **Monitor resources** - Track CPU, memory, I/O usage
 
 ### Regression Testing
+
 1. **Establish baselines** - Record initial performance metrics
 2. **Automated comparison** - Use regression testing frameworks
 3. **Threshold-based alerts** - Define acceptable performance variance
@@ -470,27 +480,34 @@ query_mysql = primitives.get_query("aggregation_sum_basic", dialect="mysql")
 
 ### Data Generation Issues
 
-**Issue: Data generation too slow**
+#### Issue: Data generation too slow
+
 ```python
 primitives = ReadPrimitives(scale_factor=0.01, parallel=8)
 ```
+
 Solution: use a smaller scale factor or parallel generation.
 
-**Issue: Out of disk space**
+#### Issue: Out of disk space
+
 ```python
 primitives = ReadPrimitives(scale_factor=0.001)
 ```
+
 Solution: use the micro scale factor (about 1MB) or clean up old data.
 
 ### Query Execution Issues
 
-**Issue: Queries timeout on large scale**
+#### Issue: Queries timeout on large scale
+
 ```python
 primitives = ReadPrimitives(scale_factor=0.01)
 ```
+
 Solution: start with a smaller scale factor for fast execution.
 
-**Issue: Inconsistent performance measurements**
+#### Issue: Inconsistent performance measurements
+
 ```python
 times = []
 for _ in range(5):
@@ -500,6 +517,7 @@ for _ in range(5):
 
 median_time = sorted(times)[len(times) // 2]
 ```
+
 Solution: run multiple iterations and use the median.
 
 ## DataFrame Support

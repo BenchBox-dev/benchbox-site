@@ -19,7 +19,7 @@ The BenchBox repository includes an `examples/` directory with over 50 practical
 
 ## Directory Structure
 
-```
+```text
 examples/
 ├── getting_started/          # Zero to working in minutes
 │   ├── local/               # DuckDB examples (no config needed)
@@ -76,16 +76,19 @@ examples/
 ### By Experience Level
 
 **Beginner** (Never used BenchBox):
+
 - Start: `examples/getting_started/local/duckdb_tpch_power.py`
 - Zero configuration, runs in seconds
 - Uses DuckDB (embedded database, no setup required)
 
 **Intermediate** (Used BenchBox CLI):
+
 - Explore: `examples/features/` for specific capabilities
 - Try: `examples/getting_started/cloud/` for cloud platforms
 - Read: `examples/PATTERNS.md` for best practices
 
 **Advanced** (Building production workflows):
+
 - Study: `examples/use_cases/` for real-world patterns
 - Use: `examples/unified_runner.py` for multi-platform execution
 - Reference: `examples/notebooks/` for interactive analysis
@@ -127,15 +130,18 @@ For comprehensive documentation of each category:
 ## Example Categories Explained
 
 ### 1. Getting Started
+
 **Purpose:** Get from zero to working benchmark in 5 minutes
 
 **Local Examples (no config required):**
+
 - `duckdb_tpch_power.py` - TPC-H analytical benchmark
 - `duckdb_tpcds_power.py` - TPC-DS complex queries
 - `duckdb_nyctaxi.py` - Real NYC taxi trip analytics
 - `duckdb_tsbs_devops.py` - DevOps time-series monitoring
 
 **Progression:**
+
 1. **Local** - DuckDB examples (no config required)
 2. **Cloud** - Databricks & BigQuery with credentials
 3. **Intermediate** - Query subsets and custom workflows
@@ -143,9 +149,11 @@ For comprehensive documentation of each category:
 **Start here if:** You're new to BenchBox
 
 ### 2. Feature Examples (9 examples)
+
 **Purpose:** Learn specific BenchBox capabilities in isolation
 
 **Topics covered:**
+
 - Test types (Power, Throughput, Maintenance)
 - Query subsetting
 - Tuning comparison
@@ -159,9 +167,11 @@ For comprehensive documentation of each category:
 **Start here if:** You know the basics and want to learn a specific feature
 
 ### 3. Use Case Patterns (4 examples)
+
 **Purpose:** Solve real-world problems with proven patterns
 
 **Use cases:**
+
 - CI/CD regression testing
 - Platform evaluation and comparison
 - Incremental tuning workflows
@@ -170,9 +180,11 @@ For comprehensive documentation of each category:
 **Start here if:** You're building production workflows
 
 ### 4. Notebooks (11 notebooks)
+
 **Purpose:** Interactive exploration and analysis
 
 **Platforms covered:**
+
 - Databricks, BigQuery, Snowflake, Redshift, ClickHouse
 - DuckDB, SQLite
 - Platform comparison, cost analysis, results visualization
@@ -180,9 +192,11 @@ For comprehensive documentation of each category:
 **Start here if:** You prefer interactive exploration
 
 ### 5. Configuration Templates (10 files)
+
 **Purpose:** Platform setup references
 
 **Includes:**
+
 - Connection configuration for each platform
 - Authentication methods (OAuth, service accounts, key pairs)
 - Platform-specific options
@@ -190,9 +204,11 @@ For comprehensive documentation of each category:
 **Start here if:** You need to configure a platform
 
 ### 6. Tuning Configurations (45 files)
+
 **Purpose:** Benchmark-specific optimizations
 
 **Includes:**
+
 - Tuned vs. notuning configurations
 - Platform-specific optimizations
 - DuckDB (18 configs), Databricks (12 configs), plus dataframe, ClickHouse, and Snowflake dirs

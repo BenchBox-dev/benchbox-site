@@ -1,4 +1,5 @@
 (cli-datagen)=
+
 # `datagen` - Data Generation
 
 ```{tags} reference, cli, data
@@ -15,10 +16,12 @@ benchbox datagen --benchmark <name> --scale <sf> [OPTIONS]
 ## Options
 
 **Required:**
+
 - `--benchmark TEXT`: Benchmark name (e.g., `tpch`, `tpcds`, `clickbench`)
 - `--scale FLOAT`: Scale factor for data generation
 
 **Optional:**
+
 - `--output PATH`: Output directory for generated data
 - `--format [parquet|csv|json]`: **Not yet implemented.** This option is accepted but has no effect. Data is generated as pipe-delimited `.tbl` flat files (compressed to `.tbl.zst` when compression is enabled, which is the default). To convert generated data to parquet or other formats, use `benchbox run` with `--table-format`.
 - `--seed INT`: Random seed for reproducible data generation

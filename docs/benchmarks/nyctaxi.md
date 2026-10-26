@@ -81,55 +81,73 @@ The NYC Taxi benchmark uses a star schema with a fact table (trips) and dimensio
 The benchmark includes 25 queries organized into 9 categories:
 
 ### Temporal Queries
+
 Time-based aggregations and patterns:
+
 - [`trips-per-hour`](queries/nyctaxi/trips-per-hour.md): Hourly trip distribution
 - [`trips-per-day`](queries/nyctaxi/trips-per-day.md): Daily trip patterns
 - [`trips-per-month`](queries/nyctaxi/trips-per-month.md): Monthly aggregations
 - [`trips-by-day-of-week`](queries/nyctaxi/trips-by-day-of-week.md): Trip patterns by weekday
 
 ### Geographic Queries
+
 Zone-level spatial analytics:
+
 - [`top-pickup-zones`](queries/nyctaxi/top-pickup-zones.md): Busiest pickup locations
 - [`top-dropoff-zones`](queries/nyctaxi/top-dropoff-zones.md): Busiest dropoff locations
 - [`top-routes`](queries/nyctaxi/top-routes.md): Most popular pickup-dropoff pairs
 - [`borough-summary`](queries/nyctaxi/borough-summary.md): Borough-level aggregations
 
 ### Financial Queries
+
 Revenue and tip analysis:
+
 - [`revenue-by-payment-type`](queries/nyctaxi/revenue-by-payment-type.md): Revenue breakdown by payment method
 - [`tip-analysis`](queries/nyctaxi/tip-analysis.md): Tip patterns by time and location
 - [`fare-distribution`](queries/nyctaxi/fare-distribution.md): Fare amount distributions
 - [`surcharge-revenue`](queries/nyctaxi/surcharge-revenue.md): Revenue from surcharges and extras
 
 ### Characteristics Queries
+
 Trip attribute analysis:
+
 - [`distance-distribution`](queries/nyctaxi/distance-distribution.md): Distribution of trip distances
 - [`passenger-count-analysis`](queries/nyctaxi/passenger-count-analysis.md): Trip patterns by passenger count
 - [`trip-duration-analysis`](queries/nyctaxi/trip-duration-analysis.md): Trip duration patterns
 
 ### Rate Code Queries
+
 Rate code analysis:
+
 - [`rate-code-summary`](queries/nyctaxi/rate-code-summary.md): Trip statistics by rate code
 - [`airport-trips`](queries/nyctaxi/airport-trips.md): Analysis of airport trips (rate codes 2, 3)
 
 ### Vendor Queries
+
 Vendor performance comparisons:
+
 - [`vendor-comparison`](queries/nyctaxi/vendor-comparison.md): Vendor-level metrics
 
 ### Complex Queries
+
 Multi-dimensional analytics:
+
 - [`hourly-zone-heatmap`](queries/nyctaxi/hourly-zone-heatmap.md): Trip density by hour and zone
 - [`weekday-weekend-comparison`](queries/nyctaxi/weekday-weekend-comparison.md): Compare weekday and weekend patterns
 - [`rush-hour-analysis`](queries/nyctaxi/rush-hour-analysis.md): Analysis of rush hour patterns
 - [`monthly-year-over-year`](queries/nyctaxi/monthly-year-over-year.md): Compare monthly patterns across years
 
 ### Point Queries
+
 Single-value lookups:
+
 - [`single-day-summary`](queries/nyctaxi/single-day-summary.md): Summary statistics for a single day
 - [`zone-detail`](queries/nyctaxi/zone-detail.md): Detailed statistics for a specific zone
 
 ### Baseline Queries
+
 Full table operations:
+
 - [`full-scan-count`](queries/nyctaxi/full-scan-count.md): Count all trips (baseline scan query)
 
 ## Usage Examples
@@ -347,21 +365,25 @@ is accessed programmatically via the functions above.
 ### Query Performance Patterns
 
 **Temporal Queries:**
+
 - **Bottleneck**: Date/time extraction and grouping
 - **Optimization**: Temporal indexes, date partitioning
 - **Typical performance**: Fast (seconds)
 
 **Geographic Queries:**
+
 - **Bottleneck**: Join with taxi_zones dimension table
 - **Optimization**: Zone ID indexes, denormalization
 - **Typical performance**: Fast to medium
 
 **Financial Queries:**
+
 - **Bottleneck**: Aggregation over numeric columns
 - **Optimization**: Columnar storage, SIMD operations
 - **Typical performance**: Fast
 
 **Complex Queries:**
+
 - **Bottleneck**: Multi-dimensional grouping, joins
 - **Optimization**: Materialized views, query caching
 - **Typical performance**: Medium to slow
@@ -379,16 +401,19 @@ The NYC Taxi data exhibits realistic patterns:
 ## Best Practices
 
 ### Data Generation
+
 1. **Start small** - Use SF=0.01 for initial testing
 2. **Choose appropriate year** - Match your analysis timeframe
 3. **Consider months** - Use specific months for seasonal analysis
 
 ### Query Optimization
+
 1. **Index zone IDs** - For geographic join performance
 2. **Partition by date** - For temporal query efficiency
 3. **Materialize zones** - Denormalize frequently-joined columns
 
 ### Performance Testing
+
 1. **Warm-up queries** - Run queries multiple times
 2. **Monitor resources** - Track CPU, memory, I/O
 3. **Compare categories** - Different query types stress different components
@@ -398,6 +423,7 @@ The NYC Taxi data exhibits realistic patterns:
 ### Data Download Failures
 
 **Issue**: Unable to download TLC data (network restrictions, rate limiting)
+
 ```python
 nyctaxi = NYCTaxi(scale_factor=0.1)
 data_files = nyctaxi.generate_data()
@@ -408,6 +434,7 @@ data_files = nyctaxi.generate_data()
 ### Memory Issues with Large Scale Factors
 
 **Issue**: Out of memory during data generation
+
 ```python
 for month in [1, 2, 3]:
     nyctaxi = NYCTaxi(
@@ -423,6 +450,7 @@ for month in [1, 2, 3]:
 ### Query Date Range Issues
 
 **Issue**: Queries return no results
+
 ```python
 nyctaxi = NYCTaxi(year=2023, months=[1])
 ```

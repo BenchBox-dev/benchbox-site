@@ -12,6 +12,7 @@ For platforms that run locally in Docker (ClickHouse, Trino, Presto, PostgreSQL,
 ## Overview
 
 Live integration tests verify that BenchBox works correctly with real cloud databases by:
+
 - Connecting to actual Databricks, Snowflake, BigQuery, Redshift, and Athena instances
 - Creating test schemas and loading data
 - Executing queries and verifying results
@@ -30,6 +31,7 @@ Live integration tests verify that BenchBox works correctly with real cloud data
 ### Cost Considerations
 
 All tests use `scale_factor=0.01` (~10MB of data) to minimize costs:
+
 - **Databricks**: <$0.05 per test run (SQL Warehouse usage)
 - **Snowflake**: <$0.05 per test run (Warehouse credit usage)
 - **BigQuery**: <$0.10 per test run (Storage + query processing)
@@ -51,6 +53,7 @@ cp .env.example .env
 Edit `.env` and add credentials for the platforms you want to test:
 
 #### Databricks
+
 ```bash
 DATABRICKS_HOST=your-workspace.cloud.databricks.com
 DATABRICKS_HTTP_PATH=/sql/1.0/warehouses/your-warehouse-id
@@ -58,6 +61,7 @@ DATABRICKS_TOKEN=your-access-token
 ```
 
 **How to get Databricks credentials**:
+
 1. Log into your Databricks workspace
 2. Go to SQL Warehouses and select a warehouse
 3. Click "Connection Details"
@@ -65,6 +69,7 @@ DATABRICKS_TOKEN=your-access-token
 5. Generate a Personal Access Token from User Settings → Access Tokens
 
 #### Snowflake
+
 ```bash
 SNOWFLAKE_ACCOUNT=your-account.snowflakecomputing.com
 SNOWFLAKE_USERNAME=your-username
@@ -75,12 +80,14 @@ SNOWFLAKE_SCHEMA=PUBLIC
 ```
 
 **How to get Snowflake credentials**:
+
 1. Your account identifier (e.g., `xy12345.us-east-1`)
 2. Username and password for authentication
 3. Warehouse name (create one if needed: `CREATE WAREHOUSE COMPUTE_WH`)
 4. Database and schema for testing (will be created if missing)
 
 #### BigQuery
+
 ```bash
 BIGQUERY_PROJECT=your-project-id
 BIGQUERY_DATASET=benchbox_test
@@ -89,6 +96,7 @@ GOOGLE_APPLICATION_CREDENTIALS=/path/to/service-account.json
 ```
 
 **How to get BigQuery credentials**:
+
 1. Create a Google Cloud project
 2. Enable the BigQuery API
 3. Create a service account with BigQuery Admin role
@@ -108,13 +116,17 @@ make test-live-databricks
 ## Running Tests
 
 ### Run All Live Tests
+
 This runs all platforms and requires all credentials:
+
 ```bash
 make test-live-all
 ```
 
 ### Run Individual Platforms
+
 The commands below run Databricks only, Snowflake only, and BigQuery only:
+
 ```bash
 make test-live-databricks
 
@@ -124,7 +136,9 @@ make test-live-bigquery
 ```
 
 ### Run with pytest Directly
+
 The commands below run all live tests, one platform's tests, and one test file:
+
 ```bash
 uv run -- python -m pytest -m live_integration -v
 
@@ -187,16 +201,19 @@ uv run -- python -m pytest tests/integration/platforms/test_databricks_live.py -
 Create dedicated service accounts with minimal permissions:
 
 **Databricks**:
+
 - SQL Warehouse usage permission
 - Schema create/drop permission
 - No admin/cluster create permissions needed
 
 **Snowflake**:
+
 - `CREATE SCHEMA` privilege
 - `USAGE` on warehouse and database
 - No `ACCOUNTADMIN` role needed
 
 **BigQuery**:
+
 - BigQuery Data Editor role
 - BigQuery Job User role
 - Storage Object Admin (for GCS staging)
@@ -214,6 +231,7 @@ Create dedicated service accounts with minimal permissions:
 **Problem**: All tests show `SKIPPED`
 
 **Solution**: Check that required environment variables are set. The commands below check Databricks, Snowflake, and BigQuery in that order:
+
 ```bash
 echo $DATABRICKS_TOKEN
 
@@ -225,16 +243,19 @@ echo $GOOGLE_APPLICATION_CREDENTIALS
 ### Authentication Errors
 
 **Databricks**: "Invalid access token"
+
 - Verify token hasn't expired
 - Check workspace URL is correct
 - Ensure SQL Warehouse is running
 
 **Snowflake**: "Incorrect username or password"
+
 - Verify credentials in Snowflake UI
 - Check account identifier format
 - Try connecting with `snowsql` CLI first
 
 **BigQuery**: "Could not load credentials"
+
 - Verify JSON key file path exists
 - Check service account has required roles
 - Try `gcloud auth application-default login`
@@ -244,6 +265,7 @@ echo $GOOGLE_APPLICATION_CREDENTIALS
 **Problem**: Tests fail during data loading
 
 **Solutions**:
+
 - Verify sufficient warehouse/compute resources
 - Check network connectivity
 - Ensure sufficient storage quota
@@ -256,6 +278,7 @@ echo $GOOGLE_APPLICATION_CREDENTIALS
 **Impact**: Usually benign - schemas with timestamps avoid conflicts
 
 **Solution**: Manually drop test schemas if needed. The statements below apply to Databricks, Snowflake, and BigQuery in that order, and are identical across the three:
+
 ```sql
 DROP SCHEMA IF EXISTS benchbox_test_1234567890 CASCADE;
 
@@ -318,6 +341,7 @@ jobs:
 ### Testing Without Credentials
 
 Regular smoke tests don't require credentials and use stubs. Either command runs them:
+
 ```bash
 make test-smoke
 uv run -- python -m pytest -m platform_smoke -v
@@ -326,6 +350,7 @@ uv run -- python -m pytest -m platform_smoke -v
 ### Debugging Live Tests
 
 Enable verbose pytest output, and capture logs with the second command:
+
 ```bash
 uv run -- python -m pytest -m live_databricks -vv -s
 
@@ -343,6 +368,7 @@ uv run -- python -m pytest -m live_databricks -v --log-cli-level=DEBUG
 ## Support
 
 For issues or questions:
+
 - [GitHub Issues](https://github.com/BenchBox-dev/BenchBox/issues)
 - Review test output for specific error messages
 - Check platform-specific documentation

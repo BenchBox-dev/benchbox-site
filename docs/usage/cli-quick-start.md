@@ -163,6 +163,7 @@ uv run -- benchbox export --last --format html --output-dir ./reports/
 ```
 
 **Common Use Cases:**
+
 - **CSV** for spreadsheet analysis (Excel, Google Sheets)
 - **HTML** for standalone reports with formatted tables
 - **JSON** for programmatic analysis and archival
@@ -211,12 +212,14 @@ uv run -- benchbox platforms setup
 ```
 
 **Platform Management vs Credential Setup:**
+
 - `benchbox platforms` manages platform *availability* (dependencies installed, enabled/disabled)
 - `benchbox setup --platform <name>` manages *credentials* for cloud platforms
 - For cloud platforms, you need both: enable the platform AND configure credentials
 
 **Typical Cloud Platform Workflow:** check that the platform dependencies are installed, install them if needed
 (follow the guidance shown), enable the platform, configure credentials, then verify that everything is ready.
+
 ```bash
 uv run -- benchbox platforms status databricks
 
@@ -275,12 +278,14 @@ uv run -- benchbox shell --output ./my-benchmarks
 ```
 
 **Shell Features:**
+
 - **DuckDB & SQLite**: Full interactive shells with `.tables`, `.schema`, `.info` commands
 - **Command History**: Navigate previous commands with arrow keys
 - **Query Timing**: Automatic execution time measurement
 - **Database Discovery**: Automatically finds databases in benchmark_runs/
 
 **Common Use Cases:**
+
 - Verify data loaded correctly after benchmarks
 - Debug individual queries before running full suite
 - Explore table schemas and row counts

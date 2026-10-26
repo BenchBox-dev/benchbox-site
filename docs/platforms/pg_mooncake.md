@@ -75,7 +75,7 @@ pg_mooncake transforms PostgreSQL into a hybrid analytical database:
 
 ### Storage Architecture
 
-```
+```text
 PostgreSQL Instance
 ├── pg_mooncake extension
 │   ├── Columnstore Access Method (USING mooncake)

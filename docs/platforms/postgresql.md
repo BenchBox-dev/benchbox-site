@@ -189,6 +189,7 @@ benchbox run --platform postgresql --benchmark tpch \
 ```
 
 This captures EXPLAIN ANALYZE output including:
+
 - Execution time per node
 - Actual vs estimated rows
 - Memory usage

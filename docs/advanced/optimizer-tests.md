@@ -20,6 +20,7 @@ The BenchBox Read Primitives benchmark includes 13 optimizer test queries that t
 **Purpose**: Tests whether the query optimizer can convert correlated EXISTS subqueries to more efficient semijoin operations.
 
 **What it tests**:
+
 - Subquery decorrelation capabilities
 - Semijoin optimization recognition
 - Performance impact of EXISTS vs JOIN transformations
@@ -27,6 +28,7 @@ The BenchBox Read Primitives benchmark includes 13 optimizer test queries that t
 **Expected behavior**: Advanced-level optimizers should automatically convert the EXISTS subquery to a semijoin, resulting in faster execution (typically 10x or more vs. naive nested loop).
 
 **Query pattern**:
+
 ```sql
 SELECT c_custkey, c_name, c_mktsegment, c_nationkey
 FROM customer c
@@ -46,6 +48,7 @@ WHERE EXISTS (
 **Purpose**: Tests whether the query optimizer can eliminate redundant DISTINCT clauses when they're not needed due to primary key constraints.
 
 **What it tests**:
+
 - Primary key constraint awareness
 - Redundant DISTINCT detection
 - Logical optimization capabilities
@@ -53,6 +56,7 @@ WHERE EXISTS (
 **Expected behavior**: Since the query selects the primary key (`o_orderkey`) and other columns from the same table, the DISTINCT is redundant and should be eliminated by the optimizer.
 
 **Query pattern**:
+
 ```sql
 SELECT DISTINCT o_orderkey, o_custkey, o_orderdate, o_totalprice
 FROM orders o
@@ -68,6 +72,7 @@ WHERE o_orderdate >= DATE '1995-01-01'
 **Purpose**: Tests whether the query optimizer can identify and eliminate common subexpressions, computing complex expressions only once.
 
 **What it tests**:
+
 - Common subexpression recognition
 - Expression optimization
 - Computational efficiency optimization
@@ -75,6 +80,7 @@ WHERE o_orderdate >= DATE '1995-01-01'
 **Expected behavior**: The complex expression `l_quantity * l_extendedprice * (1 - l_discount) * (1 + l_tax)` appears multiple times and should be computed only once, then reused.
 
 **Query pattern**:
+
 ```sql
 SELECT
     l_orderkey, l_partkey, l_suppkey, l_linenumber,
@@ -99,6 +105,7 @@ ORDER BY l_quantity * l_extendedprice * (1 - l_discount) * (1 + l_tax) DESC
 **Purpose**: Tests whether the query optimizer can push predicates down past joins to reduce intermediate result sizes.
 
 **What it tests**:
+
 - Predicate pushdown optimization
 - Join selectivity optimization
 - Filter placement strategies
@@ -112,6 +119,7 @@ ORDER BY l_quantity * l_extendedprice * (1 - l_discount) * (1 + l_tax) DESC
 **Purpose**: Tests whether the query optimizer can reorder joins based on cardinality and selectivity.
 
 **What it tests**:
+
 - Join order optimization
 - Cardinality-based optimization
 - Cost-based join planning
@@ -125,6 +133,7 @@ ORDER BY l_quantity * l_extendedprice * (1 - l_discount) * (1 + l_tax) DESC
 **Purpose**: Tests whether the query optimizer can push LIMIT clauses down to reduce work in upstream operations.
 
 **What it tests**:
+
 - Limit pushdown optimization
 - Top-N optimization
 - Early termination strategies
@@ -138,6 +147,7 @@ ORDER BY l_quantity * l_extendedprice * (1 - l_discount) * (1 + l_tax) DESC
 **Purpose**: Tests whether the query optimizer can partially compute aggregates before joins when possible.
 
 **What it tests**:
+
 - Aggregate placement optimization
 - Pre-aggregation strategies
 - HAVING clause optimization
@@ -151,6 +161,7 @@ ORDER BY l_quantity * l_extendedprice * (1 - l_discount) * (1 + l_tax) DESC
 **Purpose**: Tests whether the query optimizer can convert scalar subqueries to joins for improved execution efficiency.
 
 **What it tests**:
+
 - Subquery flattening optimization
 - Join conversion strategies
 - Correlated subquery elimination
@@ -164,6 +175,7 @@ ORDER BY l_quantity * l_extendedprice * (1 - l_discount) * (1 + l_tax) DESC
 **Purpose**: Tests whether the query optimizer can pre-compute constants and simplify expressions at compile time.
 
 **What it tests**:
+
 - Constant folding optimization
 - Expression simplification
 - Algebraic optimization
@@ -177,6 +189,7 @@ ORDER BY l_quantity * l_extendedprice * (1 - l_discount) * (1 + l_tax) DESC
 **Purpose**: Tests whether the query optimizer can eliminate unnecessary column reads to reduce I/O.
 
 **What it tests**:
+
 - Column pruning optimization
 - Projection pushdown
 - I/O reduction strategies
@@ -190,6 +203,7 @@ ORDER BY l_quantity * l_extendedprice * (1 - l_discount) * (1 + l_tax) DESC
 **Purpose**: Tests whether the query optimizer can transform IN subqueries to EXISTS when beneficial.
 
 **What it tests**:
+
 - IN subquery optimization
 - EXISTS transformation
 - Subquery execution strategies
@@ -203,6 +217,7 @@ ORDER BY l_quantity * l_extendedprice * (1 - l_discount) * (1 + l_tax) DESC
 **Purpose**: Tests whether the query optimizer can optimize UNION operations and eliminate redundant operations.
 
 **What it tests**:
+
 - UNION optimization
 - Set operation efficiency
 - Redundant sort elimination
@@ -216,6 +231,7 @@ ORDER BY l_quantity * l_extendedprice * (1 - l_discount) * (1 + l_tax) DESC
 **Purpose**: Tests whether the query optimizer can generate runtime filters (bloom filters, hash filters) for selective joins.
 
 **What it tests**:
+
 - Runtime filter generation
 - Bloom filter optimization
 - Dynamic join optimization
@@ -225,11 +241,13 @@ ORDER BY l_quantity * l_extendedprice * (1 - l_discount) * (1 + l_tax) DESC
 ## Implementation Details
 
 ### Database Compatibility
+
 - **Schema**: Uses standard TPC-H tables (customer, orders, lineitem)
 - **SQL Features**: Standard SQL constructs supported by all major databases
 - **Dialects**: Compatible with DuckDB, PostgreSQL, SQLite, MySQL, and others via SQLGlot translation
 
 ### Performance Characteristics
+
 - **Scale Factor Dependency**: Query performance scales with TPC-H scale factor
 - **Execution Complexity**: Simple queries at small scale factors; complexity increases with scale
 - **Resource Usage**: Memory usage depends on intermediate result sizes
@@ -266,13 +284,17 @@ Execute each query against a TPC-H database and measure its performance, then an
 ## Testing and Validation
 
 ### Automated Testing
+
 All optimizer queries are automatically tested as part of the BenchBox test suite:
+
 - Syntax validation against multiple SQL dialects
 - Execution testing with TPC-H scale factor 0.01
 - Result validation and row count verification
 
 ### Manual Testing
+
 For manual testing of optimizer effectiveness:
+
 1. Run queries with `EXPLAIN` or `EXPLAIN ANALYZE` to examine query plans
 2. Compare execution times with and without optimizations
 3. Monitor resource usage (CPU, memory) during execution
@@ -281,6 +303,7 @@ For manual testing of optimizer effectiveness:
 ## Expected Row Counts
 
 Expected row counts at TPC-H scale factor 0.01 (useful for validation):
+
 - **EXISTS to Semijoin**: ~1,000 rows returned
 - **DISTINCT Elimination**: ~2,000 rows returned
 - **Common Subexpression**: ~5,000 rows returned
@@ -318,6 +341,7 @@ The following are theoretical benefits from query optimizations. Actual improvem
 - **Runtime Filter**: Performance improvement by reducing join input sizes
 
 ### Measurable Indicators
+
 - Query execution time reduction
 - Lower CPU usage during execution
 - Reduced intermediate result sizes
@@ -326,12 +350,14 @@ The following are theoretical benefits from query optimizations. Actual improvem
 ## Future Enhancements
 
 ### Additional Test Patterns
+
 - **Predicate Pushdown**: Test filter predicate optimization through joins
 - **Join Reordering**: Test appropriate join order selection
 - **Constant Folding**: Test compile-time constant evaluation
 - **Index Usage**: Test index selection and utilization
 
 ### Advanced-level Metrics
+
 - Query plan complexity analysis
 - Optimizer decision tracking
 - Performance regression detection

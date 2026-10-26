@@ -122,12 +122,14 @@ Snowpark Connect uses a fundamentally different execution model than Spark:
 ## When to Use Snowpark Connect
 
 **Good fit:**
+
 - Teams familiar with PySpark who use Snowflake
 - Existing Snowflake warehouse investments
 - DataFrame-based analytics without cluster management
 - Quick ad-hoc analysis with PySpark syntax
 
 **Consider alternatives:**
+
 - Need RDD APIs → Apache Spark
 - Need Spark Streaming → Databricks/EMR
 - Need full Spark UDF support → Apache Spark
@@ -203,21 +205,25 @@ Snowpark Connect uses standard Snowflake credit consumption:
 ### Common Issues
 
 **Account identifier format:**
+
 - Format: `xy12345.region` or `xy12345.region.cloud`
 - Example: `xy12345.us-east-1` or `xy12345.us-east-1.aws`
 - Don't include `.snowflakecomputing.com`
 
 **Warehouse not found:**
+
 - Verify warehouse exists: `SHOW WAREHOUSES;`
 - Check permissions on warehouse
 - Warehouse may be suspended (auto-resumes on first query)
 
 **Authentication errors:**
+
 - Verify account identifier is correct
 - Check username and password
 - For key-pair: ensure private key format is correct (PKCS#8)
 
 **Permission denied:**
+
 - Check role has necessary privileges
 - Verify database and schema access
 - Check warehouse usage permission

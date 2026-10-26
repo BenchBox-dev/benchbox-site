@@ -621,6 +621,7 @@ benchbox visualize benchmark_runs/results/*.json --chart-type performance_bar
 
 benchbox visualize benchmark_runs/results/*.json --no-color > charts.txt
 ```
+
 The first command visualizes a specific result file, the second renders one chart type, and the last saves plain-text output to a file. Find file names with `benchbox results` or `benchbox results --paths`.
 
 See the [Visualization Guide](../visualization/overview.md) for chart types, templates, and customization options.
@@ -778,7 +779,6 @@ exporter = ResultExporter(anonymize=True, anonymization_config=config)
 
 `custom_sanitizers` lists extra regexes stripped from free-text fields, on top
 of the built-in IP, email and SSN patterns.
-
 
 ### Disable Anonymization
 

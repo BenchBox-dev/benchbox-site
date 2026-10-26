@@ -320,6 +320,7 @@ variance of TPC-H lineitem generation.
 Data Vault queries typically involve more joins than equivalent TPC-H queries due to the Hub-Link-Satellite structure. A simple TPC-H 3-table join may become a 6-8 table join in Data Vault.
 
 **Performance Implications:**
+
 - **Hash join heavy** - Most queries benefit from hash join optimization
 - **Index candidates** - Hash key columns (hk_*) are primary join keys
 - **Filter pushdown** - `load_end_dts IS NULL` filters should be pushed to satellites
@@ -336,6 +337,7 @@ Data Vault queries typically involve more joins than equivalent TPC-H queries du
 ### Hash Keys
 
 All surrogate keys use MD5 hashes stored as VARCHAR(32):
+
 - **Hub hash keys**: MD5 of business key (e.g., `MD5(c_custkey)`)
 - **Link hash keys**: MD5 of concatenated hub hash keys
 - **HASHDIFF**: MD5 of concatenated attribute values for change detection
@@ -343,10 +345,12 @@ All surrogate keys use MD5 hashes stored as VARCHAR(32):
 ### Audit Columns
 
 Every table includes:
+
 - `load_dts` (TIMESTAMP): When the record was loaded
 - `record_source` (VARCHAR): Source system identifier
 
 Satellites additionally include:
+
 - `load_end_dts` (TIMESTAMP, nullable): End date for historical records (NULL = current)
 - `hashdiff` (VARCHAR(32)): Hash of attributes for change detection
 

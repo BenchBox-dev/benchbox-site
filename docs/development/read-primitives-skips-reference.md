@@ -86,6 +86,7 @@ repo implements `sp_correlation` as a stored procedure using manual arithmetic,
 confirming native support is absent.
 
 **Re-enable when**:
+
 - `CORR` and `REGR_SLOPE` disappear from the unsupported-functions list, **and**
 - Both appear on the [Aggregate Functions](https://docs.aws.amazon.com/redshift/latest/dg/c_Aggregate_Functions.html) page.
 
@@ -131,6 +132,7 @@ input or produce one as output. Redshift scalar rewrites such as `COUNT(*)`,
 but they do not test the array capability declared in the query contract.
 
 **Re-enable when**: AWS adds native array type support to Redshift. Monitor:
+
 - [What's new in Amazon Redshift](https://aws.amazon.com/about-aws/whats-new/database/?whats-new-content.sort-by=item.additionalFields.postDateTime&whats-new-content.sort-order=desc&awsf.whats-new-product=product%23amazon-redshift)
 - [Redshift SQL commands reference](https://docs.aws.amazon.com/redshift/latest/dg/r_ARRAY.html)
   (currently 404; if this URL resolves, native arrays have shipped)
@@ -475,7 +477,7 @@ whether removing it is safe. Understanding how they relate prevents both
 false confidence (unit test passes but live run fails) and unnecessary work
 (live run attempted before the catalog change is consistent).
 
-```
+```text
 Reference doc      queries.yaml      Static/unit tests      Runtime parity      Platform run
 ─────────────      ────────────      ────────────────       ──────────────      ────────────
 Check URL     →    Remove skip  →    contracts pass    →    DuckDB ref    →    benchbox run

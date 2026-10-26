@@ -12,6 +12,7 @@ The BenchBox examples are organized into six categories to help you learn progre
 ## Example Categories
 
 ### 1. [Getting Started Examples](../../../examples/getting_started/README.md)
+
 **Walkthroughs** | **Beginner-friendly** | **5-10 minutes each**
 
 Zero to working benchmark in minutes. Includes local (DuckDB) and cloud (Databricks, BigQuery) examples with clear progression.
@@ -19,6 +20,7 @@ Zero to working benchmark in minutes. Includes local (DuckDB) and cloud (Databri
 **Start here if:** You're new to BenchBox
 
 ### 2. [Feature Examples](../../../examples/features/README.md)
+
 **9 examples** | **Intermediate** | **10-15 minutes each**
 
 Learn specific BenchBox capabilities in isolation: test types, query subsetting, tuning, multi-platform execution, and more.
@@ -26,6 +28,7 @@ Learn specific BenchBox capabilities in isolation: test types, query subsetting,
 **Start here if:** You know the basics and want to learn specific features
 
 ### 3. [Use Case Patterns](../../../examples/use_cases/README.md)
+
 **4 examples** | **Advanced** | **20-30 minutes each**
 
 Real-world solutions for common problems: CI/CD testing, platform evaluation, incremental tuning, and cost optimization.
@@ -33,6 +36,7 @@ Real-world solutions for common problems: CI/CD testing, platform evaluation, in
 **Start here if:** You're building production workflows
 
 ### 4. [Notebook Examples](../../../examples/notebooks/README.md)
+
 **11 notebooks** | **All levels** | **Interactive**
 
 Interactive Jupyter notebooks for each platform plus analysis patterns. Perfect for exploration and presentation.
@@ -40,6 +44,7 @@ Interactive Jupyter notebooks for each platform plus analysis patterns. Perfect 
 **Start here if:** You prefer interactive development
 
 ### 5. [Configuration Templates](../../../examples/tunings/README.md)
+
 **55 files** | **Reference** | **Copy-paste ready**
 
 Platform configurations (10 files) and benchmark tuning configs (45 files) for all supported platforms.
@@ -47,6 +52,7 @@ Platform configurations (10 files) and benchmark tuning configs (45 files) for a
 **Start here if:** You need platform setup or tuning references
 
 ### 6. [Workflow Patterns](../../../examples/programmatic/README.md)
+
 **8 patterns** | **All levels** | **Production-ready**
 
 Complete, tested workflow patterns for common scenarios. Each pattern includes context, code, and usage guidance.

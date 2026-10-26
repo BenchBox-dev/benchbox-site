@@ -209,11 +209,13 @@ parent = PlatformRegistry.get_inherited_platform("ducklake")
 ## When to Use DuckLake
 
 **Use DuckLake when:**
+
 - You want to benchmark lakehouse table-format overhead (separate catalog + Parquet data) against plain DuckDB storage
 - You are prototyping against DuckLake's Parquet-data/SQL-catalog split before adopting a non-DuckDB catalog backend
 - You need results that stay directly comparable to `duckdb` because the underlying engine and dialect are identical
 
 **Use DuckDB instead when:**
+
 - You do not need a separate catalog/data-file split
 - You are on a DuckDB runtime older than 1.3
 - You want the most stable, generally-available local platform
@@ -246,7 +248,7 @@ schema-evolution, or snapshot benchmark yet.
 
 ### DuckDB Version Too Old
 
-```
+```text
 RuntimeError: DuckLake requires DuckDB >= 1.3 (the 'ducklake' extension is not
 available on earlier releases). Detected DuckDB version: 1.2.x. ...
 ```
@@ -255,11 +257,12 @@ available on earlier releases). Detected DuckDB version: 1.2.x. ...
 
 ### Catalog Attach Failure
 
-```
+```text
 RuntimeError: Failed to initialize the DuckLake catalog (INSTALL/LOAD/ATTACH 'ducklake' extension). ...
 ```
 
 **Solutions:**
+
 1. Confirm network access is available for the first `INSTALL ducklake` (extension download)
 2. Verify `metadata_path`'s parent directory and `data_path` are writable
 3. Re-run with `--force` if a previous run left a partially-initialized catalog
@@ -274,7 +277,7 @@ benchmark/scale/tuning identity before reuse, and drops its tables when
 
 ### PostgreSQL Catalog: Database Does Not Exist
 
-```
+```text
 ... database "ducklake_catalog" does not exist ...
 ```
 

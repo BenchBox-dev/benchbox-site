@@ -99,7 +99,7 @@ Running TPC-H on a tool optimized for TPC-C (or vice versa) produces misleading 
 
 ## When to Use Each Tool
 
-### Use HammerDB When...
+### Use HammerDB When
 
 - Benchmarking **enterprise OLTP** (Oracle, SQL Server, Db2)
 - You need **TPC-C derived metrics** for hardware/config comparisons
@@ -109,7 +109,7 @@ Running TPC-H on a tool optimized for TPC-C (or vice versa) produces misleading 
 
 **Avoid when**: Testing cloud DWs, analytical queries, or DataFrame libraries.
 
-### Use BenchBase When...
+### Use BenchBase When
 
 - Conducting **academic database research**
 - You need **OLTP workload variety** beyond TPC-C (Twitter, YCSB, SEATS)
@@ -119,7 +119,7 @@ Running TPC-H on a tool optimized for TPC-C (or vice versa) produces misleading 
 
 **Avoid when**: Testing cloud data warehouses or OLAP workloads beyond TPC-H.
 
-### Use LakeBench When...
+### Use LakeBench When
 
 - Evaluating **Spark-based lakehouse engines** (Fabric, Synapse, HDInsight)
 - Testing **end-to-end ELT pipelines** (not just queries)
@@ -129,7 +129,7 @@ Running TPC-H on a tool optimized for TPC-C (or vice versa) produces misleading 
 
 **Avoid when**: Testing non-Spark platforms or pure SQL analytics.
 
-### Use BenchBox When...
+### Use BenchBox When
 
 - Comparing **cloud data warehouses** (Snowflake vs BigQuery vs Databricks)
 - Benchmarking **embedded analytics** (DuckDB, DataFusion, SQLite)
@@ -191,7 +191,7 @@ benchbox compare -p duckdb -p postgresql --scale 10
 
 ## Decision Tree
 
-```
+```text
 Is your primary workload OLTP (transactional)?
 ├── Yes → Is it academic research?
 │         ├── Yes → BenchBase

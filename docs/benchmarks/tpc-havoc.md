@@ -73,7 +73,7 @@ TPC-Havoc applies 10 universal SQL transformation patterns to each TPC-H query:
 
 Each TPC-H query undergoes systematic transformation:
 
-```
+```text
 TPC-H Query 1 (Revenue by lineitem)
     ├── Q1_V1: Scalar subqueries variant
     ├── Q1_V2: HAVING clause variant
@@ -246,18 +246,23 @@ TPC-Havoc inherits all TPC-H infrastructure:
 ## Query Catalog
 
 ### Simple Aggregation Queries
+
 - **Q1, Q6**: Aggregation syntax variations, window functions, CTEs
 
 ### Join-Heavy Queries
+
 - **Q3, Q5, Q7, Q8, Q9, Q10, Q12, Q14**: JOIN syntax variations, subquery conversions
 
 ### Subquery-Intensive Queries
+
 - **Q2, Q4, Q11, Q16, Q17, Q18, Q20, Q21, Q22**: Subquery transformations, EXISTS ↔ IN conversions
 
 ### Complex Aggregation Queries
+
 - **Q13, Q15**: Multi-level aggregation patterns, derived tables
 
 ### Set Operation Queries
+
 - **Q19**: Complex OR conditions, UNION splits, CASE expressions
 
 ## CLI Usage
@@ -313,11 +318,13 @@ TPC-Havoc is under active development. Current limitations:
 4. **Query complexity**: Complex queries naturally show more variance
 
 **Use TPC-Havoc to**:
+
 - Identify problematic patterns for further investigation
 - Track optimizer improvements over time
 - Compare relative maturity across databases
 
 **Don't use TPC-Havoc to**:
+
 - Make absolute "Database X is better" claims
 - Optimize individual queries (use TPC-H for that)
 - Replace comprehensive performance testing

@@ -34,7 +34,7 @@ Platform registry: **53** metadata entries; **49** SQL-capable; **18** DataFrame
 
 ## Quick Decision Guide
 
-```
+```text
 1. Local development or testing?
    └── Yes → DuckDB (default) or DataFusion (Arrow-native)
    └── No → Continue to #2
@@ -88,7 +88,6 @@ BenchBox supports multiple deployment modes for platforms, enabling the same ben
 | **MotherDuck**       | DuckDB                | `motherduck`       | Serverless DuckDB cloud      |
 | **DuckLake**         | DuckDB                | `ducklake`         | Local DuckDB lakehouse (Parquet + SQL catalog) |
 | **Starburst**        | Trino                 | `starburst`        | Starburst Galaxy managed Trino |
-
 
 ### Deployment Mode Characteristics
 
@@ -227,6 +226,7 @@ TimescaleDB also supports a managed cloud deployment mode via TigerData (`timesc
 | **FedRAMP**               | Yes       | Yes       | Yes        | Yes       | Yes      | Pending   | Yes     | No        |
 
 TigerData (`timescaledb:cloud`) security profile:
+
 - Encryption at rest: Default
 - Encryption in transit: TLS (SSL required by adapter)
 - Authentication: Username/password (`TIGERDATA_*` primary, `TIMESCALE_*` fallback)
@@ -587,6 +587,7 @@ These platforms support both SQL and native DataFrame execution modes. Use the a
 ```
 
 **Usage Example:**
+
 ```bash
 benchbox run --platform polars-df --benchmark tpch --scale 1
 
@@ -728,6 +729,7 @@ Polars supports DataFrame mode only. DataFusion supports SQL mode (`datafusion`)
 ## Summary by Category
 
 ### Local/Embedded
+
 - **DuckDB**: Default choice for development, testing, and medium-scale analytics
 - **DataFusion**: Arrow-native, ideal for PyArrow workflows
 - **SQLite**: Lightweight testing and CI/CD
@@ -735,6 +737,7 @@ Polars supports DataFrame mode only. DataFusion supports SQL mode (`datafusion`)
 - **ClickHouse**: High-throughput analytics (local or server mode)
 
 ### Cloud Data Warehouses
+
 - **BigQuery**: GCP serverless, pay-per-query
 - **Snowflake**: Multi-cloud enterprise, elastic scaling
 - **Databricks**: Lakehouse, ML/data science
@@ -745,6 +748,7 @@ Polars supports DataFrame mode only. DataFusion supports SQL mode (`datafusion`)
 - **Firebolt**: High-performance vectorized analytics
 
 ### Distributed SQL
+
 - **Trino**: Federated SQL, data lake analytics
 - **PrestoDB**: Meta's fork, similar to Trino
 - **Spark SQL**: Batch processing, Spark ecosystem
@@ -752,20 +756,24 @@ Polars supports DataFrame mode only. DataFusion supports SQL mode (`datafusion`)
 - **SingleStore**: Distributed HTAP, columnstore analytics (MySQL protocol)
 
 ### Spark-Compatible Engines
+
 - **LakeSail Sail**: Rust drop-in Spark replacement (DataFusion core), SQL + DataFrame via Spark Connect
 - **Apache Gluten + Velox**: Native C++ acceleration plugin for Spark SQL (Linux-only local mode; Docker on macOS/Windows)
 
 ### Relational & Time-Series
+
 - **PostgreSQL**: Traditional RDBMS baseline
 - **TimescaleDB**: Time-series on PostgreSQL
 - **InfluxDB**: IoT and metrics workloads
 
 ### Managed Spark
+
 - **AWS**: Glue, EMR Serverless, Athena for Spark
 - **GCP**: Dataproc, Dataproc Serverless
 - **Azure**: Fabric Spark, Synapse Spark
 
 ### DataFrame
+
 - **Expression Family**: Polars (single-node), PySpark (distributed), DataFusion (Arrow-native), Databricks (managed), Snowpark Connect (Snowflake-native), LakeSail (Rust/DataFusion via Spark Connect)
 - **Pandas Family**: Pandas (reference), Dask (distributed), cuDF (GPU-accelerated)
 

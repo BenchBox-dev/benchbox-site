@@ -40,6 +40,7 @@ benchbox run --platform duckdb --benchmark tpch --no-progress
 ```
 
 **CLI Flags** (advanced options, visible with `--help-topic all`):
+
 - `--no-monitoring`: Disable automatic performance monitoring and metrics collection
 - `--no-progress`: Disable progress bars (use simple text output instead)
 

@@ -162,9 +162,9 @@ archive, use the [BYO data path](#byo-data-path).
 
 ## References
 
-- Paper: https://www.vldb.org/pvldb/vol9/p204-leis.pdf
-- Query corpus: https://github.com/gregrahn/join-order-benchmark
-- Dataset DOI: https://doi.org/10.7910/DVN/2QYZBT
+- Paper: <https://www.vldb.org/pvldb/vol9/p204-leis.pdf>
+- Query corpus: <https://github.com/gregrahn/join-order-benchmark>
+- Dataset DOI: <https://doi.org/10.7910/DVN/2QYZBT>
 
 ## Implementation Files
 

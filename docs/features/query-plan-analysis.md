@@ -80,6 +80,7 @@ Plan capture overhead depends on the platform:
 - **Redshift, DataFusion, SQLite**: estimated plans only (no ANALYZE), adds ~1-5 ms per query.
 
 In all cases:
+
 - Benchmark timing measurements are unaffected (plan capture runs after the timed execution)
 - Failed plan captures are logged but don't halt execution
 
@@ -215,7 +216,8 @@ benchbox show-plan \
 ```
 
 Output example:
-```
+
+```text
 Query Plan: q05
 Platform: duckdb
 Cost: 500.25 | Rows: 50
@@ -239,7 +241,8 @@ benchbox show-plan \
 ```
 
 Output example:
-```
+
+```text
 Query: q05 (duckdb)
 Total Operators: 5
 Max Depth: 3
@@ -286,7 +289,8 @@ benchbox compare results_duckdb.json results_datafusion.json --include-plans
 ```
 
 Output example:
-```
+
+```text
 ================================================================================
 QUERY PLAN COMPARISON
 ================================================================================
@@ -321,7 +325,8 @@ benchbox compare before_optimization.json after_optimization.json --include-plan
 ```
 
 Output example:
-```
+
+```text
 ┌───────┬────────────┬──────────┬──────────┬─────────────┬─────────────────────┐
 │ Query │ Similarity │ Type Diff│ Prop Diff│ Struct Diff │ Status              │
 ├───────┼────────────┼──────────┼──────────┼─────────────┼─────────────────────┤
@@ -385,17 +390,20 @@ The comparison engine provides four similarity scores:
 
 ### Difference Types
 
-**Type Mismatches**
+**Type Mismatches:**
+
 - Different operator types at same position
 - Example: `Scan` vs `IndexScan`
 - Often indicates algorithmic differences
 
-**Property Mismatches**
+**Property Mismatches:**
+
 - Same operator type, different properties
 - Example: `INNER JOIN` vs `LEFT JOIN`
 - Usually indicates optimizer choices
 
-**Structure Mismatches**
+**Structure Mismatches:**
+
 - Different tree structure
 - Example: Different number of children
 - Indicates major plan reorganization
@@ -482,11 +490,13 @@ for fp, query_ids in plans_by_fingerprint.items():
 **Symptom**: Warning message "No query plan captured for query"
 
 **Causes**:
+
 1. Forgot `--capture-plans` flag during benchmark
 2. Platform doesn't support plan capture
 3. Parser error (check logs for details)
 
 **Solution**: ensure `--capture-plans` is included, and check which platforms support capture:
+
 ```bash
 benchbox run --platform duckdb --benchmark tpch --scale 1 --capture-plans
 
@@ -498,11 +508,13 @@ benchbox platforms
 **Symptom**: Plan capture succeeds but plan is None
 
 **Causes**:
+
 1. EXPLAIN output format changed in newer platform version
 2. Complex query with unusual operators
 3. Platform-specific EXPLAIN extensions
 
 **Solution**:
+
 - Check benchmark logs for detailed error messages
 - File an issue with the EXPLAIN output for investigation
 - Plan capture failures don't halt benchmark execution
@@ -512,20 +524,24 @@ benchbox platforms
 **Symptom**: Benchmark runs noticeably slower with `--capture-plans`
 
 **Expected Impact**:
+
 - DuckDB (default): ~1× query cost per plan (re-executes via `EXPLAIN (ANALYZE, FORMAT JSON)`)
 - PostgreSQL SELECT queries: ~1× query cost per plan (re-executes via `EXPLAIN (ANALYZE, BUFFERS, FORMAT JSON)`)
 - PostgreSQL DML queries: ~1-5 ms (no re-execution; uses `EXPLAIN (FORMAT JSON)` only)
 - Redshift, DataFusion, SQLite: ~1-5 ms per query (estimated plans, no re-execution)
 
 **If DuckDB overhead is too high**:
+
 1. Use `--no-analyze-plans` to switch to estimated plans (~1-5 ms, no re-execution)
 2. Use `--plan-config queries:<ids>` to capture plans for a subset of queries during development
 
 **If PostgreSQL overhead is too high**:
+
 1. PostgreSQL SELECT capture re-executes each query; consider capturing a subset with `--queries`
 2. DML queries are already low-overhead by design (no ANALYZE)
 
 **If overhead exceeds 10ms per query on Redshift/DataFusion/SQLite**:
+
 1. Check if disk I/O is bottleneck (plan serialization)
 2. Verify platform EXPLAIN performance
 
@@ -536,6 +552,7 @@ benchbox platforms
 **Typical Plan Size**: 1-10 KB per query in memory, 10-100 KB serialized
 
 **For large benchmarks (TPC-DS 99 queries)**:
+
 - Memory: ~10 MB for all plans
 - Disk: ~10 MB added to results JSON
 
@@ -546,6 +563,7 @@ If memory is constrained, consider running with `--phases power` to capture fewe
 **Symptom**: Plans appear different visually but comparison shows 100% similarity
 
 **Cause**: Comparison ignores non-structural properties like:
+
 - Operator IDs (internal identifiers)
 - Cost estimates (platform-specific)
 - Row count estimates
@@ -601,6 +619,7 @@ fi
 ### Plan Fingerprints
 
 Plans are fingerprinted using SHA256 of the logical structure:
+
 - **Included**: Operator types, table names, join types, filter expressions, aggregations
 - **Excluded**: Operator IDs, costs, row estimates, timing, cardinality, physical operator details
 
@@ -619,6 +638,7 @@ Plans are fingerprinted using SHA256 of the logical structure:
 | Same query, **different benchmark seed** (data-driven filter literal) | **Differs by default** — filter/join/projection *literals* are part of the hash, so a seed-varied threshold (`l_quantity < 1234.56` vs `< 2345.67`) changes the fingerprint even though the plan shape is identical. Use literal normalization (below) for seed-independent comparison. |
 
 **What fingerprint equality does NOT guarantee:**
+
 - That query performance is the same (costs may differ with identical logical structure)
 - That the plan is optimal for the current data distribution
 - Stability across major engine version upgrades
@@ -652,6 +672,7 @@ literal-sensitive, for users who intentionally track filter-threshold changes):
   records the normalized fingerprint per query for seed-independent comparison.
 
 **Recommended use:**
+
 - Within a single run: deduplicate identical plans across concurrent streams
 - Cross-run regression detection: flag queries where the fingerprint changed between runs on the same engine version
 - Cross-platform comparison: use `compare --include-plans` for structural similarity; fingerprints will differ across platforms
@@ -688,6 +709,7 @@ plan.compute_plan_fingerprint(normalize_literals=True)
 ### Comparison Algorithm
 
 The comparison engine uses:
+
 1. **Fast path**: SHA256 fingerprint comparison (O(1))
 2. **Full comparison**: BFS tree traversal (O(n×m) where n, m = tree sizes)
 3. **Similarity scoring**: Multi-dimensional metrics based on operator matching
@@ -695,6 +717,7 @@ The comparison engine uses:
 ### Platform-Specific Notes
 
 **DuckDB**:
+
 - Uses `EXPLAIN (ANALYZE, FORMAT JSON)` by default - machine-readable JSON with actual per-operator
   timing (`operator_timing`) and cardinality (`operator_cardinality`) from real execution
 - Captures logical and physical operators; parser handles both ANALYZE and estimated-plan schemas
@@ -705,11 +728,13 @@ The comparison engine uses:
 - Fingerprints exclude timing/cardinality - structural comparisons are unaffected by this setting
 
 **SQLite**:
+
 - Uses `EXPLAIN QUERY PLAN` (text format)
 - Simpler output than DuckDB
 - Limited cost information
 
 **PostgreSQL**:
+
 - SELECT queries use `EXPLAIN (ANALYZE, BUFFERS, FORMAT JSON)` — re-executes the query to collect
   actual timing and I/O statistics (~1× query cost overhead)
 - DML queries (INSERT, UPDATE, DELETE, MERGE) use `EXPLAIN (FORMAT JSON)` without ANALYZE
@@ -723,12 +748,14 @@ The comparison engine uses:
   captured). Do not compare fingerprints across index additions on PostgreSQL.
 
 **Redshift**:
+
 - Uses text-based `EXPLAIN` output
 - Operators prefixed with "XN" (e.g., XN Seq Scan, XN Hash Join)
 - Includes distribution operators (DS_DIST_INNER, DS_BCAST_INNER, etc.)
 - Cost and row estimates parsed from output
 
 **DataFusion**:
+
 - Uses indentation-based text format from `EXPLAIN`
 - Prefers physical plan (operators ending in "Exec") over logical plan
 - Supports EXPLAIN ANALYZE metrics (output_rows, elapsed_compute, etc.)
@@ -743,5 +770,6 @@ The comparison engine uses:
 ## Support
 
 For issues or questions:
+
 - [GitHub Issues](https://github.com/BenchBox-dev/benchbox/issues)
 - Check logs in `benchmark_runs/` for detailed error messages

@@ -88,6 +88,7 @@ uv run -- benchbox export --last --format json --format csv --format html
 The commands export to CSV for spreadsheet analysis, generate an HTML report for sharing with your team, and export to all formats.
 
 The export command is useful for:
+
 - Creating shareable HTML reports for stakeholders
 - Analyzing query performance in spreadsheets (Excel, Google Sheets)
 - Archiving results in multiple formats

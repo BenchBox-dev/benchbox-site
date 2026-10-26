@@ -191,17 +191,20 @@ test_results = {
 The system supports three validation levels:
 
 ### ValidationLevel.BASIC
+
 - Basic completeness checks
 - Query execution validation
 - Simple timing validation
 
 ### ValidationLevel.STANDARD
+
 - All basic validations
 - Data integrity validation
 - Metrics validation
 - Compliance checking
 
 ### ValidationLevel.CERTIFICATION
+
 - All standard validations
 - Strict readiness checks (not a TPC certification)
 - Enhanced documentation requirements
@@ -210,13 +213,16 @@ The system supports three validation levels:
 ## Validation Results
 
 ### ValidationResult Enum
+
 - `PASSED`: All validations passed
 - `WARNING`: Validations passed with warnings
 - `FAILED`: One or more validations failed
 - `SKIPPED`: Validation was skipped
 
 ### ValidationReport
+
 The `ValidationReport` contains:
+
 - Overall validation result
 - Individual validator results
 - Detailed issues with levels (ERROR, WARNING, INFO)
@@ -228,14 +234,18 @@ The `ValidationReport` contains:
 ## Individual Validators
 
 ### CompletenessValidator
+
 Validates that all required test components are present:
+
 - Required queries executed
 - Required tables generated
 - Required maintenance operations completed
 - Execution metadata present
 
 ### QueryResultValidator
+
 Validates query execution results:
+
 - All queries executed successfully
 - Execution times within acceptable bounds
 - Row counts reasonable
@@ -243,35 +253,45 @@ Validates query execution results:
 - Schema validation (if configured)
 
 ### TimingValidator
+
 Validates timing measurements:
+
 - Total test time reasonable
 - Query execution times consistent
 - Timing precision adequate
 - Data generation timing reasonable
 
 ### DataIntegrityValidator
+
 Validates data integrity during maintenance operations:
+
 - Maintenance operations successful
 - Referential integrity maintained
 - Data consistency preserved
 - Transaction isolation maintained
 
 ### MetricsValidator
+
 Validates calculated metrics:
+
 - Required metrics present
 - Metric values within expected ranges
 - Calculated metrics match reported values
 - Statistical validity of results
 
 ### ComplianceChecker
+
 Checks TPC compliance requirements:
+
 - Benchmark-specific requirements (TPC-H: 22 queries, TPC-DS: 99 queries)
 - Scale factor compliance
 - Test isolation requirements
 - Reproducibility requirements
 
 ### CertificationChecker
+
 Runs the strictest readiness checks. This is not a TPC certification:
+
 - Performance thresholds met
 - Documentation complete
 - Test completeness
@@ -442,26 +462,31 @@ compliance_summary = {
 ## Best Practices
 
 ### 1. Configuration Management
+
 - Use configuration files for complex validation setups
 - Store benchmark-specific configurations separately
 - Version control your validation configurations
 
 ### 2. Error Handling
+
 - Always check validation results before proceeding
 - Handle validation failures gracefully
 - Log validation issues for debugging
 
 ### 3. Performance Considerations
+
 - Use appropriate validation levels for your use case
 - Consider caching validation results for repeated runs
 - Profile validation performance for large test suites
 
 ### 4. Compliance Tracking
+
 - Save validation reports for audit trails
 - Track compliance over time
 - Generate regular compliance summaries
 
 ### 5. Integration
+
 - Integrate validation into your CI/CD pipeline
 - Use validation results to gate releases
 - Monitor validation trends over time
@@ -504,6 +529,7 @@ report = validator.validate(test_results)
 ## API Reference
 
 ### TPCResultValidator
+
 - `__init__(config=None)`: Create validator with optional configuration
 - `validate(test_results, validation_level=ValidationLevel.STANDARD)`: Validate test results
 - `save_report(report, output_path)`: Save validation report to file
@@ -511,12 +537,14 @@ report = validator.validate(test_results)
 - `create_default_config()`: Create default configuration
 
 ### ValidationReport
+
 - `add_issue(level, message, details=None, validator_name="")`: Add validation issue
 - `get_issues_by_level(level)`: Get issues by severity level
 - `get_issues_by_validator(validator_name)`: Get issues by validator
 - `to_dict()`: Convert report to dictionary for serialization
 
 ### BaseValidator
+
 - `validate(test_results, report)`: Perform validation (abstract method)
 - `_check_required_fields(data, required_fields)`: Check for required fields
 

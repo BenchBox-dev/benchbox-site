@@ -21,11 +21,13 @@ Both modes run the same benchmarks (TPC-H, TPC-DS) enabling direct paradigm comp
 ### From SQL to DataFrame
 
 **SQL Mode:**
+
 ```bash
 benchbox run --platform duckdb --benchmark tpch --scale 0.1
 ```
 
 **DataFrame Mode:**
+
 ```bash
 benchbox run --platform polars-df --benchmark tpch --scale 0.1
 ```
@@ -69,7 +71,7 @@ df[df["amount"] > 100].groupby("customer")["amount"].sum()
 
 DataFrame and SQL modes share the same data files:
 
-```
+```text
 benchmark_runs/datagen/
 ├── tpch_sf0.1/          # Used by both modes
 │   ├── lineitem.csv
@@ -107,6 +109,7 @@ settings:
 ## Programmatic Usage
 
 ### SQL Mode
+
 ```python
 from benchbox import TPCH
 from benchbox.platforms.duckdb import DuckDBAdapter
@@ -117,6 +120,7 @@ results = benchmark.run(adapter)
 ```
 
 ### DataFrame Mode
+
 ```python
 from benchbox.platforms.dataframe import PolarsDataFrameAdapter
 from benchbox import TPCH

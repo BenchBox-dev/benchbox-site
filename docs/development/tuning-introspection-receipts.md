@@ -169,9 +169,10 @@ platform-agnostic; the per-platform catalog *reads* live in the
 
 The generic classifier's non-blocking prefix sets are intentionally narrow and
 are documentation, not an invitation to expand the gate: transient prefixes
-are exactly `set `, `pragma `, `set\t`, `pragma\t`, `reset `, and `use `;
-maintenance prefixes are exactly `optimize `, `vacuum`, `analyze`, and
-`compact `. Any other ddl/post_load shape remains blocking `unverifiable`.
+are exactly `set` or `pragma` followed by a space or a tab, and `reset` or `use`
+followed by a space; maintenance prefixes are exactly `optimize` or `compact`
+followed by a space, `vacuum`, and `analyze`. Any other ddl/post_load shape
+remains blocking `unverifiable`.
 
 A `CREATE TABLE` carrying **both** an `ORDER BY` and a `PARTITION BY` (the
 ClickHouse MergeTree shape) classifies as both `sort_key` and `partition_key`
@@ -240,7 +241,7 @@ comment therefore cannot create an intent or suppress ClickHouse's tuned-key
 recording. Empty parsed column tuples never corroborate: even an empty catalog
 tuple is treated as a fail-closed mismatch, not trivial equality.
 
-### Session SETs are corroboration-eligible? No (default).
+### Session SETs are corroboration-eligible? No (default)
 
 Session `SET`/`PRAGMA` statements are transient: they configure the
 connection, leave no catalog trace, and vanish when the session closes.

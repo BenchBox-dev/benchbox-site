@@ -43,11 +43,13 @@ Row counts scale linearly with `scale_factor` for all three tables (see
 ### Schema Details
 
 **RANKINGS Table:**
+
 - `pageURL` (VARCHAR(300)) - Primary Key: Web page URL
 - `pageRank` (INTEGER) - Page ranking score (1-10,000, drawn from a Pareto distribution with α=1.16 and capped)
 - `avgDuration` (INTEGER) - Average visit duration in seconds
 
 **USERVISITS Table:**
+
 - `sourceIP` (VARCHAR(15)) - Visitor IP address
 - `destURL` (VARCHAR(100)) - Destination page URL
 - `visitDate` (DATE) - Visit timestamp
@@ -59,6 +61,7 @@ Row counts scale linearly with `scale_factor` for all three tables (see
 - `duration` (INTEGER) - Visit duration in seconds
 
 **DOCUMENTS Table:**
+
 - `url` (VARCHAR(300)) - Primary Key: Document URL
 - `contents` (TEXT) - Full text content of the web page
 
@@ -108,6 +111,7 @@ platform and scale.
 **Purpose**: Test the ability to scan large datasets and perform filtering with aggregation.
 
 **[Query 1](queries/amplab/q1.md) (Basic Scan)**:
+
 ```sql
 SELECT pageURL, pageRank
 FROM rankings
@@ -115,6 +119,7 @@ WHERE pageRank > 1000;
 ```
 
 **[Query 1A](queries/amplab/q1a.md) (Aggregated Scan)**:
+
 ```sql
 SELECT
     COUNT(*) as total_pages,
@@ -125,6 +130,7 @@ WHERE pageRank > 1000;
 ```
 
 **Performance Focus:**
+
 - Sequential scan performance
 - Column store optimization
 - Predicate pushdown efficiency
@@ -135,6 +141,7 @@ WHERE pageRank > 1000;
 **Purpose**: Test join performance between large tables with aggregation.
 
 **[Query 2](queries/amplab/q2.md) (Revenue Analysis)**:
+
 ```sql
 SELECT
     sourceIP,
@@ -149,6 +156,7 @@ LIMIT 100;
 ```
 
 **[Query 2A](queries/amplab/q2a.md) (Join with Filtering)**:
+
 ```sql
 SELECT
     uv.destURL,
@@ -165,6 +173,7 @@ LIMIT 100;
 ```
 
 **Performance Focus:**
+
 - Join algorithm efficiency (hash vs. sort-merge)
 - Data distribution and partitioning
 - Memory management for large joins
@@ -175,6 +184,7 @@ LIMIT 100;
 **Purpose**: Test complex analytical operations including text processing and advanced aggregations.
 
 **[Query 3](queries/amplab/q3.md) (User Behavior Analysis)**:
+
 ```sql
 SELECT
     sourceIP,
@@ -191,6 +201,7 @@ LIMIT 100;
 ```
 
 **[Query 3A](queries/amplab/q3a.md) (Document Analysis)**:
+
 ```sql
 SELECT
     url,
@@ -206,6 +217,7 @@ LIMIT 100;
 ```
 
 **Performance Focus:**
+
 - Text processing capabilities
 - Complex predicate evaluation
 - HAVING clause optimization
@@ -484,18 +496,21 @@ The framework runs each query type with standard parameters so results are repro
 ### Query Performance Patterns
 
 **Scan Queries ([Query 1](queries/amplab/q1.md)/[1A](queries/amplab/q1a.md)):**
+
 - **Primary bottleneck**: I/O throughput and column scanning speed
 - **Optimization targets**: Column store efficiency, predicate pushdown
 - **Typical performance**: Fast on columnar systems, slower on row stores
 - **Scaling characteristics**: Linear with data size
 
 **Join Queries ([Query 2](queries/amplab/q2.md)/[2A](queries/amplab/q2a.md)):**
+
 - **Primary bottleneck**: Join algorithm efficiency and memory management
 - **Optimization targets**: Hash table construction, data distribution
 - **Typical performance**: Highly dependent on system architecture
 - **Scaling characteristics**: Can be super-linear without proper optimization
 
 **Analytics Queries ([Query 3](queries/amplab/q3.md)/[3A](queries/amplab/q3a.md)):**
+
 - **Primary bottleneck**: Complex predicate evaluation and text processing
 - **Optimization targets**: String function performance, aggregation speed
 - **Typical performance**: Variable depending on text processing capabilities
@@ -720,18 +735,21 @@ The Python code only prepares the Hive DDL and queries as strings and does not e
 ## Best Practices
 
 ### Data Generation
+
 1. **Scale appropriately** - Use realistic scale factors for your system size
 2. **Consider partitioning** - Partition large tables by date or other logical keys
 3. **Optimize file formats** - Use columnar formats (Parquet, ORC) for analytics
 4. **Distribution strategy** - Distribute data evenly across cluster nodes
 
 ### Query Optimization
+
 1. **Index strategy** - Create indices on frequently filtered columns
 2. **Join optimization** - Ensure proper join order and algorithms
 3. **Parallel execution** - Use system parallelism for large datasets
 4. **Caching strategy** - Cache frequently accessed dimensions
 
 ### Performance Testing
+
 1. **Warm-up runs** - Execute queries multiple times to account for caching
 2. **Resource monitoring** - Monitor CPU, memory, network, and disk I/O
 3. **Baseline establishment** - Establish performance baselines for regression testing
@@ -741,7 +759,7 @@ The Python code only prepares the Hive DDL and queries as strings and does not e
 
 ### Performance Issues
 
-**Issue: Slow scan queries on large datasets**
+#### Issue: Slow scan queries on large datasets
 
 Use columnar storage and predicate pushdown. The table below uses Delta; Parquet also works. A derived ``pageRank_bucket`` column provides better partitioning.
 
@@ -761,7 +779,7 @@ ADD COLUMN pageRank_bucket AS (CASE
 END);
 ```
 
-**Issue: Inefficient joins between large tables**
+#### Issue: Inefficient joins between large tables
 
 Optimize the join order and use broadcast joins where appropriate.
 
@@ -778,7 +796,7 @@ GROUP BY uv.sourceIP;
 
 ### Data Loading Issues
 
-**Issue: Out of memory during data generation**
+#### Issue: Out of memory during data generation
 
 Use streaming generation for large scale factors. With the settings below, the generator works in chunks of 10 million rows.
 
@@ -791,7 +809,7 @@ amplab = AMPLab(
 )
 ```
 
-**Issue: Slow text processing in analytics queries**
+#### Issue: Slow text processing in analytics queries
 
 Use database-specific text processing functions.
 

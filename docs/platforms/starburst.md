@@ -34,7 +34,7 @@ benchbox run --platform starburst --benchmark tpch --scale 1.0
 
 Starburst Galaxy uses a unique username format that combines your email with a role:
 
-```
+```text
 username = email/role
 # Example: joe@example.com/accountadmin
 ```
@@ -187,12 +187,14 @@ Iceberg is recommended for analytics. Set `table_format: iceberg` in the `starbu
 ## When to Use Starburst
 
 **Use Starburst when:**
+
 - You need managed Trino without cluster management
 - Running federated queries across multiple data sources
 - Using Iceberg/Delta Lake table formats
 - You want built-in catalog management
 
 **Use self-hosted Trino instead when:**
+
 - You need full control over cluster configuration
 - Cost optimization is critical
 - You have existing Trino infrastructure
@@ -202,44 +204,48 @@ Iceberg is recommended for analytics. Set `table_format: iceberg` in the `starbu
 
 ### Authentication Failed (401)
 
-```
+```text
 Starburst Galaxy authentication failed.
 ```
 
 **Solutions:**
+
 1. Verify username format: `email/role` (e.g., `joe@example.com/accountadmin`)
 2. Check password is correct
 3. Verify credentials at [galaxy.starburst.io](https://galaxy.starburst.io)
 
 ### Connection Refused
 
-```
+```text
 Cannot connect to Starburst Galaxy at {host}:{port}
 ```
 
 **Solutions:**
+
 1. Verify host is correct: `{cluster-name}.trino.galaxy.starburst.io`
 2. Check network connectivity
 3. Verify no firewall blocking port 443
 
 ### SSL Certificate Error
 
-```
+```text
 SSL certificate error connecting to Starburst Galaxy.
 ```
 
 **Solutions:**
+
 1. Check network proxy settings
 2. Verify SSL certificate chain
 3. Set `verify_ssl: false` in the `starburst` section of `~/.benchbox/credentials.yaml` (not recommended for production)
 
 ### Catalog Not Found
 
-```
+```text
 Catalog 'my_catalog' does not exist
 ```
 
 **Solutions:**
+
 1. Create the catalog in Starburst Galaxy console
 2. Use an existing catalog: check available catalogs in the console
 3. Leave the catalog unset to use the default

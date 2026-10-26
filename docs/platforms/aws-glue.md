@@ -105,6 +105,7 @@ Unlike interactive query services, Glue executes benchmarks as batch jobs:
 5. **Result Retrieval** - Results are read from S3 output location
 
 This batch model means:
+
 - Longer startup times (30-60 seconds per job)
 - Higher throughput for large queries
 - DPU-hour billing for entire job duration
@@ -185,21 +186,25 @@ Minimum required IAM policy for the Glue job role:
 ### Common Issues
 
 **Job fails to start:**
+
 - Verify IAM role has correct trust relationship for Glue
 - Check S3 bucket permissions
 - Ensure Glue service is available in your region
 
 **Slow job startup:**
+
 - First job in a session has cold start (~30-60s)
 - Subsequent jobs use warm pools if available
 - Use G.1X or larger for production
 
 **Query timeout:**
+
 - Increase `job_timeout` for large scale factors
 - Add more workers for parallel execution
 - Check Glue console for detailed job metrics
 
 **Data not found:**
+
 - Verify S3 paths are correct (s3:// prefix required)
 - Check Glue Data Catalog for table definitions
 - Ensure table format matches uploaded files (parquet)

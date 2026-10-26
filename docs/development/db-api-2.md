@@ -21,6 +21,7 @@ Python's DB API 2.0 (PEP 249) is a standardized specification for database acces
 **Primary requirement**: A robust Python library implementing DB API 2.0 specification.
 
 Platforms are selected based on:
+
 - Availability of a mature, well-maintained Python DB API 2.0 driver
 - Standard support for connection objects, cursors, and query execution
 - Reliable parameter handling and result fetching
@@ -33,6 +34,7 @@ This explains why certain database systems are supported while others may requir
 ### Connection Objects
 
 DB API 2.0 defines standard connection objects that provide:
+
 - **cursor()**: Returns a cursor object for executing queries
 - **commit()**: Commits any pending transaction
 - **rollback()**: Rolls back current transaction
@@ -41,6 +43,7 @@ DB API 2.0 defines standard connection objects that provide:
 ### Cursor Objects
 
 Cursors execute queries and manage results:
+
 - **execute(query, parameters)**: Executes a SQL query with optional parameters
 - **executemany(query, seq_of_parameters)**: Executes a query for a sequence of parameters
 - **fetchone()**: Fetches the next row of results
@@ -51,6 +54,7 @@ Cursors execute queries and manage results:
 ### Parameter Styles
 
 DB API 2.0 supports multiple parameter placeholder styles:
+
 - **qmark**: Question mark style (e.g., `...WHERE name=?`)
 - **numeric**: Numeric positional style (e.g., `...WHERE name=:1`)
 - **named**: Named style (e.g., `...WHERE name=:name`)
@@ -94,6 +98,7 @@ The `DatabaseConnection` class provides a unified interface that supports both s
 BenchBox recognizes that database drivers implement DB API 2.0 in two main patterns:
 
 **Pattern 1: Standard Cursor Pattern** (PostgreSQL, MySQL, SQLite with cursor())
+
 ```python
 cursor = connection.cursor()
 cursor.execute(query)
@@ -102,6 +107,7 @@ cursor.close()
 ```
 
 **Pattern 2: Direct Execute Pattern** (DuckDB, DataFusion)
+
 ```python
 cursor = connection.execute(query)
 results = cursor.fetchall()
@@ -180,6 +186,7 @@ def _get_parameter_placeholder(self, connection: Any) -> str:
 ```
 
 **Location**:
+
 - `benchbox/core/tpcds/maintenance_operations.py:190-208`
 - `benchbox/core/tpch/maintenance_test.py:308-325`
 
@@ -193,6 +200,7 @@ method signatures.
 ### Fully Compliant Platforms
 
 #### DuckDB
+
 - **Client Library**: `duckdb`
 - **Pattern**: Direct execute() method
 - **DB API 2.0 Compliance**: Full compliance with extended features
@@ -211,6 +219,7 @@ def execute_query(self, connection: Any, query: str, query_id: str, **options):
 **Location**: `benchbox/platforms/duckdb.py:189-242, 361-440`
 
 #### SQLite
+
 - **Client Library**: `sqlite3` (standard library)
 - **Pattern**: Standard cursor pattern
 - **DB API 2.0 Compliance**: Full compliance
@@ -231,6 +240,7 @@ def execute_query(self, connection: Any, query: str, query_id: str, **options):
 **Location**: `benchbox/platforms/sqlite.py:193-228, 326-393`
 
 #### Snowflake
+
 - **Client Library**: `snowflake-connector-python`
 - **Pattern**: Standard cursor pattern
 - **DB API 2.0 Compliance**: Full compliance
@@ -252,6 +262,7 @@ def execute_query(self, connection: Any, query: str, query_id: str, **options):
 **Location**: `benchbox/platforms/snowflake.py:374-453, 915-1011`
 
 #### Redshift
+
 - **Client Library**: `redshift_connector` or `psycopg2`
 - **Pattern**: Standard cursor pattern
 - **DB API 2.0 Compliance**: Full compliance (both drivers)
@@ -275,6 +286,7 @@ def execute_query(self, connection: Any, query: str, query_id: str, **options):
 **Location**: `benchbox/platforms/redshift.py:821-920, 1459-1543`
 
 #### Databricks
+
 - **Client Library**: `databricks-sql-connector`
 - **Pattern**: Standard cursor pattern
 - **DB API 2.0 Compliance**: Full compliance
@@ -282,6 +294,7 @@ def execute_query(self, connection: Any, query: str, query_id: str, **options):
 ### Partial Compliance / Custom Integration
 
 #### DataFusion
+
 - **Client Library**: `datafusion`
 - **Pattern**: Custom (sql() method, not standard cursor)
 - **DB API 2.0 Compliance**: Non-compliant - uses custom interface
@@ -299,11 +312,13 @@ def execute_query(self, connection: Any, query: str, query_id: str, **options):
 **Location**: `benchbox/platforms/datafusion.py:731-823`
 
 #### BigQuery
+
 - **Client Library**: `google-cloud-bigquery`
 - **Pattern**: Custom client interface
 - **DB API 2.0 Compliance**: Partial - uses custom result objects
 
 #### ClickHouse
+
 - **Client Library**: `clickhouse-driver`
 - **Pattern**: Custom client interface
 - **DB API 2.0 Compliance**: Partial - custom query execution
@@ -316,7 +331,8 @@ BenchBox includes extensive tests for DB API 2.0 compliance in `tests/unit/core/
 
 #### Testing Both Connection Patterns
 
-**Pattern 1: SQLite-like (direct execute)**
+##### Pattern 1: SQLite-like (direct execute)
+
 ```python
 def test_sqlite_like_connection(self):
     mock_conn.execute = Mock()
@@ -324,7 +340,8 @@ def test_sqlite_like_connection(self):
     results = db_conn.fetchall(cursor)
 ```
 
-**Pattern 2: PostgreSQL-like (cursor pattern)**
+##### Pattern 2: PostgreSQL-like (cursor pattern)
+
 ```python
 def test_postgres_like_connection(self):
     mock_conn.cursor = Mock(return_value=mock_cursor)
@@ -469,6 +486,7 @@ This validation ensures that only compatible connection objects are used, preven
 ### Async DB API 2.0 Support
 
 Future versions may support asynchronous database operations using async/await:
+
 - Libraries like `asyncpg` (PostgreSQL) and `aiomysql` (MySQL)
 - Potential `asyncio` support in `DatabaseConnection` wrapper
 - Concurrent query execution for throughput tests

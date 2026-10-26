@@ -201,7 +201,7 @@ The last two lines confirm that native execution happened.
 
 ## Architecture
 
-```
+```text
 ┌────────────────────┐
 │  PySpark Client     │  (user-facing SQL / DataFrame API)
 └──────────┬─────────┘
@@ -265,17 +265,20 @@ fallback configuration.
 ### When to Use Velox
 
 **Use Velox when:**
+
 - You already run Spark and want native acceleration without leaving the Spark API.
 - Your workload is OLAP-shaped (scans, filters, joins, aggregations on Parquet/ORC).
 - You want to benchmark the "accelerated-Spark" tier against Spark, LakeSail, DataFusion, and cloud engines.
 - Linux hosts (or Docker) are acceptable.
 
 **Use Apache Spark instead when:**
+
 - You need Delta Lake / Iceberg / Hudi write paths Gluten doesn't yet accelerate.
 - You rely on UDFs or Spark operators without Velox equivalents (the JVM fallback will remove the acceleration benefit).
 - You're on a non-Linux host and can't run Docker.
 
 **Use LakeSail instead when:**
+
 - You want a pure-Rust replacement rather than a Spark plugin.
 - You need DataFrame-mode benchmarks on the same engine (Velox adapter is SQL-only).
 

@@ -177,6 +177,7 @@ During development and debugging, running full benchmark suites is time-prohibit
 ### CLI Usage
 
 The commands below do the following, in order:
+
 - Run a single query for debugging (about 5 seconds, compared with 11 minutes for the full TPC-H suite).
 - Run multiple queries in a specific order.
 - Debug a failing query with verbose output.
@@ -1399,6 +1400,7 @@ if __name__ == "__main__":
 ### Multi-Database Comparison
 
 The comparison runs a subset of queries that works on all databases. Each query runs 3 times to compute an average:
+
 ```python
 from benchbox import TPCH
 import duckdb

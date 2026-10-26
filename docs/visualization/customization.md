@@ -79,6 +79,7 @@ The first command uses Unicode block characters (the default): ▏▎▍▌▋�
 ### Terminal Width
 
 Charts automatically detect terminal width and constrain output to 40-120 characters. The chart rendering adapts:
+
 - Labels are truncated to fit available space
 - Bar widths scale proportionally
 - Legends wrap as needed
@@ -90,16 +91,19 @@ Charts automatically detect terminal width and constrain output to 40-120 charac
 BenchBox visualizations are designed for accessibility:
 
 **Color Accessibility:**
+
 - Palette passes WCAG AA contrast requirements
 - Colorblind-safe: distinguishable for deuteranopia, protanopia, tritanopia
 - `--no-color` flag for screen readers and plain text processing
 
 **Screen Reader Support:**
+
 - Text-based output is inherently screen reader compatible
 - Use `--no-color` to strip ANSI codes for cleanest plain text
 - Consistent labeling with values, legends, and scale notes
 
 **Contrast Ratios:**
+
 - Text on background: minimum 4.5:1 (WCAG AA)
 - Chart elements: minimum 3:1
 

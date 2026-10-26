@@ -9,7 +9,7 @@ Benchmarks built on public real-world datasets rather than synthetic TPC or vend
 
 Synthetic benchmarks like TPC-H generate data that is statistically clean: uniform distributions, predictable cardinalities, well-behaved joins. Real-world data is messier - skewed, sparse, seasonal, and full of edge cases. BenchBox's real-world benchmarks capture these characteristics using authoritative public datasets.
 
-**What real-world data exposes that synthetic data hides**
+**What real-world data exposes that synthetic data hides:**
 
 - **Temporal skew** - weekday vs. weekend, rush hour vs. overnight, holiday effects
 - **Geographic skew** - airport hubs, city centers, regional carriers

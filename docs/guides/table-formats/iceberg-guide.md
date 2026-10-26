@@ -42,7 +42,7 @@ For benchmarking, engine independence means:
 
 ### Metadata Files
 
-```
+```text
 iceberg_table/
 ├── metadata/
 │   ├── v1.metadata.json
@@ -224,19 +224,19 @@ This compares results from different engines.
 
 ### Common Multi-Engine Issues
 
-**1. Schema evolution lag**
+#### 1. Schema evolution lag
 
 Some engines support new Iceberg schema features before others. If you add a column with Spark, older Trino versions might not see it.
 
-**2. Partition pruning variations**
+#### 2. Partition pruning variations
 
 Partition pruning implementation differs by engine. One engine might prune more aggressively than another.
 
-**3. Statistics availability**
+#### 3. Statistics availability
 
 Column-level statistics may not be shared across all engines. This affects query optimization.
 
-**4. Caching effects**
+#### 4. Caching effects
 
 Engine-specific caching can skew comparisons. BenchBox uses cold cache between runs to mitigate this.
 

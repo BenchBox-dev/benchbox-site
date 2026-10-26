@@ -153,12 +153,14 @@ MotherDuck supports hybrid queries that access both local and cloud data. The ad
 ## When to Use MotherDuck
 
 **Use MotherDuck when:**
+
 - You need cloud-based analytics without infrastructure management
 - Running benchmarks at larger scale factors (SF > 10)
 - Sharing benchmark databases across team members
 - Comparing local vs cloud DuckDB performance
 
 **Use DuckDB instead when:**
+
 - Developing and testing locally
 - No cloud credentials available
 - Cost is a primary concern
@@ -168,7 +170,7 @@ MotherDuck supports hybrid queries that access both local and cloud data. The ad
 
 ### Invalid Token
 
-```
+```text
 ValueError: MotherDuck requires authentication token.
 ```
 
@@ -176,11 +178,12 @@ ValueError: MotherDuck requires authentication token.
 
 ### Connection Failed
 
-```
+```text
 ConnectionError: Failed to connect to MotherDuck
 ```
 
 **Solutions:**
+
 1. Verify your token at [app.motherduck.com](https://app.motherduck.com)
 2. Check network connectivity
 3. Ensure DuckDB >= 0.9.0 is installed (`uv add duckdb>=0.9.0`)

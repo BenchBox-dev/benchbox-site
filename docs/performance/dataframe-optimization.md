@@ -8,6 +8,7 @@ This guide covers performance optimization techniques for BenchBox DataFrame ada
 ## Overview
 
 DataFrame benchmarking performance depends on:
+
 1. **Platform selection** - Different platforms excel at different workloads
 2. **Configuration options** - Platform-specific tuning settings
 3. **Query patterns** - Writing efficient DataFrame operations
@@ -20,6 +21,7 @@ DataFrame benchmarking performance depends on:
 Polars is the default expression-family adapter and excels at single-node performance.
 
 **Key Optimizations:**
+
 - **Lazy evaluation**: Use `LazyFrame` for query planning optimization
 - **Streaming mode**: Enable for large datasets that don't fit in memory
 - **Predicate pushdown**: Filters are automatically pushed to scan operations
@@ -36,6 +38,7 @@ adapter = PolarsDataFrameAdapter(
 `execution_engine="streaming"` selects the streaming engine for large datasets (`--execution-engine streaming` on the command line). `rechunk=True` rechunks data for a better memory layout.
 
 **Best Practices:**
+
 - Use `ctx.scalar()` instead of `.collect()[0, 0]` for single-value extraction
 - Chain operations before calling `.collect()`
 - Use `select()` to limit columns early in the query
@@ -45,6 +48,7 @@ adapter = PolarsDataFrameAdapter(
 Pandas is the reference Pandas-family implementation.
 
 **Key Optimizations:**
+
 - **Copy-on-write (2.0+)**: Reduces memory copies for read-heavy workloads
 - **PyArrow backend**: Uses Apache Arrow for better memory efficiency
 - **Categorical dtypes**: Reduces memory for low-cardinality string columns
@@ -61,6 +65,7 @@ adapter = PandasDataFrameAdapter(
 `copy_on_write=True` enables copy-on-write for Pandas 2.0+. `dtype_backend="pyarrow"` uses the PyArrow backend.
 
 **Best Practices:**
+
 - Enable CoW for read-heavy workloads with many intermediate operations
 - Use `ctx.scalar()` for efficient single-value extraction
 - Avoid chained indexing (`df['a']['b']`) - use `.loc[row, col]` instead
@@ -70,6 +75,7 @@ adapter = PandasDataFrameAdapter(
 PySpark excels at distributed processing and large-scale data.
 
 **Key Optimizations:**
+
 - **Adaptive Query Execution (AQE)**: Auto-optimizes joins and aggregations
 - **Shuffle partitions**: Tune based on data size
 - **Broadcast joins**: Use for small dimension tables
@@ -88,6 +94,7 @@ adapter = PySparkDataFrameAdapter(
 `master="local[*]"` uses all cores locally. `driver_memory` increases driver memory. `shuffle_partitions` should be tuned for your data size. `enable_aqe=True` enables Adaptive Query Execution.
 
 **Best Practices:**
+
 - Use `ctx.scalar()` instead of `.collect()[0][0]` for single values
 - Cache frequently-accessed DataFrames with `.cache()`
 - Avoid collecting large datasets to the driver
@@ -97,6 +104,7 @@ adapter = PySparkDataFrameAdapter(
 DataFusion provides SQL-like optimization with expression-family syntax.
 
 **Key Optimizations:**
+
 - **Parquet pushdown**: Filters and projections pushed to file scan
 - **Repartition joins**: Parallel hash joins
 - **Batch size tuning**: Adjust for memory/throughput tradeoff
@@ -127,6 +135,7 @@ total = ctx.scalar(df.select(col("value").sum()))
 ```
 
 This uses platform-native methods for efficient scalar extraction:
+
 - Polars: `.item()`
 - PySpark: `.first()[0]`
 - DataFusion: PyArrow column access

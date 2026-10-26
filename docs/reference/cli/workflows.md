@@ -1,4 +1,5 @@
 (cli-usage-patterns)=
+
 # Common Workflows
 
 ```{tags} reference, cli
@@ -100,6 +101,7 @@ This runs the benchmark and fails on a regression of more than 10%.
 ---
 
 (cli-troubleshooting)=
+
 # Troubleshooting
 
 ## Common Issues and Solutions

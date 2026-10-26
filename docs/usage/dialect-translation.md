@@ -112,6 +112,7 @@ Both translations work even though PostgreSQL and MySQL adapters do not exist ye
 > "BenchBox can translate queries to MySQL dialect. I can use these translated queries with my own MySQL connection, but BenchBox doesn't have a built-in MySQL adapter yet."
 
 **How to use dialect translation for unsupported platforms**: you provide the connection (here `mysql.connector`) and handle execution yourself.
+
 ```python
 from benchbox import TPCH
 import mysql.connector

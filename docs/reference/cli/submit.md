@@ -1,4 +1,5 @@
 (cli-submit)=
+
 # `submit` - Submit Results
 
 ```{tags} reference, cli, results
@@ -40,7 +41,7 @@ uv run -- benchbox submit [RESULT_FILE] [OPTIONS]
 
 Running `benchbox submit --output ./submission` creates this layout:
 
-```
+```text
 submission/
 ├── bundle/
 │   ├── <result>.json           # verbatim copy of the canonical result file
@@ -110,7 +111,7 @@ submission id locally and exits after the service accepts the upload.
 
 Hosted submissions are tracked with sidecar files next to the source result:
 
-```
+```text
 benchmark_runs/results/<result>.<idempotency-key>.submission.json
 ```
 

@@ -6,6 +6,7 @@
 This page covers smaller utility commands for dependency checking, system profiling, benchmark discovery, and configuration validation.
 
 (cli-check-deps)=
+
 ## `check-deps` - Check Dependencies
 
 Check dependency status and provide installation guidance for different platforms.
@@ -31,6 +32,7 @@ benchbox check-deps --verbose
 The commands, in order, give an overview of all platform dependencies, check one platform, show the detailed installation matrix, and give verbose output with recommendations.
 
 (cli-profile)=
+
 ## `profile` - System Profiling
 
 Profile the current system to understand hardware capabilities and provide recommendations.
@@ -42,6 +44,7 @@ benchbox profile
 ```
 
 This command analyzes:
+
 - CPU cores and architecture
 - Memory capacity and availability
 - Disk space
@@ -49,11 +52,13 @@ This command analyzes:
 - Python environment
 
 Provides recommendations for:
+
 - Appropriate scale factors
 - Concurrency settings
 - Platform selection
 
 (cli-benchmarks)=
+
 ## `benchmarks` - Manage Benchmark Suites
 
 Manage and browse available benchmark suites.
@@ -69,12 +74,14 @@ benchbox benchmarks list
 ```
 
 Shows information about:
+
 - TPC-H, TPC-DS, TPC-DI (official TPC benchmarks)
 - ClickBench, H2ODB (industry benchmarks)
 - SSB, AMPLab (academic benchmarks)
 - ReadPrimitives, WritePrimitives, TPC-Havoc (testing benchmarks)
 
 (cli-validate)=
+
 ## `validate` - Validate Configuration
 
 Validate BenchBox configuration files for syntax and completeness.
@@ -94,6 +101,7 @@ benchbox validate --config ./custom-config.yaml
 The first command validates the default configuration and the second validates a specific configuration file.
 
 (cli-validate-results)=
+
 ## Result Integrity Validation
 
 Result integrity validation checks benchmark result JSON files for structural
@@ -111,6 +119,7 @@ See the [Result Integrity Validation](../../development/result-integrity-validat
 developer guide for the full check list.
 
 **Notes:**
+
 - Automatically excludes `.plans.json` and `.tuning.json` companion files
 - Specs cover 21 of 22 benchmarks with 8 legacy alias mappings (e.g., `star_schema` → `ssb`); `ai_primitives` is not yet covered
 

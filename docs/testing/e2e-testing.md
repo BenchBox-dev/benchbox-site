@@ -15,7 +15,7 @@ The E2E test suite (`tests/e2e/`) validates that BenchBox works correctly as an 
 
 ## Test Structure
 
-```
+```text
 tests/e2e/
 ├── conftest.py                 # Fixtures and helpers
 ├── test_cli_options.py         # CLI option validation (31 tests)
@@ -356,14 +356,11 @@ jobs:
 ### Makefile Targets
 
 ```makefile
-test-e2e-quick:
-	uv run -- python -m pytest -m e2e_quick -v
+test-e2e-quick: ; uv run -- python -m pytest -m e2e_quick -v
 
-test-e2e-local:
-	uv run -- python -m pytest -m e2e_local -v
+test-e2e-local: ; uv run -- python -m pytest -m e2e_local -v
 
-test-e2e-all:
-	uv run -- python -m pytest tests/e2e/ -v
+test-e2e-all: ; uv run -- python -m pytest tests/e2e/ -v
 ```
 
 ## Platform Availability Gating

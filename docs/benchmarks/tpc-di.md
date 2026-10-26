@@ -53,6 +53,7 @@ The TPC-DI schema models a financial services data warehouse with dimension tabl
 ### Key Schema Features
 
 **Slowly Changing Dimensions:**
+
 - **Type 1 (Overwrite)**: DimBroker - Simple attribute updates
 - **Type 2 (History)**: DimCustomer, DimAccount, DimSecurity, DimCompany
   - `IsCurrent` flag for active records
@@ -60,6 +61,7 @@ The TPC-DI schema models a financial services data warehouse with dimension tabl
   - `BatchID` for data lineage tracking
 
 **Audit Fields:**
+
 - `BatchID`: Identifies the ETL batch that created/updated the record
 - `EffectiveDate`: When the record became effective
 - `EndDate`: When the record was superseded (NULL for current records)
@@ -111,6 +113,7 @@ benchmark cannot run without it.
 The TPC-DI benchmark focuses on the complete ETL pipeline rather than just final query performance:
 
 ### 1. Source Data Extraction
+
 - **Customer files**: CSV format with demographic and account data
 - **Daily Market files**: Fixed-width format with security prices
 - **Trade files**: XML format with trading transaction details
@@ -118,6 +121,7 @@ The TPC-DI benchmark focuses on the complete ETL pipeline rather than just final
 - **Reference data**: Industry classifications, status codes
 
 ### 2. Data Transformation
+
 - **Data cleansing**: Handle missing values, format standardization
 - **Business rules**: Apply financial industry business logic
 - **Data validation**: Referential integrity and business rule validation
@@ -125,6 +129,7 @@ The TPC-DI benchmark focuses on the complete ETL pipeline rather than just final
 - **Slowly changing dimensions**: Track historical changes properly
 
 ### 3. Data Loading
+
 - **Dimensional loading**: Load dimension tables with SCD logic
 - **Fact loading**: Load fact tables with proper foreign key resolution
 - **Incremental processing**: Handle updates and new records efficiently
@@ -356,11 +361,13 @@ This is a simplified example of the transformation logic for SCD Type 2 processi
 ### ETL Performance Patterns
 
 **Data Loading Performance:**
+
 - **Dimension loading**: Generally fast, limited by SCD logic complexity
 - **Fact loading**: Performance varies by table size and index strategy
 - **Incremental loading**: Optimized for changed records only
 
 **Transformation Complexity:**
+
 - **Simple transformations**: Basic data type conversions, formatting
 - **Complex transformations**: Business rule application, derived calculations
 - **SCD processing**: Most complex, requires historical tracking logic
@@ -368,11 +375,13 @@ This is a simplified example of the transformation logic for SCD Type 2 processi
 ### Query Performance Patterns
 
 **Validation Queries:**
+
 - **Fast (< 1s)**: [V1](queries/tpcdi/v1.md), [V2](queries/tpcdi/v2.md) - Simple dimension counts and aggregations
 - **Medium (1-10s)**: [V3](queries/tpcdi/v3.md) - Fact table aggregations
 - **Slower (> 10s)**: VQ-series queries with cross-dimension joins
 
 **Analytical Queries:**
+
 - **Interactive (< 5s)**: [A1](queries/tpcdi/a1.md), [A3](queries/tpcdi/a3.md) - Customer and broker analysis
 - **Reporting (5-30s)**: [A2](queries/tpcdi/a2.md), [A4](queries/tpcdi/a4.md) - Company and portfolio analysis
 - **Analytical (> 30s)**: [A5](queries/tpcdi/a5.md), AQ-series - Historical trend analysis
@@ -636,6 +645,7 @@ The framework runs the validation queries first, then the data quality checks. `
 ## Best Practices
 
 ### ETL Development
+
 1. **Incremental processing** - Design for efficient incremental updates
 2. **SCD implementation** - Use proper Type 1 and Type 2 patterns
 3. **Data validation** - Implement systematic quality checks
@@ -643,6 +653,7 @@ The framework runs the validation queries first, then the data quality checks. `
 5. **Audit trails** - Maintain complete data lineage tracking
 
 ### Performance Optimization
+
 1. **Batch processing** - Use appropriate batch sizes for loading
 2. **Parallel processing** - Use parallel ETL where possible
 3. **Index strategy** - Design indexes for both loading and querying
@@ -650,6 +661,7 @@ The framework runs the validation queries first, then the data quality checks. `
 5. **Monitoring** - Implement ETL performance monitoring
 
 ### Data Quality
+
 1. **Validation queries** - Run all validation queries after ETL
 2. **Business rules** - Implement domain-specific validation
 3. **Referential integrity** - Maintain FK relationships properly
@@ -660,7 +672,7 @@ The framework runs the validation queries first, then the data quality checks. `
 
 ### ETL Performance Issues
 
-**Issue: Slow SCD Type 2 processing**
+#### Issue: Slow SCD Type 2 processing
 
 Use merge or upsert patterns instead of separate UPDATE and INSERT statements.
 
@@ -675,7 +687,7 @@ WHEN NOT MATCHED THEN
     VALUES (source.CustomerID, source.LastName, source.FirstName, source.Address, 1, CURRENT_DATE);
 ```
 
-**Issue: Memory issues during large batch loading**
+#### Issue: Memory issues during large batch loading
 
 Use smaller batch sizes and streaming. `batch_size=5000` gives smaller batches, and `streaming_load=True` streams large files.
 
@@ -689,7 +701,7 @@ tpcdi = TPCDI(
 
 ### Data Quality Issues
 
-**Issue: Referential integrity violations**
+#### Issue: Referential integrity violations
 
 Load dimensions before facts and validate foreign keys. The query uses `-1` as a default surrogate key for missing dimension rows.
 

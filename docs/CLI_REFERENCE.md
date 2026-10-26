@@ -81,6 +81,7 @@ metadata store (`~/.benchbox/published.json`).
 
 Unlike `benchbox export` (which serialises live benchmark results to disk),
 `benchbox publish` operates on already-exported files and adds:
+
 - Addressability: a truthful backend-specific reference URI
 - Tracking: persistent publication history that survives process restart
 - Deduplication: publishing the same bundle twice updates the record
@@ -99,6 +100,7 @@ BenchBox emits a storage path reference. Public short-link permalinks are
 only possible when a resolver service exists and is explicitly configured.
 
 **Persistence guarantees:**
+
 - Local JSON store (`~/.benchbox/published.json`) survives process restart
 - Cloud URI references are durable if the underlying cloud storage is
 - Records can be removed with `benchbox publish remove <id>` (files are NOT deleted)
@@ -112,7 +114,7 @@ Common flags:
 
 Examples:
 
-```
+```bash
 # Publish a specific result to a local directory
 benchbox publish run results/tpch_sf1_duckdb.json
 

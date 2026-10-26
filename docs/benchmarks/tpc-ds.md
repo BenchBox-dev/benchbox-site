@@ -100,20 +100,24 @@ platform and scale.
 ### Query Categories by Complexity
 
 **Reporting Queries (Simple Aggregation):**
+
 - [Q1](queries/tpcds/q1.md), [Q6](queries/tpcds/q6.md), [Q11](queries/tpcds/q11.md), [Q13](queries/tpcds/q13.md): Basic aggregation with simple grouping
 - Focus on fundamental aggregation performance
 
 **Interactive Queries (Medium Complexity):**
+
 - [Q3](queries/tpcds/q3.md), [Q7](queries/tpcds/q7.md), [Q19](queries/tpcds/q19.md), [Q27](queries/tpcds/q27.md), [Q42](queries/tpcds/q42.md): Multi-table joins with moderate complexity
 - Window functions and ranking operations
 - Typical business intelligence patterns
 
 **Deep Analytics (High Complexity):**
+
 - [Q14a/14b](queries/tpcds/q14.md), [Q23a/23b](queries/tpcds/q23.md), [Q24a/24b](queries/tpcds/q24.md): Advanced-level analytical patterns
 - Complex joins and mathematical calculations
 - Multi-level aggregation and correlation analysis
 
 **Data Mining Queries (Very High Complexity):**
+
 - [Q64](queries/tpcds/q64.md), [Q67](queries/tpcds/q67.md), [Q70](queries/tpcds/q70.md), [Q86](queries/tpcds/q86.md): Statistical analysis and data mining patterns
 - Customer segmentation and behavior analysis
 - Advanced-level window functions and analytical operations
@@ -134,6 +138,7 @@ platform and scale.
 ### Query Variants
 
 Some queries have variants (e.g., [Q14a/Q14b](queries/tpcds/q14.md)) that test slightly different patterns:
+
 - **[Query 14a/14b](queries/tpcds/q14.md)**: Different approaches to cross-channel analysis
 - **[Query 23a/23b](queries/tpcds/q23.md)**: Alternative cross-channel query patterns
 - **[Query 24a/24b](queries/tpcds/q24.md)**: Different aggregation strategies
@@ -295,25 +300,29 @@ generated their queries for the data's scale factor and are unchanged. Results
 recorded before this change at other scale factors used the old SQL for the
 queries above, so don't compare those queries one for one with newer results.
 
-## Query Characteristics
+## Query Complexity
 
 ### Query Complexity Categories
 
 **Simple Queries (low complexity):**
+
 - [Q1](queries/tpcds/q1.md), [Q6](queries/tpcds/q6.md), [Q11](queries/tpcds/q11.md), [Q13](queries/tpcds/q13.md): Simple aggregation queries
 - [Q16](queries/tpcds/q16.md), [Q21](queries/tpcds/q21.md), [Q32](queries/tpcds/q32.md): Basic joins with simple predicates
 
 **Moderate Queries (medium complexity):**
+
 - [Q3](queries/tpcds/q3.md), [Q7](queries/tpcds/q7.md), [Q19](queries/tpcds/q19.md), [Q27](queries/tpcds/q27.md): Multi-table joins with moderate complexity
 - [Q25](queries/tpcds/q25.md), [Q29](queries/tpcds/q29.md), [Q43](queries/tpcds/q43.md): Window functions and ranking
 - [Q52](queries/tpcds/q52.md), [Q55](queries/tpcds/q55.md), [Q59](queries/tpcds/q59.md): Customer analysis patterns
 
 **Complex Queries (high complexity):**
+
 - [Q14a/b](queries/tpcds/q14.md), [Q23a/b](queries/tpcds/q23.md), [Q24a/b](queries/tpcds/q24.md): Advanced-level analytical patterns
 - [Q64](queries/tpcds/q64.md), [Q67](queries/tpcds/q67.md), [Q78](queries/tpcds/q78.md): Complex joins and correlations
 - [Q95](queries/tpcds/q95.md), [Q98](queries/tpcds/q98.md): Statistical and data mining operations
 
 **Very Complex Queries (highest complexity):**
+
 - [Q70](queries/tpcds/q70.md), [Q86](queries/tpcds/q86.md): Extremely complex analytical patterns
 - Queries with large intermediate result sets
 - Multi-level aggregation with complex predicates
@@ -558,18 +567,21 @@ complex_results = benchmark.benchmark_query_set(complex_queries)
 ## Best Practices
 
 ### Data Generation
+
 1. **Use official C tools** - TPC-DS requires dsdgen/dsqgen for compliance
 2. **Parallel generation** - Use multiple processes for large scale factors
 3. **Validate completeness** - Ensure all 24 tables are generated
 4. **Check file formats** - Verify pipe-delimited format and encoding
 
 ### Query Execution
+
 1. **Start with simple queries** - Test [Q1](queries/tpcds/q1.md), [Q6](queries/tpcds/q6.md), [Q11](queries/tpcds/q11.md) first
 2. **Use appropriate timeouts** - Complex queries can run for hours
 3. **Monitor resource usage** - Watch memory consumption for large queries
 4. **Test query variants** - Include both [Q14a](queries/tpcds/q14.md) and [Q14b](queries/tpcds/q14.md) in testing
 
 ### Performance Testing
+
 1. **Warm-up runs** - Execute queries multiple times for stable timings
 2. **Resource monitoring** - Track CPU, memory, and I/O during execution
 3. **Incremental complexity** - Start with simple queries, progress to complex
@@ -579,7 +591,8 @@ complex_results = benchmark.benchmark_query_set(complex_queries)
 
 ### Data Generation Issues
 
-**Issue: dsdgen/dsqgen not found**
+#### Issue: dsdgen/dsqgen not found
+
 ```bash
 cd _sources/tpc-ds/tools
 make
@@ -587,7 +600,8 @@ make
 
 Ensure the TPC-DS C tools are compiled and available.
 
-**Issue: Out of disk space during generation**
+#### Issue: Out of disk space during generation
+
 ```python
 tpcds = TPCDS(scale_factor=0.1, output_dir="/external/storage")
 ```
@@ -596,7 +610,8 @@ Use a smaller scale factor or external storage.
 
 ### Query Execution Issues
 
-**Issue: Query timeout on complex queries**
+#### Issue: Query timeout on complex queries
+
 ```python
 conn.execute("SET query_timeout='1800s'")
 tpcds = TPCDS(scale_factor=0.1)
@@ -604,7 +619,8 @@ tpcds = TPCDS(scale_factor=0.1)
 
 Increase the timeout (1800 seconds is 30 minutes) and use a smaller scale factor (a smaller dataset) for testing.
 
-**Issue: Out of memory on analytical queries**
+#### Issue: Out of memory on analytical queries
+
 ```python
 conn.execute("SET memory_limit='8GB'")
 conn.execute("SET max_memory='8GB'")
@@ -612,7 +628,8 @@ conn.execute("SET max_memory='8GB'")
 
 Configure memory limits and optimize queries.
 
-**Issue: Parameter substitution errors**
+#### Issue: Parameter substitution errors
+
 ```python
 query = tpcds.get_query(42, seed=12345)
 ```

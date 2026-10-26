@@ -153,6 +153,7 @@ Apache Doris supports four table models, each optimized for different workloads.
 | **Primary Key** | Real-time updates | Last write wins with merge-on-read | Not used |
 
 The Duplicate Key model is optimal for TPC-H and TPC-DS workloads because:
+
 - No deduplication overhead during data loading
 - All original rows are preserved for accurate query results
 - Sort keys can be specified for scan optimization
@@ -216,7 +217,7 @@ The Doris adapter is a single-file implementation:
 
 ### Connection Model
 
-```
+```text
 BenchBox CLI
     |
     v
@@ -296,6 +297,7 @@ DISTRIBUTED BY HASH(l_orderkey) BUCKETS 16;
 ```
 
 **Guidelines:**
+
 - Use high-cardinality columns for even data distribution
 - Align distribution keys with common join predicates
 - Start with 8-16 buckets and adjust based on data volume
@@ -345,6 +347,7 @@ Several vendors offer managed Apache Doris cloud services:
 | **ApsaraDB for SelectDB** | Alibaba Cloud | Managed Doris on Alibaba Cloud infrastructure |
 
 When using managed cloud services:
+
 - The host, port, and credentials are provided by the service
 - Stream Load endpoints may use HTTPS (set the adapter `use_tls` parameter)
 - HTTP port may differ from the default 8030
@@ -353,11 +356,12 @@ When using managed cloud services:
 
 ### Connection Refused
 
-```
+```text
 Error: Failed to connect to Doris
 ```
 
 **Solutions:**
+
 1. Verify Doris FE is running and accessible on the configured host and port
 2. Check that port 9030 (MySQL protocol) is open and not blocked by a firewall
 3. For Docker deployments, ensure port mapping is correct (`-p 9030:9030`)
@@ -365,21 +369,23 @@ Error: Failed to connect to Doris
 
 ### Missing PyMySQL Dependency
 
-```
+```text
 Error: Missing dependencies for doris platform: pymysql
 ```
 
 **Solutions:**
+
 1. Install PyMySQL: `uv add pymysql`
 2. Or install the Doris extra: `uv add benchbox --extra doris`
 
 ### Stream Load Failures
 
-```
+```text
 Error: Stream Load failed with status 503
 ```
 
 **Solutions:**
+
 1. Verify the FE HTTP port (default 8030) is accessible from the BenchBox host
 2. Check that BE nodes are alive: `SHOW BACKENDS;` via MySQL client
 3. Ensure the target table exists before loading data
@@ -388,11 +394,12 @@ Error: Stream Load failed with status 503
 
 ### Schema Creation Failures
 
-```
+```text
 Error: critical CREATE TABLE statement(s) failed
 ```
 
 **Solutions:**
+
 1. Check that the Doris user has `CREATE TABLE` and `CREATE DATABASE` permissions
 2. Verify the target database exists or the user has `CREATE DATABASE` privilege
 3. Review Doris FE logs (`fe.log`) for detailed error messages
@@ -402,6 +409,7 @@ Error: critical CREATE TABLE statement(s) failed
 ### Slow Data Loading
 
 **Solutions:**
+
 1. Install `requests` to enable Stream Load (the recommended bulk-ingest path; INSERT fallback is row-by-row and typically 10x or more slower for large datasets)
 2. Ensure the FE HTTP port (8030) is accessible for Stream Load
 3. Increase bucket count for better parallelism during loading
@@ -410,11 +418,12 @@ Error: critical CREATE TABLE statement(s) failed
 
 ### Query Timeout
 
-```
+```text
 Error: Query execution exceeded timeout
 ```
 
 **Solutions:**
+
 1. Check Doris resource utilization (CPU, memory, disk I/O) via `SHOW PROC '/backends';`
 2. Verify data distribution is balanced across BE nodes
 3. Run `ANALYZE TABLE` to update column statistics for the query optimizer

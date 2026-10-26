@@ -1,4 +1,5 @@
 (cli-visualize)=
+
 # `visualize` - Generate Charts
 
 ```{tags} reference, cli, visualization

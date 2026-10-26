@@ -3,7 +3,7 @@
 ```{tags} intermediate, guide, validation
 ```
 
-**Automatic validation of query results against expected row counts**
+**Automatic validation of query results against expected row counts.**
 
 ---
 
@@ -60,7 +60,7 @@ Each query result includes validation metadata when validation is performed:
 
 Query returned the exact expected number of rows (or within acceptable range for non-deterministic queries).
 
-```
+```text
 ✅ Query 1: 4 rows (expected: 4) - Validation PASSED
 ```
 
@@ -68,12 +68,13 @@ Query returned the exact expected number of rows (or within acceptable range for
 
 Query returned a different number of rows than expected. This indicates a potential correctness issue.
 
-```
+```text
 ❌ Query 2: 250 rows (expected: 460) - Validation FAILED
   Difference: -210 rows (-45.7%)
 ```
 
 **Possible causes:**
+
 - Incorrect SQL query implementation
 - Data loading errors
 - Platform-specific behavior differences
@@ -83,11 +84,12 @@ Query returned a different number of rows than expected. This indicates a potent
 
 Validation was skipped because no expected result is available for this query/scale factor combination.
 
-```
+```text
 ⚠️ Query 3: 150 rows - Validation SKIPPED
 ```
 
 **Common reasons:**
+
 - Scale factor other than 1.0 (expected results only available for SF=1.0 currently)
 - Query variant not in answer files
 - Answer files are unavailable and the provider reports `FileNotFoundError`,
@@ -242,7 +244,7 @@ There are two options. Option 1, disabling validation at the adapter level, is n
 
 ### Architecture
 
-```
+```text
 ┌─────────────────┐
 │ Platform Adapter│
 │  (run_benchmark)│
@@ -305,6 +307,7 @@ results = adapter.run_throughput_test(
 Throughput tests with concurrent queries are safe. The streams share one connection, and each stream gets its own session. `num_streams=4` runs 4 concurrent query streams, and each stream can validate concurrently without conflicts.
 
 **Implementation:**
+
 - Registry uses `threading.Lock` to protect cache and provider registry
 - Double-check locking pattern for efficient concurrent access
 - Slow provider loads happen outside locks
@@ -330,14 +333,14 @@ with no network overhead.
 
 Downloaded answer files are stored in:
 
-```
+```text
 $XDG_CACHE_HOME/benchbox/answers/    # if XDG_CACHE_HOME is set
 ~/.cache/benchbox/answers/            # otherwise (default)
 ```
 
 Subdirectories:
 
-```
+```text
 ~/.cache/benchbox/answers/
 ├── tpch/          # q1.out … q22.out
 └── tpcds/         # 1.ans … 99.ans + NULLS variants
@@ -395,19 +398,22 @@ See `.github/workflows/upload-answers.yml` for the expected archive layout.
 **Possible causes:**
 
 1. **Data loading error**
-   ```
+
+   ```sql
    # Verify data was loaded correctly
    SELECT COUNT(*) FROM lineitem;  -- Should match scale factor
    ```
 
 2. **SQL translation issue**
+
    ```python
    sql = benchmark.get_query(query_id=1, dialect="duckdb")
    print(sql)
    ```
 
 3. **Platform-specific behavior**
-   ```
+
+   ```text
    # Some platforms may handle edge cases differently
    # Check if difference is consistent across queries
    ```
@@ -417,6 +423,7 @@ See `.github/workflows/upload-answers.yml` for the expected archive layout.
 **Symptom**: All validations skipped at SF=10, SF=100, etc.
 
 **This is expected behavior:**
+
 - Expected results are only available for SF=1.0, SF=0.01 and SF=0.1
 - Scale-dependent queries cannot be validated at other SFs
 - Scale-independent queries (e.g., TPC-H Q1) still validate via fallback
@@ -430,6 +437,7 @@ See `.github/workflows/upload-answers.yml` for the expected archive layout.
 **Cause**: Provider auto-registration failed (rare)
 
 **Solution**:
+
 ```python
 from benchbox.core.expected_results import register_all_providers
 register_all_providers()
@@ -442,6 +450,7 @@ This triggers provider registration manually.
 **Symptom**: Validation skipped with "No expected row count defined"
 
 **Causes:**
+
 1. Query ID format not recognized
    - Use standard formats: 1, "1", "Q1", "query1"
 2. Query variant not in answer files
@@ -476,20 +485,24 @@ substitution parameters; runs with other parameters skip that query.
 ### Validation Modes
 
 1. **EXACT**: Row count must match exactly
+
    ```python
    expected_row_count = 4
    actual_row_count = 4
    actual_row_count = 5
    ```
+
    An actual count of 4 passes. An actual count of 5 fails.
 
 2. **RANGE**: Row count must be within min/max range (for non-deterministic queries)
+
    ```python
    expected_row_count_min = 100
    expected_row_count_max = 150
    actual_row_count = 125
    actual_row_count = 200
    ```
+
    An actual count of 125 passes. An actual count of 200 fails.
 
 3. **SKIP**: Validation is skipped. It is used when no expected result is available.
@@ -586,7 +599,7 @@ Planned improvements to row count validation:
 
 ## References
 
-- TPC-H Specification: https://www.tpc.org/tpch/
-- TPC-DS Specification: https://www.tpc.org/tpcds/
+- TPC-H Specification: <https://www.tpc.org/tpch/>
+- TPC-DS Specification: <https://www.tpc.org/tpcds/>
 - BenchBox Architecture: docs/design/architecture.md
 - Issue Tracking: Report validation bugs on GitHub

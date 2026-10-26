@@ -29,7 +29,7 @@ Dask is a flexible parallel computing library that enables distributed DataFrame
 
 Dask partitions DataFrames into chunks and builds a task graph for lazy execution:
 
-```
+```text
                   ┌───────────────┐
                   │ Dask DataFrame│
                   │  (lazy graph) │
@@ -115,11 +115,13 @@ distributed engine to an existing cluster.
 ### Scheduler Options
 
 **Threaded** (`threaded`):
+
 - Runs tasks with local worker threads
 - Does not start a Dask Distributed cluster
 - Ignores `n_workers`, `threads_per_worker`, `memory_limit` and `spill_directory`: BenchBox logs a warning for each one you set and leaves it out of the recorded platform information
 
 **Distributed** (`distributed`, the default):
+
 - Uses Dask Distributed with a local cluster or a remote scheduler
 - Scales across workers and machines
 
@@ -281,11 +283,12 @@ Install the cluster with the Dask Kubernetes Helm chart, then connect BenchBox t
 
 ### Memory Errors
 
-```
+```text
 distributed.worker - WARNING - Memory use is high but worker has no data to store
 ```
 
 **Solutions:**
+
 1. Increase memory per worker
 2. Reduce partition size
 3. Use fewer workers with more memory each
@@ -294,6 +297,7 @@ distributed.worker - WARNING - Memory use is high but worker has no data to stor
 ### Slow Performance
 
 **Check partition count:**
+
 ```python
 ddf.npartitions
 ```
@@ -301,28 +305,31 @@ ddf.npartitions
 The partition count should be 2-4 times the number of workers.
 
 **Repartition if needed:**
+
 ```python
 ddf = ddf.repartition(npartitions=16)
 ```
 
 ### Shuffle Errors
 
-```
+```text
 KilledWorker: ... exceeded memory limit
 ```
 
 **Solutions:**
+
 1. Increase worker memory
 2. Use `persist()` to materialize intermediate results
 3. Break large shuffles into smaller operations
 
 ### Connection Issues
 
-```
+```text
 OSError: [Errno 111] Connection refused
 ```
 
 **Solutions:**
+
 1. Verify scheduler is running
 2. Check firewall rules for scheduler port (default: 8786)
 3. Ensure all workers can reach scheduler
