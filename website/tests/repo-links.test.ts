@@ -3,7 +3,6 @@ import os from "node:os";
 import path from "node:path";
 import { afterEach, describe, expect, it } from "vitest";
 import { buildSite } from "../src/converter/build.ts";
-import { EXCLUSIONS_FILE } from "../src/converter/sources.ts";
 
 const roots: string[] = [];
 
@@ -14,7 +13,7 @@ afterEach(() => {
 function repository(files: Record<string, string>): string {
   const root = mkdtempSync(path.join(os.tmpdir(), "benchbox-repo-"));
   roots.push(root);
-  for (const [relative, content] of Object.entries({ [`docs/${EXCLUSIONS_FILE}`]: "", ...files })) {
+  for (const [relative, content] of Object.entries(files)) {
     mkdirSync(path.dirname(path.join(root, relative)), { recursive: true });
     writeFileSync(path.join(root, relative), content);
   }

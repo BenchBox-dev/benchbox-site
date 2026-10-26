@@ -43,13 +43,19 @@ describe("shell header links", () => {
 
 describe("edit links", () => {
   it("points authored pages at their source", () => {
-    expect(editUrlFor("docs/usage/getting-started.md")).toBe("https://github.com/BenchBox-dev/BenchBox/edit/develop/docs/usage/getting-started.md");
+    expect(editUrlFor("docs/usage/getting-started.md")).toBe("https://github.com/BenchBox-dev/benchbox-site/edit/main/docs/usage/getting-started.md");
+    expect(editUrlFor("docs/README.md")).toBe("https://github.com/BenchBox-dev/benchbox-site/edit/main/docs/README.md");
+    expect(editUrlFor("docs/blog/2026-01-01-post.md")).toBe("https://github.com/BenchBox-dev/benchbox-site/edit/main/blog/2026-01-01-post.md");
   });
 
   it("omits generated and unsafe sources", () => {
     expect(editUrlFor(undefined)).toBeUndefined();
     expect(editUrlFor("docs/_tags/duckdb.md")).toBeUndefined();
     expect(editUrlFor("docs/benchmarks/queries/tpch/q1.md")).toBeUndefined();
+    expect(editUrlFor("docs/compat/capability-matrix.md")).toBeUndefined();
+    expect(editUrlFor("docs/compat/skip-reference.md")).toBeUndefined();
+    expect(editUrlFor("docs/reference/tuning-platform-support.md")).toBeUndefined();
+    expect(editUrlFor("docs/reference/tuning-platform-support-notes.md")).toBeDefined();
     expect(editUrlFor("../secrets.md")).toBeUndefined();
   });
 });

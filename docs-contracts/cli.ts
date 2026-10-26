@@ -9,7 +9,6 @@ const { values } = parseArgs({
     inputs: { type: "string" },
     docs: { type: "string" },
     "docs-mode": { type: "string", default: "block" },
-    "allow-schema3": { type: "boolean", default: false },
   },
 });
 
@@ -25,7 +24,6 @@ try {
     inputs: path.resolve(values.inputs ?? process.env.SITE_INPUTS ?? path.join(ROOT, ".site-inputs")),
     docs: values.docs === undefined ? undefined : path.resolve(values.docs),
     mode: mode as Mode,
-    allowSchema3: values["allow-schema3"] === true,
   });
 } catch (error) {
   console.error(`docs-contracts: ${(error as Error).message}`);

@@ -1,9 +1,5 @@
 export const ROOTS = ["_project", "agent", "internal"];
 
-export function exclusionFile(roots: string[], files: string[] = []): string {
-  return [...roots.map((root) => `${root}/`), ...files].map((line) => `${line}\n`).join("");
-}
-
 import { mkdirSync, mkdtempSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import path from "node:path";
@@ -123,9 +119,6 @@ export function buildPages(): Record<string, string> {
   const pages: Record<string, string> = {
     "README.md": `# BenchBox\n\nCurrent release: \`v${VERSION}\`. Use the CLI.\n`,
     "development/open.md": "# Open\n",
-    "development/closed.md": "# Closed\n",
-    "agent/notes.md": "# Agent notes\n",
-    "internal/guide.md": "# Internal guide\n",
     "platforms/comparison-matrix.md":
       "# Matrix\n\n<!-- benchbox-registry-counts:start -->\n\nPlatform registry: **2** metadata entries; **2** SQL-capable; **1** DataFrame-capable; **1** dual-mode; support status counts: stable=1, beta=1, experimental=0, deprecated=0.\n\n<!-- benchbox-registry-counts:end -->\n",
     "platforms/support-status.md": [
@@ -227,13 +220,10 @@ export function buildPages(): Record<string, string> {
   return pages;
 }
 
-export function writeBundle(options: { schema: number; contracts?: Contracts | null; pages: Record<string, string>; exclusions?: string; allowlist?: string; packageVersion?: string }): string {
+export function writeBundle(options: { schema: number; contracts?: Contracts | null; pages: Record<string, string>; packageVersion?: string }): string {
   const root = mkdtempSync(path.join(tmpdir(), "docs-contracts-"));
   const contracts = options.contracts === undefined ? buildContracts() : options.contracts;
-  const exclusions = options.exclusions ?? exclusionFile(ROOTS, ["development/closed.md"]);
-  const allowlist = options.allowlist ?? "development/open.md\ndevelopment/result-integrity-validation.md\n";
-  const files: Record<string, string> = { ...options.pages, "publish-exclusions.txt": exclusions, "publish-allowlist.txt": allowlist };
-  for (const [name, body] of Object.entries(files)) {
+  for (const [name, body] of Object.entries(options.pages)) {
     mkdirSync(path.dirname(path.join(root, "docs", name)), { recursive: true });
     writeFileSync(path.join(root, "docs", name), body);
   }

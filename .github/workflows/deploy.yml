@@ -65,7 +65,7 @@ jobs:
         run: node --experimental-strip-types deploy/run-step.ts npm run -s deploy -- resolve
       - name: Check documentation contracts before building
         if: env.DEPLOY_MODE != 'rollback'
-        run: npm run -s docs:check -- --docs-mode block --allow-schema3
+        run: npm run -s docs:check -- --docs-mode block
       - name: Build from the bundle
         id: build
         if: env.DEPLOY_MODE != 'rollback'

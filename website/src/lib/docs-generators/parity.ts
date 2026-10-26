@@ -2,10 +2,8 @@ import { createHash } from "node:crypto";
 import { existsSync, readdirSync, readFileSync, statSync } from "node:fs";
 import path from "node:path";
 import { parseDocsData } from "./docs-data.ts";
-import { generateDocsPages } from "./generate.ts";
+import { GENERATED_DIRECTORIES, GENERATED_FILES, generateDocsPages } from "./generate.ts";
 
-export const GENERATED_DIRECTORIES = ["benchmarks/queries", "compat"];
-export const GENERATED_FILES = ["reference/tuning-platform-support.md"];
 
 const EXCERPT_LIMIT = 120;
 export const DEFAULT_LISTING_LIMIT = 50;

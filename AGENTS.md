@@ -3,9 +3,10 @@
 This repository builds and deploys benchbox.dev: the Astro site in
 `website/`, the Results Explorer in `explorer/`, the landing assets in
 `landing/`, the published blog in `blog/` and blog drafts in `drafts/`.
-Benchmark code, results data and the docs sources live in the core
-repository, `BenchBox-dev/BenchBox`. The site builds from the repository
-itself plus one versioned core bundle; it reads nothing else from core.
+Benchmark code and results data live in the core
+repository, `BenchBox-dev/BenchBox`. The documentation under `docs/` is
+authored here. The site builds from the repository itself plus one
+versioned core bundle; it reads nothing else from core.
 
 ## Language
 
@@ -24,47 +25,65 @@ itself plus one versioned core bundle; it reads nothing else from core.
   certification before anything reads it.
 - The bundle schema is an integer major version. A schema change lands in
   core first, then the site adds support for it, then core may drop the
-  older schema. The verifier accepts exact schemas 3, 4 and 5, each with
-  its own exact member set. Schemas 4 and 5 add
+  older schema. The verifier accepts exact schemas 4 and 5, each with
+  its own exact member set; schema 3 is retired. Both schemas carry
   `docs-data/docs-data.json` and `doc-contracts.json`, validated against
-  the schemas vendored in `scripts/schemas/`. Schema 5 drops `docs` and
-  `downloads`. Unknown schemas, member sets and extra entries in
-  `docs-data` fail.
+  the schemas vendored in `scripts/schemas/`. Schema 4 still carries `docs`
+  and `downloads`, which the site no longer reads; schema 5 drops them.
+  Unknown schemas, member sets and extra entries in `docs-data` fail.
 - `certified_by` is the numeric id of the core `trunk.yml` push run on
   `develop` for the bundle commit. Online certification requires that run
-  id for schemas 3 and 4 alike, with the same attestations. The value
+  id for schema 4, with the same attestations. The value
   `candidate` is valid for schemas 4 and 5 under `--offline` verification
   only, and never passes online certification. Schema 5 accepts only
   `candidate`, so it cannot be deployed yet.
-- `npm run docs:check` (`docs-contracts/`, TypeScript) checks the bundle's
+- `npm run docs:check` (`docs-contracts/`, TypeScript) checks the site's
   documentation against the `doc-contracts.json` facts core exports: registry
   and platform counts, the benchmark API surface, the quickstart commands,
   `--platform-option` examples, the MCP reference, SF1 sizes, sketch bounds,
-  version markers, the Python API headings and the publication boundary. The
+  version markers, the Python API headings and the publication boundary. It
+  assembles the documentation the way the build does (the authored pages in
+  `docs/`, the generated pages and the versioned landing page) and checks that
+  tree; `--docs <dir>` checks another documentation tree instead. The
   contract-internal consistency checks always block. The page checks block
   with `--docs-mode block` (the default) and only print with
   `--docs-mode report`; `ci` and the deploy build pass `block` (rollback
   restores an artifact and runs no check), so page drift fails the run
-  before the build and before publication. A schema 3 bundle has no
-  `doc-contracts.json`: `--allow-schema3`
-  skips the contract checks and runs only the negative publication guard,
-  without the flag the run fails, and a schema 4 or 5 bundle without the
-  member always fails. `--docs <dir>` checks a documentation tree other than
-  the bundle's `docs` member. `npm run test:docs-contracts` runs the seeded
-  drift tests; `DOC_CONTRACTS_SCHEMA4_BUNDLE=<bundle dir>` adds a run
-  against a real schema 4 bundle.
+  before the build and before publication. A bundle without
+  `doc-contracts.json` always fails. `npm run test:docs-contracts` runs the
+  seeded drift tests; `DOC_CONTRACTS_SCHEMA4_BUNDLE=<bundle dir>` adds a run
+  against a real bundle.
 - Never read core files by any other route. A guard test fails the build on
   any path outside the repository other than `$SITE_INPUTS`.
 - `npm run docs:parity -w website` runs the TypeScript generators on the
   bundle's `docs-data` and compares the output byte for byte with the
-  bundle's `docs` member. The generated scope is `benchmarks/queries/`,
-  `compat/` and `reference/tuning-platform-support.md`. Every changed,
-  missing and extra path in that scope fails the run and is named with its
-  first differing byte and SHA-256 digests; nothing is normalized. A bundle
-  without `docs-data` (schema 3) reports not applicable unless
-  `--require-applicable` is given. `--report <file>` writes the full
-  difference list with path and SHA-256 inventories of both sides. `ci` runs
-  it; production rendering still reads the bundled Markdown.
+  bundle's `docs` member while the bundle still carries one (schema 4). The
+  generated scope is `benchmarks/queries/`, `compat/` and
+  `reference/tuning-platform-support.md`. Every changed, missing and extra
+  path in that scope fails the run and is named with its first differing
+  byte and SHA-256 digests; nothing is normalized. A bundle without `docs`
+  (schema 5) reports not applicable unless `--require-applicable` is given.
+  `--report <file>` writes the full difference list with path and SHA-256
+  inventories of both sides. `ci` runs it.
+
+## Documentation
+
+- `docs/` holds the published pages, authored here, with their original
+  MIT license text in `docs/LICENSE`. The build assembles them with the
+  pages that `npm run docs:generate -w website` renders from the bundle's
+  `docs-data` (the generated scope above) and with `blog/`. An authored page
+  in the generated scope or under `docs/blog/` fails the assembly.
+- `docs/README.md` is the landing page. Its `{{package_version}}` token
+  becomes the bundle manifest's `package_version`, so the release marker in
+  the page always matches the bundle.
+- Core keeps maintainer-only material (`docs/agent/`, `docs/internal/`,
+  `design/future-state/`, the threat model, the workaround index, the TPC
+  licensing analysis and the publication lists). The site publishes
+  nothing from those paths: listing sources fails when the tree holds any
+  of them, in place of a publish list.
+- Edit links point at this repository. Generated pages (`benchmarks/queries/`,
+  `compat/`, `reference/tuning-platform-support.md`) and renderer pages carry
+  none.
 
 ## Deploys
 
