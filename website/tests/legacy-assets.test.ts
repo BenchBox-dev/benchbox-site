@@ -88,9 +88,13 @@ describe("legacy download redirects", () => {
   it("shows the notice link on a template redirect page and omits it elsewhere", () => {
     const tpch = find(downloadUrlPath(TPCH_SOURCE));
     const page = renderRedirectPage(tpch as LegacyRedirect);
-    expect(page).toContain(`<meta http-equiv="refresh" content="0; url=${tpch?.target}">`);
+    expect(page).toContain(`<meta http-equiv="refresh" content="5; url=${tpch?.target}">`);
     expect(page).toContain(`<a href="${tpch?.notice}">TPC End User License Agreement</a>`);
-    expect(renderRedirectPage(find(downloadUrlPath("../examples/run.py")) as LegacyRedirect)).not.toContain("TPC");
+    const plain = find(downloadUrlPath("../examples/run.py")) as LegacyRedirect;
+    expect(renderRedirectPage(plain)).not.toContain("TPC");
+    expect(renderRedirectPage(plain)).toContain(`<meta http-equiv="refresh" content="0; url=${plain.target}">`);
+    const sidecar = redirects.find((redirect) => redirect.url.endsWith("/TPC_EULA.txt")) as LegacyRedirect;
+    expect(renderRedirectPage(sidecar)).toContain(`content="0; url=${sidecar.target}">`);
   });
 
   it("escapes markup in a target", () => {

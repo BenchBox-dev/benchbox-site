@@ -10,6 +10,7 @@ export type LegacyDownload = { source: string; path: string; core_sha?: string; 
 export type LegacyDownloads = { core_sha: string; downloads: LegacyDownload[] };
 export type LegacyRedirect = { url: string; target: string; notice?: string };
 
+export const NOTICE_DELAY_SECONDS = 5;
 export const TPC_NOTICE_NAME = "TPC_EULA.txt";
 
 export function downloadUrlPath(relative: string): string {
@@ -74,7 +75,7 @@ export function renderRedirectPage(redirect: Pick<LegacyRedirect, "target" | "no
     "    <title>This page has moved</title>",
     '    <meta name="robots" content="noindex">',
     `    <link rel="canonical" href="${target}">`,
-    `    <meta http-equiv="refresh" content="0; url=${target}">`,
+    `    <meta http-equiv="refresh" content="${redirect.notice === undefined ? 0 : NOTICE_DELAY_SECONDS}; url=${target}">`,
     "  </head>",
     "  <body>",
     `    <p>This page has moved. <a href="${target}">Continue to the new page</a>.</p>`,
