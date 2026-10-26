@@ -38,6 +38,16 @@ itself plus one versioned core bundle; it reads nothing else from core.
   `candidate`, so it cannot be deployed yet.
 - Never read core files by any other route. A guard test fails the build on
   any path outside the repository other than `$SITE_INPUTS`.
+- `npm run docs:parity -w website` runs the TypeScript generators on the
+  bundle's `docs-data` and compares the output byte for byte with the
+  bundle's `docs` member. The generated scope is `benchmarks/queries/`,
+  `compat/` and `reference/tuning-platform-support.md`. Every changed,
+  missing and extra path in that scope fails the run and is named with its
+  first differing byte and SHA-256 digests; nothing is normalized. A bundle
+  without `docs-data` (schema 3) reports not applicable unless
+  `--require-applicable` is given. `--report <file>` writes the full
+  difference list with path and SHA-256 inventories of both sides. `ci` runs
+  it; production rendering still reads the bundled Markdown.
 
 ## Deploys
 

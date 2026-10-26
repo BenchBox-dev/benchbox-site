@@ -2,9 +2,7 @@ import { mkdirSync, rmSync, writeFileSync } from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { loadDocsData } from "../src/lib/docs-generators/docs-data.ts";
-import { renderCompatPages } from "../src/lib/docs-generators/compat-pages.ts";
-import { renderQueryPages } from "../src/lib/docs-generators/query-pages.ts";
-import { renderTuningPage } from "../src/lib/docs-generators/tuning-matrix.ts";
+import { generateDocsPages } from "../src/lib/docs-generators/generate.ts";
 import { siteInputsPath } from "../src/lib/site-inputs.ts";
 
 const websiteRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
@@ -18,10 +16,7 @@ const docsDataFile = path.resolve(option("--docs-data", siteInputsPath("docs-dat
 const outRoot = path.resolve(option("--out", path.join(websiteRoot, ".generated", "docs-pages")));
 
 const data = loadDocsData(docsDataFile);
-const files = renderQueryPages(data);
-for (const [relative, content] of renderCompatPages(data)) files.set(relative, content);
-const tuning = renderTuningPage(data);
-files.set(tuning.path, tuning.content);
+const files = generateDocsPages(data);
 
 rmSync(outRoot, { recursive: true, force: true });
 for (const [relative, content] of [...files.entries()].sort(([left], [right]) => (left < right ? -1 : left > right ? 1 : 0))) {
