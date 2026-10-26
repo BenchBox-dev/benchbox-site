@@ -81,7 +81,7 @@ jobs:
       - run: npm run bundle:verify -- --offline
       - run: npm run docs:parity -w website
       - name: Check documentation contracts against the fetched bundle
-        run: npm run docs:check -- --docs-mode report --allow-schema3
+        run: npm run docs:check -- --docs-mode block --allow-schema3
       - run: npm run typecheck -w explorer
       - run: npm run typecheck:e2e -w explorer
       - run: npm run check -w website

@@ -43,9 +43,10 @@ itself plus one versioned core bundle; it reads nothing else from core.
   version markers, the Python API headings and the publication boundary. The
   contract-internal consistency checks always block. The page checks block
   with `--docs-mode block` (the default) and only print with
-  `--docs-mode report`; CI and the deploy build pass `report` until the
-  documentation moves into this repository, and that move changes them to
-  block. A schema 3 bundle has no `doc-contracts.json`: `--allow-schema3`
+  `--docs-mode report`; `ci` and the deploy build pass `block` (rollback
+  restores an artifact and runs no check), so page drift fails the run
+  before the build and before publication. A schema 3 bundle has no
+  `doc-contracts.json`: `--allow-schema3`
   skips the contract checks and runs only the negative publication guard,
   without the flag the run fails, and a schema 4 or 5 bundle without the
   member always fails. `--docs <dir>` checks a documentation tree other than
