@@ -301,3 +301,5 @@ zipfian
 zstd
 sfqid
 microsecs
+introspector
+linkcheck

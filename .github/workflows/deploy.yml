@@ -63,6 +63,9 @@ jobs:
           SITE_INPUTS_RUN_ID: ${{ github.event.client_payload.run_id }}
           SITE_INPUTS_DIGEST: ${{ github.event.client_payload.digest }}
         run: node --experimental-strip-types deploy/run-step.ts npm run -s deploy -- resolve
+      - name: Check documentation contracts before building
+        if: env.DEPLOY_MODE != 'rollback'
+        run: npm run -s docs:check -- --docs-mode report --allow-schema3
       - name: Build from the bundle
         id: build
         if: env.DEPLOY_MODE != 'rollback'

@@ -72,12 +72,16 @@ jobs:
           path: .site-inputs
       - run: node --test scripts/*.test.mjs
       - run: npm run test:deploy
+      - run: npm run test:docs-contracts
       - run: npx tsc -p deploy
+      - run: npx tsc -p docs-contracts
       - run: npm run lint:comments
       - run: npm run lint:guard
       - run: npm run lint:blog
       - run: npm run bundle:verify -- --offline
       - run: npm run docs:parity -w website
+      - name: Check documentation contracts against the fetched bundle
+        run: npm run docs:check -- --docs-mode report --allow-schema3
       - run: npm run typecheck -w explorer
       - run: npm run typecheck:e2e -w explorer
       - run: npm run check -w website
