@@ -147,6 +147,14 @@ versioned core bundle; it reads nothing else from core.
 - The Visual comparison workflow screenshots a PR's build and the deployed
   artifact and reports the differences. It is advisory: it is not part of
   `ci` and never fails on a difference.
+- The Nightly workflow's `links` job checks external links in `blog/`, `docs/`
+  and the site pages with `.lychee.toml`, which carries the scoped ignore
+  policy for flaky and login-gated hosts. It then checks the published
+  documentation: every `/docs/` page in the `SITE_ORIGIN` sitemap, with
+  fragments, for links to that origin (the scoped policy's own-origin exclusion
+  yields to the check's include pattern). `scripts/check-published-links.mjs` accepts the
+  failures whose target is in `inventory/known-broken-links.json` and fails on
+  any other. Either failure opens or updates the `broken-links` issue.
 
 ## Core and this repository
 

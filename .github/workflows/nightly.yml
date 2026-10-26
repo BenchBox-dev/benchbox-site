@@ -45,21 +45,65 @@ jobs:
           args: --config .lychee.toml --no-progress --max-concurrency 8 --scheme https --scheme http --exclude-loopback "blog/**/*.md" "docs/**/*.md" "website/src/**/*.astro"
           output: lychee-report.md
           fail: false
+      - uses: actions/setup-node@a0853c24544627f65ddf259abe73b1d18a591444
+        with:
+          node-version-file: .nvmrc
+      - name: Check published documentation routes and fragments
+        id: published
+        if: vars.SITE_ORIGIN != ''
+        env:
+          SITE_ORIGIN: ${{ vars.SITE_ORIGIN }}
+        run: |
+          set -uo pipefail
+          curl -fsS "$SITE_ORIGIN/sitemap.xml" | grep -o '<loc>[^<]*</loc>' | sed -e 's/<[^>]*>//g' -e 's#^https\{0,1\}://[^/]*##' | grep '^/docs/' | sed "s#^#$SITE_ORIGIN#" > published-docs.txt
+          mapfile -t pages < published-docs.txt
+          if [ "${#pages[@]}" -eq 0 ]; then
+            echo "The sitemap lists no documentation pages." > published-report.md
+            echo "failed=true" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          origin_pattern="^$(printf '%s' "$SITE_ORIGIN" | sed 's/\./\\./g')"
+          lychee --config .lychee.toml --no-progress --max-concurrency 4 --include-fragments --include "$origin_pattern" --scheme https --format json --output published-links.json "${pages[@]}"
+          status=$?
+          if [ "$status" -ne 0 ] && [ "$status" -ne 2 ]; then
+            printf 'lychee exited with status %s on the published documentation.\n' "$status" > published-report.md
+            echo "failed=true" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          if node scripts/check-published-links.mjs published-links.json inventory/known-broken-links.json > published-report.md; then
+            echo "failed=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "failed=true" >> "$GITHUB_OUTPUT"
+          fi
       - name: Open or update the broken-links issue
-        if: steps.lychee.outputs.exit_code != '0'
+        if: steps.lychee.outputs.exit_code != '0' || steps.published.outputs.failed == 'true'
         env:
           GH_TOKEN: ${{ github.token }}
           REPO: ${{ github.repository }}
           RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+          EXTERNAL_EXIT: ${{ steps.lychee.outputs.exit_code }}
+          PUBLISHED_FAILED: ${{ steps.published.outputs.failed }}
         run: |
           set -euo pipefail
           NUMBER="$(gh issue list --repo "$REPO" --label broken-links --state open --json number --jq '.[0].number // empty')"
-          BODY="$(printf 'External link check found broken links.\n\nRun: %s\n\n' "$RUN_URL"; head -c 60000 lychee-report.md)"
+          {
+            printf 'Link check found broken links.\n\nRun: %s\n\n' "$RUN_URL"
+            if [ "$EXTERNAL_EXIT" != "0" ]; then
+              printf '## External links in the sources\n\n'
+              head -c 30000 lychee-report.md
+              printf '\n\n'
+            fi
+            if [ "$PUBLISHED_FAILED" = "true" ]; then
+              printf '## Published documentation\n\n'
+              head -c 30000 published-report.md
+            fi
+          } > issue-body.md
+          BODY="$(cat issue-body.md)"
           if [ -n "$NUMBER" ]; then
             gh issue comment "$NUMBER" --repo "$REPO" --body "$BODY"
           else
-            gh label create broken-links --repo "$REPO" --color D93F0B --description "The nightly external link check failed" --force
-            gh issue create --repo "$REPO" --title "Broken external links" --label broken-links --body "$BODY"
+            gh label create broken-links --repo "$REPO" --color D93F0B --description "The nightly link check failed" --force
+            gh issue create --repo "$REPO" --title "Broken links" --label broken-links --body "$BODY"
           fi
 
   contract-drift:
