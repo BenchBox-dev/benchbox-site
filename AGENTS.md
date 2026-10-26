@@ -33,10 +33,9 @@ versioned core bundle; it reads nothing else from core.
   Unknown schemas, member sets and extra entries in `docs-data` fail.
 - `certified_by` is the numeric id of the core `trunk.yml` push run on
   `develop` for the bundle commit. Online certification requires that run
-  id for schema 4, with the same attestations. The value
+  id for schemas 4 and 5, with the same attestations. The value
   `candidate` is valid for schemas 4 and 5 under `--offline` verification
-  only, and never passes online certification. Schema 5 accepts only
-  `candidate`, so it cannot be deployed yet.
+  only, and never passes online certification.
 - `npm run docs:check` (`docs-contracts/`, TypeScript) checks the site's
   documentation against the `doc-contracts.json` facts core exports: registry
   and platform counts, the benchmark API surface, the quickstart commands,

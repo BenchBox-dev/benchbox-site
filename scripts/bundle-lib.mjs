@@ -95,17 +95,15 @@ function schemaErrors(label, file, schemaName) {
 }
 
 const RUN_ID = /^\d+$/;
-const CERTIFIERS_BY_SCHEMA = { 4: "candidate or a run id", 5: CANDIDATE_CERTIFIER };
-
 function certifierAccepted(manifest) {
   if (manifest.certified_by === CANDIDATE_CERTIFIER) return true;
-  return manifest.schema === 4 && typeof manifest.certified_by === "string" && RUN_ID.test(manifest.certified_by);
+  return typeof manifest.certified_by === "string" && RUN_ID.test(manifest.certified_by);
 }
 
 export function checkCandidate(dir, manifest) {
   const errors = [];
   if (!certifierAccepted(manifest)) {
-    errors.push(`schema ${manifest.schema} requires certified_by ${CERTIFIERS_BY_SCHEMA[manifest.schema]}, got ${JSON.stringify(manifest.certified_by)}`);
+    errors.push(`schema ${manifest.schema} requires certified_by candidate or a run id, got ${JSON.stringify(manifest.certified_by)}`);
   }
   const docsData = path.join(dir, "docs-data");
   if (existsSync(docsData) && statSync(docsData).isDirectory()) {
