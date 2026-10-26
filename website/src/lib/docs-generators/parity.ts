@@ -2,10 +2,8 @@ import { createHash } from "node:crypto";
 import { existsSync, readdirSync, readFileSync, statSync } from "node:fs";
 import path from "node:path";
 import { parseDocsData } from "./docs-data.ts";
-import { generateDocsPages } from "./generate.ts";
+import { GENERATED_DIRECTORIES, GENERATED_FILES, generateDocsPages } from "./generate.ts";
 
-export const GENERATED_DIRECTORIES = ["benchmarks/queries", "compat"];
-export const GENERATED_FILES = ["reference/tuning-platform-support.md"];
 
 const EXCERPT_LIMIT = 120;
 export const DEFAULT_LISTING_LIMIT = 50;
@@ -167,7 +165,7 @@ export function runParity(bundleDir: string): ParityResult {
   }
   const docsRoot = path.join(bundleDir, "docs");
   if (!existsSync(docsRoot)) {
-    throw new Error(`bundle schema ${manifest.schema} carries docs-data but no bundled docs to compare against`);
+    return { status: "not-applicable", message: `bundle schema ${manifest.schema} carries no docs member, so there is nothing to compare` };
   }
   const docsDataText = readFileSync(docsDataFile, "utf-8");
   const generated = new Map<string, Buffer>();

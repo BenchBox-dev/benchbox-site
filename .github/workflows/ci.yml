@@ -78,10 +78,11 @@ jobs:
       - run: npm run lint:comments
       - run: npm run lint:guard
       - run: npm run lint:blog
+      - run: npm run lint:docs
       - run: npm run bundle:verify -- --offline
       - run: npm run docs:parity -w website
-      - name: Check documentation contracts against the fetched bundle
-        run: npm run docs:check -- --docs-mode block --allow-schema3
+      - name: Check the site documentation against the bundle's contracts
+        run: npm run docs:check -- --docs-mode block
       - run: npm run typecheck -w explorer
       - run: npm run typecheck:e2e -w explorer
       - run: npm run check -w website
@@ -160,7 +161,7 @@ jobs:
     timeout-minutes: 5
     strategy:
       matrix:
-        schema: [3, 4, 5]
+        schema: [4, 5]
     steps:
       - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09
       - uses: actions/setup-node@a0853c24544627f65ddf259abe73b1d18a591444

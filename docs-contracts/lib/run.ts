@@ -1,6 +1,8 @@
-import { existsSync, readFileSync } from "node:fs";
+import { existsSync, mkdtempSync, readFileSync, rmSync } from "node:fs";
+import os from "node:os";
 import path from "node:path";
-import { listDocSources } from "../../website/src/converter/sources.ts";
+import { walkDocFiles } from "../../website/src/converter/sources.ts";
+import { assembleAuthoredDocs } from "../../website/src/lib/site-inputs.ts";
 import { boundaryViolations } from "../checks/boundary.ts";
 import { commandViolations, mcpViolations } from "../checks/commands.ts";
 import { consistencyViolations } from "../checks/consistency.ts";
@@ -11,12 +13,14 @@ import type { Context, Contracts, Manifest, Page, Violation } from "./types.ts";
 
 export type Mode = "report" | "block";
 
-export type Options = { inputs: string; docs?: string; mode: Mode; allowSchema3: boolean };
+export type Options = { inputs: string; docs?: string; mode: Mode };
 
 export type Outcome = { blocking: Violation[]; reported: Violation[]; notes: string[] };
 
 export function readPages(docsRoot: string): Page[] {
-  return listDocSources(docsRoot, ".md").map((source) => ({ path: source.relative, text: readFileSync(source.absolute, "utf-8") }));
+  return walkDocFiles(docsRoot)
+    .filter((source) => source.relative.endsWith(".md"))
+    .map((source) => ({ path: source.relative, text: readFileSync(source.absolute, "utf-8") }));
 }
 
 function guarded(name: string, run: () => Violation[]): Violation[] {
@@ -44,29 +48,25 @@ export function runChecks(options: Options): Outcome {
   const manifest = JSON.parse(readFileSync(manifestFile, "utf-8")) as Manifest;
   const outcome: Outcome = { blocking: [], reported: [], notes: [] };
   const docsFailures = options.mode === "block" ? outcome.blocking : outcome.reported;
-  const docsRoot = options.docs ?? path.join(options.inputs, "docs");
   const contractsFile = path.join(options.inputs, "doc-contracts.json");
-
-  let contracts: Contracts | null = null;
-  if (existsSync(contractsFile)) {
-    contracts = JSON.parse(readFileSync(contractsFile, "utf-8")) as Contracts;
-  } else if (manifest.schema === 3 && options.allowSchema3) {
-    outcome.notes.push("schema 3 bundle carries no doc-contracts.json; contract checks are skipped and only the schema-independent publication boundary runs");
-  } else {
+  if (!existsSync(contractsFile)) {
     outcome.blocking.push({ check: "contracts-present", page: "doc-contracts.json", invariant: `schema ${manifest.schema} bundle has no doc-contracts.json` });
+    return outcome;
   }
+  const contracts = JSON.parse(readFileSync(contractsFile, "utf-8")) as Contracts;
 
-  if (!existsSync(docsRoot)) {
-    outcome.blocking.push({ check: "docs-present", page: docsRoot, invariant: "no documentation tree to check; pass --docs for a bundle without a docs member" });
+  const scratch = options.docs === undefined ? mkdtempSync(path.join(os.tmpdir(), "benchbox-docs-check-")) : null;
+  try {
+    const docsRoot = options.docs ?? assembleAuthoredDocs(scratch as string, options.inputs);
+    if (!existsSync(docsRoot)) {
+      outcome.blocking.push({ check: "docs-present", page: docsRoot, invariant: "no documentation tree to check" });
+      return outcome;
+    }
+    const ctx: Context = { manifest, contracts, pages: readPages(docsRoot) };
+    outcome.blocking.push(...guarded("contract-consistency", () => consistencyViolations(ctx)));
+    docsFailures.push(...docsChecks(ctx));
     return outcome;
+  } finally {
+    if (scratch !== null) rmSync(scratch, { recursive: true, force: true });
   }
-  const pages = readPages(docsRoot);
-  if (contracts === null) {
-    docsFailures.push(...boundaryViolations({ pages, contracts: null }));
-    return outcome;
-  }
-  const ctx: Context = { manifest, contracts, pages };
-  outcome.blocking.push(...guarded("contract-consistency", () => consistencyViolations(ctx)));
-  docsFailures.push(...docsChecks(ctx));
-  return outcome;
 }

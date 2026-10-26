@@ -3,14 +3,13 @@ import os from "node:os";
 import path from "node:path";
 import { buildSite, type BuildResult } from "../src/converter/build.ts";
 import type { HandlerRegistry } from "../src/converter/registry.ts";
-import { EXCLUSIONS_FILE } from "../src/converter/sources.ts";
 
 const created: string[] = [];
 
 export function writeDocs(files: Record<string, string>): string {
   const root = mkdtempSync(path.join(os.tmpdir(), "benchbox-docs-"));
   created.push(root);
-  for (const [relative, content] of Object.entries({ [EXCLUSIONS_FILE]: "", ...files })) {
+  for (const [relative, content] of Object.entries(files)) {
     const target = path.join(root, relative);
     mkdirSync(path.dirname(target), { recursive: true });
     writeFileSync(target, content);

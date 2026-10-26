@@ -18,9 +18,9 @@ function schemaInstance(name) {
   return `${JSON.stringify(minimalInstance(path.join(SCHEMA_DIR, `${name}.schema.json`)))}\n`;
 }
 
-export function fixtureBundle({ schema = 3, attestationResult = "pass", tamper = false, dir, certifiedBy, contractOverrides = {} } = {}) {
+export function fixtureBundle({ schema = 4, attestationResult = "pass", tamper = false, dir, certifiedBy, contractOverrides = {} } = {}) {
   const root = dir ?? mkdtempSync(path.join(tmpdir(), "bundle-fixture-"));
-  const required = membersFor(schema) ?? membersFor(3);
+  const required = membersFor(schema) ?? membersFor(4);
   for (const member of required) {
     if (member === "attestations.json") continue;
     if (member === "docs-data") write(path.join(root, member, DOCS_DATA_FILE), contractOverrides["docs-data"] ?? schemaInstance("docs-data"));
@@ -47,7 +47,7 @@ export function fixtureBundle({ schema = 3, attestationResult = "pass", tamper =
       parent_source: "bundle",
       corpus_sha: "c".repeat(40),
       package_version: "0.0.0",
-      certified_by: certifiedBy ?? (schema >= 4 ? CANDIDATE_CERTIFIER : "1"),
+      certified_by: certifiedBy ?? CANDIDATE_CERTIFIER,
       members,
     }),
   );

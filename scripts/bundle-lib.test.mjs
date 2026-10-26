@@ -12,10 +12,10 @@ function write(file, body) {
   writeFileSync(file, body);
 }
 
-test("schemas 3, 4 and 5 verify and retired or unknown schemas fail", () => {
-  assert.deepEqual(SUPPORTED_SCHEMAS, [3, 4, 5]);
+test("schemas 4 and 5 verify and retired or unknown schemas fail", () => {
+  assert.deepEqual(SUPPORTED_SCHEMAS, [4, 5]);
   for (const schema of SUPPORTED_SCHEMAS) assert.deepEqual(verifyBundle(fixtureBundle({ schema })).errors, []);
-  for (const schema of [1, 2, 6]) {
+  for (const schema of [1, 2, 3, 6]) {
     assert.ok(verifyBundle(fixtureBundle({ schema })).errors.some((error) => error.startsWith(`schema ${schema}`)));
   }
 });
@@ -24,10 +24,10 @@ test("a changed member fails its digest", () => {
   assert.ok(verifyBundle(fixtureBundle({ tamper: true })).errors.includes("digest mismatch: docs"));
 });
 
-test("a consumer that supports only schema 3 rejects candidate bundles", () => {
-  for (const schema of [4, 5]) {
-    const result = verifyBundle(fixtureBundle({ schema }), { supportedSchemas: [3] });
-    assert.ok(result.errors.some((error) => error.startsWith(`schema ${schema} is not supported`)));
+test("a consumer that supports one schema rejects the other", () => {
+  for (const [schema, supported] of [[4, 5], [5, 4]]) {
+    const result = verifyBundle(fixtureBundle({ schema }), { supportedSchemas: [supported] });
+    assert.ok(result.errors.some((error) => error.startsWith(`schema ${schema} is not supported (supported: ${supported})`)));
   }
 });
 
@@ -49,15 +49,25 @@ function rewriteMember(dir, name, body) {
 test("member sets are exact for each schema", () => {
   assert.ok(!membersFor(5).includes("docs") && !membersFor(5).includes("downloads"));
   assert.ok(membersFor(4).includes("docs") && membersFor(4).includes("docs-data"));
-  assert.ok(!membersFor(3).includes("docs-data"));
-  const withExtra = rewriteManifest(fixtureBundle({ schema: 3 }), (manifest) => {
-    manifest.members["docs-data"] = "0".repeat(64);
-  });
-  assert.ok(verifyBundle(withExtra).errors.some((error) => error.startsWith("member set mismatch")));
-  const schema4AsSchema3 = rewriteManifest(fixtureBundle({ schema: 4 }), (manifest) => {
+  assert.equal(membersFor(3), undefined);
+  const schema3Members = rewriteManifest(fixtureBundle({ schema: 4 }), (manifest) => {
     manifest.schema = 3;
+    delete manifest.members["docs-data"];
+    delete manifest.members["doc-contracts.json"];
   });
-  assert.ok(verifyBundle(schema4AsSchema3).errors.some((error) => error.startsWith("member set mismatch")));
+  assert.ok(verifyBundle(schema3Members).errors.includes("schema 3 is not supported (supported: 4, 5)"));
+  const schema5WithDownloads = rewriteManifest(fixtureBundle({ schema: 5 }), (manifest) => {
+    manifest.members.downloads = "0".repeat(64);
+  });
+  assert.ok(verifyBundle(schema5WithDownloads).errors.some((error) => error.startsWith("member set mismatch")));
+  const schema4WithoutDocs = rewriteManifest(fixtureBundle({ schema: 4 }), (manifest) => {
+    delete manifest.members.docs;
+  });
+  assert.ok(verifyBundle(schema4WithoutDocs).errors.some((error) => error.startsWith("member set mismatch")));
+  const schema4WithoutDocsData = rewriteManifest(fixtureBundle({ schema: 4 }), (manifest) => {
+    delete manifest.members["docs-data"];
+  });
+  assert.ok(verifyBundle(schema4WithoutDocsData).errors.some((error) => error.startsWith("member set mismatch")));
   const schema5WithDocs = rewriteManifest(fixtureBundle({ schema: 5 }), (manifest) => {
     manifest.members.docs = "0".repeat(64);
   });
@@ -124,7 +134,7 @@ test("a certified schema 4 bundle fails closed on member set, tampering and inva
   const asSchema3 = rewriteManifest(certified(), (manifest) => {
     manifest.schema = 3;
   });
-  assert.ok(verifyBundle(asSchema3).errors.some((error) => error.startsWith("member set mismatch")));
+  assert.ok(verifyBundle(asSchema3).errors.includes("schema 3 is not supported (supported: 4, 5)"));
 });
 
 test("docs-data holds exactly docs-data.json and validates against its schema", () => {
@@ -169,7 +179,7 @@ test("a digest mismatch in a candidate member is reported before its contents ar
 const GENUINE = process.env.SITE_CANDIDATE_BUNDLES;
 const CORE_TREE = process.env.CORE_TREE;
 
-test("genuine core candidate bundles verify and are rejected by a schema 3 consumer", { skip: !GENUINE }, () => {
+test("genuine core candidate bundles verify and are rejected by a consumer of the other schema", { skip: !GENUINE }, () => {
   for (const schema of [4, 5]) {
     const dir = path.join(GENUINE, `candidate${schema}`);
     assert.ok(existsSync(dir), `${dir} is missing`);
@@ -177,7 +187,7 @@ test("genuine core candidate bundles verify and are rejected by a schema 3 consu
     assert.deepEqual(result.errors, []);
     assert.equal(result.manifest.schema, schema);
     assert.equal(result.manifest.certified_by, "candidate");
-    const old = verifyBundle(dir, { supportedSchemas: [3] });
+    const old = verifyBundle(dir, { supportedSchemas: [schema === 4 ? 5 : 4] });
     assert.ok(old.errors.some((error) => error.startsWith(`schema ${schema} is not supported`)));
   }
 });

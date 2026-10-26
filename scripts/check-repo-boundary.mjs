@@ -14,6 +14,7 @@ const RELATIVE_LITERAL = /["'`]((?:\.\.\/)+[^"'`\s]*)["'`]/g;
 
 export const ORIGIN_ALLOWLIST = [
   /^blog\//,
+  /^docs\//,
   /^drafts\//,
   /^inventory\//,
   /^landing\/(index|prompts\/index)\.html$/,

@@ -8,11 +8,15 @@ import { pythonPatternToJs } from "../checks/pages.ts";
 import { resolveInvocation } from "../checks/commands.ts";
 import { runChecks, type Mode } from "../lib/run.ts";
 import type { Contracts } from "../lib/types.ts";
-import { ROOTS, RELEASE_PATTERN, VERSION, buildContracts, buildPages, exclusionFile, writeBundle } from "./fixture.ts";
+import { RELEASE_PATTERN, VERSION, buildContracts, buildPages, writeBundle } from "./fixture.ts";
 
 const CLI = path.resolve(import.meta.dirname, "..", "cli.ts");
 
 type Seed = { name: string; check: string; page: string; contracts?: (contracts: Contracts) => void; pages?: (pages: Record<string, string>) => void };
+
+function docsOf(inputs: string): string {
+  return path.join(inputs, "docs");
+}
 
 function run(seed: { contracts?: (contracts: Contracts) => void; pages?: (pages: Record<string, string>) => void }, mode: Mode = "block", schema = 4) {
   const contracts = buildContracts();
@@ -20,7 +24,7 @@ function run(seed: { contracts?: (contracts: Contracts) => void; pages?: (pages:
   seed.contracts?.(contracts);
   seed.pages?.(pages);
   const inputs = writeBundle({ schema, contracts, pages });
-  return runChecks({ inputs, mode, allowSchema3: false });
+  return runChecks({ inputs, docs: docsOf(inputs), mode });
 }
 
 function replace(pages: Record<string, string>, name: string, from: string, to: string): void {
@@ -111,18 +115,18 @@ describe("contract-internal consistency", () => {
 });
 
 describe("publication boundary", () => {
-  it("fails when core stops excluding a maintainer-only directory", () => {
-    const pages = buildPages();
-    const inputs = writeBundle({ schema: 4, pages, exclusions: exclusionFile(["_project", "internal"], ["development/closed.md"]) });
-    const outcome = runChecks({ inputs, mode: "block", allowSchema3: false });
+  it("fails when a core-only page appears in the documentation tree", () => {
+    const pages = { ...buildPages(), "agent/notes.md": "# Agent notes\n" };
+    const inputs = writeBundle({ schema: 4, pages });
+    const outcome = runChecks({ inputs, docs: docsOf(inputs), mode: "block" });
     const paths = outcome.blocking.filter((violation) => violation.check === "publication-boundary").map((violation) => violation.page);
     assert.deepEqual(paths, ["agent/notes.md", "agent/notes.md"]);
   });
 
   it("fails when a gated page is published without an allowlist entry", () => {
-    const pages = buildPages();
-    const inputs = writeBundle({ schema: 4, pages, exclusions: exclusionFile(ROOTS), allowlist: "development/open.md\ndevelopment/closed.md\ndevelopment/result-integrity-validation.md\n" });
-    const outcome = runChecks({ inputs, mode: "block", allowSchema3: false });
+    const pages = { ...buildPages(), "development/closed.md": "# Closed\n" };
+    const inputs = writeBundle({ schema: 4, pages });
+    const outcome = runChecks({ inputs, docs: docsOf(inputs), mode: "block" });
     assert.ok(outcome.blocking.some((violation) => violation.page === "development/closed.md" && violation.check === "publication-boundary"));
   });
 
@@ -139,40 +143,22 @@ describe("modes and bundle schemas", () => {
     assert.ok(outcome.reported.some((violation) => violation.check === "benchmark-count-claims"));
   });
 
-  it("skips contract checks on a schema 3 bundle only when schema 3 is allowed", () => {
-    const inputs = writeBundle({ schema: 3, contracts: null, pages: buildPages() });
-    const allowed = runChecks({ inputs, mode: "block", allowSchema3: true });
-    assert.deepEqual(allowed.blocking, []);
-    assert.match(allowed.notes.join("\n"), /schema 3 bundle carries no doc-contracts\.json/);
-    const strict = runChecks({ inputs, mode: "block", allowSchema3: false });
-    assert.deepEqual(strict.blocking.map((violation) => violation.check), ["contracts-present"]);
-  });
-
-  it("still enforces the negative ownership guard on a schema 3 bundle", () => {
-    const inputs = writeBundle({ schema: 3, contracts: null, pages: buildPages(), exclusions: exclusionFile(["_project", "internal"], ["development/closed.md"]) });
-    const blocking = runChecks({ inputs, mode: "block", allowSchema3: true });
-    assert.deepEqual(blocking.blocking.map((violation) => violation.page), ["agent/notes.md"]);
-    const reported = runChecks({ inputs, mode: "report", allowSchema3: true });
-    assert.deepEqual(reported.blocking, []);
-    assert.deepEqual(reported.reported.map((violation) => violation.page), ["agent/notes.md"]);
-  });
-
-  it("fails a schema 4 bundle without doc-contracts.json even when schema 3 is allowed", () => {
+  it("fails a bundle without doc-contracts.json", () => {
     const inputs = writeBundle({ schema: 4, contracts: null, pages: buildPages() });
-    const outcome = runChecks({ inputs, mode: "report", allowSchema3: true });
+    const outcome = runChecks({ inputs, docs: docsOf(inputs), mode: "report" });
     assert.deepEqual(outcome.blocking.map((violation) => violation.check), ["contracts-present"]);
   });
 
   it("fails when there is no documentation tree to check", () => {
     const inputs = writeBundle({ schema: 4, pages: buildPages() });
-    const outcome = runChecks({ inputs, docs: path.join(inputs, "missing"), mode: "block", allowSchema3: false });
+    const outcome = runChecks({ inputs, docs: path.join(inputs, "missing"), mode: "block" });
     assert.deepEqual(outcome.blocking.map((violation) => violation.check), ["docs-present"]);
   });
 
   it("checks a documentation tree passed by path instead of the bundle docs", () => {
     const inputs = writeBundle({ schema: 5, pages: { "README.md": "# Empty\n" } });
     const docs = writeBundle({ schema: 4, pages: buildPages() });
-    const outcome = runChecks({ inputs, docs: path.join(docs, "docs"), mode: "block", allowSchema3: false });
+    const outcome = runChecks({ inputs, docs: path.join(docs, "docs"), mode: "block" });
     assert.equal(outcome.blocking.length, 0, JSON.stringify(outcome.blocking));
   });
 
@@ -217,22 +203,16 @@ describe("command line", () => {
 
   it("exits 0 for a clean bundle and 1 for blocking drift", () => {
     const clean = writeBundle({ schema: 4, pages: buildPages() });
-    assert.equal(invoke(["--inputs", clean]).status, 0);
+    assert.equal(invoke(["--inputs", clean, "--docs", docsOf(clean)]).status, 0);
     const pages = buildPages();
     replace(pages, "usage/faq.md", "**2**", "**22**");
     const drifted = writeBundle({ schema: 4, pages });
-    const blocked = invoke(["--inputs", drifted]);
+    const blocked = invoke(["--inputs", drifted, "--docs", docsOf(drifted)]);
     assert.equal(blocked.status, 1);
     assert.match(blocked.stderr, /\[benchmark-count-claims\] usage\/faq\.md: registry-derived claim is missing or stale/);
-    const reported = invoke(["--inputs", drifted, "--docs-mode", "report"]);
+    const reported = invoke(["--inputs", drifted, "--docs", docsOf(drifted), "--docs-mode", "report"]);
     assert.equal(reported.status, 0);
     assert.match(reported.stderr, /report-only \[benchmark-count-claims\]/);
-  });
-
-  it("exits 0 for a schema 3 bundle with --allow-schema3 and 1 without it", () => {
-    const inputs = writeBundle({ schema: 3, contracts: null, pages: buildPages() });
-    assert.equal(invoke(["--inputs", inputs, "--allow-schema3"]).status, 0);
-    assert.equal(invoke(["--inputs", inputs]).status, 1);
   });
 
   it("exits 2 for a missing bundle or a bad mode", () => {
@@ -243,7 +223,7 @@ describe("command line", () => {
 
 describe("a real schema 4 bundle", { skip: !existsSync(process.env.DOC_CONTRACTS_SCHEMA4_BUNDLE ?? "/nonexistent") }, () => {
   it("passes every check", () => {
-    const outcome = runChecks({ inputs: process.env.DOC_CONTRACTS_SCHEMA4_BUNDLE as string, mode: "block", allowSchema3: false });
+    const outcome = runChecks({ inputs: process.env.DOC_CONTRACTS_SCHEMA4_BUNDLE as string, mode: "block" });
     assert.deepEqual(outcome.blocking, []);
     assert.deepEqual(outcome.reported, []);
   });

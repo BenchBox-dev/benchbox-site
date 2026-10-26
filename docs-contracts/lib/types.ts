@@ -92,7 +92,7 @@ export type Context = {
   pages: Page[];
 };
 
-export type BoundaryContext = { pages: Page[]; contracts: Contracts | null };
+export type BoundaryContext = { pages: Page[]; contracts: Contracts };
 
 export function page(ctx: { pages: Page[] }, relative: string): Page | undefined {
   return ctx.pages.find((candidate) => candidate.path === relative);

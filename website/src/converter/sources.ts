@@ -1,68 +1,77 @@
-import { readdirSync, readFileSync } from "node:fs";
+import { readdirSync } from "node:fs";
 import path from "node:path";
 
 export const RENDERER_ROOTS: ReadonlySet<string> = new Set(["_build", "_tags", "_static", "_templates"]);
 
-export const EXCLUSIONS_FILE = "publish-exclusions.txt";
-
-export type PublishExclusions = { roots: ReadonlySet<string>; files: ReadonlySet<string> };
-
-function readListFile(file: string): string[] | null {
-  let text: string;
-  try {
-    text = readFileSync(file, "utf-8");
-  } catch (error) {
-    if ((error as NodeJS.ErrnoException).code === "ENOENT") return null;
-    throw error;
-  }
-  return text.split("\n").map((line) => line.trim()).filter((line) => line !== "" && !line.startsWith("#"));
-}
-
-export function readPublishExclusions(docsRoot: string): PublishExclusions {
-  const file = path.join(docsRoot, EXCLUSIONS_FILE);
-  const entries = readListFile(file);
-  if (entries === null) throw new Error(`${file} is missing; it lists the documentation paths that must not be published`);
-  return {
-    roots: new Set(entries.filter((entry) => entry.endsWith("/")).map((entry) => entry.slice(0, -1))),
-    files: new Set(entries.filter((entry) => !entry.endsWith("/"))),
-  };
-}
-
-export const PUBLISH_LIST_ROOTS: readonly string[] = ["development", "operations"];
-export const PUBLISH_LIST_FILE = "publish-allowlist.txt";
+const CORE_ONLY_ROOTS: readonly string[] = ["agent", "internal", "_project"];
+const CORE_ONLY_PREFIXES: readonly string[] = ["design/future-state/"];
+const CORE_ONLY_FILES: ReadonlySet<string> = new Set([
+  "reference/threat-model.md",
+  "platforms/workaround-index.md",
+  "tpc-licensing-analysis.md",
+  "publish-allowlist.txt",
+  "publish-exclusions.txt",
+  "linkcheck_ignore.txt",
+  "operations/local-platform-provisioning.tsv",
+]);
 
 export type DocSourceFile = { absolute: string; relative: string };
 
-export function readPublishList(docsRoot: string): ReadonlySet<string> {
-  return new Set(readListFile(path.join(docsRoot, PUBLISH_LIST_FILE)) ?? []);
+export function coreOnlyReason(relative: string): string | null {
+  const root = relative.split("/")[0];
+  if (relative.includes("/") && CORE_ONLY_ROOTS.includes(root)) return `${root}/ is maintainer-only content that core keeps`;
+  const prefix = CORE_ONLY_PREFIXES.find((candidate) => relative.startsWith(candidate));
+  if (prefix !== undefined) return `${prefix} is unpublished planning content that core keeps`;
+  if (CORE_ONLY_FILES.has(relative)) return "core keeps this file";
+  return null;
 }
 
-export function underPublishListRoot(relative: string): boolean {
-  return PUBLISH_LIST_ROOTS.some((root) => relative.startsWith(`${root}/`));
+export class CoreOnlyContentError extends Error {
+  readonly violations: readonly string[];
+
+  constructor(violations: readonly string[]) {
+    super(`the documentation tree holds core-only content that the site must not publish:\n${violations.map((entry) => `  ${entry}`).join("\n")}`);
+    this.name = "CoreOnlyContentError";
+    this.violations = violations;
+  }
 }
 
 function compareNames(a: string, b: string): number {
   return a < b ? -1 : a > b ? 1 : 0;
 }
 
-function walk(root: string, directory: string, suffix: string, excluded: PublishExclusions, published: ReadonlySet<string>, found: DocSourceFile[]): void {
+function walk(root: string, directory: string, found: DocSourceFile[]): void {
   const entries = readdirSync(directory, { withFileTypes: true }).sort((a, b) => compareNames(a.name, b.name));
   for (const entry of entries) {
     const absolute = path.join(directory, entry.name);
     const relative = path.relative(root, absolute).split(path.sep).join("/");
     if (entry.name.startsWith(".#")) continue;
     if (entry.isDirectory()) {
-      if (directory === root && (RENDERER_ROOTS.has(entry.name) || excluded.roots.has(entry.name))) continue;
+      if (directory === root && RENDERER_ROOTS.has(entry.name)) continue;
       if (entry.name === "_sources" || entry.name.endsWith(".lproj")) continue;
-      walk(root, absolute, suffix, excluded, published, found);
-    } else if (entry.name.endsWith(suffix) && !excluded.files.has(relative) && (!underPublishListRoot(relative) || published.has(relative))) {
+      walk(root, absolute, found);
+    } else {
       found.push({ absolute, relative });
     }
   }
 }
 
-export function listDocSources(docsRoot: string, suffix: ".md" | ".rst" = ".md"): DocSourceFile[] {
+export function walkDocFiles(docsRoot: string): DocSourceFile[] {
   const found: DocSourceFile[] = [];
-  walk(docsRoot, docsRoot, suffix, readPublishExclusions(docsRoot), readPublishList(docsRoot), found);
+  walk(docsRoot, docsRoot, found);
   return found;
+}
+
+export function assertNoCoreOnlyContent(files: readonly DocSourceFile[]): void {
+  const violations = files.flatMap((file) => {
+    const reason = coreOnlyReason(file.relative);
+    return reason === null ? [] : [`${file.relative}: ${reason}`];
+  });
+  if (violations.length > 0) throw new CoreOnlyContentError(violations);
+}
+
+export function listDocSources(docsRoot: string, suffix: ".md" | ".rst" = ".md"): DocSourceFile[] {
+  const files = walkDocFiles(docsRoot);
+  assertNoCoreOnlyContent(files);
+  return files.filter((file) => file.relative.endsWith(suffix));
 }

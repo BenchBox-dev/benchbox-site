@@ -1,11 +1,12 @@
-import { readFileSync } from "node:fs";
+import { mkdtempSync, readFileSync } from "node:fs";
+import os from "node:os";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { emptyInventory, scanFile, type Counter, type Inventory } from "../src/converter/inventory.ts";
 import { listDocSources } from "../src/converter/sources.ts";
-import { siteInputsPath } from "../src/lib/site-inputs.ts";
+import { assembleAuthoredDocs } from "../src/lib/site-inputs.ts";
 
-const docsRoot = siteInputsPath("docs");
+const docsRoot = assembleAuthoredDocs(mkdtempSync(path.join(os.tmpdir(), "benchbox-inventory-")));
 const queriesPrefix = "benchmarks/queries/";
 
 function scanAll(include: (relative: string) => boolean): Inventory {
