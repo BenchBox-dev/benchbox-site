@@ -135,7 +135,7 @@ export function mcpViolations(ctx: Context): Violation[] {
   for (const tool of mcp.remote_only_tools) if (!documentedRemote.has(tool)) fail("mcp-tool-inventory", `remote-only tool ${tool} is not in the documented remote inventory`);
   for (const tool of documentedRemote) if (!mcp.remote_only_tools.includes(tool)) fail("mcp-tool-inventory", `documented remote tool ${tool} is not registered as remote-only`);
   for (const [tool, definition] of Object.entries(mcp.tools)) {
-    const markdown = tool === "run_benchmark" ? section(text, "**MCP run parameter schema**", "**Behavior**") : toolSection(text, tool);
+    const markdown = tool === "run_benchmark" ? section(text, "**MCP run parameter schema:**", "**Behavior:**") : toolSection(text, tool);
     if (markdown === null) {
       fail("mcp-tool-params", `no parameter table for ${tool}`);
       continue;
