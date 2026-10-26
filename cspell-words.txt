@@ -124,6 +124,7 @@ importorskip
 includehidden
 inde
 isinstance
+introspector
 joeharris
 joinorder
 kaleido
