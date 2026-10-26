@@ -2,6 +2,7 @@ import { existsSync, readFileSync } from "node:fs";
 import path from "node:path";
 
 export const REPO_FILES_NAME = "repo-files.json";
+export const REPOSITORY_URL = "https://github.com/BenchBox-dev/BenchBox";
 
 export type RepoFileKind = "file" | "tree";
 export type RepoFiles = { coreSha: string; kinds: ReadonlyMap<string, RepoFileKind> };

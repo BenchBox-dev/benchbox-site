@@ -37,6 +37,30 @@ test("the probe manifest covers every route class and samples more files", () =>
   assert.throws(() => checksumManifest(site({ "index.html": "home" })), /required probe paths/);
 });
 
+test("the probe manifest samples one legacy download per extension under its dotted URL", () => {
+  const legacy = {
+    "docs/_downloads/0123456789abcdef0123456789abcdef/run.py/index.html": "py",
+    "docs/_downloads/0123456789abcdef0123456789abcdef/other.py/index.html": "py2",
+    "docs/_downloads/fedcba9876543210fedcba9876543210/1.sql/index.html": "sql",
+    "docs/_downloads/fedcba9876543210fedcba9876543210/TPC_EULA.txt/index.html": "txt",
+  };
+  const manifest = checksumManifest(site({ ...REQUIRED, ...legacy }));
+  assert.equal(manifest["/docs/_downloads/0123456789abcdef0123456789abcdef/other.py"], sha("py2"));
+  assert.equal(manifest["/docs/_downloads/fedcba9876543210fedcba9876543210/1.sql"], sha("sql"));
+  assert.equal(manifest["/docs/_downloads/fedcba9876543210fedcba9876543210/TPC_EULA.txt"], sha("txt"));
+  assert.equal(Object.keys(manifest).filter((url) => url.endsWith(".py")).length, 1);
+});
+
+test("a legacy download URL must answer as text/html", async () => {
+  const url = "/docs/_downloads/0123456789abcdef0123456789abcdef/run.py";
+  const serve = (contentType: string) => async () => ({ status: 200, body: new TextEncoder().encode("py"), headers: { "content-type": contentType } });
+  const html = await probeOnce("https://site.test", { [url]: sha("py") }, serve("text/html; charset=utf-8"));
+  assert.deepEqual(html.errors, []);
+  assert.equal(html.matched, 1);
+  const python = await probeOnce("https://site.test", { [url]: sha("py") }, serve("text/x-python"));
+  assert.deepEqual(python.errors, [`${url}: content type text/x-python is not text/html`]);
+});
+
 function fakeFetch(served: Record<string, { status: number; body: string }>) {
   return async (url: string) => {
     const entry = served[new URL(url).pathname] ?? { status: 404, body: "benchbox.results.redirect" };

@@ -118,7 +118,6 @@ export function buildSite(options: BuildOptions): BuildResult {
   files.set(
     "manifest/legacy-files.json",
     json({
-      downloads: [...new Set(infos.flatMap((info) => info.downloads))].sort(),
       images: [...new Set(infos.flatMap((info) => info.images))].sort(),
     }),
   );

@@ -10,7 +10,7 @@ import { defineConfig } from "astro/config";
 import type { SidebarManifest } from "./src/converter/sidebar.ts";
 import { toStarlightSidebar } from "./src/converter/sidebar.ts";
 import { renderRobots, renderSitemap, sitemapPathForFile } from "./src/lib/page-meta.ts";
-import { publishLegacyFiles, renderObjectsInventory, REDIRECT_PAGES, type InventoryEntry, type LegacyFiles } from "./src/lib/legacy-assets.ts";
+import { legacyRedirects, loadLegacyDownloads, publishLegacyImages, publishLegacyRedirects, renderObjectsInventory, REDIRECT_PAGES, type InventoryEntry, type LegacyFiles } from "./src/lib/legacy-assets.ts";
 import { docutilsQuotes, SMARTYPANTS } from "./src/lib/smartypants.ts";
 import { treeDigest } from "./src/lib/tree-digest.ts";
 import { headingIds } from "./src/plugins/heading-ids.ts";
@@ -75,7 +75,8 @@ const publishStatic = (): AstroIntegration => ({
       writeFileSync(path.join(out, "sitemap.xml"), renderSitemap(pages.map(sitemapPathForFile)));
       const legacy = JSON.parse(readFileSync(path.join(repoRoot, "website", ".generated", "manifest", "legacy-files.json"), "utf-8")) as LegacyFiles;
       for (const name of legacy.images) cpSync(path.join(images, name), path.join(out, "_images", name));
-      publishLegacyFiles(legacy, path.join(repoRoot, "website", ".core-source", "docs"), out);
+      publishLegacyImages(legacy, path.join(repoRoot, "website", ".core-source", "docs"), out);
+      publishLegacyRedirects(legacyRedirects(loadLegacyDownloads(path.join(repoRoot, "inventory", "legacy-downloads.json"))), out);
       const entries = JSON.parse(readFileSync(path.join(repoRoot, "website", ".generated", "manifest", "inventory-entries.json"), "utf-8")) as InventoryEntry[];
       const version = bundleManifest().package_version;
       writeFileSync(path.join(out, "docs", "objects.inv"), renderObjectsInventory(entries, "BenchBox", version));

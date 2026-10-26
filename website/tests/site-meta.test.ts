@@ -82,7 +82,7 @@ function content(markup: string, attribute: "name" | "property", value: string):
 
 describe.skipIf(!dist)("built site", () => {
   const site = dist as string;
-  const isRedirect = (file: string) => Object.hasOwn(REDIRECT_PAGES, file.replace(/^docs\/dev\//, "docs/"));
+  const isRedirect = (file: string) => Object.hasOwn(REDIRECT_PAGES, file.replace(/^docs\/dev\//, "docs/")) || /^docs\/(dev\/)?_downloads\//.test(file);
   const pages = dist ? inventoryPages(site).filter((file) => !isRedirect(file)) : [];
 
   it("gives every html page canonical, description, Open Graph and Twitter tags", () => {

@@ -1,0 +1,875 @@
+{
+ "core_sha": "26f6c26fc7969e9505e278e20bb610b5d6ad38c5",
+ "downloads": [
+  {
+   "source": "../examples/features/test_types.py",
+   "path": "examples/features/test_types.py"
+  },
+  {
+   "source": "../benchbox/core/ssb/queries.py",
+   "path": "benchbox/core/ssb/queries.py"
+  },
+  {
+   "source": "../benchbox/_binaries/tpc-h/templates/queries/1.sql",
+   "path": "benchbox/_binaries/tpc-h/templates/queries/1.sql",
+   "notice": "benchbox/_binaries/tpc-h/templates/queries/EULA.txt"
+  },
+  {
+   "source": "../benchbox/sql_compat/rules/query_adapter/datafusion_query_rewrites.py",
+   "path": "benchbox/sql_compat/rules/query_adapter/datafusion_query_rewrites.py"
+  },
+  {
+   "source": "../examples/getting_started/local/duckdb_tpch_power.py",
+   "path": "examples/getting_started/local/duckdb_tpch_power.py"
+  },
+  {
+   "source": "../benchbox/core/tpcdi/query_etl.py",
+   "path": "benchbox/core/tpcdi/query_etl.py"
+  },
+  {
+   "source": "../examples/features/multi_platform.py",
+   "path": "examples/features/multi_platform.py"
+  },
+  {
+   "source": "../_sources/tpc-ds/query_templates/query82.tpl",
+   "path": "_sources/tpc-ds/query_templates/query82.tpl",
+   "notice": "_sources/tpc-ds/query_templates/EULA.txt"
+  },
+  {
+   "source": "../_sources/tpc-ds/query_templates/query71.tpl",
+   "path": "_sources/tpc-ds/query_templates/query71.tpl",
+   "notice": "_sources/tpc-ds/query_templates/EULA.txt"
+  },
+  {
+   "source": "../_sources/tpc-ds/query_templates/query91.tpl",
+   "path": "_sources/tpc-ds/query_templates/query91.tpl",
+   "notice": "_sources/tpc-ds/query_templates/EULA.txt"
+  },
+  {
+   "source": "../_sources/tpc-ds/query_templates/query13.tpl",
+   "path": "_sources/tpc-ds/query_templates/query13.tpl",
+   "notice": "_sources/tpc-ds/query_templates/EULA.txt"
+  },
+  {
+   "source": "../_sources/tpc-ds/query_templates/query53.tpl",
+   "path": "_sources/tpc-ds/query_templates/query53.tpl",
+   "notice": "_sources/tpc-ds/query_templates/EULA.txt"
+  },
+  {
+   "source": "../_sources/tpc-ds/query_templates/query38.tpl",
+   "path": "_sources/tpc-ds/query_templates/query38.tpl",
+   "notice": "_sources/tpc-ds/query_templates/EULA.txt"
+  },
+  {
+   "source": "../benchbox/core/tpcds_obt/queries.py",
+   "path": "benchbox/core/tpcds_obt/queries.py"
+  },
+  {
+   "source": "../_sources/tpc-ds/query_templates/query50.tpl",
+   "path": "_sources/tpc-ds/query_templates/query50.tpl",
+   "notice": "_sources/tpc-ds/query_templates/EULA.txt"
+  },
+  {
+   "source": "../_sources/tpc-ds/query_templates/query24.tpl",
+   "path": "_sources/tpc-ds/query_templates/query24.tpl",
+   "notice": "_sources/tpc-ds/query_templates/EULA.txt"
+  },
+  {
+   "source": "../_sources/tpc-ds/query_templates/query77.tpl",
+   "path": "_sources/tpc-ds/query_templates/query77.tpl",
+   "notice": "_sources/tpc-ds/query_templates/EULA.txt"
+  },
+  {
+   "source": "../benchbox/core/tpchavoc/variant_sets/q10.py",
+   "path": "benchbox/core/tpchavoc/variant_sets/q10.py"
+  },
+  {
+   "source": "../scripts/generate_compat_docs.py",
+   "path": "scripts/generate_compat_docs.py"
+  },
+  {
+   "source": "../benchbox/core/tpchavoc/variant_sets/q14.py",
+   "path": "benchbox/core/tpchavoc/variant_sets/q14.py"
+  },
+  {
+   "source": "../_sources/tpc-ds/query_templates/query48.tpl",
+   "path": "_sources/tpc-ds/query_templates/query48.tpl",
+   "notice": "_sources/tpc-ds/query_templates/EULA.txt"
+  },
+  {
+   "source": "../benchbox/_binaries/tpc-h/templates/queries/3.sql",
+   "path": "benchbox/_binaries/tpc-h/templates/queries/3.sql",
+   "notice": "benchbox/_binaries/tpc-h/templates/queries/EULA.txt"
+  },
+  {
+   "source": "../examples/features/result_analysis.py",
+   "path": "examples/features/result_analysis.py"
+  },
+  {
+   "source": "../_sources/tpc-ds/query_templates/query43.tpl",
+   "path": "_sources/tpc-ds/query_templates/query43.tpl",
+   "notice": "_sources/tpc-ds/query_templates/EULA.txt"
+  },
+  {
+   "source": "../examples/getting_started/local/duckdb_nyctaxi.py",
+   "path": "examples/getting_started/local/duckdb_nyctaxi.py"
+  },
+  {
+   "source": "../_sources/tpc-ds/query_templates/query63.tpl",
+   "path": "_sources/tpc-ds/query_templates/query63.tpl",
+   "notice": "_sources/tpc-ds/query_templates/EULA.txt"
+  },
+  {
+   "source": "../_sources/tpc-ds/query_templates/query97.tpl",
+   "path": "_sources/tpc-ds/query_templates/query97.tpl",
+   "notice": "_sources/tpc-ds/query_templates/EULA.txt"
+  },
+  {
+   "source": "../benchbox/core/clickbench/queries.py",
+   "path": "benchbox/core/clickbench/queries.py"
+  },
+  {
+   "source": "../_sources/tpc-ds/query_templates/query30.tpl",
+   "path": "_sources/tpc-ds/query_templates/query30.tpl",
+   "notice": "_sources/tpc-ds/query_templates/EULA.txt"
+  },
+  {
+   "source": "../benchbox/core/tpchavoc/variant_sets/q12.py",
+   "path": "benchbox/core/tpchavoc/variant_sets/q12.py"
+  },
+  {
+   "source": "../_sources/tpc-ds/query_templates/query58.tpl",
+   "path": "_sources/tpc-ds/query_templates/query58.tpl",
+   "notice": "_sources/tpc-ds/query_templates/EULA.txt"
+  },
+  {
+   "source": "../.github/workflows/ci.yml",
+   "path": ".github/workflows/ci.yml"
+  },
+  {
+   "source": "../benchbox/_binaries/tpc-h/templates/queries/16.sql",
+   "path": "benchbox/_binaries/tpc-h/templates/queries/16.sql",
+   "notice": "benchbox/_binaries/tpc-h/templates/queries/EULA.txt"
+  },
+  {
+   "source": "../benchbox/core/tpchavoc/variant_sets/q11.py",
+   "path": "benchbox/core/tpchavoc/variant_sets/q11.py"
+  },
+  {
+   "source": "../benchbox/core/coffeeshop/queries.py",
+   "path": "benchbox/core/coffeeshop/queries.py"
+  },
+  {
+   "source": "../benchbox/core/tpchavoc/variant_sets/q04.py",
+   "path": "benchbox/core/tpchavoc/variant_sets/q04.py"
+  },
+  {
+   "source": "../_sources/tpc-ds/query_templates/query94.tpl",
+   "path": "_sources/tpc-ds/query_templates/query94.tpl",
+   "notice": "_sources/tpc-ds/query_templates/EULA.txt"
+  },
+  {
+   "source": "../benchbox/core/tpchavoc/variant_sets/q22.py",
+   "path": "benchbox/core/tpchavoc/variant_sets/q22.py"
+  },
+  {
+   "source": "../benchbox/_binaries/tpc-h/templates/queries/14.sql",
+   "path": "benchbox/_binaries/tpc-h/templates/queries/14.sql",
+   "notice": "benchbox/_binaries/tpc-h/templates/queries/EULA.txt"
+  },
+  {
+   "source": "../benchbox/core/read_primitives/queries.py",
+   "path": "benchbox/core/read_primitives/queries.py"
+  },
+  {
+   "source": "../_sources/tpc-ds/query_templates/query62.tpl",
+   "path": "_sources/tpc-ds/query_templates/query62.tpl",
+   "notice": "_sources/tpc-ds/query_templates/EULA.txt"
+  },
+  {
+   "source": "../.github/workflows/sync-results-data-to-published.yml",
+   "path": ".github/workflows/sync-results-data-to-published.yml"
+  },
+  {
+   "source": "../_sources/tpc-ds/query_templates/query42.tpl",
+   "path": "_sources/tpc-ds/query_templates/query42.tpl",
+   "notice": "_sources/tpc-ds/query_templates/EULA.txt"
+  },
+  {
+   "source": "../_sources/tpc-ds/query_templates/query41.tpl",
+   "path": "_sources/tpc-ds/query_templates/query41.tpl",
+   "notice": "_sources/tpc-ds/query_templates/EULA.txt"
+  },
+  {
+   "source": "../benchbox/_binaries/tpc-h/templates/queries/4.sql",
+   "path": "benchbox/_binaries/tpc-h/templates/queries/4.sql",
+   "notice": "benchbox/_binaries/tpc-h/templates/queries/EULA.txt"
+  },
+  {
+   "source": "../benchbox/_binaries/tpc-h/templates/queries/8.sql",
+   "path": "benchbox/_binaries/tpc-h/templates/queries/8.sql",
+   "notice": "benchbox/_binaries/tpc-h/templates/queries/EULA.txt"
+  },
+  {
+   "source": "../benchbox/_binaries/tpc-h/templates/queries/15.sql",
+   "path": "benchbox/_binaries/tpc-h/templates/queries/15.sql",
+   "notice": "benchbox/_binaries/tpc-h/templates/queries/EULA.txt"
+  },
+  {
+   "source": "../benchbox/core/vector_search/queries.py",
+   "path": "benchbox/core/vector_search/queries.py"
+  },
+  {
+   "source": "../benchbox/core/nyctaxi/queries.py",
+   "path": "benchbox/core/nyctaxi/queries.py"
+  },
+  {
+   "source": "../examples/unified_runner.py",
+   "path": "examples/unified_runner.py"
+  },
+  {
+   "source": "../tests/conftest.py",
+   "path": "tests/conftest.py"
+  },
+  {
+   "source": "../_sources/tpc-ds/query_templates/query93.tpl",
+   "path": "_sources/tpc-ds/query_templates/query93.tpl",
+   "notice": "_sources/tpc-ds/query_templates/EULA.txt"
+  },
+  {
+   "source": "../_sources/tpc-ds/query_templates/query55.tpl",
+   "path": "_sources/tpc-ds/query_templates/query55.tpl",
+   "notice": "_sources/tpc-ds/query_templates/EULA.txt"
+  },
+  {
+   "source": "../_sources/tpc-ds/query_templates/query78.tpl",
+   "path": "_sources/tpc-ds/query_templates/query78.tpl",
+   "notice": "_sources/tpc-ds/query_templates/EULA.txt"
+  },
+  {
+   "source": "../benchbox/core/tpchavoc/variant_sets/q09.py",
+   "path": "benchbox/core/tpchavoc/variant_sets/q09.py"
+  },
+  {
+   "source": "../_sources/tpc-ds/query_templates/query54.tpl",
+   "path": "_sources/tpc-ds/query_templates/query54.tpl",
+   "notice": "_sources/tpc-ds/query_templates/EULA.txt"
+  },
+  {
+   "source": "../_sources/tpc-ds/query_templates/query18.tpl",
+   "path": "_sources/tpc-ds/query_templates/query18.tpl",
+   "notice": "_sources/tpc-ds/query_templates/EULA.txt"
+  },
+  {
+   "source": "../benchbox/core/tpchavoc/variant_sets/q13.py",
+   "path": "benchbox/core/tpchavoc/variant_sets/q13.py"
+  },
+  {
+   "source": "../_sources/tpc-ds/query_templates/query88.tpl",
+   "path": "_sources/tpc-ds/query_templates/query88.tpl",
+   "notice": "_sources/tpc-ds/query_templates/EULA.txt"
+  },
+  {
+   "source": "../_sources/tpc-ds/query_templates/query56.tpl",
+   "path": "_sources/tpc-ds/query_templates/query56.tpl",
+   "notice": "_sources/tpc-ds/query_templates/EULA.txt"
+  },
+  {
+   "source": "../_sources/tpc-ds/query_templates/query72.tpl",
+   "path": "_sources/tpc-ds/query_templates/query72.tpl",
+   "notice": "_sources/tpc-ds/query_templates/EULA.txt"
+  },
+  {
+   "source": "../_sources/tpc-ds/query_templates/query36.tpl",
+   "path": "_sources/tpc-ds/query_templates/query36.tpl",
+   "notice": "_sources/tpc-ds/query_templates/EULA.txt"
+  },
+  {
+   "source": "../_sources/tpc-ds/query_templates/query67.tpl",
+   "path": "_sources/tpc-ds/query_templates/query67.tpl",
+   "notice": "_sources/tpc-ds/query_templates/EULA.txt"
+  },
+  {
+   "source": "../_sources/tpc-ds/query_templates/query92.tpl",
+   "path": "_sources/tpc-ds/query_templates/query92.tpl",
+   "notice": "_sources/tpc-ds/query_templates/EULA.txt"
+  },
+  {
+   "source": "../benchbox/core/write_primitives/operations.py",
+   "path": "benchbox/core/write_primitives/operations.py"
+  },
+  {
+   "source": "../_sources/tpc-ds/query_templates/query16.tpl",
+   "path": "_sources/tpc-ds/query_templates/query16.tpl",
+   "notice": "_sources/tpc-ds/query_templates/EULA.txt"
+  },
+  {
+   "source": "../benchbox/core/tpchavoc/variant_sets/q17.py",
+   "path": "benchbox/core/tpchavoc/variant_sets/q17.py"
+  },
+  {
+   "source": "../_sources/tpc-ds/query_templates/query1.tpl",
+   "path": "_sources/tpc-ds/query_templates/query1.tpl",
+   "notice": "_sources/tpc-ds/query_templates/EULA.txt"
+  },
+  {
+   "source": "../_sources/tpc-ds/query_templates/query89.tpl",
+   "path": "_sources/tpc-ds/query_templates/query89.tpl",
+   "notice": "_sources/tpc-ds/query_templates/EULA.txt"
+  },
+  {
+   "source": "../_sources/tpc-ds/query_templates/query68.tpl",
+   "path": "_sources/tpc-ds/query_templates/query68.tpl",
+   "notice": "_sources/tpc-ds/query_templates/EULA.txt"
+  },
+  {
+   "source": "../_sources/tpc-ds/query_templates/query64.tpl",
+   "path": "_sources/tpc-ds/query_templates/query64.tpl",
+   "notice": "_sources/tpc-ds/query_templates/EULA.txt"
+  },
+  {
+   "source": "../_sources/tpc-ds/query_templates/query65.tpl",
+   "path": "_sources/tpc-ds/query_templates/query65.tpl",
+   "notice": "_sources/tpc-ds/query_templates/EULA.txt"
+  },
+  {
+   "source": "../benchbox/_binaries/tpc-h/templates/queries/19.sql",
+   "path": "benchbox/_binaries/tpc-h/templates/queries/19.sql",
+   "notice": "benchbox/_binaries/tpc-h/templates/queries/EULA.txt"
+  },
+  {
+   "source": "../benchbox/core/joinorder/queries.py",
+   "path": "benchbox/core/joinorder/queries.py"
+  },
+  {
+   "source": "../_sources/tpc-ds/query_templates/query69.tpl",
+   "path": "_sources/tpc-ds/query_templates/query69.tpl",
+   "notice": "_sources/tpc-ds/query_templates/EULA.txt"
+  },
+  {
+   "source": "../_sources/tpc-ds/query_templates/query12.tpl",
+   "path": "_sources/tpc-ds/query_templates/query12.tpl",
+   "notice": "_sources/tpc-ds/query_templates/EULA.txt"
+  },
+  {
+   "source": "../_sources/tpc-ds/query_templates/query87.tpl",
+   "path": "_sources/tpc-ds/query_templates/query87.tpl",
+   "notice": "_sources/tpc-ds/query_templates/EULA.txt"
+  },
+  {
+   "source": "../_sources/tpc-ds/query_templates/query11.tpl",
+   "path": "_sources/tpc-ds/query_templates/query11.tpl",
+   "notice": "_sources/tpc-ds/query_templates/EULA.txt"
+  },
+  {
+   "source": "../_sources/tpc-ds/query_templates/query32.tpl",
+   "path": "_sources/tpc-ds/query_templates/query32.tpl",
+   "notice": "_sources/tpc-ds/query_templates/EULA.txt"
+  },
+  {
+   "source": "../benchbox/core/tsbs_devops/queries.py",
+   "path": "benchbox/core/tsbs_devops/queries.py"
+  },
+  {
+   "source": "../benchbox/core/flightdata/queries.py",
+   "path": "benchbox/core/flightdata/queries.py"
+  },
+  {
+   "source": "../benchbox/_binaries/tpc-h/templates/queries/6.sql",
+   "path": "benchbox/_binaries/tpc-h/templates/queries/6.sql",
+   "notice": "benchbox/_binaries/tpc-h/templates/queries/EULA.txt"
+  },
+  {
+   "source": "../_sources/tpc-ds/query_templates/query70.tpl",
+   "path": "_sources/tpc-ds/query_templates/query70.tpl",
+   "notice": "_sources/tpc-ds/query_templates/EULA.txt"
+  },
+  {
+   "source": "../_sources/tpc-ds/query_templates/query66.tpl",
+   "path": "_sources/tpc-ds/query_templates/query66.tpl",
+   "notice": "_sources/tpc-ds/query_templates/EULA.txt"
+  },
+  {
+   "source": "../_sources/tpc-ds/query_templates/query39.tpl",
+   "path": "_sources/tpc-ds/query_templates/query39.tpl",
+   "notice": "_sources/tpc-ds/query_templates/EULA.txt"
+  },
+  {
+   "source": "../_sources/tpc-ds/query_templates/query75.tpl",
+   "path": "_sources/tpc-ds/query_templates/query75.tpl",
+   "notice": "_sources/tpc-ds/query_templates/EULA.txt"
+  },
+  {
+   "source": "../_sources/tpc-ds/query_templates/query33.tpl",
+   "path": "_sources/tpc-ds/query_templates/query33.tpl",
+   "notice": "_sources/tpc-ds/query_templates/EULA.txt"
+  },
+  {
+   "source": "../_sources/tpc-ds/query_templates/query25.tpl",
+   "path": "_sources/tpc-ds/query_templates/query25.tpl",
+   "notice": "_sources/tpc-ds/query_templates/EULA.txt"
+  },
+  {
+   "source": "../_sources/tpc-ds/query_templates/query98.tpl",
+   "path": "_sources/tpc-ds/query_templates/query98.tpl",
+   "notice": "_sources/tpc-ds/query_templates/EULA.txt"
+  },
+  {
+   "source": "../_sources/tpc-ds/query_templates/query14.tpl",
+   "path": "_sources/tpc-ds/query_templates/query14.tpl",
+   "notice": "_sources/tpc-ds/query_templates/EULA.txt"
+  },
+  {
+   "source": "../_sources/tpc-ds/query_templates/query2.tpl",
+   "path": "_sources/tpc-ds/query_templates/query2.tpl",
+   "notice": "_sources/tpc-ds/query_templates/EULA.txt"
+  },
+  {
+   "source": "../_sources/tpc-ds/query_templates/query90.tpl",
+   "path": "_sources/tpc-ds/query_templates/query90.tpl",
+   "notice": "_sources/tpc-ds/query_templates/EULA.txt"
+  },
+  {
+   "source": "../_sources/tpc-ds/query_templates/query86.tpl",
+   "path": "_sources/tpc-ds/query_templates/query86.tpl",
+   "notice": "_sources/tpc-ds/query_templates/EULA.txt"
+  },
+  {
+   "source": "../_sources/tpc-ds/query_templates/query29.tpl",
+   "path": "_sources/tpc-ds/query_templates/query29.tpl",
+   "notice": "_sources/tpc-ds/query_templates/EULA.txt"
+  },
+  {
+   "source": "../_sources/tpc-ds/query_templates/query81.tpl",
+   "path": "_sources/tpc-ds/query_templates/query81.tpl",
+   "notice": "_sources/tpc-ds/query_templates/EULA.txt"
+  },
+  {
+   "source": "../_sources/tpc-ds/query_templates/query7.tpl",
+   "path": "_sources/tpc-ds/query_templates/query7.tpl",
+   "notice": "_sources/tpc-ds/query_templates/EULA.txt"
+  },
+  {
+   "source": "../benchbox/core/metadata_primitives/queries.py",
+   "path": "benchbox/core/metadata_primitives/queries.py"
+  },
+  {
+   "source": "../_sources/tpc-ds/query_templates/query4.tpl",
+   "path": "_sources/tpc-ds/query_templates/query4.tpl",
+   "notice": "_sources/tpc-ds/query_templates/EULA.txt"
+  },
+  {
+   "source": "../benchbox/platforms/datafusion_tpch_rewrites.py",
+   "path": "benchbox/platforms/datafusion_tpch_rewrites.py"
+  },
+  {
+   "source": "../benchbox/core/tpchavoc/variant_sets/q16.py",
+   "path": "benchbox/core/tpchavoc/variant_sets/q16.py"
+  },
+  {
+   "source": "../_sources/tpc-ds/query_templates/query73.tpl",
+   "path": "_sources/tpc-ds/query_templates/query73.tpl",
+   "notice": "_sources/tpc-ds/query_templates/EULA.txt"
+  },
+  {
+   "source": "../benchbox/core/tpchavoc/variant_sets/q06.py",
+   "path": "benchbox/core/tpchavoc/variant_sets/q06.py"
+  },
+  {
+   "source": "../benchbox/_binaries/tpc-h/templates/queries/11.sql",
+   "path": "benchbox/_binaries/tpc-h/templates/queries/11.sql",
+   "notice": "benchbox/_binaries/tpc-h/templates/queries/EULA.txt"
+  },
+  {
+   "source": "../benchbox/core/tpchavoc/variant_sets/q01.py",
+   "path": "benchbox/core/tpchavoc/variant_sets/q01.py"
+  },
+  {
+   "source": "../_sources/tpc-ds/query_templates/query40.tpl",
+   "path": "_sources/tpc-ds/query_templates/query40.tpl",
+   "notice": "_sources/tpc-ds/query_templates/EULA.txt"
+  },
+  {
+   "source": "../benchbox/core/tpchavoc/variant_sets/q08.py",
+   "path": "benchbox/core/tpchavoc/variant_sets/q08.py"
+  },
+  {
+   "source": "../benchbox/core/tpchavoc/variant_sets/q05.py",
+   "path": "benchbox/core/tpchavoc/variant_sets/q05.py"
+  },
+  {
+   "source": "../benchbox/core/datavault/queries.py",
+   "path": "benchbox/core/datavault/queries.py"
+  },
+  {
+   "source": "../benchbox/core/ai_primitives/queries.py",
+   "path": "benchbox/core/ai_primitives/queries.py"
+  },
+  {
+   "source": "../_sources/tpc-ds/query_templates/query31.tpl",
+   "path": "_sources/tpc-ds/query_templates/query31.tpl",
+   "notice": "_sources/tpc-ds/query_templates/EULA.txt"
+  },
+  {
+   "source": "../_sources/tpc-ds/query_templates/query20.tpl",
+   "path": "_sources/tpc-ds/query_templates/query20.tpl",
+   "notice": "_sources/tpc-ds/query_templates/EULA.txt"
+  },
+  {
+   "source": "../benchbox/core/tpchavoc/variant_sets/q02.py",
+   "path": "benchbox/core/tpchavoc/variant_sets/q02.py"
+  },
+  {
+   "source": "../_sources/tpc-ds/query_templates/query57.tpl",
+   "path": "_sources/tpc-ds/query_templates/query57.tpl",
+   "notice": "_sources/tpc-ds/query_templates/EULA.txt"
+  },
+  {
+   "source": "../_sources/tpc-ds/query_templates/query17.tpl",
+   "path": "_sources/tpc-ds/query_templates/query17.tpl",
+   "notice": "_sources/tpc-ds/query_templates/EULA.txt"
+  },
+  {
+   "source": "../_sources/tpc-ds/query_templates/query76.tpl",
+   "path": "_sources/tpc-ds/query_templates/query76.tpl",
+   "notice": "_sources/tpc-ds/query_templates/EULA.txt"
+  },
+  {
+   "source": "../_sources/tpc-ds/query_templates/query26.tpl",
+   "path": "_sources/tpc-ds/query_templates/query26.tpl",
+   "notice": "_sources/tpc-ds/query_templates/EULA.txt"
+  },
+  {
+   "source": "../benchbox/_binaries/tpc-h/templates/queries/10.sql",
+   "path": "benchbox/_binaries/tpc-h/templates/queries/10.sql",
+   "notice": "benchbox/_binaries/tpc-h/templates/queries/EULA.txt"
+  },
+  {
+   "source": "../benchbox/_binaries/tpc-h/templates/queries/7.sql",
+   "path": "benchbox/_binaries/tpc-h/templates/queries/7.sql",
+   "notice": "benchbox/_binaries/tpc-h/templates/queries/EULA.txt"
+  },
+  {
+   "source": "../_sources/tpc-ds/query_templates/query37.tpl",
+   "path": "_sources/tpc-ds/query_templates/query37.tpl",
+   "notice": "_sources/tpc-ds/query_templates/EULA.txt"
+  },
+  {
+   "source": "../_benchbox_pytest_xdist_safety.py",
+   "path": "_benchbox_pytest_xdist_safety.py"
+  },
+  {
+   "source": "../_sources/tpc-ds/query_templates/query3.tpl",
+   "path": "_sources/tpc-ds/query_templates/query3.tpl",
+   "notice": "_sources/tpc-ds/query_templates/EULA.txt"
+  },
+  {
+   "source": "../_sources/tpc-ds/query_templates/query52.tpl",
+   "path": "_sources/tpc-ds/query_templates/query52.tpl",
+   "notice": "_sources/tpc-ds/query_templates/EULA.txt"
+  },
+  {
+   "source": "../benchbox/_binaries/tpc-h/templates/queries/13.sql",
+   "path": "benchbox/_binaries/tpc-h/templates/queries/13.sql",
+   "notice": "benchbox/_binaries/tpc-h/templates/queries/EULA.txt"
+  },
+  {
+   "source": "../_sources/tpc-ds/query_templates/query60.tpl",
+   "path": "_sources/tpc-ds/query_templates/query60.tpl",
+   "notice": "_sources/tpc-ds/query_templates/EULA.txt"
+  },
+  {
+   "source": "../.github/workflows/corpus-drift-check.yml",
+   "path": ".github/workflows/corpus-drift-check.yml"
+  },
+  {
+   "source": "../benchbox/core/tpchavoc/variant_sets/q19.py",
+   "path": "benchbox/core/tpchavoc/variant_sets/q19.py"
+  },
+  {
+   "source": "../_sources/tpc-ds/query_templates/query44.tpl",
+   "path": "_sources/tpc-ds/query_templates/query44.tpl",
+   "notice": "_sources/tpc-ds/query_templates/EULA.txt"
+  },
+  {
+   "source": "../_sources/tpc-ds/query_templates/query61.tpl",
+   "path": "_sources/tpc-ds/query_templates/query61.tpl",
+   "notice": "_sources/tpc-ds/query_templates/EULA.txt"
+  },
+  {
+   "source": "../benchbox/core/amplab/queries.py",
+   "path": "benchbox/core/amplab/queries.py"
+  },
+  {
+   "source": "../_sources/tpc-ds/query_templates/query46.tpl",
+   "path": "_sources/tpc-ds/query_templates/query46.tpl",
+   "notice": "_sources/tpc-ds/query_templates/EULA.txt"
+  },
+  {
+   "source": "../scripts/compat_lint.py",
+   "path": "scripts/compat_lint.py"
+  },
+  {
+   "source": "../_sources/tpc-ds/query_templates/query47.tpl",
+   "path": "_sources/tpc-ds/query_templates/query47.tpl",
+   "notice": "_sources/tpc-ds/query_templates/EULA.txt"
+  },
+  {
+   "source": "../benchbox/_binaries/tpc-h/templates/queries/5.sql",
+   "path": "benchbox/_binaries/tpc-h/templates/queries/5.sql",
+   "notice": "benchbox/_binaries/tpc-h/templates/queries/EULA.txt"
+  },
+  {
+   "source": "../benchbox/platforms/dataframe/unified_frame.py",
+   "path": "benchbox/platforms/dataframe/unified_frame.py"
+  },
+  {
+   "source": "../_sources/tpc-ds/query_templates/query96.tpl",
+   "path": "_sources/tpc-ds/query_templates/query96.tpl",
+   "notice": "_sources/tpc-ds/query_templates/EULA.txt"
+  },
+  {
+   "source": "../benchbox/_binaries/tpc-h/templates/queries/9.sql",
+   "path": "benchbox/_binaries/tpc-h/templates/queries/9.sql",
+   "notice": "benchbox/_binaries/tpc-h/templates/queries/EULA.txt"
+  },
+  {
+   "source": "../_sources/tpc-ds/query_templates/query5.tpl",
+   "path": "_sources/tpc-ds/query_templates/query5.tpl",
+   "notice": "_sources/tpc-ds/query_templates/EULA.txt"
+  },
+  {
+   "source": "../_sources/tpc-ds/query_templates/query21.tpl",
+   "path": "_sources/tpc-ds/query_templates/query21.tpl",
+   "notice": "_sources/tpc-ds/query_templates/EULA.txt"
+  },
+  {
+   "source": "../_sources/tpc-ds/query_templates/query6.tpl",
+   "path": "_sources/tpc-ds/query_templates/query6.tpl",
+   "notice": "_sources/tpc-ds/query_templates/EULA.txt"
+  },
+  {
+   "source": "../benchbox/_binaries/tpc-h/templates/queries/17.sql",
+   "path": "benchbox/_binaries/tpc-h/templates/queries/17.sql",
+   "notice": "benchbox/_binaries/tpc-h/templates/queries/EULA.txt"
+  },
+  {
+   "source": "../tests/unit/test_xdist_safety.py",
+   "path": "tests/unit/test_xdist_safety.py"
+  },
+  {
+   "source": "../_sources/tpc-ds/query_templates/query27.tpl",
+   "path": "_sources/tpc-ds/query_templates/query27.tpl",
+   "notice": "_sources/tpc-ds/query_templates/EULA.txt"
+  },
+  {
+   "source": "../benchbox/_binaries/tpc-h/templates/queries/21.sql",
+   "path": "benchbox/_binaries/tpc-h/templates/queries/21.sql",
+   "notice": "benchbox/_binaries/tpc-h/templates/queries/EULA.txt"
+  },
+  {
+   "source": "../benchbox/core/transaction_primitives/operations.py",
+   "path": "benchbox/core/transaction_primitives/operations.py"
+  },
+  {
+   "source": "../benchbox/core/tpchavoc/variant_sets/q18.py",
+   "path": "benchbox/core/tpchavoc/variant_sets/q18.py"
+  },
+  {
+   "source": "../benchbox/core/tpcdi/queries.py",
+   "path": "benchbox/core/tpcdi/queries.py"
+  },
+  {
+   "source": "../benchbox/core/tpcdi/query_validation.py",
+   "path": "benchbox/core/tpcdi/query_validation.py"
+  },
+  {
+   "source": "../_sources/tpc-ds/query_templates/query34.tpl",
+   "path": "_sources/tpc-ds/query_templates/query34.tpl",
+   "notice": "_sources/tpc-ds/query_templates/EULA.txt"
+  },
+  {
+   "source": "../benchbox/core/tpcdi/query_analytics.py",
+   "path": "benchbox/core/tpcdi/query_analytics.py"
+  },
+  {
+   "source": "../examples/getting_started/local/duckdb_tsbs_devops.py",
+   "path": "examples/getting_started/local/duckdb_tsbs_devops.py"
+  },
+  {
+   "source": "../_sources/tpc-ds/query_templates/query23.tpl",
+   "path": "_sources/tpc-ds/query_templates/query23.tpl",
+   "notice": "_sources/tpc-ds/query_templates/EULA.txt"
+  },
+  {
+   "source": "../_sources/tpc-ds/query_templates/query9.tpl",
+   "path": "_sources/tpc-ds/query_templates/query9.tpl",
+   "notice": "_sources/tpc-ds/query_templates/EULA.txt"
+  },
+  {
+   "source": "../_sources/tpc-ds/query_templates/query51.tpl",
+   "path": "_sources/tpc-ds/query_templates/query51.tpl",
+   "notice": "_sources/tpc-ds/query_templates/EULA.txt"
+  },
+  {
+   "source": "../benchbox/core/tpchavoc/variant_sets/q07.py",
+   "path": "benchbox/core/tpchavoc/variant_sets/q07.py"
+  },
+  {
+   "source": "../_sources/tpc-ds/query_templates/query84.tpl",
+   "path": "_sources/tpc-ds/query_templates/query84.tpl",
+   "notice": "_sources/tpc-ds/query_templates/EULA.txt"
+  },
+  {
+   "source": "../benchbox/core/tpchavoc/variant_sets/q15.py",
+   "path": "benchbox/core/tpchavoc/variant_sets/q15.py"
+  },
+  {
+   "source": "../pytest.ini",
+   "path": "pytest.ini"
+  },
+  {
+   "source": "../benchbox/_binaries/tpc-h/templates/queries/12.sql",
+   "path": "benchbox/_binaries/tpc-h/templates/queries/12.sql",
+   "notice": "benchbox/_binaries/tpc-h/templates/queries/EULA.txt"
+  },
+  {
+   "source": "../_sources/tpc-ds/query_templates/query49.tpl",
+   "path": "_sources/tpc-ds/query_templates/query49.tpl",
+   "notice": "_sources/tpc-ds/query_templates/EULA.txt"
+  },
+  {
+   "source": "../benchbox/_binaries/tpc-h/templates/queries/2.sql",
+   "path": "benchbox/_binaries/tpc-h/templates/queries/2.sql",
+   "notice": "benchbox/_binaries/tpc-h/templates/queries/EULA.txt"
+  },
+  {
+   "source": "../_sources/tpc-ds/query_templates/query99.tpl",
+   "path": "_sources/tpc-ds/query_templates/query99.tpl",
+   "notice": "_sources/tpc-ds/query_templates/EULA.txt"
+  },
+  {
+   "source": "../_sources/tpc-ds/query_templates/query28.tpl",
+   "path": "_sources/tpc-ds/query_templates/query28.tpl",
+   "notice": "_sources/tpc-ds/query_templates/EULA.txt"
+  },
+  {
+   "source": "../benchbox/_binaries/tpc-h/templates/queries/18.sql",
+   "path": "benchbox/_binaries/tpc-h/templates/queries/18.sql",
+   "notice": "benchbox/_binaries/tpc-h/templates/queries/EULA.txt"
+  },
+  {
+   "source": "../_sources/tpc-ds/query_templates/query59.tpl",
+   "path": "_sources/tpc-ds/query_templates/query59.tpl",
+   "notice": "_sources/tpc-ds/query_templates/EULA.txt"
+  },
+  {
+   "source": "../benchbox/platforms/datafusion_query_transformer.py",
+   "path": "benchbox/platforms/datafusion_query_transformer.py",
+   "core_sha": "1c70fd0618cb2589c573fe4c31a0929eb5baacf3"
+  },
+  {
+   "source": "../_sources/tpc-ds/query_templates/query95.tpl",
+   "path": "_sources/tpc-ds/query_templates/query95.tpl",
+   "notice": "_sources/tpc-ds/query_templates/EULA.txt"
+  },
+  {
+   "source": "../_sources/tpc-ds/query_templates/query85.tpl",
+   "path": "_sources/tpc-ds/query_templates/query85.tpl",
+   "notice": "_sources/tpc-ds/query_templates/EULA.txt"
+  },
+  {
+   "source": "../_sources/tpc-ds/query_templates/query15.tpl",
+   "path": "_sources/tpc-ds/query_templates/query15.tpl",
+   "notice": "_sources/tpc-ds/query_templates/EULA.txt"
+  },
+  {
+   "source": "../benchbox/_binaries/tpc-h/templates/queries/22.sql",
+   "path": "benchbox/_binaries/tpc-h/templates/queries/22.sql",
+   "notice": "benchbox/_binaries/tpc-h/templates/queries/EULA.txt"
+  },
+  {
+   "source": "../benchbox/_binaries/tpc-h/templates/queries/20.sql",
+   "path": "benchbox/_binaries/tpc-h/templates/queries/20.sql",
+   "notice": "benchbox/_binaries/tpc-h/templates/queries/EULA.txt"
+  },
+  {
+   "source": "../benchbox/core/h2odb/queries.py",
+   "path": "benchbox/core/h2odb/queries.py"
+  },
+  {
+   "source": "../_sources/tpc-ds/query_templates/query79.tpl",
+   "path": "_sources/tpc-ds/query_templates/query79.tpl",
+   "notice": "_sources/tpc-ds/query_templates/EULA.txt"
+  },
+  {
+   "source": "../_sources/tpc-ds/query_templates/query80.tpl",
+   "path": "_sources/tpc-ds/query_templates/query80.tpl",
+   "notice": "_sources/tpc-ds/query_templates/EULA.txt"
+  },
+  {
+   "source": "../benchbox/core/tpchavoc/variant_sets/q03.py",
+   "path": "benchbox/core/tpchavoc/variant_sets/q03.py"
+  },
+  {
+   "source": "../_sources/tpc-ds/query_templates/query19.tpl",
+   "path": "_sources/tpc-ds/query_templates/query19.tpl",
+   "notice": "_sources/tpc-ds/query_templates/EULA.txt"
+  },
+  {
+   "source": "../benchbox/sql_compat/rules/ddl_optimize/fabric_dw_ddl_rewrites.py",
+   "path": "benchbox/sql_compat/rules/ddl_optimize/fabric_dw_ddl_rewrites.py"
+  },
+  {
+   "source": "../_sources/tpc-ds/query_templates/query35.tpl",
+   "path": "_sources/tpc-ds/query_templates/query35.tpl",
+   "notice": "_sources/tpc-ds/query_templates/EULA.txt"
+  },
+  {
+   "source": "../examples/use_cases/ci_regression_test.py",
+   "path": "examples/use_cases/ci_regression_test.py"
+  },
+  {
+   "source": "../_sources/tpc-ds/query_templates/query45.tpl",
+   "path": "_sources/tpc-ds/query_templates/query45.tpl",
+   "notice": "_sources/tpc-ds/query_templates/EULA.txt"
+  },
+  {
+   "source": "../_sources/tpc-ds/query_templates/query83.tpl",
+   "path": "_sources/tpc-ds/query_templates/query83.tpl",
+   "notice": "_sources/tpc-ds/query_templates/EULA.txt"
+  },
+  {
+   "source": "../_sources/tpc-ds/query_templates/query8.tpl",
+   "path": "_sources/tpc-ds/query_templates/query8.tpl",
+   "notice": "_sources/tpc-ds/query_templates/EULA.txt"
+  },
+  {
+   "source": "../benchbox/core/tpchavoc/variant_sets/q20.py",
+   "path": "benchbox/core/tpchavoc/variant_sets/q20.py"
+  },
+  {
+   "source": "../_sources/tpc-ds/query_templates/query10.tpl",
+   "path": "_sources/tpc-ds/query_templates/query10.tpl",
+   "notice": "_sources/tpc-ds/query_templates/EULA.txt"
+  },
+  {
+   "source": "../_sources/tpc-ds/query_templates/query74.tpl",
+   "path": "_sources/tpc-ds/query_templates/query74.tpl",
+   "notice": "_sources/tpc-ds/query_templates/EULA.txt"
+  },
+  {
+   "source": "../_sources/tpc-ds/query_templates/query22.tpl",
+   "path": "_sources/tpc-ds/query_templates/query22.tpl",
+   "notice": "_sources/tpc-ds/query_templates/EULA.txt"
+  },
+  {
+   "source": "../benchbox/core/tpchavoc/variant_sets/q21.py",
+   "path": "benchbox/core/tpchavoc/variant_sets/q21.py"
+  },
+  {
+   "source": "../examples/use_cases/platform_evaluation.py",
+   "path": "examples/use_cases/platform_evaluation.py"
+  }
+ ]
+}

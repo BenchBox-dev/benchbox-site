@@ -45,7 +45,6 @@ export interface ConvertContext {
   addSection(depth: number, title: TitleNode[], id: string): void;
   setPageData(key: string, value: unknown): void;
   useComponent(name: ComponentName): void;
-  recordDownload(relative: string): void;
   recordImage(name: string): void;
 }
 

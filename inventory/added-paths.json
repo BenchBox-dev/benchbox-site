@@ -36,7 +36,7 @@
  },
  {
   "path": "/docs/_downloads/*/TPC_EULA.txt",
-  "reason": "adjacent TPC-H and TPC-DS license sidecars accompany downloadable query files",
+  "reason": "legacy sidecar URL kept for TPC query templates: the path redirects to the TPC license in the core repository at the archive commit",
   "owner_approval": "pending"
  }
 ]

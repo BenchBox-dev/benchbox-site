@@ -51,8 +51,6 @@ export function assembleDocsSource(destination: string): string {
   const docsRoot = path.join(destination, "docs");
   rmSync(destination, { recursive: true, force: true });
   mkdirSync(destination, { recursive: true });
-  const downloads = path.join(inputs, "downloads");
-  if (existsSync(downloads)) cpSync(downloads, destination, { recursive: true });
   cpSync(path.join(inputs, "docs"), docsRoot, { recursive: true });
   cpSync(repoPath("blog"), path.join(docsRoot, "blog"), { recursive: true });
   cpSync(path.join(inputs, "repo-files.json"), path.join(destination, "repo-files.json"));
