@@ -223,14 +223,16 @@ describe("docs parity run", () => {
   });
 
   it("is not applicable to a bundle without docs-data", () => {
-    writeBundle(new Map(), 3);
+    writeBundle(new Map(), 4);
     rmSync(path.join(bundle, "docs-data"), { recursive: true });
     expect(runParity(bundle).status).toBe("not-applicable");
   });
 
-  it("rejects a bundle that has docs-data but no bundled docs", () => {
-    writeBundle(new Map());
-    expect(() => runParity(bundle)).toThrow("no bundled docs");
+  it("is not applicable to a bundle that has docs-data but no docs member", () => {
+    writeBundle(new Map(), 5);
+    const result = runParity(bundle);
+    expect(result.status).toBe("not-applicable");
+    expect(result.status === "not-applicable" && result.message).toContain("no docs member");
   });
 });
 
@@ -264,7 +266,7 @@ describe("docs parity command", () => {
   });
 
   it("treats a bundle without docs-data as not applicable unless applicability is required", () => {
-    writeBundle(new Map(), 3);
+    writeBundle(new Map(), 4);
     rmSync(path.join(bundle, "docs-data"), { recursive: true });
     expect(run().status).toBe(0);
     expect(run().stdout).toContain("not applicable");

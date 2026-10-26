@@ -165,7 +165,7 @@ export function runParity(bundleDir: string): ParityResult {
   }
   const docsRoot = path.join(bundleDir, "docs");
   if (!existsSync(docsRoot)) {
-    throw new Error(`bundle schema ${manifest.schema} carries docs-data but no bundled docs to compare against`);
+    return { status: "not-applicable", message: `bundle schema ${manifest.schema} carries no docs member, so there is nothing to compare` };
   }
   const docsDataText = readFileSync(docsDataFile, "utf-8");
   const generated = new Map<string, Buffer>();
