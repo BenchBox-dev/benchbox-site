@@ -25,6 +25,7 @@ test("paths that leave the repository or name the old core layout are refused", 
 test("the production origin is allowed only on the allowlist", () => {
   assert.equal(findingsFor("website/src/lib/a.ts", 'const o = "https://benchbox.dev";\n').length, 1);
   assert.deepEqual(findingsFor("blog/post.md", "see https://benchbox.dev\n"), []);
+  assert.deepEqual(findingsFor("docs/usage/page.md", "see https://benchbox.dev/docs/index.html\n"), []);
   assert.deepEqual(findingsFor("website/src/lib/site-origin.ts", 'const o = "https://benchbox.dev";\n'), []);
   assert.deepEqual(findingsFor("scripts/schemas/docs-data.schema.json", `{"$id": "https://benchbox.dev/schemas/docs-data.schema.json"}\n`), []);
   assert.equal(findingsFor("scripts/other.json", `{"$id": "https://benchbox.dev/x"}\n`).length, 1);

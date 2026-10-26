@@ -8,6 +8,7 @@ ignores:
   - "**/node_modules/**"
   - "**/dist/**"
   - "blog/**"
+  - "docs/**"
   - "drafts/**"
   - "inventory/**"
   - "website/tests/golden/**"
