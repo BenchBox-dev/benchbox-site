@@ -141,6 +141,18 @@ Adaptations to keep:
 - Explorer code takes the origin from `SITE_ORIGIN` in
   `explorer/src/components/siteOrigin.ts` and never hard-codes the
   production origin. `npm run lint:guard` fails on a hard-coded one.
+- The site serves no copies of core files. Documentation links to files
+  outside `docs/` point at GitHub, pinned to the bundle's `core_sha`. The
+  Sphinx-era URLs `/docs/_downloads/<md5>/<name>`, and the `TPC_EULA.txt`
+  sidecars beside TPC query templates, are a closed set recorded in
+  `inventory/legacy-downloads.json`. Each is published, also under
+  `/docs/dev/`, as a redirect page at `<name>/index.html`, so the dotted legacy
+  URL normalizes to a directory that answers as `text/html`. Targets stay
+  pinned to the inventory's archive commit, not to later bundles, and a
+  template's redirect page links the adjacent TPC license. Redirect pages stay
+  out of the sitemap and the search index.
+  `npm run verify:legacy-downloads -w website` drives them in Chromium
+  against a built `website/dist`.
 
 ## Changes
 

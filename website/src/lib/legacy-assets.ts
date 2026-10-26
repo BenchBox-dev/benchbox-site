@@ -1,9 +1,16 @@
 import { createHash } from "node:crypto";
-import { cpSync, existsSync, mkdirSync } from "node:fs";
+import { cpSync, existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { deflateSync } from "node:zlib";
 import path from "node:path";
+import { REPOSITORY_URL } from "./repo-files.ts";
 
-export type LegacyFiles = { downloads: string[]; images: string[] };
+export type LegacyFiles = { images: string[] };
+
+export type LegacyDownload = { source: string; path: string; core_sha?: string; notice?: string };
+export type LegacyDownloads = { core_sha: string; downloads: LegacyDownload[] };
+export type LegacyRedirect = { url: string; target: string; notice?: string };
+
+export const TPC_NOTICE_NAME = "TPC_EULA.txt";
 
 export function downloadUrlPath(relative: string): string {
   const digest = createHash("md5").update(relative).digest("hex");
@@ -14,28 +21,77 @@ export function imageUrlPath(name: string): string {
   return `/docs/_images/${name}`;
 }
 
-export function publishLegacyFiles(files: LegacyFiles, docsRoot: string, out: string): number {
-  const copies = [
-    ...files.downloads.map((relative) => ({ from: path.resolve(docsRoot, relative), to: downloadUrlPath(relative) })),
-    ...files.images.map((name) => ({ from: path.join(docsRoot, "blog", "images", name), to: imageUrlPath(name) })),
-  ];
-  for (const copy of copies) {
-    if (!existsSync(copy.from)) throw new Error(`legacy public file is missing: ${copy.from}`);
-    const target = path.join(out, copy.to);
+export function publishLegacyImages(files: LegacyFiles, docsRoot: string, out: string): number {
+  for (const name of files.images) {
+    const from = path.join(docsRoot, "blog", "images", name);
+    if (!existsSync(from)) throw new Error(`legacy public file is missing: ${from}`);
+    const target = path.join(out, imageUrlPath(name));
     mkdirSync(path.dirname(target), { recursive: true });
-    cpSync(copy.from, target);
-    const sourcePath = path.relative(docsRoot, copy.from).split(path.sep).join("/");
-    const eulaSource = sourcePath.startsWith("../_sources/tpc-ds/query_templates/")
-      ? path.resolve(docsRoot, "../_sources/tpc-ds/EULA.txt")
-      : sourcePath.startsWith("../benchbox/_binaries/tpc-h/templates/queries/")
-        ? path.resolve(docsRoot, "../_sources/tpc-h/EULA.txt")
-        : undefined;
-    if (eulaSource !== undefined) {
-      if (!existsSync(eulaSource)) throw new Error(`TPC EULA is missing: ${eulaSource}`);
-      cpSync(eulaSource, path.join(path.dirname(target), "TPC_EULA.txt"));
+    cpSync(from, target);
+  }
+  return files.images.length;
+}
+
+export function loadLegacyDownloads(file: string): LegacyDownloads {
+  return JSON.parse(readFileSync(file, "utf-8")) as LegacyDownloads;
+}
+
+export function repositoryBlobUrl(coreSha: string, repositoryPath: string): string {
+  return `${REPOSITORY_URL}/blob/${coreSha}/${repositoryPath.split("/").map(encodeURIComponent).join("/")}`;
+}
+
+export function legacyRedirects(inventory: LegacyDownloads): LegacyRedirect[] {
+  const redirects = new Map<string, LegacyRedirect>();
+  for (const download of inventory.downloads) {
+    const url = downloadUrlPath(download.source);
+    const coreSha = download.core_sha ?? inventory.core_sha;
+    const notice = download.notice === undefined ? undefined : repositoryBlobUrl(inventory.core_sha, download.notice);
+    redirects.set(url, { url, target: repositoryBlobUrl(coreSha, download.path), ...(notice === undefined ? {} : { notice }) });
+    if (notice !== undefined) {
+      const sidecar = `${path.posix.dirname(url)}/${TPC_NOTICE_NAME}`;
+      redirects.set(sidecar, { url: sidecar, target: notice });
     }
   }
-  return copies.length;
+  return [...redirects.values()].sort((left, right) => (left.url < right.url ? -1 : 1));
+}
+
+function escapeAttribute(value: string): string {
+  return value.replace(/&/g, "&amp;").replace(/"/g, "&quot;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+}
+
+export function renderRedirectPage(redirect: Pick<LegacyRedirect, "target" | "notice">): string {
+  const target = escapeAttribute(redirect.target);
+  const notice =
+    redirect.notice === undefined
+      ? []
+      : [`    <p>This is a TPC query template. Its use is governed by the <a href="${escapeAttribute(redirect.notice)}">TPC End User License Agreement</a>.</p>`];
+  return [
+    "<!doctype html>",
+    '<html lang="en">',
+    "  <head>",
+    '    <meta charset="utf-8">',
+    '    <meta name="viewport" content="width=device-width, initial-scale=1">',
+    "    <title>This page has moved</title>",
+    '    <meta name="robots" content="noindex">',
+    `    <link rel="canonical" href="${target}">`,
+    `    <meta http-equiv="refresh" content="0; url=${target}">`,
+    "  </head>",
+    "  <body>",
+    `    <p>This page has moved. <a href="${target}">Continue to the new page</a>.</p>`,
+    ...notice,
+    "  </body>",
+    "</html>",
+    "",
+  ].join("\n");
+}
+
+export function publishLegacyRedirects(redirects: readonly LegacyRedirect[], out: string): number {
+  for (const redirect of redirects) {
+    const target = path.join(out, redirect.url, "index.html");
+    mkdirSync(path.dirname(target), { recursive: true });
+    writeFileSync(target, renderRedirectPage(redirect));
+  }
+  return redirects.length;
 }
 
 export const REDIRECT_PAGES: Readonly<Record<string, string>> = {

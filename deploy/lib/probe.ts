@@ -8,6 +8,21 @@ export const ROUTE_ROOTS = ["index.html", "docs/index.html", "docs/dev/index.htm
 export const REQUIRED_PATHS = [...ROUTE_ROOTS, "results/data/results.duckdb", "docs/objects.inv"];
 const SAMPLED = /\.(html|css|js|svg|json|xml)$/;
 export const DEEP_LINK = "/results/__site_deploy_probe__/deep/link";
+const LEGACY_DOWNLOAD_PAGE = /^docs\/_downloads\/[0-9a-f]{32}\/([^/]+)\/index\.html$/;
+const LEGACY_DOWNLOAD_URL = /^\/docs\/_downloads\/[0-9a-f]{32}\/[^/]+$/;
+
+export function legacyDownloadSamples(files: readonly string[]): string[] {
+  const byExtension = new Map<string, string>();
+  for (const file of files) {
+    const name = LEGACY_DOWNLOAD_PAGE.exec(file)?.[1];
+    if (name !== undefined && !byExtension.has(path.extname(name))) byExtension.set(path.extname(name), file);
+  }
+  return [...byExtension.values()];
+}
+
+function legacyDownloadUrl(file: string): string {
+  return `/${file.slice(0, -"/index.html".length)}`;
+}
 
 export function servedUrl(file: string): string {
   if (file === "index.html") return "/";
@@ -26,6 +41,7 @@ export function checksumManifest(siteDir: string, samples = 25): Record<string, 
   for (let index = 0; index < candidates.length && Object.keys(manifest).length < REQUIRED_PATHS.length + samples; index += stride) {
     manifest[servedUrl(candidates[index])] = sha(candidates[index]);
   }
+  for (const file of legacyDownloadSamples(filesUnder(siteDir))) manifest[legacyDownloadUrl(file)] = sha(file);
   return manifest;
 }
 
@@ -42,7 +58,7 @@ export type ProbeOutcome = {
 
 type ProbeResponse = { status: number; body: Uint8Array; headers?: Record<string, string> };
 type Fetch = (url: string) => Promise<ProbeResponse>;
-const CACHE_HEADERS = ["age", "cache-control", "date", "etag", "last-modified", "via", "x-cache", "x-cache-hits", "x-served-by", "x-proxy-cache"];
+const CACHE_HEADERS = ["age", "cache-control", "content-type", "date", "etag", "last-modified", "via", "x-cache", "x-cache-hits", "x-served-by", "x-proxy-cache"];
 
 export async function fetchBytes(url: string): Promise<ProbeResponse> {
   const response = await fetch(url, { redirect: "follow", headers: { "User-Agent": "benchbox-site-deploy-probe/1.0" } });
@@ -64,6 +80,10 @@ export async function probeOnce(baseUrl: string, manifest: Record<string, string
       const { status, body, headers = {} } = await fetchImpl(new URL(url, baseUrl).href);
       if (status < 200 || status >= 300) {
         errors.push(`${url}: HTTP ${status}`);
+        continue;
+      }
+      if (LEGACY_DOWNLOAD_URL.test(url) && !(headers["content-type"] ?? "").toLowerCase().startsWith("text/html")) {
+        errors.push(`${url}: content type ${headers["content-type"] ?? "missing"} is not text/html`);
         continue;
       }
       const actual = createHash("sha256").update(body).digest("hex");

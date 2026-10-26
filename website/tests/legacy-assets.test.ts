@@ -1,16 +1,29 @@
 import { createHash } from "node:crypto";
-import { existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
+import { existsSync, mkdirSync, mkdtempSync, readdirSync, readFileSync, rmSync, statSync, writeFileSync } from "node:fs";
 import os from "node:os";
 import path from "node:path";
 import { inflateSync } from "node:zlib";
 import { describe, expect, it } from "vitest";
 import { buildSite } from "../src/converter/build.ts";
-import { downloadUrlPath, imageUrlPath, publishLegacyFiles, REDIRECT_PAGES, renderObjectsInventory } from "../src/lib/legacy-assets.ts";
+import {
+  downloadUrlPath,
+  imageUrlPath,
+  legacyRedirects,
+  loadLegacyDownloads,
+  publishLegacyImages,
+  publishLegacyRedirects,
+  REDIRECT_PAGES,
+  renderObjectsInventory,
+  renderRedirectPage,
+  type LegacyDownloads,
+  type LegacyRedirect,
+} from "../src/lib/legacy-assets.ts";
 import { fileURLToPath } from "node:url";
 import { builtSite } from "./built-site.ts";
 import { writeDocs } from "./support.ts";
 
 const dist = builtSite();
+const repoRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..", "..");
 const built = dist === undefined ? describe.skip : describe;
 
 describe("legacy public file paths", () => {
@@ -20,73 +33,126 @@ describe("legacy public file paths", () => {
     expect(imageUrlPath("chart.png")).toBe("/docs/_images/chart.png");
   });
 
-  it("copies each file to its legacy path and fails on a missing source", () => {
+  it("copies each blog image to its legacy path and fails on a missing source", () => {
     const root = mkdtempSync(path.join(os.tmpdir(), "benchbox-legacy-"));
     try {
       mkdirSync(path.join(root, "docs", "blog", "images"), { recursive: true });
-      mkdirSync(path.join(root, "examples"));
       writeFileSync(path.join(root, "docs", "blog", "images", "chart.png"), "png");
-      writeFileSync(path.join(root, "examples", "run.py"), "print(1)\n");
       const out = path.join(root, "out");
-      expect(publishLegacyFiles({ downloads: ["../examples/run.py"], images: ["chart.png"] }, path.join(root, "docs"), out)).toBe(2);
-      expect(readFileSync(path.join(out, downloadUrlPath("../examples/run.py")), "utf-8")).toBe("print(1)\n");
+      expect(publishLegacyImages({ images: ["chart.png"] }, path.join(root, "docs"), out)).toBe(1);
       expect(readFileSync(path.join(out, "docs", "_images", "chart.png"), "utf-8")).toBe("png");
-      expect(() => publishLegacyFiles({ downloads: ["../examples/gone.py"], images: [] }, path.join(root, "docs"), out)).toThrow("missing");
-    } finally {
-      rmSync(root, { recursive: true, force: true });
-    }
-  });
-  it("publishes the matching TPC license beside downloadable query templates", () => {
-    const root = mkdtempSync(path.join(os.tmpdir(), "benchbox-tpc-"));
-    try {
-      const docsRoot = path.join(root, "docs");
-      const tpch = "../benchbox/_binaries/tpc-h/templates/queries/1.sql";
-      const tpcds = "../_sources/tpc-ds/query_templates/query1.tpl";
-      const tpchOther = "../benchbox/_binaries/tpc-h/README.txt";
-      const tpcdsOther = "../_sources/tpc-ds/README.txt";
-      mkdirSync(path.join(root, "benchbox/_binaries/tpc-h/templates/queries"), { recursive: true });
-      mkdirSync(path.join(root, "_sources/tpc-h"), { recursive: true });
-      mkdirSync(path.join(root, "_sources/tpc-ds/query_templates"), { recursive: true });
-      writeFileSync(path.join(root, "benchbox/_binaries/tpc-h/templates/queries/1.sql"), "select 1;\n");
-      writeFileSync(path.join(root, "_sources/tpc-ds/query_templates/query1.tpl"), "select 2;\n");
-      writeFileSync(path.join(root, "benchbox/_binaries/tpc-h/README.txt"), "TPC-H metadata\n");
-      writeFileSync(path.join(root, "_sources/tpc-ds/README.txt"), "TPC-DS metadata\n");
-      writeFileSync(path.join(root, "_sources/tpc-h/EULA.txt"), "TPC-H license\n");
-      writeFileSync(path.join(root, "_sources/tpc-ds/EULA.txt"), "TPC-DS license\n");
-      const out = path.join(root, "out");
-
-      publishLegacyFiles({ downloads: [tpch, tpcds, tpchOther, tpcdsOther], images: [] }, docsRoot, out);
-      const tpchOtherDownload = path.join(out, downloadUrlPath(tpchOther));
-      const tpcdsOtherDownload = path.join(out, downloadUrlPath(tpcdsOther));
-      expect(existsSync(path.join(path.dirname(tpchOtherDownload), "TPC_EULA.txt"))).toBe(false);
-      expect(existsSync(path.join(path.dirname(tpcdsOtherDownload), "TPC_EULA.txt"))).toBe(false);
-
-      const tpchDownload = path.join(out, downloadUrlPath(tpch));
-      const tpcdsDownload = path.join(out, downloadUrlPath(tpcds));
-      expect(readFileSync(path.join(path.dirname(tpchDownload), "TPC_EULA.txt"), "utf-8")).toBe("TPC-H license\n");
-      expect(readFileSync(path.join(path.dirname(tpcdsDownload), "TPC_EULA.txt"), "utf-8")).toBe("TPC-DS license\n");
-    } finally {
-      rmSync(root, { recursive: true, force: true });
-    }
-  });
-  it("fails when a query template has no matching TPC EULA", () => {
-    const root = mkdtempSync(path.join(os.tmpdir(), "benchbox-tpc-missing-eula-"));
-    try {
-      const docsRoot = path.join(root, "docs");
-      const tpcds = "../_sources/tpc-ds/query_templates/query1.tpl";
-      mkdirSync(path.join(root, "_sources/tpc-ds/query_templates"), { recursive: true });
-      writeFileSync(path.join(root, "_sources/tpc-ds/query_templates/query1.tpl"), "select 1;\n");
-      const out = path.join(root, "out");
-
-      expect(() => publishLegacyFiles({ downloads: [tpcds], images: [] }, docsRoot, out)).toThrow("TPC EULA is missing");
+      expect(() => publishLegacyImages({ images: ["gone.png"] }, path.join(root, "docs"), out)).toThrow("missing");
     } finally {
       rmSync(root, { recursive: true, force: true });
     }
   });
 });
 
+const ARCHIVE = "a".repeat(40);
+const OLDER = "b".repeat(40);
+const TPCH_SOURCE = "../benchbox/_binaries/tpc-h/templates/queries/1.sql";
+const TPCDS_SOURCE = "../_sources/tpc-ds/query_templates/query1.tpl";
+const synthetic: LegacyDownloads = {
+  core_sha: ARCHIVE,
+  downloads: [
+    { source: "../examples/run.py", path: "examples/run.py" },
+    { source: "../benchbox/gone.py", path: "benchbox/gone.py", core_sha: OLDER },
+    { source: TPCH_SOURCE, path: "benchbox/_binaries/tpc-h/templates/queries/1.sql", notice: "benchbox/_binaries/tpc-h/templates/queries/EULA.txt" },
+    { source: TPCDS_SOURCE, path: "_sources/tpc-ds/query_templates/query1.tpl", notice: "_sources/tpc-ds/query_templates/EULA.txt" },
+  ],
+};
+const blob = (sha: string, file: string) => `https://github.com/BenchBox-dev/BenchBox/blob/${sha}/${file}`;
+
+describe("legacy download redirects", () => {
+  const redirects = legacyRedirects(synthetic);
+  const find = (url: string) => redirects.find((redirect) => redirect.url === url);
+
+  it("points each legacy download at its path pinned to the archive commit", () => {
+    expect(find(downloadUrlPath("../examples/run.py"))).toEqual({ url: downloadUrlPath("../examples/run.py"), target: blob(ARCHIVE, "examples/run.py") });
+    expect(find(downloadUrlPath("../benchbox/gone.py"))?.target).toBe(blob(OLDER, "benchbox/gone.py"));
+  });
+
+  it("links the adjacent TPC notice from each template and adds a sidecar redirect to it", () => {
+    const tpch = find(downloadUrlPath(TPCH_SOURCE));
+    const tpcds = find(downloadUrlPath(TPCDS_SOURCE));
+    expect(tpch?.notice).toBe(blob(ARCHIVE, "benchbox/_binaries/tpc-h/templates/queries/EULA.txt"));
+    expect(tpcds?.notice).toBe(blob(ARCHIVE, "_sources/tpc-ds/query_templates/EULA.txt"));
+    for (const [source, redirect] of [[TPCH_SOURCE, tpch], [TPCDS_SOURCE, tpcds]] as const) {
+      const sidecar = find(`${path.posix.dirname(downloadUrlPath(source))}/TPC_EULA.txt`);
+      expect(sidecar).toEqual({ url: `${path.posix.dirname(downloadUrlPath(source))}/TPC_EULA.txt`, target: redirect?.notice });
+    }
+    expect(redirects.filter((redirect) => redirect.url.endsWith("/TPC_EULA.txt"))).toHaveLength(2);
+    expect(find(downloadUrlPath("../examples/run.py"))?.notice).toBeUndefined();
+  });
+
+  it("shows the notice link on a template redirect page and omits it elsewhere", () => {
+    const tpch = find(downloadUrlPath(TPCH_SOURCE));
+    const page = renderRedirectPage(tpch as LegacyRedirect);
+    expect(page).toContain(`<meta http-equiv="refresh" content="0; url=${tpch?.target}">`);
+    expect(page).toContain(`<a href="${tpch?.notice}">TPC End User License Agreement</a>`);
+    expect(renderRedirectPage(find(downloadUrlPath("../examples/run.py")) as LegacyRedirect)).not.toContain("TPC");
+  });
+
+  it("escapes markup in a target", () => {
+    expect(renderRedirectPage({ target: 'https://example.test/a?b=1&c="2"' })).toContain('url=https://example.test/a?b=1&amp;c=&quot;2&quot;">');
+  });
+
+  it("writes each redirect as a directory index and no file under the legacy name", () => {
+    const root = mkdtempSync(path.join(os.tmpdir(), "benchbox-redirects-"));
+    try {
+      expect(publishLegacyRedirects(redirects, root)).toBe(redirects.length);
+      for (const redirect of redirects) {
+        const written = path.join(root, redirect.url);
+        expect(statSync(written).isDirectory()).toBe(true);
+        expect(readdirSync(written)).toEqual(["index.html"]);
+        expect(readFileSync(path.join(written, "index.html"), "utf-8")).toBe(renderRedirectPage(redirect));
+      }
+    } finally {
+      rmSync(root, { recursive: true, force: true });
+    }
+  });
+});
+
+describe("legacy download inventory", () => {
+  const inventory = loadLegacyDownloads(path.join(repoRoot, "inventory", "legacy-downloads.json"));
+  const redirects = legacyRedirects(inventory);
+  const sha = /^[0-9a-f]{40}$/;
+
+  it("pins every target to a full commit and keeps each legacy URL once", () => {
+    expect(inventory.core_sha).toMatch(sha);
+    const urls = inventory.downloads.map((download) => downloadUrlPath(download.source));
+    expect(new Set(urls).size).toBe(urls.length);
+    for (const download of inventory.downloads) {
+      expect(download.source).toBe(`../${download.path}`);
+      for (const segment of download.path.split("/")) expect(encodeURIComponent(segment)).toBe(segment);
+      if (download.core_sha !== undefined) expect(download.core_sha).toMatch(sha);
+    }
+    for (const redirect of redirects) expect(redirect.target).toMatch(/^https:\/\/github\.com\/BenchBox-dev\/BenchBox\/blob\/[0-9a-f]{40}\/[^?#\s]+$/);
+  });
+
+  it("covers every download URL the Sphinx baseline published", () => {
+    const baseline = new Set<string>();
+    const directory = path.join(repoRoot, "inventory", "baseline-develop");
+    for (const name of readdirSync(directory)) {
+      for (const match of readFileSync(path.join(directory, name), "utf-8").matchAll(/"(\/docs\/_downloads\/[^"]*)"/g)) baseline.add(match[1]);
+    }
+    const covered = new Set(redirects.map((redirect) => redirect.url));
+    expect(baseline.size).toBeGreaterThan(0);
+    expect([...baseline].filter((url) => !covered.has(url))).toEqual([]);
+  });
+
+  it("gives a notice to every TPC query template and to nothing else", () => {
+    const templates = [/^\.\.\/_sources\/tpc-ds\/query_templates\//, /^\.\.\/benchbox\/_binaries\/tpc-h\/templates\/queries\//];
+    for (const download of inventory.downloads) {
+      const isTemplate = templates.some((pattern) => pattern.test(download.source));
+      expect(download.notice).toBe(isTemplate ? `${path.posix.dirname(download.path)}/EULA.txt` : undefined);
+    }
+    expect(inventory.downloads.filter((download) => download.notice !== undefined).length).toBeGreaterThan(0);
+  });
+});
+
 describe("download and image records", () => {
-  it("records files that Sphinx would publish as downloads and the blog images a page uses", () => {
+  it("records the blog images a page uses and no longer records downloads", () => {
     const docsRoot = writeDocs({
       "docs/publish-exclusions.txt": "",
       "docs/guide/a.md": "# A\n\n[Run](../../examples/run.py#L2) [Data](../data.csv) [Readme](../../README.md) [Pkg](../../examples/)\n",
@@ -99,9 +165,9 @@ describe("download and image records", () => {
     const result = buildSite({ docsRoot: path.join(docsRoot, "docs") });
     expect(result.errors).toEqual([]);
     const guide = result.infos.find((info) => info.path === "guide/a.md");
-    expect(guide?.downloads).toEqual(["../examples/run.py", "data.csv"]);
+    expect(guide).not.toHaveProperty("downloads");
     expect(result.infos.find((info) => info.path === "blog/post.md")?.images).toEqual(["chart.png"]);
-    expect(JSON.parse(result.files.get("manifest/legacy-files.json") ?? "{}")).toEqual({ downloads: ["../examples/run.py", "data.csv"], images: ["chart.png"] });
+    expect(JSON.parse(result.files.get("manifest/legacy-files.json") ?? "{}")).toEqual({ images: ["chart.png"] });
   });
 });
 
@@ -154,10 +220,30 @@ built("built site", () => {
     expect(readFileSync(path.join(dist as string, "sitemap.xml"), "utf-8")).not.toContain("genindex");
   });
 
-  it("publishes the legacy download, image and inventory files", () => {
-    const legacy = JSON.parse(readFileSync(path.join(path.dirname(fileURLToPath(import.meta.url)), "..", ".generated", "manifest", "legacy-files.json"), "utf-8")) as { downloads: string[]; images: string[] };
-    expect(legacy.downloads.length).toBeGreaterThan(0);
-    for (const relative of legacy.downloads) expect(existsSync(path.join(dist as string, downloadUrlPath(relative)))).toBe(true);
+  it("publishes redirect pages, not copies, for the legacy downloads and sidecars, at the root and under /docs/dev/", () => {
+    const redirects = legacyRedirects(loadLegacyDownloads(path.join(repoRoot, "inventory", "legacy-downloads.json")));
+    expect(redirects.length).toBeGreaterThan(0);
+    for (const prefix of ["", "docs/dev/"]) {
+      for (const redirect of redirects) {
+        const served = path.join(dist as string, redirect.url.replace(/^\/docs\//, `${prefix === "" ? "docs" : prefix.slice(0, -1)}/`));
+        expect(statSync(served).isDirectory()).toBe(true);
+        expect(readdirSync(served)).toEqual(["index.html"]);
+        expect(readFileSync(path.join(served, "index.html"), "utf-8")).toBe(renderRedirectPage(redirect));
+      }
+    }
+  });
+
+  it("keeps redirects out of the sitemap and leaves no copied template or TPC_EULA.txt file", () => {
+    const sitemap = readFileSync(path.join(dist as string, "sitemap.xml"), "utf-8");
+    expect(sitemap).not.toContain("_downloads");
+    const files = readdirSync(path.join(dist as string, "docs"), { recursive: true, encoding: "utf-8" }).map((entry) => entry.split(path.sep).join("/"));
+    const downloads = files.filter((entry) => entry.includes("_downloads/"));
+    expect(downloads.length).toBeGreaterThan(0);
+    expect(downloads.filter((entry) => statSync(path.join(dist as string, "docs", entry)).isFile() && !entry.endsWith("/index.html"))).toEqual([]);
+  });
+
+  it("publishes the legacy image and inventory files", () => {
+    const legacy = JSON.parse(readFileSync(path.join(path.dirname(fileURLToPath(import.meta.url)), "..", ".generated", "manifest", "legacy-files.json"), "utf-8")) as { images: string[] };
     for (const name of legacy.images) expect(existsSync(path.join(dist as string, imageUrlPath(name)))).toBe(true);
     const inventory = readFileSync(path.join(dist as string, "docs", "objects.inv"));
     expect(inventory.toString("latin1").startsWith("# Sphinx inventory version 2\n# Project: BenchBox\n")).toBe(true);

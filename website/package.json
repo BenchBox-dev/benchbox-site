@@ -22,6 +22,7 @@
     "verify": "node e2e/verify.mjs",
     "verify:shell": "node e2e/shell.mjs",
     "verify:not-found": "node e2e/not-found.mjs",
+    "verify:legacy-downloads": "node e2e/legacy-downloads.mjs",
     "verify:landing": "node e2e/landing.mjs",
     "verify:explorer": "node e2e/explorer.mjs",
     "verify:parity": "node e2e/parity.mjs"

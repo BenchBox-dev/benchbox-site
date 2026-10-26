@@ -35,7 +35,6 @@ export function placeholderInfo(source: { relative: string }): DocInfo {
     toc: [],
     tags: [],
     orphan: false,
-    downloads: [],
     images: [],
     headingLabels: [],
   };

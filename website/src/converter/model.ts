@@ -37,7 +37,6 @@ export type DocInfo = {
   toc: TocNode[];
   tags: string[];
   orphan: boolean;
-  downloads: string[];
   images: string[];
   headingLabels: LabelInfo[];
 };

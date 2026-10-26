@@ -22,5 +22,17 @@
   "target": "/blog/",
   "reason": "the blog index was also published under the docs path; the redirect sends those links to the blog",
   "owner_approval": "approved"
+ },
+ {
+  "path": "/docs/_downloads/*/*",
+  "target": "https://github.com/BenchBox-dev/BenchBox/blob/26f6c26fc7969e9505e278e20bb610b5d6ad38c5/<repository path>",
+  "reason": "the Sphinx download copies are replaced by redirect pages, served at <legacy name>/index.html so the dotted legacy URL answers as HTML, that send each legacy download URL to its file in the core repository pinned to the archive commit; the URL list is inventory/legacy-downloads.json",
+  "owner_approval": "pending"
+ },
+ {
+  "path": "/docs/_downloads/*/TPC_EULA.txt",
+  "target": "https://github.com/BenchBox-dev/BenchBox/blob/26f6c26fc7969e9505e278e20bb610b5d6ad38c5/<EULA.txt beside the query templates>",
+  "reason": "the license sidecar that accompanied each TPC query template is replaced by a redirect to the adjacent TPC license; each template redirect page also links that license",
+  "owner_approval": "pending"
  }
 ]
