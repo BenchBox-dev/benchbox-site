@@ -1,0 +1,88 @@
+name: Nightly browser smoke
+
+on:
+  schedule:
+    - cron: "43 5 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: nightly-browser
+  cancel-in-progress: false
+
+env:
+  SITE_INPUTS: ${{ github.workspace }}/.site-inputs
+  CORE_REPO: ${{ vars.CORE_REPO || 'BenchBox-dev/BenchBox' }}
+
+jobs:
+  browser:
+    name: browser smoke | ${{ matrix.browser }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    strategy:
+      fail-fast: false
+      matrix:
+        browser: [firefox, webkit]
+    env:
+      HAS_BRIDGE_APP: ${{ secrets.SITE_BRIDGE_APP_ID != '' }}
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09
+      - uses: actions/setup-node@a0853c24544627f65ddf259abe73b1d18a591444
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+      - run: npm ci --ignore-scripts
+      - name: Mint a core-scoped token
+        id: app
+        if: env.HAS_BRIDGE_APP == 'true'
+        uses: actions/create-github-app-token@bcd2ba49218906704ab6c1aa796996da409d3eb1
+        with:
+          app-id: ${{ secrets.SITE_BRIDGE_APP_ID }}
+          private-key: ${{ secrets.SITE_BRIDGE_PRIVATE_KEY }}
+          owner: BenchBox-dev
+          repositories: BenchBox
+      - name: Fetch and verify the newest certified bundle
+        env:
+          GH_TOKEN: ${{ steps.app.outputs.token || github.token }}
+        run: npm run bundle:fetch
+      - run: npx playwright install --with-deps ${{ matrix.browser }}
+      - name: Run the Explorer smoke suite
+        run: npm run test:e2e:${{ matrix.browser }} -w explorer
+      - name: Upload failure artifacts
+        if: failure()
+        uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f
+        with:
+          name: playwright-report-${{ matrix.browser }}
+          path: |
+            explorer/playwright-report
+            explorer/test-results
+          if-no-files-found: ignore
+          retention-days: 7
+
+  report:
+    name: report failures
+    if: always() && needs.browser.result == 'failure'
+    needs: browser
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      contents: read
+      issues: write
+    steps:
+      - name: Open or update the browser-smoke issue
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: |
+          set -euo pipefail
+          NUMBER="$(gh issue list --repo "$REPO" --label t3:browser --state open --json number --jq '.[0].number // empty')"
+          BODY="$(printf 'The nightly Explorer browser smoke failed on Firefox or WebKit.\n\nRun: %s\n' "$RUN_URL")"
+          if [ -n "$NUMBER" ]; then
+            gh issue comment "$NUMBER" --repo "$REPO" --body "$BODY"
+          else
+            gh label create t3:browser --repo "$REPO" --color D93F0B --description "The nightly Explorer browser smoke failed" --force
+            gh issue create --repo "$REPO" --title "Nightly Explorer browser smoke failed" --label t3:browser --body "$BODY"
+          fi
