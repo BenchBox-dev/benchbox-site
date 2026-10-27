@@ -53,24 +53,37 @@ jobs:
         if: vars.SITE_ORIGIN != ''
         env:
           SITE_ORIGIN: ${{ vars.SITE_ORIGIN }}
+          GITHUB_TOKEN: ${{ github.token }}
         run: |
           set -uo pipefail
+          set +e
           curl -fsS "$SITE_ORIGIN/sitemap.xml" | grep -o '<loc>[^<]*</loc>' | sed -e 's/<[^>]*>//g' -e 's#^https\{0,1\}://[^/]*##' | grep '^/docs/' | sed "s#^#$SITE_ORIGIN#" > published-docs.txt
-          mapfile -t pages < published-docs.txt
-          if [ "${#pages[@]}" -eq 0 ]; then
+          if [ ! -s published-docs.txt ]; then
             echo "The sitemap lists no documentation pages." > published-report.md
             echo "failed=true" >> "$GITHUB_OUTPUT"
             exit 0
           fi
           origin_pattern="^$(printf '%s' "$SITE_ORIGIN" | sed 's/\./\\./g')"
-          lychee --config .lychee.toml --no-progress --max-concurrency 4 --include-fragments --include "$origin_pattern" --scheme https --format json --output published-links.json "${pages[@]}"
-          status=$?
-          if [ "$status" -ne 0 ] && [ "$status" -ne 2 ]; then
-            printf 'lychee exited with status %s on the published documentation.\n' "$status" > published-report.md
-            echo "failed=true" >> "$GITHUB_OUTPUT"
-            exit 0
-          fi
-          if node scripts/check-published-links.mjs published-links.json inventory/known-broken-links.json > published-report.md; then
+          rm -rf published-batches && mkdir published-batches
+          split -l 100 -d -a 3 published-docs.txt published-batches/pages-
+          for batch in published-batches/pages-*; do
+            mapfile -t pages < "$batch"
+            status=1
+            for attempt in 1 2 3; do
+              lychee --config .lychee.toml --no-progress --max-concurrency 4 --include-fragments --include "$origin_pattern" --scheme https --cache --format json --output "$batch.json" "${pages[@]}"
+              status=$?
+              if [ "$status" -eq 0 ] || [ "$status" -eq 2 ]; then
+                break
+              fi
+              sleep 15
+            done
+            if [ "$status" -ne 0 ] && [ "$status" -ne 2 ]; then
+              printf 'lychee exited with status %s after 3 attempts on %s.\n' "$status" "$batch" > published-report.md
+              echo "failed=true" >> "$GITHUB_OUTPUT"
+              exit 0
+            fi
+          done
+          if node scripts/check-published-links.mjs inventory/known-broken-links.json published-batches/*.json > published-report.md; then
             echo "failed=false" >> "$GITHUB_OUTPUT"
           else
             echo "failed=true" >> "$GITHUB_OUTPUT"

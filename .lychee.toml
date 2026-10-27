@@ -33,6 +33,11 @@ exclude = [
   # Historical links under the former owner redirect and then fail for
   # unauthenticated CI. Current BenchBox-dev links stay checked.
   '^https://github\.com/joeharris76/BenchBox/(blob|issues)',
+  # Every published page carries one generated edit link, so crawling them
+  # sends about 1,700 distinct requests to GitHub and trips its rate limit.
+  # The edit URL is derived from each page's source path in
+  # website/src/lib/edit-url.ts, which has unit tests.
+  '^https://github\.com/BenchBox-dev/benchbox-site/edit/main/docs/',
   # Results Explorer deep links are served through the root fallback with
   # HTTP 404; only the published two-result comparison receipts are exempt.
   '^https://benchbox\.dev/results/compare\?ids=[0-9a-f]{8},[0-9a-f]{8}$',
