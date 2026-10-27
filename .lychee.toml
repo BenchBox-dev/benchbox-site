@@ -1,7 +1,8 @@
 # External URLs that are known to be flaky, rate-limited or login-gated.
 # Keep this list focused and prune entries when upstream stability improves.
 exclude = [
-  # The site's own origins are checked by the deploy gates.
+  # The site's own origins are checked by the deploy gates and by the nightly
+  # published-documentation step, whose include pattern supersedes this entry.
   '^https://(next\.)?benchbox\.dev',
   # TPC pages are frequently unavailable to automated checks.
   '^https?://www\.tpc\.org/',
