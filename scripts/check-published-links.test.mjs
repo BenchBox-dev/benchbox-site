@@ -1,6 +1,6 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { evaluate, targetOf, disallowedFailures } from "./check-published-links.mjs";
+import { evaluate, targetOf, disallowedFailures, mergeReports } from "./check-published-links.mjs";
 
 const ALLOWANCE = [["/docs/a.html", "/docs/b.html#gone", "missing fragment"]];
 
@@ -40,4 +40,15 @@ test("a run that checked nothing is a failure", () => {
   const result = evaluate({ total: 0, unique: 0, successful: 0, errors: 0, timeouts: 0 }, ALLOWANCE);
   assert.equal(result.ok, false);
   assert.deepEqual(result.problems, ["lychee checked no links"]);
+});
+
+test("batch reports merge into one verdict", () => {
+  const first = report([["https://benchbox.dev/docs/a.html", "https://benchbox.dev/docs/b.html#gone"]]);
+  const second = report([["https://benchbox.dev/docs/c.html", "https://benchbox.dev/docs/missing.html"]]);
+  const merged = mergeReports([first, second]);
+  assert.equal(merged.total, 20);
+  assert.equal(merged.errors, 2);
+  const result = evaluate(merged, ALLOWANCE);
+  assert.equal(result.ok, false);
+  assert.deepEqual(result.failures.map((failure) => failure.target), ["/docs/missing.html"]);
 });

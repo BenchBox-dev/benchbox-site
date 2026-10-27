@@ -37,7 +37,7 @@ export function renderReport(report, failures) {
   const lines = [
     "Published documentation link check",
     "",
-    `Checked ${report.total} links (${report.unique} unique): ${report.successful} ok, ${report.errors} failed, ${report.timeouts} timed out.`,
+    `Checked ${report.total} links: ${report.successful} ok, ${report.errors} failed, ${report.timeouts} timed out.`,
     "",
   ];
   if (failures.length === 0) {
@@ -49,6 +49,17 @@ export function renderReport(report, failures) {
   return `${lines.join("\n")}\n`;
 }
 
+export function mergeReports(reports) {
+  const merged = { total: 0, successful: 0, errors: 0, timeouts: 0, error_map: {}, timeout_map: {} };
+  for (const report of reports) {
+    for (const key of ["total", "successful", "errors", "timeouts"]) merged[key] += report[key] ?? 0;
+    for (const key of ["error_map", "timeout_map"]) {
+      for (const [source, entries] of Object.entries(report[key] ?? {})) (merged[key][source] ??= []).push(...entries);
+    }
+  }
+  return merged;
+}
+
 export function evaluate(report, allowance) {
   const failures = disallowedFailures(report, allowance);
   const checked = report.successful + report.errors + report.timeouts;
@@ -57,12 +68,13 @@ export function evaluate(report, allowance) {
 }
 
 if (import.meta.url === pathToFileURL(process.argv[1] ?? "").href) {
-  const [reportPath, allowancePath] = process.argv.slice(2);
-  if (!reportPath || !allowancePath) {
-    console.error("usage: check-published-links.mjs <lychee-report.json> <known-broken-links.json>");
+  const [allowancePath, ...reportPaths] = process.argv.slice(2);
+  if (!allowancePath || reportPaths.length === 0) {
+    console.error("usage: check-published-links.mjs <known-broken-links.json> <lychee-report.json>...");
     process.exit(2);
   }
-  const result = evaluate(JSON.parse(readFileSync(reportPath, "utf8")), JSON.parse(readFileSync(allowancePath, "utf8")));
+  const reports = reportPaths.map((path) => JSON.parse(readFileSync(path, "utf8")));
+  const result = evaluate(mergeReports(reports), JSON.parse(readFileSync(allowancePath, "utf8")));
   process.stdout.write(result.text);
   for (const problem of result.problems) console.log(problem);
   process.exit(result.ok ? 0 : 1);
