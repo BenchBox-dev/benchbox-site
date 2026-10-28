@@ -19,3 +19,28 @@ which bytes a historical deployment served.
 Run `npm run test:deploy` to check mismatch evidence, receipt serialization, and
 rollback behavior. `npm run deploy -- probe` writes `deploy-work/probe.json`;
 `npm run deploy -- receipt` includes that evidence in the deployment receipt.
+
+## Holding a rollback
+
+A rollback restores an older generation but does not stop later runs. A
+`core-bundle` dispatch or a push to `main` that resolves, builds and passes
+every gate deploys a newer generation over it. The hold is to unset the
+repository variable `SITE_DEPLOY_TARGET`. Only the owner changes repository
+variables.
+
+1. Dispatch the rollback while the variable still matches the target of the
+   receipt: `gh workflow run deploy.yml -R BenchBox-dev/benchbox-site --ref
+   main -f mode=rollback -f receipt_run_id=<receipt run>`. The run looks the
+   receipt up among those recorded for the current `SITE_DEPLOY_TARGET`, so a
+   receipt recorded for another target is not found, and only the `deploy`
+   job, which needs `rehearsal` or `production`, publishes it.
+2. Wait for the rollback run to finish and its probes to pass.
+3. Unset `SITE_DEPLOY_TARGET`. Later runs, including `core-bundle`
+   dispatches, still resolve, build and gate, then stop before the `deploy`
+   job and write a summary saying nothing was deployed.
+4. To resume, set the variable back to the recorded target and dispatch
+   `mode=deploy` or wait for the next bundle. A candidate bundle must not be
+   older than or diverged from the deployed core commit.
+
+Unsetting the variable before step 2 completes leaves the rollback run
+without a `deploy` job, so nothing is restored.

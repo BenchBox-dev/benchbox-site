@@ -119,6 +119,11 @@ versioned core bundle; it reads nothing else from core.
   its digest on the GitHub Pages deployment. `npm run deploy -- deployed`
   prints the current one. If the probes fail after a deploy, the run
   dispatches at most one rollback to the last known good receipt.
+- A rollback does not stay in place by itself: the next deploy run that
+  passes the gates replaces it. To hold one, the owner rolls back while
+  `SITE_DEPLOY_TARGET` still matches the receipt's target, waits for that run
+  to finish, then clears the variable; the steps and resume are in
+  `deploy/README.md` under "Holding a rollback".
 - The post-deploy probe compares served bytes with the artifact and repeats
   every ten seconds for at most eleven minutes of monotonic elapsed time,
   which covers the ten-minute `max-age` of the served pages while Pages and
