@@ -561,8 +561,7 @@
         "allowlist": {"$ref": "#/$defs/sortedStrings"},
         "exclusions": {"$ref": "#/$defs/sortedStrings"},
         "excluded_roots": {"$ref": "#/$defs/sortedStrings"},
-        "gated_pages": {"$ref": "#/$defs/sortedStrings"},
-        "linkcheck_ignore_patterns": {"$ref": "#/$defs/strings"}
+        "gated_pages": {"$ref": "#/$defs/sortedStrings"}
       }
     },
     "ownership": {

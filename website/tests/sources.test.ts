@@ -29,7 +29,6 @@ describe("core-only classification", () => {
     "tpc-licensing-analysis.md",
     "publish-allowlist.txt",
     "publish-exclusions.txt",
-    "linkcheck_ignore.txt",
     "operations/local-platform-provisioning.tsv",
   ])("rejects %s", (relative) => {
     expect(coreOnlyReason(relative)).not.toBeNull();

@@ -11,7 +11,6 @@ const CORE_ONLY_FILES: ReadonlySet<string> = new Set([
   "tpc-licensing-analysis.md",
   "publish-allowlist.txt",
   "publish-exclusions.txt",
-  "linkcheck_ignore.txt",
   "operations/local-platform-provisioning.tsv",
 ]);
 

@@ -109,7 +109,6 @@ export function buildContracts(): Contracts {
       exclusions: [...ROOTS.map((root) => `${root}/`), "development/closed.md"].sort(),
       excluded_roots: ["_project", "agent", "internal"],
       gated_pages: ["development/closed.md", "development/open.md", "development/result-integrity-validation.md"],
-      linkcheck_ignore_patterns: [],
     },
     ownership: { counts: { "site-owned": 2 }, site_owned: ["docs/a.md", "docs/b.md"], core_generated: [] },
   } as unknown as Contracts;
