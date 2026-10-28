@@ -1,0 +1,403 @@
+{
+  "schema_version": 1,
+  "queries": {
+    "reference_dialect": "datafusion",
+    "tpc_notice": "> TPC test notice.",
+    "group_threshold": 30,
+    "bucket_size": 25,
+    "tpcds_parity_notes_url": "https://example.invalid/parity",
+    "tpcds_subscale_notes_url": "https://example.invalid/subscale",
+    "benchmarks": [
+      {
+        "id": "flat",
+        "display_name": "Flat Demo",
+        "overview_slug": "flat-demo",
+        "query_count": 5,
+        "tpc_derived": true,
+        "seed_driven": true,
+        "supports_dialect_translation": true,
+        "default_scale": 0.01,
+        "recipe": {
+          "import_line": "from benchbox import FlatDemo",
+          "class_name": "FlatDemo"
+        },
+        "groups": null,
+        "queries": [
+          {
+            "id": "1",
+            "slug": "q1",
+            "label": "Q1",
+            "display_name": "First Query",
+            "heading": "Flat Demo Q1 — First Query",
+            "description": "Counts things.",
+            "groups": [],
+            "native_key": "1",
+            "native_key_repr": "'1'",
+            "source_path": "benchbox/core/flat/queries.py",
+            "seed_driven": true,
+            "answer_set_note": null,
+            "subscale_note": null,
+            "sql": {
+              "dialect": "datafusion",
+              "is_template": false,
+              "sql": "SELECT 1",
+              "pretty_sql": "SELECT 1"
+            },
+            "sql_native": null,
+            "reference_dialect_label": "DataFusion",
+            "dataframe": {
+              "family": "expression",
+              "source": "def q1_expression_impl():\n    return 1"
+            },
+            "dataframe_renderings": [
+              {
+                "family": "expression",
+                "source": "def q1_expression_impl():\n    return 1"
+              }
+            ]
+          },
+          {
+            "id": "2",
+            "slug": "q2",
+            "label": "Q2",
+            "display_name": null,
+            "heading": "Flat Demo Q2",
+            "description": null,
+            "groups": [],
+            "native_key": "2",
+            "native_key_repr": "'2'",
+            "source_path": null,
+            "seed_driven": true,
+            "answer_set_note": null,
+            "subscale_note": null,
+            "sql": {
+              "dialect": "default",
+              "is_template": true,
+              "sql": "SELECT @x",
+              "pretty_sql": "SELECT @x\n```\nFROM t"
+            },
+            "sql_native": null,
+            "reference_dialect_label": null,
+            "dataframe": null,
+            "dataframe_renderings": []
+          },
+          {
+            "id": "3a",
+            "slug": "q3a",
+            "label": "3a",
+            "display_name": null,
+            "heading": "Flat Demo 3a",
+            "description": null,
+            "groups": [],
+            "native_key": "3a",
+            "native_key_repr": "'3a'",
+            "source_path": null,
+            "seed_driven": true,
+            "answer_set_note": null,
+            "subscale_note": null,
+            "sql": {
+              "dialect": "datafusion",
+              "is_template": false,
+              "sql": "SELECT 3",
+              "pretty_sql": "SELECT 3"
+            },
+            "sql_native": null,
+            "reference_dialect_label": null,
+            "dataframe": {
+              "family": "pandas",
+              "source": "def q3a_pandas_impl(df):\n    return df.head(1)"
+            },
+            "dataframe_renderings": [
+              {
+                "family": "pandas",
+                "source": "def q3a_pandas_impl(df):\n    return df.head(1)"
+              },
+              {
+                "family": "expression",
+                "source": "def q3a_expression_impl():\n    return 3"
+              }
+            ]
+          },
+          {
+            "id": "x'y",
+            "slug": "xy",
+            "label": "x'y",
+            "display_name": null,
+            "heading": "Flat Demo x'y",
+            "description": null,
+            "groups": [],
+            "native_key": "x'y",
+            "native_key_repr": "\"x'y\"",
+            "source_path": null,
+            "seed_driven": true,
+            "answer_set_note": null,
+            "subscale_note": null,
+            "sql": null,
+            "sql_native": null,
+            "reference_dialect_label": null,
+            "dataframe": {
+              "family": "expression",
+              "source": "def xy():\n    return 1"
+            },
+            "dataframe_renderings": []
+          },
+          {
+            "id": "a'b\"c\\d",
+            "slug": "abcd",
+            "label": "a'b\"c\\d",
+            "display_name": null,
+            "heading": "Flat Demo a'b\"c\\d",
+            "description": null,
+            "groups": [],
+            "native_key": "a'b\"c\\d",
+            "native_key_repr": "'a\\'b\"c\\\\d'",
+            "source_path": null,
+            "seed_driven": true,
+            "answer_set_note": null,
+            "subscale_note": null,
+            "sql": null,
+            "sql_native": null,
+            "reference_dialect_label": null,
+            "dataframe": {
+              "family": "polars-lazy",
+              "source": "def abcd():\n    return 2"
+            },
+            "dataframe_renderings": []
+          }
+        ]
+      },
+      {
+        "id": "grouped",
+        "display_name": "Grouped Demo",
+        "overview_slug": "grouped-demo",
+        "query_count": 3,
+        "tpc_derived": false,
+        "seed_driven": false,
+        "supports_dialect_translation": false,
+        "default_scale": 1,
+        "recipe": {
+          "import_line": "from benchbox.core.grouped.benchmark import GDemo",
+          "class_name": "GDemo"
+        },
+        "groups": [
+          {
+            "name": "beta",
+            "slug": "beta",
+            "query_ids": [
+              "b2",
+              "b1"
+            ]
+          },
+          {
+            "name": "alpha set",
+            "slug": "alpha-set",
+            "query_ids": [
+              "a1"
+            ]
+          }
+        ],
+        "queries": [
+          {
+            "id": "b1",
+            "slug": "b1",
+            "label": "b1",
+            "display_name": "Bee One",
+            "heading": "Grouped Demo b1 — Bee One",
+            "description": null,
+            "groups": [
+              "beta"
+            ],
+            "native_key": 1,
+            "native_key_repr": "1",
+            "source_path": null,
+            "seed_driven": false,
+            "answer_set_note": null,
+            "subscale_note": null,
+            "sql": {
+              "dialect": "duckdb",
+              "is_template": false,
+              "sql": "SELECT b1",
+              "pretty_sql": "SELECT b1"
+            },
+            "sql_native": null,
+            "reference_dialect_label": null,
+            "dataframe": null,
+            "dataframe_renderings": []
+          },
+          {
+            "id": "b2",
+            "slug": "b2",
+            "label": "b2",
+            "display_name": "Bee | Two",
+            "heading": "Grouped Demo b2 — Bee | Two",
+            "description": null,
+            "groups": [
+              "beta"
+            ],
+            "native_key": 2,
+            "native_key_repr": "2",
+            "source_path": null,
+            "seed_driven": false,
+            "answer_set_note": null,
+            "subscale_note": null,
+            "sql": null,
+            "sql_native": null,
+            "reference_dialect_label": null,
+            "dataframe": null,
+            "dataframe_renderings": []
+          },
+          {
+            "id": "a1",
+            "slug": "a1",
+            "label": "a1",
+            "display_name": "Ay One",
+            "heading": "Grouped Demo a1 — Ay One",
+            "description": "Ay one description.",
+            "groups": [
+              "alpha set"
+            ],
+            "native_key": 3,
+            "native_key_repr": "3",
+            "source_path": null,
+            "seed_driven": false,
+            "answer_set_note": "> **Answer set note:** results differ from the reference.",
+            "subscale_note": "**Subscale note:** this template is overridden below SF1.",
+            "sql": {
+              "dialect": "duckdb",
+              "is_template": false,
+              "sql": "SELECT a1",
+              "pretty_sql": "SELECT a1"
+            },
+            "sql_native": null,
+            "reference_dialect_label": null,
+            "dataframe": null,
+            "dataframe_renderings": []
+          }
+        ]
+      }
+    ]
+  },
+  "compat": {
+    "phase_order": [
+      "query_compile",
+      "execution_filter"
+    ],
+    "will_not_run_levels": [
+      "BLOCKED",
+      "SKIPPED_QUERY"
+    ],
+    "runs_with_caveats_levels": [
+      "INFORMATIONAL",
+      "SKIPPED_DDL_FRAGMENT"
+    ],
+    "rules": [
+      {
+        "platform": "b_platform",
+        "phase": "query_compile",
+        "benchmark": null,
+        "query_id": null,
+        "scope": "platform-wide",
+        "action": "rewrite_query",
+        "support_level": "REWRITTEN",
+        "failure_mode": "SYNTAX_ERROR",
+        "rule_id": "query_compile.b_platform.all.rewrite",
+        "reason": "Rewrites all queries."
+      },
+      {
+        "platform": "a_platform",
+        "phase": "execution_filter",
+        "benchmark": "tpch",
+        "query_id": "1",
+        "scope": "benchmark=tpch, query=1",
+        "action": "skip_query",
+        "support_level": "SKIPPED_QUERY",
+        "failure_mode": "NOT_SUPPORTED",
+        "rule_id": "execution_filter.a_platform.tpch.skip",
+        "reason": "Skips | this\nquery."
+      },
+      {
+        "platform": "a_platform",
+        "phase": "query_compile",
+        "benchmark": null,
+        "query_id": null,
+        "scope": "platform-wide",
+        "action": "flag",
+        "support_level": "INFORMATIONAL",
+        "failure_mode": "NONE",
+        "rule_id": "query_compile.a_platform.all.note",
+        "reason": "Notes a caveat."
+      }
+    ]
+  },
+  "tuning": {
+    "aliases": {
+      "zeta": "alpha",
+      "mid": "alpha"
+    },
+    "platforms": [
+      {
+        "platform": "beta",
+        "shipped_templates": [],
+        "applied": [],
+        "not_applied": [
+          "partitioning"
+        ],
+        "session_config": false,
+        "catalog_introspector": null,
+        "can_reach_applied_verified": false
+      },
+      {
+        "platform": "alpha",
+        "shipped_templates": [
+          "tpch"
+        ],
+        "applied": [
+          {
+            "type": "clustering",
+            "requires_sorted_ingestion": false
+          },
+          {
+            "type": "sorting",
+            "requires_sorted_ingestion": true
+          }
+        ],
+        "not_applied": [
+          "partitioning",
+          "foreign_keys"
+        ],
+        "session_config": true,
+        "catalog_introspector": true,
+        "can_reach_applied_verified": true
+      },
+      {
+        "platform": "gamma",
+        "shipped_templates": [
+          "tpch",
+          "tpcds"
+        ],
+        "applied": [
+          {
+            "type": "partitioning",
+            "requires_sorted_ingestion": false
+          }
+        ],
+        "not_applied": [],
+        "session_config": false,
+        "catalog_introspector": false,
+        "can_reach_applied_verified": false
+      },
+      {
+        "platform": "delta",
+        "shipped_templates": [],
+        "applied": [],
+        "not_applied": [
+          "clustering",
+          "sorting"
+        ],
+        "session_config": true,
+        "catalog_introspector": true,
+        "can_reach_applied_verified": false
+      }
+    ]
+  }
+}
