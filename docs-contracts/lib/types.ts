@@ -63,7 +63,7 @@ export type Contracts = {
     platforms: Record<string, { applied_types: string[]; has_catalog_introspector: boolean; can_reach_applied_verified: boolean }>;
   };
   cli: {
-    commands: { path: string; is_group: boolean; options: { names: string[]; is_flag: boolean }[] }[];
+    commands: { path: string; is_group: boolean; options: { names: string[]; is_flag: boolean; choices: string[] | null }[] }[];
     help_catalog: { command_examples: Record<string, Record<string, string[]>> };
   };
   mcp: {
