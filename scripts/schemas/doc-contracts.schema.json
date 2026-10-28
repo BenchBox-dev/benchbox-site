@@ -554,8 +554,7 @@
         "allowlist",
         "exclusions",
         "excluded_roots",
-        "gated_pages",
-        "linkcheck_ignore_patterns"
+        "gated_pages"
       ],
       "properties": {
         "gated_roots": {"$ref": "#/$defs/strings"},
