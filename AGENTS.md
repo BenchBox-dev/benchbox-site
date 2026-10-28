@@ -52,6 +52,14 @@ versioned core bundle; it reads nothing else from core.
   `doc-contracts.json` always fails. `npm run test:docs-contracts` runs the
   seeded drift tests; `DOC_CONTRACTS_SCHEMA4_BUNDLE=<bundle dir>` adds a run
   against a real bundle.
+- `inventory/core-linked-paths.json` lists every core path that a relative
+  link in `docs/` or `blog/` points at, with its kind and the
+  `file:line` of each link. It is generated through the converter's own link
+  resolution: `npm run inventory:core-links -w website` rewrites it and
+  `-- --check` fails when it is stale; `ci` runs the check. Core reads the
+  file from `main` to refuse a pull request that deletes or moves a listed
+  path. To rename or delete such a path: drop the link or pin it to a core SHA
+  here and merge, merge the core change, then relink here.
 - Never read core files by any other route. A guard test fails the build on
   any path outside the repository other than `$SITE_INPUTS`.
 - `npm run docs:parity -w website` runs the TypeScript generators on the

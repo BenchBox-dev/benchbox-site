@@ -1,0 +1,281 @@
+{
+  "paths": [
+    {
+      "path": "_benchbox_pytest_xdist_safety.py",
+      "kind": "file",
+      "sources": [
+        "docs/development/pytest-xdist-safety.md:61"
+      ]
+    },
+    {
+      "path": "benchbox/platforms/dataframe/unified_frame.py",
+      "kind": "file",
+      "sources": [
+        "docs/development/adr/adr-sqlglot-use-and-non-use.md:205"
+      ]
+    },
+    {
+      "path": "benchbox/platforms/datafusion_tpch_rewrites.py",
+      "kind": "file",
+      "sources": [
+        "docs/development/adr/adr-sqlglot-use-and-non-use.md:141"
+      ]
+    },
+    {
+      "path": "benchbox/sql_compat",
+      "kind": "directory",
+      "sources": [
+        "docs/development/adr/adr-sql-compat-phase-aware-pipeline.md:11",
+        "docs/development/adr/adr-sqlglot-use-and-non-use.md:216"
+      ]
+    },
+    {
+      "path": "benchbox/sql_compat/rules/ddl_optimize",
+      "kind": "directory",
+      "sources": [
+        "docs/development/adr/adr-sqlglot-use-and-non-use.md:167"
+      ]
+    },
+    {
+      "path": "benchbox/sql_compat/rules/ddl_optimize/fabric_dw_ddl_rewrites.py",
+      "kind": "file",
+      "sources": [
+        "docs/development/adr/adr-sqlglot-use-and-non-use.md:173"
+      ]
+    },
+    {
+      "path": "benchbox/sql_compat/rules/query_adapter/datafusion_query_rewrites.py",
+      "kind": "file",
+      "sources": [
+        "docs/development/adr/adr-sqlglot-use-and-non-use.md:143"
+      ]
+    },
+    {
+      "path": "benchbox/sql_compat/rules/query_source",
+      "kind": "directory",
+      "sources": [
+        "docs/development/adr/adr-sqlglot-use-and-non-use.md:194"
+      ]
+    },
+    {
+      "path": "examples/INDEX.md",
+      "kind": "file",
+      "sources": [
+        "docs/guides/compression.md:392",
+        "docs/usage/examples-directory.md:264",
+        "docs/usage/examples/index.md:66"
+      ]
+    },
+    {
+      "path": "examples/PATTERNS.md",
+      "kind": "file",
+      "sources": [
+        "docs/usage/examples-directory.md:18",
+        "docs/usage/examples-directory.md:265",
+        "docs/usage/examples/index.md:67"
+      ]
+    },
+    {
+      "path": "examples/config",
+      "kind": "directory",
+      "sources": [
+        "docs/usage/examples-directory.md:17"
+      ]
+    },
+    {
+      "path": "examples/features",
+      "kind": "directory",
+      "sources": [
+        "docs/usage/examples-directory.md:14",
+        "docs/usage/examples.md:1001"
+      ]
+    },
+    {
+      "path": "examples/features/README.md",
+      "kind": "file",
+      "sources": [
+        "docs/usage/examples-directory.md:124",
+        "docs/usage/examples.md:22",
+        "docs/usage/examples/index.md:22"
+      ]
+    },
+    {
+      "path": "examples/features/multi_platform.py",
+      "kind": "file",
+      "sources": [
+        "docs/usage/examples.md:1522"
+      ]
+    },
+    {
+      "path": "examples/features/result_analysis.py",
+      "kind": "file",
+      "sources": [
+        "docs/usage/examples.md:1143"
+      ]
+    },
+    {
+      "path": "examples/features/test_types.py",
+      "kind": "file",
+      "sources": [
+        "docs/guides/tpc/maintenance-phase-guide.md:538"
+      ]
+    },
+    {
+      "path": "examples/getting_started",
+      "kind": "directory",
+      "sources": [
+        "docs/usage/examples-directory.md:12",
+        "docs/usage/examples-directory.md:13",
+        "docs/usage/examples.md:1001"
+      ]
+    },
+    {
+      "path": "examples/getting_started/README.md",
+      "kind": "file",
+      "sources": [
+        "docs/usage/examples-directory.md:123",
+        "docs/usage/examples.md:21",
+        "docs/usage/examples/index.md:14"
+      ]
+    },
+    {
+      "path": "examples/getting_started/cloud",
+      "kind": "directory",
+      "sources": [
+        "docs/usage/examples.md:904"
+      ]
+    },
+    {
+      "path": "examples/getting_started/local/duckdb_nyctaxi.py",
+      "kind": "file",
+      "sources": [
+        "docs/usage/examples.md:840"
+      ]
+    },
+    {
+      "path": "examples/getting_started/local/duckdb_tpch_power.py",
+      "kind": "file",
+      "sources": [
+        "docs/usage/examples.md:836"
+      ]
+    },
+    {
+      "path": "examples/getting_started/local/duckdb_tsbs_devops.py",
+      "kind": "file",
+      "sources": [
+        "docs/usage/examples.md:841"
+      ]
+    },
+    {
+      "path": "examples/notebooks",
+      "kind": "directory",
+      "sources": [
+        "docs/usage/examples-directory.md:16"
+      ]
+    },
+    {
+      "path": "examples/notebooks/README.md",
+      "kind": "file",
+      "sources": [
+        "docs/usage/examples-directory.md:126",
+        "docs/usage/examples.md:24",
+        "docs/usage/examples/index.md:38"
+      ]
+    },
+    {
+      "path": "examples/programmatic/README.md",
+      "kind": "file",
+      "sources": [
+        "docs/usage/examples-directory.md:128",
+        "docs/usage/examples.md:26",
+        "docs/usage/examples/index.md:54"
+      ]
+    },
+    {
+      "path": "examples/tunings",
+      "kind": "directory",
+      "sources": [
+        "docs/usage/examples.md:904"
+      ]
+    },
+    {
+      "path": "examples/tunings/README.md",
+      "kind": "file",
+      "sources": [
+        "docs/usage/examples-directory.md:127",
+        "docs/usage/examples.md:25",
+        "docs/usage/examples/index.md:46",
+        "docs/usage/examples/index.md:98"
+      ]
+    },
+    {
+      "path": "examples/unified_runner.py",
+      "kind": "file",
+      "sources": [
+        "docs/usage/examples-directory.md:266"
+      ]
+    },
+    {
+      "path": "examples/use_cases",
+      "kind": "directory",
+      "sources": [
+        "docs/usage/examples-directory.md:15"
+      ]
+    },
+    {
+      "path": "examples/use_cases/README.md",
+      "kind": "file",
+      "sources": [
+        "docs/usage/examples-directory.md:125",
+        "docs/usage/examples.md:23",
+        "docs/usage/examples/index.md:30"
+      ]
+    },
+    {
+      "path": "examples/use_cases/ci_regression_test.py",
+      "kind": "file",
+      "sources": [
+        "docs/usage/examples.md:1326",
+        "docs/usage/examples.md:1711"
+      ]
+    },
+    {
+      "path": "examples/use_cases/platform_evaluation.py",
+      "kind": "file",
+      "sources": [
+        "docs/usage/examples.md:1522"
+      ]
+    },
+    {
+      "path": "pytest.ini",
+      "kind": "file",
+      "sources": [
+        "docs/development/pytest-xdist-safety.md:62",
+        "docs/development/pytest-xdist-safety.md:141"
+      ]
+    },
+    {
+      "path": "scripts/compat_lint.py",
+      "kind": "file",
+      "sources": [
+        "docs/development/adr/adr-sqlglot-use-and-non-use.md:217"
+      ]
+    },
+    {
+      "path": "tests/conftest.py",
+      "kind": "file",
+      "sources": [
+        "docs/development/pytest-xdist-safety.md:81",
+        "docs/development/pytest-xdist-safety.md:94",
+        "docs/development/pytest-xdist-safety.md:144"
+      ]
+    },
+    {
+      "path": "tests/unit/test_xdist_safety.py",
+      "kind": "file",
+      "sources": [
+        "docs/development/pytest-xdist-safety.md:118"
+      ]
+    }
+  ]
+}
