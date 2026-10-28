@@ -27,7 +27,7 @@ Platform registry: **53** metadata entries; **49** SQL-capable; **18** DataFrame
 | timeseries | 3 | Time-series engines with SQL/query support |
 
 ```{note}
-**CLI Naming Convention**: DataFrame platforms use the `-df` suffix (e.g., `polars-df`, `pandas-df`) to distinguish them from SQL mode platforms. Some platforms like DataFusion support both modes - see [Hybrid Platforms](#hybrid-platforms-sql--dataframe) for details.
+**CLI Naming Convention**: DataFrame platforms use the `-df` suffix (e.g., `polars-df`, `pandas-df`) to distinguish them from SQL mode platforms. Some platforms like DataFusion support both modes - see [Hybrid Platforms](#hybrid-platforms-sql-dataframe) for details.
 ```
 
 ---

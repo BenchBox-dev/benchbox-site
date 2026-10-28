@@ -32,7 +32,7 @@ benchbox run [OPTIONS]
     - `warmup` - Run warmup queries (optional, prepares caches)
     - `power` - Sequential query execution (Power Test)
     - `throughput` - Concurrent query execution (Throughput Test)
-    - `maintenance` - **Data modification operations (DATABASE RELOAD REQUIRED AFTER)** - See [TPC-H Maintenance](../../guides/tpc/tpc-h-official-guide.md#maintenance-test) or [TPC-DS Maintenance](../../guides/tpc/tpc-ds-official-guide.md#3-maintenance-test)
+    - `maintenance` - **Data modification operations (DATABASE RELOAD REQUIRED AFTER)** - See [TPC-H Maintenance](../../guides/tpc/tpc-h-official-guide.md#maintenance-test) or [TPC-DS Maintenance](../../guides/tpc/tpc-ds-official-guide.md#maintenance-test)
   - Use comma-separated list: `--phases generate,load,power`
   - **Warning:** Maintenance phase permanently modifies data; reload database before running power/throughput again
   - **Note:** the number of concurrent streams for the `throughput` phase is set

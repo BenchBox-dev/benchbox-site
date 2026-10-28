@@ -15,7 +15,7 @@ This guide helps diagnose and resolve common issues when running BenchBox benchm
 |----------------------|--------------|---------|
 | "connection refused" | Platform not running | [Connection Issues](#connection-issues) |
 | "authentication failed" | Invalid credentials | [Authentication](#authentication-failures) |
-| "catalog not found" | Presto/Trino config | [Catalog Errors](#catalog-not-found-prestotrino) |
+| "catalog not found" | Presto/Trino config | [Catalog Errors](#catalog-not-found-presto-or-trino) |
 | "permission denied" | Access rights | [Permission Errors](#permission-errors) |
 | "timeout" | Slow query/network | [Timeouts](#query-timeouts) |
 | "out of memory" | Scale too large | [Memory Issues](#memory-issues) |
@@ -236,7 +236,7 @@ Session expired
    gcloud auth application-default login
    ```
 
-## Catalog Not Found (Presto/Trino)
+## Catalog Not Found (Presto or Trino)
 
 **Symptoms:**
 

@@ -33,10 +33,12 @@ exclude = [
   # Historical links under the former owner redirect and then fail for
   # unauthenticated CI. Current BenchBox-dev links stay checked.
   '^https://github\.com/joeharris76/BenchBox/(blob|issues)',
-  # Every published page carries one generated edit link, so crawling them
-  # sends about 1,700 distinct requests to GitHub and trips its rate limit.
-  # The edit URL is derived from each page's source path in
-  # website/src/lib/edit-url.ts, which has unit tests.
+  # Authored docs carry 335 distinct generated edit links (one per file;
+  # generated pages carry none). An anonymous request to a GitHub edit URL
+  # answers 302 to the login page whether or not the file exists, so a crawl
+  # cannot detect a broken one. Targets are correct by construction:
+  # assembleAuthoredDocs copies docs/ as is and editUrlFor in
+  # website/src/lib/edit-url.ts skips generated and _tags pages.
   '^https://github\.com/BenchBox-dev/benchbox-site/edit/main/docs/',
   # Results Explorer deep links are served through the root fallback with
   # HTTP 404; only the published two-result comparison receipts are exempt.
