@@ -215,7 +215,7 @@ our compatibility policy.
 
 - [`benchbox/sql_compat/`](../../../benchbox/sql_compat/), rule engine
 - [`scripts/compat_lint.py`](../../../scripts/compat_lint.py), runs in permanent error mode
-- [`scripts/generate_compat_docs.py`](../../../scripts/generate_compat_docs.py), regenerates capability matrix and skip reference
+- The capability matrix and skip reference are rendered by this site's generators from the exported compatibility data; the former `scripts/generate_compat_docs.py` has been retired
 - Generated artifacts: [capability matrix](../../compat/capability-matrix.md), [skip reference](../../compat/skip-reference.md)
 
 ---
