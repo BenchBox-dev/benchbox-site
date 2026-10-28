@@ -1,7 +1,9 @@
 import { bashBlocks, section, shellWords } from "../lib/markdown.ts";
+import { optionResolver } from "./options.ts";
 import { page, type Context, type Contracts, type Violation } from "../lib/types.ts";
 
-const COMMAND_PAGES = ["usage/getting-started.md", "platforms/singlestore.md"];
+const COMMAND_PAGES = ["usage/getting-started.md", "platforms/singlestore.md", "usage/cli-quick-start.md"];
+const PLACEHOLDER_VALUE = /^[A-Z][A-Z0-9_]*$|\$/;
 
 type Command = Contracts["cli"]["commands"][number];
 
@@ -23,13 +25,26 @@ export function invocations(text: string): string[][] {
   return found;
 }
 
-export function resolveInvocation(commands: Map<string, Command>, argv: string[]): string | null {
+type PlatformCheck = (value: string) => boolean;
+
+function valueProblem(node: Command, option: Command["options"][number], value: string, knownPlatform: PlatformCheck | undefined): string | null {
+  if (PLACEHOLDER_VALUE.test(value)) return null;
+  if (option.choices !== null && option.choices.length > 0) {
+    return option.choices.includes(value) ? null : `${option.names[0]} value '${value}' is not one of ${option.choices.join(", ")} for ${node.path}`;
+  }
+  if (option.names.includes("--platform") && knownPlatform !== undefined && !knownPlatform(value)) return `--platform value '${value}' is not a known platform`;
+  return null;
+}
+
+export function resolveInvocation(commands: Map<string, Command>, argv: string[], knownPlatform?: PlatformCheck): string | null {
   let node = commands.get("benchbox");
   if (node === undefined) return "the command tree has no benchbox root";
-  let skip = false;
+  let pending: { node: Command; option: Command["options"][number] } | null = null;
   for (const token of argv) {
-    if (skip) {
-      skip = false;
+    if (pending !== null) {
+      const problem = valueProblem(pending.node, pending.option, token, knownPlatform);
+      pending = null;
+      if (problem !== null) return problem;
       continue;
     }
     if (token === "--") continue;
@@ -38,7 +53,12 @@ export function resolveInvocation(commands: Map<string, Command>, argv: string[]
       if (name === "--help") continue;
       const option = node.options.find((candidate) => candidate.names.includes(name));
       if (option === undefined) return `option ${name} is not an option of ${node.path}`;
-      if (!option.is_flag && !token.includes("=")) skip = true;
+      if (!option.is_flag) {
+        if (token.includes("=")) {
+          const problem = valueProblem(node, option, token.slice(token.indexOf("=") + 1), knownPlatform);
+          if (problem !== null) return problem;
+        } else pending = { node, option };
+      }
       continue;
     }
     const child = commands.get(`${node.path} ${token}`);
@@ -51,6 +71,8 @@ export function resolveInvocation(commands: Map<string, Command>, argv: string[]
 export function commandViolations(ctx: Context): Violation[] {
   const found: Violation[] = [];
   const commands = new Map(ctx.contracts.cli.commands.map((command) => [command.path, command]));
+  const { split } = optionResolver(ctx.contracts);
+  const knownPlatform: PlatformCheck = (value) => split(value)[0] in ctx.contracts.platforms.entries;
   for (const path of COMMAND_PAGES) {
     const entry = page(ctx, path);
     if (entry === undefined) {
@@ -60,7 +82,7 @@ export function commandViolations(ctx: Context): Violation[] {
     const examples = invocations(entry.text);
     if (path === COMMAND_PAGES[0] && examples.length === 0) found.push({ check: "quickstart-commands", page: path, invariant: "no benchbox command found in the quickstart fences" });
     for (const argv of examples) {
-      const problem = resolveInvocation(commands, argv);
+      const problem = resolveInvocation(commands, argv, knownPlatform);
       if (problem !== null) found.push({ check: "quickstart-commands", page: path, invariant: `benchbox ${argv.join(" ")}: ${problem}` });
     }
   }
