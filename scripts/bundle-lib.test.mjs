@@ -169,10 +169,12 @@ test("doc-contracts validate against their schema and fail closed on a changed c
   assert.ok(verifyBundle(missing).errors.length > 0);
 });
 
-test("the publication contract accepts a bundle without linkcheck_ignore_patterns and still requires its other fields", () => {
+test("the contracts accept a bundle without the retired link-check fields and still require their other fields", () => {
   const contracts = JSON.parse(readFileSync(path.join(fixtureBundle({ schema: 5 }), "doc-contracts.json"), "utf8"));
   const { linkcheck_ignore_patterns: _dropped, ...publication } = contracts.publication;
-  const without = rewriteMember(fixtureBundle({ schema: 5 }), "doc-contracts.json", JSON.stringify({ ...contracts, publication }));
+  const { linkcheck_policy: _policy, ...transitions } = contracts.ownership.transitions;
+  const ownership = { ...contracts.ownership, transitions };
+  const without = rewriteMember(fixtureBundle({ schema: 5 }), "doc-contracts.json", JSON.stringify({ ...contracts, publication, ownership }));
   assert.deepEqual(verifyBundle(without).errors, []);
   const { gated_pages: _gated, ...incomplete } = publication;
   const broken = rewriteMember(fixtureBundle({ schema: 5 }), "doc-contracts.json", JSON.stringify({ ...contracts, publication: incomplete }));

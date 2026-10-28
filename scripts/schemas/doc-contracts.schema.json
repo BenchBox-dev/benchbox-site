@@ -579,7 +579,6 @@
             "readme_landing",
             "sql_contract",
             "publication_controls",
-            "linkcheck_policy",
             "operations_inventory"
           ],
           "additionalProperties": {
