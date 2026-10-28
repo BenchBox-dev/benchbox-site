@@ -170,7 +170,7 @@ carries contract obligations from the map:
   same PR; IDs are deprecated, never silently removed.
 - A new `CREATE TABLE` rewrite path in an adapter must satisfy the SQL
   compatibility governance in `benchbox/sql_compat/` (`make
-  compat-docs-check`).
+  compat-inventory-check`).
 - Behavior changes to any mapped surface update the contract map (or state
   why it is unchanged) and land docs/tests in the same PR; removals go
   through `docs/reference/backward-compatibility.md`.
