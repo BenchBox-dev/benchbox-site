@@ -2,12 +2,8 @@
 
 This page lists, for each platform in the tuning capability registry, what a
 tuning file can change at execution and whether a tuned run can be verified
-against the live catalog. It is generated from
-`benchbox/core/tuning/capability_registry.py`, the packaged tuning templates,
-and each adapter's catalog introspector by
-`scripts/generate_tuning_support_matrix.py` (`make tuning-support-matrix`);
-a test fails when the page drifts from those sources, so do not edit it by
-hand.
+against the live catalog. It is generated from the exported tuning support
+data when the site is built, so do not edit it by hand.
 
 - **Shipped templates**: benchmarks with a packaged `*_tuned.yaml` template,
   used by `--tuning tuned`. Platforms without one use the generic fallback.
