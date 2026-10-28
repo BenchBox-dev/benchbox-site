@@ -141,6 +141,9 @@ versioned core bundle; it reads nothing else from core.
   with an empty temporary download directory; digest, provenance and deploy
   gates remain outside the retry boundary. Retry delays add at most 20 seconds.
 - A failed run opens or updates an issue.
+- `.github/workflows/nightly-browser.yml` runs the Explorer `@smoke` suite on
+  Firefox and WebKit daily and on dispatch. A failure opens or updates the one
+  open issue labelled `t3:browser`.
 - `npm run shadow:compare -- <core tree> website/dist
   inventory/shadow-allowlist.json` compares a build with core's build of
   the same bundle. Every allowed difference in that file carries a reason.

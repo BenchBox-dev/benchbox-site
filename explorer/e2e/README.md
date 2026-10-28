@@ -25,6 +25,15 @@ and then invoke Playwright, which starts the static server in
 `scripts/serve-browser-tests.mjs`. The server mounts `dist/` at `/results/`
 and routes `/results/data/` to `test-fixtures/.generated/data/`.
 
+## Nightly Firefox and WebKit run
+
+`.github/workflows/nightly-browser.yml` runs the `@smoke` tests on Firefox and
+WebKit every day and on `workflow_dispatch`. Each browser is its own matrix
+leg: it fetches the newest certified bundle, installs that browser and runs
+`npm run test:e2e:<browser> -w explorer`. Pull request CI runs Chromium only.
+A failed leg uploads `playwright-report-<browser>` and opens or updates the one
+open issue labelled `t3:browser`, adding a comment per failing run.
+
 ## Project layout
 
 - `smoke/` - shell-level sanity checks tagged `@smoke`; also run under
