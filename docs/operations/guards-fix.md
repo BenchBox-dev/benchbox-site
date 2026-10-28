@@ -18,7 +18,7 @@ make guards-fix
 | Dependency inventory | `make audit-raw-check` | `make audit-raw` (dependency-audit parser script) |
 | Benchmark correctness-oracle coverage map | `make oracle-coverage-map-check` | `make oracle-coverage-map` (oracle coverage-map generator script) |
 | Visualization parity fixtures | `make parity-check` | `make parity-fixtures` (`tests/parity/generate_visualization_fixtures.py`) |
-| sql_compat capability matrix / skip-reference docs | `make compat-docs-check` | `make compat-docs` (`scripts/generate_compat_docs.py`) |
+| Vendor-derived pricing tables | `make pricing-data-check` | `make pricing-data` (offline, from checked-in evidence) |
 | skill-sync tracked snapshot | `make skill-sync-check` | `make skill-sync` (fail-closed when the vendored wrapper is missing — see the Makefile comments) |
 
 **Not in this table: the UAT production-LOC ceiling gate.** It is a budget
@@ -42,7 +42,7 @@ the `content-revision` hash unchanged, is not drift and won't fail CI.
 `guards-fix` only regenerates artifacts. It never edits an allowlist,
 ceiling, or curation list — those stay a human-reviewed decision, and each
 guard still fails CI on drift afterward (regen is remediation, not
-suppression). Two guards in this class have no regen mode at all; their
+suppression). Three guards in this class have no regen mode at all; their
 failure output names the exact hand edit instead:
 
 - **Module-size guard** (`tests/system/test_module_size_thresholds.py`) —
@@ -51,12 +51,15 @@ failure output names the exact hand edit instead:
   count. Paste it in with a real justification; `ALLOWLIST_HEADROOM` is
   added on top automatically.
 - **DDL governance drift** (`benchbox/sql_compat/inventory.py
-  --check-ddl-drift`, run as part of `make compat-docs-check`) — an
+  --check-ddl-drift`, run by `make compat-inventory-check`) — an
   unregistered or uninspectable DDL-optimize transform is fixed by
   registering it under `benchbox/sql_compat/rules/ddl_optimize/`, adding a
   `_DDL_GOVERNANCE_TRANSFORMER_ALIASES` entry (if it's registered under a
   different function name), or an explicit `_DDL_DRIFT_EXEMPTIONS` entry
   with rationale.
+- **Release curation list** (`scripts/check_release_curation.py`) — a
+  path that is not yet classified is fixed by classifying it as main-only
+  or release-cut curated.
 
 ## When to run it
 
