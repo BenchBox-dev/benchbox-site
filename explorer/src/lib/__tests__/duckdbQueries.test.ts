@@ -349,10 +349,15 @@ describe("duckdbQueries - SQL targets and parameters", () => {
       };
     }
 
-    async function fetchDetail(resultId: string, wideRow: ResultDetailMetricsRow) {
+    async function fetchDetail(
+      resultId: string,
+      wideRow: ResultDetailMetricsRow,
+      translatorRows: Record<string, unknown>[] = [],
+    ) {
       mockedQueryRows.mockResolvedValueOnce([wideRow]);
       mockedQueryRows.mockResolvedValueOnce([]);
       mockedQueryRows.mockResolvedValueOnce([]);
+      mockedQueryRows.mockResolvedValueOnce(translatorRows);
       return getDetailResult(resultId);
     }
 
@@ -414,6 +419,35 @@ describe("duckdbQueries - SQL targets and parameters", () => {
       expect(detail?.statement_overhead_min_ms).toBe(1.25);
       expect(detail?.statement_overhead_median_ms).toBe(2.5);
       expect(detail?.link_status).toBe("measured");
+    });
+
+    it("carries the translator identity from a read-model-18 results row", async () => {
+      const detail = await fetchDetail("t18", makeWideRow({ result_id: "t18" }), [
+        {
+          result_id: "t18",
+          translator_version: "30.24.0.17",
+          translator_fork_sha: "b181afce8e9e9cd78b12ba78151d1cf7dbc9adf7",
+          translator_version_source: "attested",
+        },
+      ]);
+      expect(detail?.translator_version).toBe("30.24.0.17");
+      expect(detail?.translator_fork_sha).toBe("b181afce8e9e9cd78b12ba78151d1cf7dbc9adf7");
+      expect(detail?.translator_version_source).toBe("attested");
+      expect(mockedQueryRows.mock.calls.some(([sql]) => /FROM bench\.results WHERE result_id = \?/.test(String(sql)))).toBe(true);
+    });
+
+    it("leaves the translator identity empty for a read-model-17 results row without the columns", async () => {
+      const detail = await fetchDetail("t17", makeWideRow({ result_id: "t17" }), [{ result_id: "t17" }]);
+      expect(detail?.translator_version).toBeNull();
+      expect(detail?.translator_fork_sha).toBeNull();
+      expect(detail?.translator_version_source).toBeNull();
+    });
+
+    it("drops an unknown translator source instead of passing it to the receipt", async () => {
+      const detail = await fetchDetail("tx", makeWideRow({ result_id: "tx" }), [
+        { result_id: "tx", translator_version: "1.0", translator_version_source: "guessed" },
+      ]);
+      expect(detail?.translator_version_source).toBeNull();
     });
 
     it("a legacy row (no logical_profile recorded -> NULL) yields undefined, not []", async () => {

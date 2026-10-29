@@ -64,6 +64,35 @@ function rowFromSummary(label: string, value: string): ReceiptRow {
   return recordedRow(label, value);
 }
 
+function translatorRow(detail: DetailResult): ReceiptRow {
+  const label = "SQL translator";
+  const source = detail.translator_version_source;
+  if (source === "not_applicable") {
+    return recordedRow(label, <span title="This run did not translate SQL, so there is no translator to record.">Not applicable</span>);
+  }
+  const version = detail.translator_version;
+  if ((source !== "recorded" && source !== "attested") || !version) return missingRow(label);
+  const forkSha = detail.translator_fork_sha;
+  return recordedRow(
+    label,
+    <div class="space-y-1">
+      <span class="flex min-w-0 flex-wrap items-center gap-x-2 gap-y-1">
+        <VersionLabel version={version} />
+        {forkSha && (
+          <code class="font-mono text-xs" title={forkSha}>
+            {shortHash(forkSha)}
+          </code>
+        )}
+      </span>
+      <p class="text-xs text-[var(--bb-data-fg-muted)]">
+        {source === "recorded"
+          ? "Recorded by the run itself."
+          : "Attested after the run: the translator version was added to the published result from separate evidence and was not recorded by the run itself."}
+      </p>
+    </div>,
+  );
+}
+
 function estimateProvenanceRow(detail: DetailResult): ReceiptRow {
   const assumptions = parseEstimateAssumptions(detail.cost_estimate_assumptions);
   return recordedRow(
@@ -209,6 +238,7 @@ export function RunReceipt({
         recordedRow("Platform", detail.platform),
         detail.platform_version ? recordedRow("Platform version", <VersionLabel version={detail.platform_version} />) : missingRow("Platform version"),
         detail.driver_version ? recordedRow("Driver version", <VersionLabel version={detail.driver_version} />) : missingRow("Driver version"),
+        translatorRow(detail),
         formattedRow("Execution mode", detail.execution_mode, formatExecutionMode),
         formattedRow("Tuning mode", detail.tuning_mode, formatTuningMode),
         rowFromString("Tuning hash", detail.tuning_hash),

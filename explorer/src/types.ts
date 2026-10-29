@@ -57,6 +57,8 @@ export interface CostDeploymentFields {
   storage_tier?: string | null;
 }
 
+export type TranslatorVersionSource = "recorded" | "attested" | "not_recorded" | "not_applicable";
+
 export interface DetailResult extends CostDeploymentFields {
   result_id: string;
   benchmark: string;
@@ -69,6 +71,9 @@ export interface DetailResult extends CostDeploymentFields {
   gateway_name?: string | null;
   gateway_routed?: boolean | null;
   driver_version: string | null;
+  translator_version?: string | null;
+  translator_fork_sha?: string | null;
+  translator_version_source?: TranslatorVersionSource | null;
   run_date: string;
   total_duration_s: number;
   geomean_ms: number | null;

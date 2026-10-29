@@ -46,6 +46,7 @@ async function createCspBoundWorker(workerPath: string): Promise<Worker> {
 }
 
 const EXPECTED_READ_MODEL_VERSION = 17;
+const LATEST_READ_MODEL_VERSION = 18;
 
 const SNAPSHOT_READY_SCANS = [
   {
@@ -180,6 +181,7 @@ export async function _validateAttachedSnapshotForTest(
 }
 
 export const _EXPECTED_READ_MODEL_VERSION_FOR_TEST = EXPECTED_READ_MODEL_VERSION;
+export const _LATEST_READ_MODEL_VERSION_FOR_TEST = LATEST_READ_MODEL_VERSION;
 export const _COLD_EMPTY_READ_MAX_DELAY_MS_FOR_TEST =
   QUERY_RETRY_ATTEMPTS * QUERY_EMPTY_RETRY_DELAY_MS;
 export const _DUCKDB_QUERY_TIMEOUT_MS_FOR_TEST = DUCKDB_QUERY_TIMEOUT_MS;
@@ -206,9 +208,9 @@ async function verifyReadModelVersion(conn: DuckDBConnection): Promise<void> {
   if (found < EXPECTED_READ_MODEL_VERSION) {
     throwReadModelVersionError(found);
   }
-  if (found > EXPECTED_READ_MODEL_VERSION) {
+  if (found > LATEST_READ_MODEL_VERSION) {
     console.warn(
-      `DuckDB snapshot read-model v${found}; UI expects v${EXPECTED_READ_MODEL_VERSION}. ` +
+      `DuckDB snapshot read-model v${found}; UI supports v${EXPECTED_READ_MODEL_VERSION} through v${LATEST_READ_MODEL_VERSION}. ` +
         "Proceeding with forward-compatible reads.",
     );
   }

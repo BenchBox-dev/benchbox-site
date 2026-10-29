@@ -1,6 +1,7 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
 import {
   _EXPECTED_READ_MODEL_VERSION_FOR_TEST,
+  _LATEST_READ_MODEL_VERSION_FOR_TEST,
   _validateAttachedSnapshotForTest,
   _verifyReadModelVersionForTest,
 } from "@/db";
@@ -98,7 +99,7 @@ describe("read-model version guard", () => {
 
   it("warns but proceeds when the snapshot version is newer than the UI contract", async () => {
     const warn = vi.spyOn(console, "warn").mockImplementation(() => undefined);
-    const conn = makeConn(_EXPECTED_READ_MODEL_VERSION_FOR_TEST + 1);
+    const conn = makeConn(_LATEST_READ_MODEL_VERSION_FOR_TEST + 1);
 
     await expect(
       _verifyReadModelVersionForTest(conn as unknown as Parameters<typeof _verifyReadModelVersionForTest>[0]),

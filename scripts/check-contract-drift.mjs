@@ -5,21 +5,22 @@ import { tmpdir } from "node:os";
 import path from "node:path";
 import { zstdDecompressSync } from "node:zlib";
 import { pathToFileURL } from "node:url";
-import { EXPECTED_READ_MODEL_VERSION } from "../explorer/scripts/explorer-build-contract.mjs";
+import { isSupportedReadModelVersion, LATEST_READ_MODEL_VERSION, MINIMUM_READ_MODEL_VERSION } from "../explorer/scripts/explorer-build-contract.mjs";
 import { newestBundle } from "./bundle-fetch.mjs";
 import { CORE_REPO, certificationErrors, githubJson } from "./bundle-verify.mjs";
 
 const CONTRACT_MEMBER = "site-inputs-bundle/explorer/contract.json";
 const MANIFEST_MEMBER = "site-inputs-bundle/manifest.json";
 
-export function driftErrors(expected, contract) {
+export function driftErrors(contract) {
   const version = contract?.read_model_version;
-  if (version === expected) return [];
+  const expected = `${MINIMUM_READ_MODEL_VERSION} through ${LATEST_READ_MODEL_VERSION}`;
+  if (isSupportedReadModelVersion(version)) return [];
   if (typeof version !== "number") {
-    return [`Explorer read-model drift: newest certified bundle has no numeric read_model_version, site expects ${expected}.`];
+    return [`Explorer read-model drift: newest certified bundle has no numeric read_model_version, site supports ${expected}.`];
   }
   return [
-    `Explorer read-model drift: site expects ${expected}, newest certified bundle has ${version}. ` +
+    `Explorer read-model drift: site supports ${expected}, newest certified bundle has ${version}. ` +
       `Update the Explorer for the new contract before taking this bundle.`,
   ];
 }
@@ -48,10 +49,10 @@ async function main() {
     const certErrors = certificationErrors(run, manifest);
     if (certErrors.length > 0) throw new Error(`newest bundle is not certified:\n  ${certErrors.join("\n  ")}`);
     const contract = JSON.parse(extractMember(tarball, CONTRACT_MEMBER)).build_contract;
-    const errors = driftErrors(EXPECTED_READ_MODEL_VERSION, contract);
+    const errors = driftErrors(contract);
     if (errors.length > 0) throw new Error(errors.join("\n"));
     console.log(
-      `contract drift: none (site ${EXPECTED_READ_MODEL_VERSION}, bundle ${contract.read_model_version} from run ${runId})`,
+      `contract drift: none (site ${MINIMUM_READ_MODEL_VERSION}-${LATEST_READ_MODEL_VERSION}, bundle ${contract.read_model_version} from run ${runId})`,
     );
   } finally {
     rmSync(work, { recursive: true, force: true });

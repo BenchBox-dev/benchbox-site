@@ -16,6 +16,7 @@ import type {
   PlatformRow,
   QueryDisplayTiming,
   QueryTiming,
+  TranslatorVersionSource,
 } from "@/types";
 
 export const QUERY_RESULT_PAGE_SIZE = 24;
@@ -851,10 +852,42 @@ export async function getResultBasisAvailability(
   return rows[0] ?? null;
 }
 
+export interface TranslatorIdentity {
+  translator_version: string | null;
+  translator_fork_sha: string | null;
+  translator_version_source: TranslatorVersionSource | null;
+}
+
+const NO_TRANSLATOR_IDENTITY: TranslatorIdentity = {
+  translator_version: null,
+  translator_fork_sha: null,
+  translator_version_source: null,
+};
+
+const TRANSLATOR_VERSION_SOURCES: readonly string[] = ["recorded", "attested", "not_recorded", "not_applicable"];
+
+function textOrNull(value: unknown): string | null {
+  return typeof value === "string" && value !== "" ? value : null;
+}
+
+export async function getTranslatorIdentity(resultId: string): Promise<TranslatorIdentity> {
+  const rows = await queryRows<Record<string, unknown>>("SELECT * FROM bench.results WHERE result_id = ?", [resultId]);
+  const row = rows[0];
+  if (!row) return NO_TRANSLATOR_IDENTITY;
+  const source = textOrNull(row.translator_version_source);
+  return {
+    translator_version: textOrNull(row.translator_version),
+    translator_fork_sha: textOrNull(row.translator_fork_sha),
+    translator_version_source:
+      source !== null && TRANSLATOR_VERSION_SOURCES.includes(source) ? (source as TranslatorVersionSource) : null,
+  };
+}
+
 function detailResultFromWideRow(
   wide: ResultDetailMetricsRow,
   executionRows: readonly QueryExecutionRow[],
   timingRows: readonly QueryDisplayTimingRow[],
+  translator: TranslatorIdentity = NO_TRANSLATOR_IDENTITY,
 ): DetailResult {
   const environment: Environment = {};
   if (wide.os !== null) environment.os = wide.os;
@@ -899,6 +932,7 @@ function detailResultFromWideRow(
     platform: wide.platform,
     platform_id: wide.platform_id,
     driver_version: wide.driver_version,
+    ...translator,
     run_date: wide.run_date,
     total_duration_s: wide.total_duration_s,
     geomean_ms: wide.geomean_ms,
@@ -980,13 +1014,14 @@ function detailResultFromWideRow(
 }
 
 export async function getDetailResult(resultId: string): Promise<DetailResult | null> {
-  const [wide, timingRows, executionRows] = await Promise.all([
+  const [wide, timingRows, executionRows, translator] = await Promise.all([
     getResultDetailMetrics(resultId),
     getQueryDisplayTimings(resultId),
     getQueryExecutions(resultId),
+    getTranslatorIdentity(resultId),
   ]);
   if (!wide) return null;
-  return detailResultFromWideRow(wide, executionRows, timingRows);
+  return detailResultFromWideRow(wide, executionRows, timingRows, translator);
 }
 
 function streamCountClause(column: string, streamCount: number | null): { sql: string; params: number[] } {

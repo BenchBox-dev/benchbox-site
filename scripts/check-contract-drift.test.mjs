@@ -4,31 +4,33 @@ import { readFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { parse } from "yaml";
-import { EXPECTED_READ_MODEL_VERSION } from "../explorer/scripts/explorer-build-contract.mjs";
+import { LATEST_READ_MODEL_VERSION, MINIMUM_READ_MODEL_VERSION } from "../explorer/scripts/explorer-build-contract.mjs";
 import { driftErrors } from "./check-contract-drift.mjs";
 
-test("equal read-model versions pass", () => {
-  assert.deepEqual(driftErrors(EXPECTED_READ_MODEL_VERSION, { read_model_version: EXPECTED_READ_MODEL_VERSION }), []);
+test("every supported read-model version passes", () => {
+  for (let version = MINIMUM_READ_MODEL_VERSION; version <= LATEST_READ_MODEL_VERSION; version += 1) {
+    assert.deepEqual(driftErrors({ read_model_version: version }), []);
+  }
 });
 
 test("a newer bundle contract fails naming both versions", () => {
-  const errors = driftErrors(EXPECTED_READ_MODEL_VERSION, { read_model_version: EXPECTED_READ_MODEL_VERSION + 1 });
+  const errors = driftErrors({ read_model_version: LATEST_READ_MODEL_VERSION + 1 });
   assert.equal(errors.length, 1);
-  assert.ok(errors[0].includes(String(EXPECTED_READ_MODEL_VERSION)));
-  assert.ok(errors[0].includes(String(EXPECTED_READ_MODEL_VERSION + 1)));
+  assert.ok(errors[0].includes(String(LATEST_READ_MODEL_VERSION)));
+  assert.ok(errors[0].includes(String(LATEST_READ_MODEL_VERSION + 1)));
 });
 
 test("an older bundle contract fails naming both versions", () => {
-  const errors = driftErrors(EXPECTED_READ_MODEL_VERSION, { read_model_version: EXPECTED_READ_MODEL_VERSION - 1 });
+  const errors = driftErrors({ read_model_version: MINIMUM_READ_MODEL_VERSION - 1 });
   assert.equal(errors.length, 1);
-  assert.ok(errors[0].includes(String(EXPECTED_READ_MODEL_VERSION)));
-  assert.ok(errors[0].includes(String(EXPECTED_READ_MODEL_VERSION - 1)));
+  assert.ok(errors[0].includes(String(MINIMUM_READ_MODEL_VERSION)));
+  assert.ok(errors[0].includes(String(MINIMUM_READ_MODEL_VERSION - 1)));
 });
 
 test("a missing contract fails closed", () => {
-  const errors = driftErrors(EXPECTED_READ_MODEL_VERSION, undefined);
+  const errors = driftErrors(undefined);
   assert.equal(errors.length, 1);
-  assert.ok(errors[0].includes(String(EXPECTED_READ_MODEL_VERSION)));
+  assert.ok(errors[0].includes(String(MINIMUM_READ_MODEL_VERSION)));
 });
 
 test("the nightly drift step fails on script failure and captures stderr", () => {
