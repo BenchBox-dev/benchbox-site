@@ -523,6 +523,8 @@ for the full surface-by-surface matrix.
 | `result_file` | string | Yes | - | Result filename containing captured query plans. |
 | `query_id` | string | Yes | - | Query identifier. |
 | `format` | string | No | `tree` | `tree`, `json`, or `summary`. |
+| `stream` | string or null | No | `null` | Optional qualifier that selects one plan variant when a query has several, for example the stream in `Q1#0:power`. Without a qualifier, a query with several variants returns a validation error listing them. |
+| `test_type` | string or null | No | `null` | Optional qualifier that selects one plan variant when a query has several, for example the test type in `Q1#0:power`. Use it alone or together with `stream`. |
 
 #### `validate_results`
 
