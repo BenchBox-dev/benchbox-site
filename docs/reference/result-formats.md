@@ -536,6 +536,40 @@ explicit `load_ms: 0` is a measured zero and stays distinguishable from a
 missing key. Older bundles may omit the block. The Results Explorer does not
 read it; it is bundle-level diagnostic data.
 
+#### Execution Block: SQL Translation
+
+When a run logged SQL translation outcomes, the optional `execution.translation` object summarizes them (`status`, attempt and outcome counts, dialects and translators) and records which SQLGlot runtime did the translating in `execution.translation.runtime`.
+
+| Field | Type | Description |
+| ------- | ------ | ------------- |
+| `execution.translation.runtime.distribution` | string | Distribution name of the bundled SQLGlot runtime. |
+| `execution.translation.runtime.version` | string | Wheel version, for example `30.25.0.2`. |
+| `execution.translation.runtime.fork_sha` | string | Commit of the BenchBox SQLGlot fork the wheel was built from. |
+| `execution.translation.runtime.upstream_sha` | string | Upstream SQLGlot commit the fork was based on. |
+| `execution.translation.runtime.wheel_sha256` | string | SHA-256 checksum of the wheel. |
+
+The values come from the runtime pin that ships with the BenchBox release that ran the benchmark. All five fields are required non-empty strings whenever `runtime` is present, and the submission validator rejects a `runtime` that is not an object or that lacks one of them. The field is additive under the existing result schema version, and public export and `benchbox submit` keep it unchanged.
+
+`runtime` is present only when translation ran and logged outcomes. It is absent, never inferred, for:
+
+- DataFrame runs, which execute no translated SQL.
+- Runs that logged no translation outcomes, including paths that change SQL through SQLGlot without logging outcomes, such as read-primitives variant contracts and TPC-DS qualification.
+- Bundles published before the field existed.
+
+##### Translator version provenance
+
+A bundle is immutable once published, so a bundle that predates `runtime` cannot gain it. Its manifest sidecar (`<bundle>.manifest.json`, next to the bundle) can instead carry a `sql_translator_version` attestation with the same `version`, `fork_sha`, `upstream_sha` and `wheel_sha256` fields plus a required `evidence` string. `evidence` states how the maintainers established the wheel, for example by naming the reconciled per-bundle wheel record. All five fields are required non-empty strings, `version` must be a dotted numeric version, and unknown keys are rejected.
+
+Consumers resolve the translator version for a bundle into exactly one of three states:
+
+| State | Meaning |
+| ------- | ------ |
+| `recorded` | The bundle's own `execution.translation.runtime` carries the identity. It was captured by the run itself. |
+| `attested` | The bundle has no `runtime`, and its manifest sidecar's `sql_translator_version` supplies the identity. It was established after the fact from the evidence string, not captured by the run. |
+| `not_recorded` | Neither source exists. The translator version is unknown and is not guessed, which is the case for DataFrame runs and for runs that logged no translation outcomes. |
+
+A recorded runtime always takes precedence. If a bundle has both a `runtime` and an attestation and any of `version`, `fork_sha`, `upstream_sha` or `wheel_sha256` differ, the result is a conflict, not a preference: the submission validator, the corpus validation and the Explorer pipeline fail closed with an error. A malformed attestation fails the same way. The attestation does not change ranking identity.
+
 #### Export Block
 
 The `export` block records how and when the bundle file was written.
