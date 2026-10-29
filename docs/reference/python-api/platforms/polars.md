@@ -155,7 +155,7 @@ Polars SQL mode is not support
 #### Capabilities
 
 <span id="benchbox.platforms.polars_platform.PolarsAdapter.plan_capture_phase_eligible"></span>
-**`plan_capture_phase_eligible`** (class attribute): `True`.
+**`plan_capture_phase_eligible`** (class attribute): `True`. This selects the deferred post-measurement capture phase; it does not by itself produce a comparable plan. In DataFrame mode Polars records the plan as raw text only (`plan_format` `text`), with no `plan_fingerprint` and no plan comparison.
 
 <span id="benchbox.platforms.polars_platform.PolarsAdapter.driver_isolation_capability"></span>
 **`driver_isolation_capability`** (class attribute): `DriverIsolationCapability.NOT_APPLICABLE` (from `benchbox.platforms.base`).

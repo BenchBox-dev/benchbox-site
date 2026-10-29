@@ -366,6 +366,8 @@ These flags control monitoring, progress display, memory handling, and caching b
 ## Query Plan Capture Options
 
 - `--capture-plans`: Capture the logical query plan for each executed query and embed it in results.
+  By default this is a static (estimated) `EXPLAIN` issued after measurement, with no re-execution of the
+  query (overhead is typically a few milliseconds per query).
   Plans are persisted to the results bundle for later comparison or regression detection.
   Display is not affected — plans are captured silently.
   See [Query Plan Analysis](../../features/query-plan-analysis.md) for full details.
@@ -376,11 +378,12 @@ These flags control monitoring, progress display, memory handling, and caching b
   `benchbox show-plan` to inspect plans already captured to the results bundle.
 
 - `--analyze-plans` / `--no-analyze-plans`: The single capture-detail knob (used with
-  `--capture-plans`). `--analyze-plans` (default) captures `EXPLAIN (ANALYZE)` plans with actual
-  per-operator timing/cardinality, re-running each query once in the isolated post-measurement
-  phase (~1× extra cost, outside the measured window). `--no-analyze-plans` captures the static
-  (estimated) plan with no re-execution. Write statements are never re-executed regardless (DML
-  stays on a non-`ANALYZE` `EXPLAIN`).
+  `--capture-plans`). The default is the static (estimated) plan with no re-execution.
+  `--analyze-plans` opts into post-measurement `EXPLAIN ANALYZE` plans with actual per-operator
+  timing and cardinality where the engine supports it (DuckDB, MotherDuck, PostgreSQL, GizmoSQL),
+  re-running each SELECT once in the isolated post-measurement phase (~1× extra query cost, outside
+  the measured window). `--no-analyze-plans` forces the estimated plan. Write statements (DML, CTAS,
+  `SELECT ... INTO`) are never re-executed regardless: they stay on a plain `EXPLAIN`.
 
 - `--normalize-plan-literals`: In addition to the default fingerprint, record a literal-normalized fingerprint (`fingerprint_normalized` in the plans companion file) that collapses queries differing only in literal constants (e.g. parameter substitutions) to the same value. Requires `--capture-plans`; the default `fingerprint` is left unchanged.
   - Example: `--capture-plans --normalize-plan-literals`
@@ -389,13 +392,13 @@ These flags control monitoring, progress display, memory handling, and caching b
   - Format: comma-separated key:value pairs
   - Keys:
     - `queries:ID1,ID2,...` - capture plans for specific query IDs only
-    - `strict:true|false` - fail if plan capture encounters errors
+    - `strict:true|false` - fail if plan capture encounters errors; without it, failures are recorded as plan capture errors
   - Requires `--capture-plans` to also be set
   - Example: `--capture-plans --plan-config "queries:Q1,Q6,strict:true"`
   - **Note:** Plan capture records each distinct query exactly once in an isolated
     post-measurement phase, so the old per-iteration sampling keys (`sample:` / `first:`) have
-    been removed. On DuckDB the default `EXPLAIN (ANALYZE, FORMAT JSON)` re-runs each query once;
-    use `--no-analyze-plans` for estimated plans without that overhead.
+    been removed. The default capture does not re-execute queries; `--analyze-plans` re-runs each
+    captured SELECT once on DuckDB, MotherDuck, PostgreSQL and GizmoSQL.
 
 > **Cross-run fingerprint comparison and benchmark seeds.** The default
 > `plan_fingerprint` embeds filter/join/projection literals, so comparing fingerprints

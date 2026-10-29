@@ -117,7 +117,7 @@ Every platform adapter accepts these keyword arguments. All are optional.
 | `force_recreate` | `bool` | `False` | Recreate an existing database instead of reusing it. |
 | `show_query_plans` | `bool` | `False` | Print each query's plan after it runs. |
 | `capture_plans` | `bool` | `False` | Add `query_plan` and `plan_fingerprint` to each successful query result. |
-| `analyze_plans` | `bool` | `False` | Capture plans with actual timings; each captured `SELECT` is executed once more. |
+| `analyze_plans` | `bool` | `False` | Opt into post-measurement `EXPLAIN ANALYZE` plans with actual timings. Each captured `SELECT` is executed once more, outside the measured window; the default is a static, estimated plan with no re-execution. |
 | `tuning_enabled` | `bool` | `False` | Apply the tuning configuration given in `tuning_config`. |
 | `tuning_config` | `UnifiedTuningConfiguration` or `None` | `None` | The tuning configuration (`unified_tuning_configuration` is read as a fallback). |
 | `enable_validation` | `bool` | `False` | The benchmark runner passes `validate_row_count=True` to `execute_query`. |
