@@ -11,6 +11,9 @@ function makeDetail(overrides: Partial<DetailResult> = {}): DetailResult {
     platform: "DuckDB",
     platform_id: "duckdb",
     driver_version: "1.2.0",
+    translator_version: "30.25.0.2",
+    translator_fork_sha: "9f51489a1721423dd45e2662b87a2870648b61bd",
+    translator_version_source: "recorded",
     run_date: "2026-04-01",
     total_duration_s: 60,
     geomean_ms: 15,
@@ -105,6 +108,69 @@ describe("RunReceipt", () => {
     expect(within(receipt).getByText("2026.05.0")).toBeTruthy();
     expect(receipt).not.toHaveTextContent("benchbox.core.cost.pricing");
     expect(within(receipt).getByText("compute only")).toBeTruthy();
+  });
+
+  describe("SQL translator row", () => {
+    const FORK_SHA = "b181afce8e9e9cd78b12ba78151d1cf7dbc9adf7";
+
+    function translatorRowValue(detail: DetailResult) {
+      render(<RunReceipt detail={detail} />);
+      const receipt = screen.getByRole("region", { name: "Run receipt" });
+      const toggle = within(receipt).queryByRole("button", { name: "Show missing fields" });
+      if (toggle) fireEvent.click(toggle);
+      const label = within(receipt).queryByText("SQL translator");
+      return { receipt, value: label?.nextElementSibling ?? null };
+    }
+
+    it("shows a recorded translator version without attestation text", () => {
+      const { value } = translatorRowValue(
+        makeDetail({ translator_version: "30.25.0.2", translator_fork_sha: FORK_SHA, translator_version_source: "recorded" }),
+      );
+      expect(value).not.toBeNull();
+      expect(value).toHaveTextContent("30.25.0.2");
+      expect(value).toHaveTextContent("Recorded by the run itself.");
+      expect(value).not.toHaveTextContent("Attested after the run");
+      expect(value?.querySelector("code")?.getAttribute("title")).toBe(FORK_SHA);
+    });
+
+    it("shows an attested translator version with the explanation that the run did not record it", () => {
+      const { value } = translatorRowValue(
+        makeDetail({ translator_version: "30.24.0.17", translator_fork_sha: FORK_SHA, translator_version_source: "attested" }),
+      );
+      expect(value).toHaveTextContent("30.24.0.17");
+      expect(value).toHaveTextContent("Attested after the run");
+      expect(value).toHaveTextContent("not recorded by the run itself");
+    });
+
+    it("shows not recorded behind the missing-fields disclosure", () => {
+      render(<RunReceipt detail={makeDetail({ translator_version: null, translator_version_source: "not_recorded" })} />);
+      const receipt = screen.getByRole("region", { name: "Run receipt" });
+      expect(within(receipt).queryByText("SQL translator")).toBeNull();
+      fireEvent.click(within(receipt).getByRole("button", { name: "Show missing fields" }));
+      const label = within(receipt).getByText("SQL translator");
+      expect(label.nextElementSibling).toHaveTextContent("Not recorded");
+      expect(label.parentElement?.getAttribute("data-missing")).toBe("true");
+    });
+
+    it("shows not applicable as a recorded row for runs that do not translate SQL", () => {
+      render(<RunReceipt detail={makeDetail({ translator_version: null, translator_version_source: "not_applicable" })} />);
+      const receipt = screen.getByRole("region", { name: "Run receipt" });
+      const label = within(receipt).getByText("SQL translator");
+      expect(label.nextElementSibling).toHaveTextContent("Not applicable");
+      expect(label.parentElement?.getAttribute("data-missing")).toBeNull();
+    });
+
+    it("treats a read-model-17 detail without translator fields as not recorded", () => {
+      const { value } = translatorRowValue(
+        makeDetail({ translator_version: undefined, translator_fork_sha: undefined, translator_version_source: undefined }),
+      );
+      expect(value).toHaveTextContent("Not recorded");
+    });
+
+    it("treats a recorded source without a version as not recorded", () => {
+      const { value } = translatorRowValue(makeDetail({ translator_version: null, translator_version_source: "recorded" }));
+      expect(value).toHaveTextContent("Not recorded");
+    });
   });
 
   it("renders normalized cost metadata when it is present", () => {

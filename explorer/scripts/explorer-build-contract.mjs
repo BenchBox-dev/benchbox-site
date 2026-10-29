@@ -2,7 +2,13 @@ import { readFileSync } from "node:fs";
 import { siteInputsPath } from "./site-inputs.mjs";
 
 const EXPECTED_CONTRACT_VERSION = "6";
-export const EXPECTED_READ_MODEL_VERSION = 17;
+export const MINIMUM_READ_MODEL_VERSION = 17;
+export const LATEST_READ_MODEL_VERSION = 18;
+const SUPPORTED_RANGE = `${MINIMUM_READ_MODEL_VERSION} through ${LATEST_READ_MODEL_VERSION}`;
+
+export function isSupportedReadModelVersion(version) {
+  return Number.isInteger(version) && version >= MINIMUM_READ_MODEL_VERSION && version <= LATEST_READ_MODEL_VERSION;
+}
 const EXPECTED_NEWER_READ_MODEL_POLICY = "warn-and-continue";
 const REQUIRED_FLAGS = ["--data-dir", "--output", "--trust-label", "--visibility"];
 const REQUIRED_OUTPUTS = ["results.duckdb", "bundles/{result_id}.json"];
@@ -35,13 +41,13 @@ export function readExplorerBuildContract(file = siteInputsPath("explorer", "con
   if (contract.command !== EXPECTED_COMMAND) {
     throw new Error(`Explorer build contract command ${EXPECTED_COMMAND} expected, got ${contract.command}. ${ALIGNMENT_HINT}`);
   }
-  if (contract.read_model_version !== EXPECTED_READ_MODEL_VERSION) {
-    throw new Error(`Explorer read-model version ${EXPECTED_READ_MODEL_VERSION} expected, got ${contract.read_model_version}. ${ALIGNMENT_HINT}`);
+  if (!isSupportedReadModelVersion(contract.read_model_version)) {
+    throw new Error(`Explorer read-model version ${SUPPORTED_RANGE} expected, got ${contract.read_model_version}. ${ALIGNMENT_HINT}`);
   }
   const compatibility = contract.read_model_compatibility ?? {};
-  if (compatibility.minimum_supported !== EXPECTED_READ_MODEL_VERSION) {
+  if (!isSupportedReadModelVersion(compatibility.minimum_supported)) {
     throw new Error(
-      `Explorer minimum supported read-model version ${EXPECTED_READ_MODEL_VERSION} expected, got ${compatibility.minimum_supported}. ${ALIGNMENT_HINT}`,
+      `Explorer minimum supported read-model version ${SUPPORTED_RANGE} expected, got ${compatibility.minimum_supported}. ${ALIGNMENT_HINT}`,
     );
   }
   if (compatibility.newer_policy !== EXPECTED_NEWER_READ_MODEL_POLICY) {

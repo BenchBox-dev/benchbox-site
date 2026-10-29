@@ -1,11 +1,16 @@
 import { readFileSync } from "node:fs";
 import { describe, expect, it, vi } from "vitest";
-import { _EXPECTED_READ_MODEL_VERSION_FOR_TEST, _verifyReadModelVersionForTest } from "@/db";
+import {
+  _EXPECTED_READ_MODEL_VERSION_FOR_TEST,
+  _LATEST_READ_MODEL_VERSION_FOR_TEST,
+  _verifyReadModelVersionForTest,
+} from "@/db";
 import { siteInputsPath } from "@/test/siteInputs";
 
 const EXPECTED_EXPLORER_BUILD_COMMAND =
   "uv run -- python _project/scripts/explorer_publish.py build";
-const CURRENT_READ_MODEL_VERSION = 17;
+const MINIMUM_READ_MODEL_VERSION = 17;
+const LATEST_READ_MODEL_VERSION = 18;
 const NEWER_READ_MODEL_POLICY = "warn-and-continue";
 
 type SnapshotConnection = Parameters<typeof _verifyReadModelVersionForTest>[0];
@@ -30,38 +35,40 @@ describe("db remediation command pin", () => {
       };
     };
     expect(contract.command).toBe(EXPECTED_EXPLORER_BUILD_COMMAND);
-    expect(contract.read_model_version).toBe(CURRENT_READ_MODEL_VERSION);
-    expect(contract.read_model_compatibility).toEqual({
-      minimum_supported: CURRENT_READ_MODEL_VERSION,
-      newer_policy: NEWER_READ_MODEL_POLICY,
-    });
-    expect(_EXPECTED_READ_MODEL_VERSION_FOR_TEST).toBe(CURRENT_READ_MODEL_VERSION);
+    expect(contract.read_model_version).toBeGreaterThanOrEqual(MINIMUM_READ_MODEL_VERSION);
+    expect(contract.read_model_version).toBeLessThanOrEqual(LATEST_READ_MODEL_VERSION);
+    expect(contract.read_model_compatibility?.minimum_supported).toBeGreaterThanOrEqual(MINIMUM_READ_MODEL_VERSION);
+    expect(contract.read_model_compatibility?.minimum_supported).toBeLessThanOrEqual(LATEST_READ_MODEL_VERSION);
+    expect(contract.read_model_compatibility?.newer_policy).toBe(NEWER_READ_MODEL_POLICY);
+    expect(_EXPECTED_READ_MODEL_VERSION_FOR_TEST).toBe(MINIMUM_READ_MODEL_VERSION);
+    expect(_LATEST_READ_MODEL_VERSION_FOR_TEST).toBe(LATEST_READ_MODEL_VERSION);
   }, 30_000);
 
   it.each([
-    { label: "older", version: CURRENT_READ_MODEL_VERSION - 1 },
+    { label: "older", version: MINIMUM_READ_MODEL_VERSION - 1 },
     { label: "missing", version: 0 },
   ])("rejects $label incompatible snapshots clearly", async ({ version }) => {
     await expect(_verifyReadModelVersionForTest(connectionWithReadModelVersion(version))).rejects.toThrow(
-      `DuckDB snapshot read-model v${version}; UI requires v${CURRENT_READ_MODEL_VERSION}.`,
+      `DuckDB snapshot read-model v${version}; UI requires v${MINIMUM_READ_MODEL_VERSION}.`,
     );
   });
 
-  it("accepts the current read-model version", async () => {
-    await expect(
-      _verifyReadModelVersionForTest(connectionWithReadModelVersion(CURRENT_READ_MODEL_VERSION)),
-    ).resolves.toBeUndefined();
+  it.each([MINIMUM_READ_MODEL_VERSION, LATEST_READ_MODEL_VERSION])("accepts read-model version %i without warning", async (version) => {
+    const warn = vi.spyOn(console, "warn").mockImplementation(() => undefined);
+    await expect(_verifyReadModelVersionForTest(connectionWithReadModelVersion(version))).resolves.toBeUndefined();
+    expect(warn).not.toHaveBeenCalled();
+    warn.mockRestore();
   });
 
   it("warns and continues for a newer forward-compatible snapshot", async () => {
     const warn = vi.spyOn(console, "warn").mockImplementation(() => undefined);
 
     await expect(
-      _verifyReadModelVersionForTest(connectionWithReadModelVersion(CURRENT_READ_MODEL_VERSION + 1)),
+      _verifyReadModelVersionForTest(connectionWithReadModelVersion(LATEST_READ_MODEL_VERSION + 1)),
     ).resolves.toBeUndefined();
     expect(warn).toHaveBeenCalledWith(
-      `DuckDB snapshot read-model v${CURRENT_READ_MODEL_VERSION + 1}; ` +
-        `UI expects v${CURRENT_READ_MODEL_VERSION}. Proceeding with forward-compatible reads.`,
+      `DuckDB snapshot read-model v${LATEST_READ_MODEL_VERSION + 1}; ` +
+        `UI supports v${MINIMUM_READ_MODEL_VERSION} through v${LATEST_READ_MODEL_VERSION}. Proceeding with forward-compatible reads.`,
     );
 
     warn.mockRestore();
