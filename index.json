@@ -1,6 +1,13 @@
 {
   "batches": {},
   "items": {
+    "docs-contracts-option-values-and-fences-coverage-20261029": {
+      "claim": null,
+      "needs": [],
+      "priority": "low",
+      "status": "open",
+      "title": "Extend the site docs contract checks to option values beyond --platform, other pages, and non-bash code fences"
+    },
     "rollback-gates-on-pre-allowlist-removal-artifacts-20261029": {
       "claim": null,
       "needs": [],

@@ -1,0 +1,22 @@
+{
+  "acceptance": [
+    "docs:check fails on a stale --template value in reference/cli/visualize.md-style examples, shown by a seeded test",
+    "Every non-blog docs page with a bash, shell or console CLI example is covered, with zero violations on the real bundle in block mode, or each excluded page is listed with a reason"
+  ],
+  "context": "Moved from the BenchBox core tracker, where it was filed on 2026-10-29, when this repository gained its own tracker.",
+  "description": "Found 2026-10-28 while extending the checker to usage/cli-quick-start.md. The checker (docs-contracts/checks/commands.ts) now validates option names and values with exported choices on two pages plus cli-quick-start.md, but: (1) other pages are not scanned; scanning every page produced 6 false positives (-vv, COMMAND, |) and two placeholders in usage/dry-run.md:417,428; (2) reference/cli/visualize.md uses `--template overview`, which is not among the choices exported for that option, likely real drift; (3) bashBlocks reads only ```bash fences, so shell and console fences are never scanned; (4) values of deployment-mode selectors (base:mode) and positional arguments are not exported by core so they are unchecked.\n\nRoll the checker out page by page: resolve visualize.md first (fix the doc or the exported choices), add placeholder skipping rules that remove the 6 false positives, add shell and console fences, and extend page coverage with the real bundle in block mode before each addition. Items 4 needs a core doc-contracts export change: schema changes land in core first.",
+  "links": [
+    "BenchBox-dev/benchbox-site: docs-contracts/checks/commands.ts",
+    "BenchBox-dev/benchbox-site: docs/reference/cli/visualize.md"
+  ],
+  "sessions": [
+    {
+      "actor": "mcp:omp-coding-agent:joe@joe-mac-mini.local:b8b5f8ab822ab44135d67f90",
+      "at": "2026-10-30T21:03:09Z",
+      "client": "omp-coding-agent",
+      "op": "create",
+      "op_id": "7c30dec8b437409386040f0d6567a2cc",
+      "session_id": "cc767de99c19400aa238236633ca9140"
+    }
+  ]
+}
