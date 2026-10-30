@@ -21,6 +21,13 @@
       "priority": "low",
       "status": "open",
       "title": "Check that site docs links to core directories resolve against every ancestor directory, as repo-files.json now lists them"
+    },
+    "tuning-page-empty-aliases-sentence-20261029": {
+      "claim": null,
+      "needs": [],
+      "priority": "low",
+      "status": "open",
+      "title": "Stop the generated tuning page rendering 'Aliases resolve to another platform's entry: .' when a platform has no aliases"
     }
   },
   "schema_version": 3
