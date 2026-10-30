@@ -61,6 +61,13 @@
       "status": "open",
       "title": "Check that site docs links to core directories resolve against every ancestor directory, as repo-files.json now lists them"
     },
+    "site-myst-converter-retirement-20261017": {
+      "claim": null,
+      "needs": [],
+      "priority": "low",
+      "status": "open",
+      "title": "Decide whether to keep or retire the site's MyST-to-Markdown converter"
+    },
     "tuning-page-empty-aliases-sentence-20261029": {
       "claim": null,
       "needs": [],
