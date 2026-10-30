@@ -213,6 +213,19 @@ Adaptations to keep:
 - Merge with `gh pr merge --squash` once `ci` is green. Auto-merge is turned
   off for this repository.
 
+## Tracker
+
+- Work for this repository is tracked on its own `todo-state` branch.
+  `.todo-db/config.json` binds the `todo-db` MCP server that `.mcp.json`
+  starts to that branch. The server runs on the developer's machine as
+  `todo-db-mcp` and is not part of the site build.
+- Before the first tracker write in a session, confirm the bound store by
+  passing `BenchBox-dev/benchbox-site` as `expect_store`. A server started
+  from the core repository is bound to core's tracker and refuses it.
+- Work that needs changes in both repositories is tracked in core, with
+  links to the site paths it touches.
+- Change tracker state only through the server, never by editing the branch.
+
 ## Code comments
 
 First-party code carries no explanatory comments or docstrings. Name things
