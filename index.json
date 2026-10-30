@@ -68,6 +68,13 @@
       "status": "open",
       "title": "Run the site's browser acceptance checks against the built site in CI"
     },
+    "site-comment-policy-parity-20261017": {
+      "claim": null,
+      "needs": [],
+      "priority": "low",
+      "status": "open",
+      "title": "Enforce a comment and docstring policy on the site repo's source"
+    },
     "site-converter-tree-link-kind-immediate-parents-20261029": {
       "claim": null,
       "needs": [],
