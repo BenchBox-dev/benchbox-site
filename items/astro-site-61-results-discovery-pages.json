@@ -1,0 +1,20 @@
+{
+  "acceptance": [
+    "URL scheme agreed and recorded in the ADR before implementation",
+    "Summary pages generated from canonical pipeline output; values match the Explorer for the same snapshot",
+    "Withdrawn-result fixture absent from pages and search index after rebuild",
+    "Results section of search returns a platform and a benchmark by name"
+  ],
+  "context": "2026-10-17, after the site split: still a future feature that needs its own owner approval before starting. Needs moved from astro-site-54 to site-browser-acceptance-ci-20261017 (the Pagefind smoke search must run in CI first). Corrections to the description: (1) data source: explorer_publish.py runs in core, and the site sees only the bundle snapshot and per-result JSON, so generate the pages at site build time from the bundle and add any needed bundle fields in core first (site-split ADR D16); (2) routes: \"/results/platforms/<id>\" is wrong; the Explorer routes are /results/p/:platform/, /results/:benchmark/ and the index pages /results/platforms/ and /results/benchmarks/ (explorer/src/App.tsx), so agree the scheme against those; (3) search: website/scripts/pagefind-index.mjs indexes only docs and blog, and SearchBox.astro has a link to /results/, not a Results section, so this item adds both; (4) record the URL scheme in docs/internal/adr/adr-site-repo-split.md (core) or a benchbox-site decision note, since the astro ADR is partly superseded.\n\nMoved from the BenchBox core tracker on 2026-10-30, when this repository gained its own tracker.\n\nIf the pages need bundle fields that core does not yet provide, track that core change in core's tracker.",
+  "description": "A post-cutover feature with its own owner approval before starting.\n\nPagefind cannot see results loaded through DuckDB-WASM. At build time, generate static summary pages for each platform and benchmark from the same canonical pipeline output as the Explorer (explorer_publish.py and results.duckdb). Each page links into the Explorer view, and Pagefind indexes these pages under the Results search section.\n\nPages carry their snapshot identity, follow admission and withdrawal rules (withdrawn results are excluded from indexes and pages on the next build), and must not conflict with Explorer client routes: agree the URL scheme first, e.g. render at the same /results/platforms/<id> paths with the island hydrating on top.",
+  "sessions": [
+    {
+      "actor": "mcp:omp-coding-agent:joe@joe-mac-mini.local:2b2975333a407fd7c2ce08ce",
+      "at": "2026-10-30T23:04:00Z",
+      "client": "omp-coding-agent",
+      "op": "create",
+      "op_id": "9150ce3d694a407f81b90aad2368a8ce",
+      "session_id": "82c0d7d9603c4b7cb3497f18a64ea231"
+    }
+  ]
+}
