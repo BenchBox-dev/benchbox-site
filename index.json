@@ -54,6 +54,13 @@
       "status": "open",
       "title": "Extend the site docs contract checks to option values beyond --platform, other pages, and non-bash code fences"
     },
+    "public-site-visual-regression-false-mismatch-20261014": {
+      "claim": null,
+      "needs": [],
+      "priority": "medium",
+      "status": "open",
+      "title": "Public-site visual regression reported every /results/ page changed for a PR that cannot affect rendering"
+    },
     "rollback-gates-on-pre-allowlist-removal-artifacts-20261029": {
       "claim": null,
       "needs": [],
