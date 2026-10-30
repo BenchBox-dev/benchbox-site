@@ -521,10 +521,22 @@ for the full surface-by-surface matrix.
 | Name | Type | Required | Default | Description |
 |---|---|---:|---|---|
 | `result_file` | string | Yes | - | Result filename containing captured query plans. |
-| `query_id` | string | Yes | - | Query identifier. |
+| `query_id` | string | Yes | - | Query identifier. `1`, `Q1` and `q1` all resolve to the same query. |
 | `format` | string | No | `tree` | `tree`, `json`, or `summary`. |
 | `stream` | string or null | No | `null` | Optional qualifier that selects one plan variant when a query has several, for example the stream in `Q1#0:power`. Without a qualifier, a query with several variants returns a validation error listing them. |
 | `test_type` | string or null | No | `null` | Optional qualifier that selects one plan variant when a query has several, for example the test type in `Q1#0:power`. Use it alone or together with `stream`. |
+
+The tool resolves plans with the same identity rules as `benchbox show-plan`, including the qualified companion keys
+that a result bundle uses for streams and test types (for example `Q1#0:power`). When a query has exactly one plan
+variant it is returned. The tool also accepts optional `stream` and `test_type` qualifiers that select one variant
+when a query has several. When several stream or test type variants exist and no qualifier is given, the tool
+returns a validation error that lists the available variants instead of choosing one. A qualifier that matches no
+variant returns a not-found error that lists the available variants.
+
+For a plan truncated by depth, the `tree` format appends a truncation note to the tree and the response carries `truncated_at_depth`; the `summary` format reports `truncated_at_depth` in its summary. The `tree` and `summary` formats render the canonical plan. The summary counts operators, joins, scans, aggregates,
+filters and sorts, and reports the maximum depth; estimated rows and cost are `null` unless the plan carries them. The
+`json` format returns the stored plan unchanged. A stored plan that is not canonical returns a validation error that
+points at `format='json'`.
 
 #### `validate_results`
 

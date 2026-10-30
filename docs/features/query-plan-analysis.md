@@ -45,44 +45,46 @@ benchbox run \
   --capture-plans
 ```
 
-This captures the logical query plan for each query executed during the benchmark.
+This captures a static (estimated) `EXPLAIN` plan for each query executed during the benchmark. The plan is
+captured after measurement and the query is not re-executed. Add `--analyze-plans` to opt into
+`EXPLAIN ANALYZE` plans with actual per-operator timing and cardinality on the engines that support it.
 
-### Supported Platforms
+Plan capture applies to every adapter that provides an `EXPLAIN` acquisition hook and a parser (see
+"Capture Isolation" below); the table lists the platforms with the most mature parsers. BigQuery is the one
+side-effect engine that harvests its plan from the executed job rather than via `EXPLAIN`.
 
-Plan capture is the default for every EXPLAIN-based engine (see "Capture Isolation" below); the
-table lists the platforms with the most mature parsers. BigQuery is the one side-effect engine that
-harvests its plan from the executed job rather than via `EXPLAIN`.
-
-| Platform    | Parser Status | EXPLAIN Format                          | Notes                                                    |
-|-------------|---------------|-----------------------------------------|----------------------------------------------------------|
-| DuckDB      | ✓ Stable      | JSON (`EXPLAIN (ANALYZE, FORMAT JSON)`) | Actual per-operator timing; ~1× query cost overhead      |
-| SQLite      | ✓ Stable      | Text (tree)                             | Simple tree format                                       |
-| PostgreSQL  | ✓ Stable      | JSON                                    | SELECT: `EXPLAIN (ANALYZE, BUFFERS, FORMAT JSON)`; DML: `EXPLAIN (FORMAT JSON)` only |
-| Redshift    | ✓ Beta        | Text                                    | Supports XN prefixed operators                           |
-| DataFusion  | ✓ Beta        | Text (indent)                           | Physical plan operators                                  |
+| Platform    | Parser Status | Default capture (estimated, no re-execution) | With `--analyze-plans`                            | Notes                                |
+|-------------|---------------|----------------------------------------------|---------------------------------------------------|--------------------------------------|
+| DuckDB      | ✓ Stable      | JSON (`EXPLAIN (FORMAT JSON)`)               | `EXPLAIN (ANALYZE, FORMAT JSON)`; ~1× query cost  | Actual per-operator timing with ANALYZE |
+| MotherDuck  | DuckDB parser | JSON (`EXPLAIN (FORMAT JSON)`)               | `EXPLAIN (ANALYZE, FORMAT JSON)`; ~1× query cost  | Same plan format as DuckDB           |
+| SQLite      | ✓ Stable      | Text (`EXPLAIN QUERY PLAN`, `id\|parent\|detail` rows) | Not supported (no ANALYZE mode)         | Branching topology preserved         |
+| PostgreSQL  | ✓ Stable      | JSON (`EXPLAIN (FORMAT JSON)`)               | SELECT only: `EXPLAIN (ANALYZE, BUFFERS, FORMAT JSON)` | DML stays on plain `EXPLAIN`    |
+| GizmoSQL    | DuckDB parser | JSON (`EXPLAIN (FORMAT JSON)`)               | `EXPLAIN (ANALYZE, FORMAT JSON)`; ~1× query cost  | Same plan format as DuckDB           |
+| Redshift    | ✓ Beta        | Text                                         | Not supported                                     | Supports XN prefixed operators       |
+| DataFusion  | ✓ Beta        | Text (indent)                                | Not supported                                     | Physical plan operators              |
 
 Plans are captured using platform-specific `EXPLAIN` commands and parsed into a unified logical representation.
 
 ### Performance Impact
 
-Plan capture overhead depends on the platform:
+The default capture issues a static `EXPLAIN` that does not execute the query, so its overhead is on the order
+of milliseconds per query (typically ~1-5 ms). The capture runs after all timed queries finish, so it never
+inflates measured query times, with or without `--analyze-plans`.
 
-- **DuckDB** (default): uses `EXPLAIN (ANALYZE, FORMAT JSON)`, which re-executes the query to collect
-  actual per-operator timing and cardinality. Overhead is approximately **1× query cost** per captured
-  plan — a 2-second query costs ~2 extra seconds. Disable re-execution with
-  `--no-analyze-plans` to use estimated plans only (~1-5 ms overhead). The capture re-run happens
-  in the isolated post-measurement phase, so it never inflates the measured query time.
-- **PostgreSQL** (SELECT queries): uses `EXPLAIN (ANALYZE, BUFFERS, FORMAT JSON)`, which also
-  re-executes the query. Overhead is approximately **1× query cost** per captured plan.
-- **PostgreSQL** (DML — INSERT/UPDATE/DELETE/MERGE): uses `EXPLAIN (FORMAT JSON)` without
-  ANALYZE to prevent double-execution of writes. Overhead is low (~1-5 ms, estimated plan only).
+`--analyze-plans` opts into post-measurement `EXPLAIN ANALYZE` on the engines that support it (DuckDB,
+MotherDuck, PostgreSQL, GizmoSQL). Each captured SELECT is re-run once, so the overhead is approximately
+**1× query cost** per captured plan, outside the measured window: a 2-second query costs about 2 extra
+seconds of capture time. `--no-analyze-plans` forces the estimated default explicitly.
+
+- **PostgreSQL** (DML — INSERT/UPDATE/DELETE/MERGE): always uses `EXPLAIN (FORMAT JSON)` without ANALYZE, even
+  with `--analyze-plans`, so writes are never executed twice. Overhead is low (~1-5 ms, estimated plan only).
   Note: PostgreSQL `EXPLAIN` does not accept `COPY`, so COPY statements are not plan-captured.
-- **Redshift, DataFusion, SQLite**: estimated plans only (no ANALYZE), adds ~1-5 ms per query.
+- **SQLite, Redshift, DataFusion**: always estimated plans (no ANALYZE mode), ~1-5 ms per query.
 
 In all cases:
 
 - Benchmark timing measurements are unaffected (plan capture runs after the timed execution)
-- Failed plan captures are logged but don't halt execution
+- Failed plan captures are recorded as plan capture errors and counted in `plan_capture_failures`; they don't halt execution unless strict plan capture is enabled
 
 ### Capture Isolation (the canonical post-measurement phase)
 
@@ -93,28 +95,31 @@ combined) complete. After measurement, BenchBox issues one `EXPLAIN` pass over t
 successfully-executed queries on the measurement connection and merges the resulting
 `plan_fingerprint` / `query_plan` back into each query result. This means:
 
-- **Default-ON for every EXPLAIN engine.** Plan capture via the isolated phase is the default for
-  all engines whose plan a standalone `EXPLAIN` reproduces — DuckDB, MotherDuck, PostgreSQL,
-  Redshift, SQLite, DataFusion, ClickHouse, Athena, Presto/Trino/Starburst, Spark, Databricks,
-  Snowflake, Firebolt, Doris, SingleStore, Databend, Azure Synapse, Fabric, and others. There is
-  no per-adapter opt-in.
+- **A deferred phase for every adapter that opts in.** `plan_capture_phase_eligible` is a *timing*
+  mechanism: it says that the adapter's plan is captured in this deferred post-measurement phase instead of
+  inline with the timed query. It is not a capability claim. Whether a plan is actually produced depends on the
+  adapter providing an `EXPLAIN` acquisition hook (`get_query_plan`) and a parser (`get_query_plan_parser`).
+  Adapters that provide both include DuckDB, MotherDuck, PostgreSQL, Redshift, SQLite, DataFusion, ClickHouse,
+  Athena, Presto/Trino/Starburst, Spark, Databricks, Snowflake, Firebolt, Doris, SingleStore, Databend,
+  Azure Synapse and Fabric. A missing hook, a missing parser, an `EXPLAIN` failure or a parse failure is
+  recorded as a plan capture error for that query and counted in `plan_capture_failures`; with strict plan
+  capture (`--plan-config strict:true`) it raises instead.
 - **No EXPLAIN on the measurement path.** Capture never interleaves with a timed query or holds the
   connection between measured queries — the `EXPLAIN` pass runs strictly after the timed loop, so
   measured per-query execution times are never inflated by capture cost, for any test type.
-- **`analyze_plans` is the one and only capture-detail knob.** It is a first-class flag:
-  `--analyze-plans` (the default) re-runs each SELECT once with `EXPLAIN (ANALYZE)` *after*
-  measurement, so captured plans carry actual per-operator timing and cardinality (~1× extra query
-  cost, outside the measured window); `--no-analyze-plans` uses a static (non-`ANALYZE`) `EXPLAIN`,
-  giving estimated plans only with no re-execution cost (~1-5 ms). The structural `plan_fingerprint`
-  is identical either way (it excludes timing/cardinality by design); the measured execution times
-  in the result bundle remain the authoritative timings.
-  **Note:** only engines whose `EXPLAIN` has an ANALYZE mode (DuckDB, MotherDuck, PostgreSQL) honour
-  the knob. SQLite (`EXPLAIN QUERY PLAN`), DataFusion, and Redshift (plain `EXPLAIN`) have no ANALYZE
-  mode: they always capture a static, estimated plan and `analyze_plans` is a no-op for them (no
-  per-operator timing is available).
+- **Static `EXPLAIN` by default; `analyze_plans` is the one capture-detail knob.** Without a flag, capture
+  issues a static (estimated) `EXPLAIN` after measurement and never re-executes a query.
+  `--analyze-plans` opts into a post-measurement `EXPLAIN (ANALYZE)` re-run of each SELECT where the engine
+  supports it (DuckDB, MotherDuck, PostgreSQL, GizmoSQL), so captured plans carry actual per-operator timing
+  and cardinality (~1× extra query cost, outside the measured window). `--no-analyze-plans` forces the
+  estimated default. The structural `plan_fingerprint` is identical either way (it excludes timing and
+  estimates by design); the measured execution times in the result bundle remain the authoritative timings.
+  **Note:** only engines whose `EXPLAIN` has an ANALYZE mode honour the knob. SQLite
+  (`EXPLAIN QUERY PLAN`), DataFusion, and Redshift (plain `EXPLAIN`) have no ANALYZE mode: they always
+  capture a static, estimated plan and `analyze_plans` is a no-op for them.
 - **DML runs exactly once.** Even with `--analyze-plans`, an INSERT/UPDATE/DELETE/MERGE/COPY (or
-  CTAS / `SELECT ... INTO`) query is downgraded to a non-`ANALYZE` `EXPLAIN` by the shared
-  `is_dml_query` write guard, so writes are captured without being re-executed a second time.
+  CTAS / `SELECT ... INTO`) query is never re-executed: the shared `is_dml_query` write guard downgrades it
+  to a plain, non-`ANALYZE` `EXPLAIN`.
 - **Capture once per query.** Each distinct executed query is captured exactly once — a plan is a
   property of `(query, schema, engine)`, not of an execution. `--plan-config queries:<ids>`
   restricts *which* queries are captured.
@@ -145,12 +150,14 @@ so capture keeps actual-execution detail and never runs the query a second time
 (which would cost money). If the completed job exposes no plan stages, capture
 reports `explain_failed`. Every other engine uses the isolated `EXPLAIN` path.
 
-#### Mid-run data mutation: capture before the mutation
+#### Mid-run data mutation: reconstructing the plan
 
-The isolated `EXPLAIN` pass runs *after* the timed loop, so for a **read-only** workload it sees the
-exact data state every query was measured against — captured plans and their cardinality estimates
-match what the optimizer chose during measurement. Standard TPC-H/TPC-DS **power** and **throughput**
-sets are `SELECT`-only, so this is always true for them.
+Post-measurement capture does not keep the plan the optimizer used while the query ran. It issues a fresh
+`EXPLAIN` for each recorded query after the timed loop and attaches the resulting plan to the result row, so
+the plan is *reconstructed* against the data state at the moment of capture. For a **read-only** workload that
+is the exact data state every query was measured against, so captured plans and their cardinality estimates
+match what the optimizer saw. Standard TPC-H/TPC-DS **power** and **throughput** sets are `SELECT`-only, so
+this is always true for them.
 
 A workload that **mutates data mid-run** would otherwise break that guarantee. In **combined mode**
 the order is *power → throughput → maintenance*: the maintenance step (TPC-H RF1/RF2 inserts+deletes,
@@ -162,7 +169,7 @@ BenchBox resolves this by capturing **before the mutation**. A capture *checkpoi
 of the maintenance phase — after the read phases, before any maintenance write — so the
 power/throughput plans are EXPLAINed against the pre-maintenance state they were measured against.
 The maintenance writes themselves are then captured in the final post-measurement pass (downgraded to
-a non-`ANALYZE` `EXPLAIN`, so they are never re-executed). Each query is still captured exactly once,
+a plain, non-`ANALYZE` `EXPLAIN`, so they are never re-executed). Each query is still captured exactly once,
 and plans are attached to result rows once, at the end. The checkpoint runs strictly between phases —
 never inside a timed query or a concurrent throughput stream — so measured timings are unaffected.
 
@@ -173,14 +180,17 @@ seed-varied stream attaches its own plan rather than falling back to an id-only 
 somehow lacks the key (a bespoke driver that cannot supply one) falls back to matching by bare query id,
 which only succeeds when that id maps to a single executed SQL variant.
 
-Multi-stream runs persist one plan record per `(query_id, stream_id)` in the `.plans.json` companion -
-streams are never deduplicated or last-writer-wins collapsed, so every stream's plan and fingerprint
-survive a result-file round trip (`show-plan`, `compare --include-plans`).
+The `.plans.json` companion holds one entry per `(query, stream, test_type)`. Streams are never
+deduplicated or last-writer-wins collapsed, so every stream's plan and fingerprint survive a result-file
+round trip (`show-plan`, `compare --include-plans`). Each entry records the `iteration` and `run_type`
+of the execution it was captured from, and a reloaded result attaches the plan (SQL included) only to the
+row with that iteration and run type. There are no per-iteration `@N` keys.
 
 > **Bespoke DML query sets.** A *bespoke* query set that runs an `INSERT`/`UPDATE`/`DELETE` partway
-> through and then more `SELECT`s has no maintenance phase boundary, so the isolated model captures
-> those later reads against the end-of-run state. Keep data-mutating steps in a maintenance phase (or a
-> separate run) when you need read-query fingerprints to reflect their measured data state.
+> through and then more `SELECT`s has no maintenance phase boundary and no pre-mutation checkpoint. Its
+> mid-run mutations are captured against the **end-of-run** state, so the later reads are explained after
+> every mutation has been applied. Keep data-mutating steps in a maintenance phase (or a separate run) when
+> you need read-query plans and fingerprints to reflect their measured data state.
 
 ### Captured Fields
 
@@ -189,19 +199,36 @@ Each query result includes three plan-related fields when `--capture-plans` is a
 | Field | Type | Description |
 |-------|------|-------------|
 | `query_plan` | `QueryPlan \| None` | Parsed logical plan tree; `None` if capture failed or was skipped |
-| `plan_fingerprint` | `str \| None` | SHA256 of the plan's logical structure; `None` when `query_plan` is `None` |
+| `plan_fingerprint` | `str \| None` | SHA-256 of the plan's normalized logical structure; `None` when `query_plan` is `None` |
 | `plan_capture_time_ms` | `float \| None` | Wall-clock milliseconds spent on plan capture (excludes the *timed* benchmark execution; see note below) |
 
 `plan_fingerprint` is `None` when `query_plan` is `None`. Both are `None` when `--capture-plans` is
 not set or when the query was excluded by `--plan-config`.
 
-> **`plan_capture_time_ms` is the full capture overhead, including EXPLAIN execution — not parse-only.**
+> **`plan_capture_time_ms` is the full capture cost, including the `EXPLAIN` statement — not parse-only.**
 > Plan capture runs in a separate post-measurement phase, so it never affects the timed benchmark
-> result. But the metric does include the cost of running `EXPLAIN` itself. On DuckDB the default
-> `EXPLAIN (ANALYZE, FORMAT JSON)` **re-executes the query**, so `plan_capture_time_ms` there is
-> roughly the query's own runtime plus parsing (~1× query cost), not a few milliseconds of parsing.
-> Engines that capture estimated plans only (Redshift, DataFusion, SQLite, PostgreSQL DML) add just
-> ~1-5 ms because no re-execution occurs.
+> result. With the default static `EXPLAIN` the value is small (~milliseconds), because no query runs. With
+> `--analyze-plans` on DuckDB, MotherDuck, PostgreSQL (SELECT) or GizmoSQL, `EXPLAIN ANALYZE` **re-executes
+> the query**, so `plan_capture_time_ms` is roughly the query's own runtime plus parsing (~1× query cost).
+
+### DataFrame Plan Capture
+
+`--capture-plans` also applies to DataFrame-mode runs. Support differs by engine:
+
+| Engine | Capture result | `plan_format` | Fingerprint |
+|--------|----------------|---------------|-------------|
+| DataFusion, PySpark, LakeSail, Databricks | Structured plan DAG, comparable with `compare --include-plans` | `dag` | `plan_fingerprint`, plus `plan_fingerprint_normalized` with `--normalize-plan-literals` |
+| Polars | Raw plan text only | `text` | None; the plan is not comparable |
+| Pandas, Dask, cuDF | Unsupported | — | None |
+
+Every captured DataFrame plan carries `plan_capture_time_ms`. For Polars, DataFusion, PySpark and LakeSail,
+capture runs after collection, and its time is excluded from the measured execution time. Databricks
+DataFrame capture is deferred to the post-measurement phase, outside the timed windows. Pandas, Dask and
+cuDF have no plan to capture, so each query records a plan capture error with reason `unsupported`, counted
+in `capture_failures`; strict plan capture raises instead.
+
+`plan_capture_failures` (`capture_failures` in the companion) counts distinct query IDs with at least one
+uncaptured execution, the same unit as `plans_captured`, not individual executions. `show-plan` prints the raw text for Polars and the rendered tree for DAG engines.
 
 ## Viewing Plans
 
@@ -517,7 +544,7 @@ benchbox platforms
 
 - Check benchmark logs for detailed error messages
 - File an issue with the EXPLAIN output for investigation
-- Plan capture failures don't halt benchmark execution
+- Plan capture failures are recorded as plan capture errors and don't halt benchmark execution unless strict plan capture (`--plan-config strict:true`) is enabled
 
 ### Performance Issues
 
@@ -525,20 +552,16 @@ benchbox platforms
 
 **Expected Impact**:
 
-- DuckDB (default): ~1× query cost per plan (re-executes via `EXPLAIN (ANALYZE, FORMAT JSON)`)
-- PostgreSQL SELECT queries: ~1× query cost per plan (re-executes via `EXPLAIN (ANALYZE, BUFFERS, FORMAT JSON)`)
-- PostgreSQL DML queries: ~1-5 ms (no re-execution; uses `EXPLAIN (FORMAT JSON)` only)
-- Redshift, DataFusion, SQLite: ~1-5 ms per query (estimated plans, no re-execution)
+- Default (all engines): ~1-5 ms per query (static `EXPLAIN`, no re-execution)
+- `--analyze-plans` on DuckDB, MotherDuck, GizmoSQL: ~1× query cost per plan (re-executes via `EXPLAIN (ANALYZE, FORMAT JSON)`)
+- `--analyze-plans` on PostgreSQL SELECT queries: ~1× query cost per plan (re-executes via `EXPLAIN (ANALYZE, BUFFERS, FORMAT JSON)`)
+- DML queries: ~1-5 ms (never re-executed; plain `EXPLAIN`)
 
-**If DuckDB overhead is too high**:
+**If `--analyze-plans` overhead is too high**:
 
-1. Use `--no-analyze-plans` to switch to estimated plans (~1-5 ms, no re-execution)
+1. Drop `--analyze-plans` (or pass `--no-analyze-plans`) to capture estimated plans (~1-5 ms, no re-execution)
 2. Use `--plan-config queries:<ids>` to capture plans for a subset of queries during development
-
-**If PostgreSQL overhead is too high**:
-
-1. PostgreSQL SELECT capture re-executes each query; consider capturing a subset with `--queries`
-2. DML queries are already low-overhead by design (no ANALYZE)
+3. Consider capturing a subset with `--queries` when you need ANALYZE detail
 
 **If overhead exceeds 10ms per query on Redshift/DataFusion/SQLite**:
 
@@ -618,10 +641,12 @@ fi
 
 ### Plan Fingerprints
 
-Plans are fingerprinted using SHA256 of the logical structure:
+Plans are fingerprinted using SHA-256 of the normalized logical structure:
 
-- **Included**: Operator types, table names, join types, filter expressions, aggregations
-- **Excluded**: Operator IDs, costs, row estimates, timing, cardinality, physical operator details
+- **Included**: Operator types, table names, join type and join conditions, filters, aggregates, grouping keys, sort keys, projections, limits, and child structure
+- **Excluded**: Operator IDs, costs, row and cardinality estimates, timing, and physical metadata
+
+Matching fingerprints mean matching logical structure, not an identical physical plan: scan methods, join algorithms and other physical details are not part of the hash.
 
 #### Stability contract
 
@@ -718,29 +743,37 @@ The comparison engine uses:
 
 **DuckDB**:
 
-- Uses `EXPLAIN (ANALYZE, FORMAT JSON)` by default - machine-readable JSON with actual per-operator
-  timing (`operator_timing`) and cardinality (`operator_cardinality`) from real execution
+- Uses `EXPLAIN (FORMAT JSON)` by default, which captures the estimated plan without executing the query
+- `--analyze-plans` opts into `EXPLAIN (ANALYZE, FORMAT JSON)`, which adds actual per-operator timing
+  (`operator_timing`) and cardinality (`operator_cardinality`) from real execution
 - Captures logical and physical operators; parser handles both ANALYZE and estimated-plan schemas
-- Re-executes the query at capture time (~1× query cost, in the isolated post-measurement phase);
-  use `--no-analyze-plans` to opt out and capture estimated plans only
+- With `--analyze-plans` the query is re-executed at capture time (~1× query cost, in the isolated
+  post-measurement phase)
 - DML statements (INSERT/UPDATE/DELETE/MERGE/COPY) use `FORMAT JSON` without `ANALYZE` to
   prevent double-execution side effects
-- Fingerprints exclude timing/cardinality - structural comparisons are unaffected by this setting
+- Fingerprints exclude timing and estimates - structural comparisons are unaffected by this setting
 
 **SQLite**:
 
-- Uses `EXPLAIN QUERY PLAN` (text format)
-- Simpler output than DuckDB
-- Limited cost information
+- Uses `EXPLAIN QUERY PLAN`, returned as `id|parent|detail` rows under a `QUERY PLAN` header
+- The parser builds the plan tree from the parent ids, so compound queries (`UNION`), subqueries and
+  multi-table nested-loop scans keep their branching topology. Several top-level rows (for example sibling
+  scans of a join) become children of a synthetic `Other` root; no binary join tree is invented
+- Malformed rows, duplicate ids and dangling parent references fail parsing and are recorded as a plan
+  capture error
+- Fingerprints reflect the branching shape, so SQLite plan fingerprints captured before this change differ
+  for any multi-node plan; do not compare them with fingerprints from newer runs
+- No ANALYZE mode and limited cost information
 
 **PostgreSQL**:
 
-- SELECT queries use `EXPLAIN (ANALYZE, BUFFERS, FORMAT JSON)` — re-executes the query to collect
+- Default capture is `EXPLAIN (FORMAT JSON)`, which does not execute the query. With `--analyze-plans`,
+  SELECT queries use `EXPLAIN (ANALYZE, BUFFERS, FORMAT JSON)` — re-executes the query to collect
   actual timing and I/O statistics (~1× query cost overhead)
-- DML queries (INSERT, UPDATE, DELETE, MERGE) use `EXPLAIN (FORMAT JSON)` without ANALYZE
+- DML queries (INSERT, UPDATE, DELETE, MERGE) always use `EXPLAIN (FORMAT JSON)` without ANALYZE
   to prevent writing data twice (~1-5 ms overhead, estimated plan only). `COPY` is not
   plan-captured: PostgreSQL `EXPLAIN` does not accept `COPY` statements.
-- Provides detailed cost estimates, row counts, and operator properties
+- Provides detailed cost estimates, row counts, and operator properties (estimates are excluded from the fingerprint)
 - Supports all PostgreSQL node types (Seq Scan, Index Scan, Hash Join, etc.)
 - Requires PostgreSQL 12+ for full JSON format support
 - Note: adding an index can change the fingerprint for PostgreSQL plans (Seq Scan uses

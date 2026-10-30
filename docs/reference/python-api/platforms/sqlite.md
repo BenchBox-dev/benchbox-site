@@ -147,7 +147,7 @@ Every platform adapter accepts these keyword arguments. All are optional.
 | `force_recreate` | `bool` | `False` | Recreate an existing database instead of reusing it. |
 | `show_query_plans` | `bool` | `False` | Print each query's plan after it runs. |
 | `capture_plans` | `bool` | `False` | Add `query_plan` and `plan_fingerprint` to each successful query result. |
-| `analyze_plans` | `bool` | `False` | Capture plans with actual timings; each captured `SELECT` is executed once more. |
+| `analyze_plans` | `bool` | `False` | Has no effect on SQLite: `EXPLAIN QUERY PLAN` has no ANALYZE mode, so plans are always captured as static, estimated plans. |
 | `tuning_enabled` | `bool` | `False` | Apply the tuning configuration given in `tuning_config`. |
 | `tuning_config` | `UnifiedTuningConfiguration` or `None` | `None` | The tuning configuration (`unified_tuning_configuration` is read as a fallback). |
 | `enable_validation` | `bool` | `False` | The benchmark runner passes `validate_row_count=True` to `execute_query`. |
@@ -203,10 +203,10 @@ The values are stored as attributes of the same name (`SQLiteAdapter().force_rec
 **`execute_query(connection: Any, query: str, query_id: str, benchmark_type: str | None = None, scale_factor: float | None = None, validate_row_count: bool = True, stream_id: int | None = None) -> dict[str, Any]`**: Runs one query and returns a result `dict`; it does not raise for SQL errors. On success `status` is `'SUCCESS'` and the dict holds `query_id`, `execution_time_seconds`, `rows_returned`, `first_row` and `results` (every row, as a list of tuples). On an error `status` is `'FAILED'` with `error` (message), `error_type` (for example `'OperationalError'`), `execution_time_seconds` and `rows_returned` of `0`. When `benchmark_type` is given and `validate_row_count` is true, a row-count comparison is added to the result.
 
 <span id="benchbox.platforms.sqlite.SQLiteAdapter.get_query_plan"></span>
-**`get_query_plan(connection: Any, query: str) -> str | None`**: Returns the plan as text built from `EXPLAIN QUERY PLAN`: the line `QUERY PLAN` followed by an indented tree, for example `QUERY PLAN` then `` `--SCAN nation``. Returns `None` if the statement fails (for example for a missing table) or returns no rows.
+**`get_query_plan(connection: Any, query: str) -> str | None`**: Returns the plan as text built from `EXPLAIN QUERY PLAN`: the line `QUERY PLAN` followed by one `id|parent|detail` row per plan step, so the parent ids keep the plan's branching (compound queries, subqueries and sibling nested-loop scans). It only runs `EXPLAIN QUERY PLAN`: there is no ANALYZE mode and no statement is executed. Returns `None` if the statement fails (for example for a missing table) or returns no rows.
 
 <span id="benchbox.platforms.sqlite.SQLiteAdapter.get_query_plan_parser"></span>
-**`get_query_plan_parser()`**: Returns a `SQLiteQueryPlanParser` (from `benchbox.core.query_plans.parsers.sqlite`) for the text that `get_query_plan` returns.
+**`get_query_plan_parser()`**: Returns a `SQLiteQueryPlanParser` (from `benchbox.core.query_plans.parsers.sqlite`) for the text that `get_query_plan` returns. The parser builds the plan tree from the parent ids; several top-level rows become children of a synthetic `Other` root. Malformed rows, duplicate ids and dangling parent references fail parsing and are recorded as a plan capture error. SQLite plan fingerprints reflect the branching shape, so they differ from fingerprints captured before parent ids were preserved.
 
 <span id="benchbox.platforms.sqlite.SQLiteAdapter.plan_capture_phase_eligible"></span>
 **`plan_capture_phase_eligible`** (class attribute): `True`. Query plans for SQLite are captured in a separate pass after the timed run, not inline with the timed queries.

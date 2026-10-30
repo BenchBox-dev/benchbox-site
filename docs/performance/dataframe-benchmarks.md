@@ -127,6 +127,18 @@ if plan:
         print(f"  - {hint}")
 ```
 
+### Plan capture in benchmark runs
+
+With `--capture-plans`, DataFrame-mode benchmark runs capture a plan per query after measurement. The result depends on the engine:
+
+| Engine | Captured plan | `plan_format` | Fingerprint |
+|---|---|---|---|
+| DataFusion, PySpark, LakeSail, Databricks | Structured plan DAG that `show-plan` renders and `compare --include-plans` compares | `dag` | `plan_fingerprint`, plus `plan_fingerprint_normalized` with `--normalize-plan-literals` |
+| Polars | Raw plan text only | `text` | None; the plan is not compared |
+| Pandas, Dask, cuDF | Unsupported | none | None |
+
+Each captured plan records `plan_capture_time_ms`. For Polars, DataFusion, PySpark and LakeSail, capture runs after collection and its time is excluded from the measured execution time; Databricks capture is deferred to the post-measurement phase, outside the timed windows. Pandas, Dask and cuDF have no plan to capture, so every query records a plan capture error with reason `unsupported`; these errors are counted in `capture_failures`, and strict plan capture raises instead. See [Query Plan Analysis](../features/query-plan-analysis.md#dataframe-plan-capture) for the fingerprint contract.
+
 ## SQL vs DataFrame Comparison
 
 Compare execution modes for platforms supporting both. The `sql_times` dictionary holds SQL execution times in milliseconds from a previous benchmark run:

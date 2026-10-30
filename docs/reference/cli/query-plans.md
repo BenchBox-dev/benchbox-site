@@ -48,6 +48,10 @@ benchbox show-plan --run results.json --query-id q05 --max-depth 3
 ### Notes
 
 - Plans must be captured during the benchmark run using `--capture-plans`. Without this flag, no plan data is available.
+- By default `--capture-plans` records a static (estimated) `EXPLAIN` plan after measurement, without re-executing the query. `--analyze-plans` opts into post-measurement `EXPLAIN ANALYZE` plans with actual timings on DuckDB, MotherDuck, PostgreSQL and GizmoSQL; `--no-analyze-plans` forces the estimated plan. DML, CTAS and `SELECT ... INTO` statements are never re-executed.
+- A query that has no captured plan reports a plan capture error in the run results instead of a plan. Strict plan capture raises instead.
+- SQLite plans keep the branching of `EXPLAIN QUERY PLAN` (compound queries, subqueries and sibling scans appear as sibling nodes).
+- For DataFrame runs, DataFusion, PySpark, LakeSail and Databricks plans render as trees. Polars stores raw plan text only, so `show-plan` prints the text and there is no fingerprint or plan comparison. Pandas, Dask and cuDF have no plan capture.
 - The result loader automatically checks for a companion `.plans.json` file alongside the result file.
 
 ---
@@ -97,6 +101,8 @@ The history table shows:
 | Version | Plan version number (increments on each plan change) |
 
 A summary section shows the total number of unique plans and plan changes. With `--check-flapping`, the command reports whether the plan exhibits instability.
+
+The fingerprint is the SHA-256 of the plan's normalized logical structure: operator types, tables, join type and conditions, filters, aggregates, grouping, sort, projections, limits and children. It excludes estimates, timings and physical metadata, so a matching fingerprint does not mean an identical physical plan. SQLite plan fingerprints changed when branching topology was preserved; history recorded before that change will show a one-time plan change for SQLite queries.
 
 ## Related
 

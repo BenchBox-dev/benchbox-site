@@ -26,9 +26,9 @@ All parameters are keyword-only. Positional arguments raise `TypeError`.
 | `scale_factor` | `float` | `0.01` | Data size multiplier. Must be greater than 0 and at most 100000. |
 | `queries` | `list[str]` or `None` | `None` | Query identifiers to run. `None` runs the benchmark's full query set. |
 | `concurrency` | `int` or `None` | `None` | Number of concurrent throughput streams. `None` means not set and runs the default of 2 streams. Must be at least 1, and at least 2 when the run includes the throughput phase. |
-| `capture_plans` | `bool` | `False` | Add `query_plan`, `plan_fingerprint` and `plan_capture_time_ms` to each query result when the lifecycle runs. |
-| `analyze_plans` | `bool` or `None` | `None` | Plan-capture detail. `None` leaves the choice to the platform adapter. |
-| `strict_plan_capture` | `bool` | `False` | Strict plan-capture mode. |
+| `capture_plans` | `bool` | `False` | Add `query_plan`, `plan_fingerprint` and `plan_capture_time_ms` to each query result when the lifecycle runs. Plans come from a static (estimated) `EXPLAIN` issued after measurement; queries are not re-executed. A capture that fails is recorded as a plan capture error and counted in `plan_capture_failures`. |
+| `analyze_plans` | `bool` or `None` | `None` | Plan-capture detail. `None` leaves the choice to the platform adapter, whose default is the static `EXPLAIN`. `True` opts into post-measurement `EXPLAIN ANALYZE` on the engines that support it (DuckDB, MotherDuck, PostgreSQL, GizmoSQL), which re-runs each captured SELECT once outside the measured window (about 1x the query cost); `False` forces the estimated plan. DML, CTAS and `SELECT ... INTO` statements are never re-executed. |
+| `strict_plan_capture` | `bool` | `False` | Strict plan-capture mode. A plan capture failure raises instead of being recorded as a plan capture error. |
 | `stats_reset` | `bool` or `None` | `None` | Reset control for the statistics phase. `None` keeps the default. |
 | `stats_per_table_timing` | `bool` | `False` | Record per-table timing for the statistics phase. |
 | `options` | `dict[str, Any]` | `{}` | Free-form options. The lifecycle reads `table_mode` from it (default `"native"`). |
