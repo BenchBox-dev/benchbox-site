@@ -1,0 +1,7 @@
+{
+  "mcpServers": {
+    "todo-db": {
+      "command": "todo-db-mcp"
+    }
+  }
+}
