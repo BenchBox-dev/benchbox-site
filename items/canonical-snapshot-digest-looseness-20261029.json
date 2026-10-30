@@ -1,0 +1,22 @@
+{
+  "acceptance": [
+    "The digest either covers column types and view definitions, or deploy/README.md states they are ignored and why, with a test for each rule",
+    "No exclusion in canonical-digest.ts matches a column that does not exist; tests in deploy/test/canonical-digest.test.ts cover each rule"
+  ],
+  "context": "Moved from the BenchBox core tracker, where it was filed on 2026-10-29, when this repository gained its own tracker.",
+  "description": "Found 2026-10-28 while reviewing results.duckdb byte differences. The deploy compares snapshots by canonical content digest (deploy/lib/canonical-digest.ts, deploy/gates/snapshot-digest.ts, from site PR 15). It orders rows by every column, rounds floats to 9 significant digits and drops generated_at. Gaps: (1) the generated_at exclusion now matches no column because core stores only read_model_version in the database (core duckdb_builder.py), so it is dead logic or hides a future column; (2) the digest ignores view and index definitions and column types, and float changes beyond 9 significant digits, although an exact EXCEPT ALL comparison of two core builds showed equal rows, row order and full float precision; (3) deploy/README.md does not explain why the digest is a content digest rather than a byte digest or what it ignores.\n\nRemove the dead exclusion or tie it to a real column, decide whether column types and view definitions belong in the digest (a schema change should change the digest), and add a short section to deploy/README.md that states the invariant and what is ignored.",
+  "links": [
+    "BenchBox-dev/benchbox-site: deploy/lib/canonical-digest.ts",
+    "BenchBox-dev/benchbox-site: deploy/gates/snapshot-digest.ts"
+  ],
+  "sessions": [
+    {
+      "actor": "mcp:omp-coding-agent:joe@joe-mac-mini.local:b8b5f8ab822ab44135d67f90",
+      "at": "2026-10-30T21:03:13Z",
+      "client": "omp-coding-agent",
+      "op": "create",
+      "op_id": "5424103361b3415986059c923c181b07",
+      "session_id": "cc767de99c19400aa238236633ca9140"
+    }
+  ]
+}

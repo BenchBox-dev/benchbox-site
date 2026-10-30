@@ -1,6 +1,13 @@
 {
   "batches": {},
   "items": {
+    "canonical-snapshot-digest-looseness-20261029": {
+      "claim": null,
+      "needs": [],
+      "priority": "low",
+      "status": "open",
+      "title": "Tighten or document what the deploy's canonical snapshot digest ignores"
+    },
     "docs-contracts-option-values-and-fences-coverage-20261029": {
       "claim": null,
       "needs": [],
