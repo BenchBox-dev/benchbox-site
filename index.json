@@ -7,6 +7,13 @@
       "priority": "medium",
       "status": "open",
       "title": "Check that a rollback to an artifact built before the known-broken-links allowance was emptied still passes the deploy gates"
+    },
+    "site-converter-tree-link-kind-immediate-parents-20261029": {
+      "claim": null,
+      "needs": [],
+      "priority": "low",
+      "status": "open",
+      "title": "Check that site docs links to core directories resolve against every ancestor directory, as repo-files.json now lists them"
     }
   },
   "schema_version": 3
