@@ -219,9 +219,10 @@ Adaptations to keep:
   `.todo-db/config.json` binds the `todo-db` MCP server that `.mcp.json`
   starts to that branch. The server runs on the developer's machine as
   `todo-db-mcp` and is not part of the site build.
-- Before the first tracker write in a session, confirm the bound store by
-  passing `BenchBox-dev/benchbox-site` as `expect_store`. A server started
-  from the core repository is bound to core's tracker and refuses it.
+- Use todo-db 0.11.0 or later; older servers ignore `expect_store`. Before
+  the first tracker write in a session, confirm the bound store by passing
+  `BenchBox-dev/benchbox-site` as `expect_store`. A server bound to core's
+  tracker refuses it.
 - Work that needs changes in both repositories is tracked in core, with
   links to the site paths it touches.
 - Change tracker state only through the server, never by editing the branch.
