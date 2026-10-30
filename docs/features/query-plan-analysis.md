@@ -180,9 +180,11 @@ seed-varied stream attaches its own plan rather than falling back to an id-only 
 somehow lacks the key (a bespoke driver that cannot supply one) falls back to matching by bare query id,
 which only succeeds when that id maps to a single executed SQL variant.
 
-Multi-stream runs persist one plan record per `(query_id, stream_id)` in the `.plans.json` companion -
-streams are never deduplicated or last-writer-wins collapsed, so every stream's plan and fingerprint
-survive a result-file round trip (`show-plan`, `compare --include-plans`).
+The `.plans.json` companion holds one entry per `(query, stream, test_type)`. Streams are never
+deduplicated or last-writer-wins collapsed, so every stream's plan and fingerprint survive a result-file
+round trip (`show-plan`, `compare --include-plans`). Each entry records the `iteration` and `run_type`
+of the execution it was captured from, and a reloaded result attaches the plan (SQL included) only to the
+row with that iteration and run type. There are no per-iteration `@N` keys.
 
 > **Bespoke DML query sets.** A *bespoke* query set that runs an `INSERT`/`UPDATE`/`DELETE` partway
 > through and then more `SELECT`s has no maintenance phase boundary and no pre-mutation checkpoint. Its
@@ -219,9 +221,14 @@ not set or when the query was excluded by `--plan-config`.
 | Polars | Raw plan text only | `text` | None; the plan is not comparable |
 | Pandas, Dask, cuDF | Unsupported | — | None |
 
-Every captured DataFrame plan carries `plan_capture_time_ms`. Pandas, Dask and cuDF have no plan to capture,
-so each query records a plan capture error with reason `unsupported`, counted in `capture_failures`; strict
-plan capture raises instead. `show-plan` prints the raw text for Polars and the rendered tree for DAG engines.
+Every captured DataFrame plan carries `plan_capture_time_ms`. For Polars, DataFusion, PySpark and LakeSail,
+capture runs after collection, and its time is excluded from the measured execution time. Databricks
+DataFrame capture is deferred to the post-measurement phase, outside the timed windows. Pandas, Dask and
+cuDF have no plan to capture, so each query records a plan capture error with reason `unsupported`, counted
+in `capture_failures`; strict plan capture raises instead.
+
+`plan_capture_failures` (`capture_failures` in the companion) counts distinct query IDs with at least one
+uncaptured execution, the same unit as `plans_captured`, not individual executions. `show-plan` prints the raw text for Polars and the rendered tree for DAG engines.
 
 ## Viewing Plans
 

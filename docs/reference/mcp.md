@@ -533,7 +533,7 @@ when a query has several. When several stream or test type variants exist and no
 returns a validation error that lists the available variants instead of choosing one. A qualifier that matches no
 variant returns a not-found error that lists the available variants.
 
-The `tree` and `summary` formats render the canonical plan. The summary counts operators, joins, scans, aggregates,
+For a plan truncated by depth, the `tree` format appends a truncation note to the tree and the response carries `truncated_at_depth`; the `summary` format reports `truncated_at_depth` in its summary. The `tree` and `summary` formats render the canonical plan. The summary counts operators, joins, scans, aggregates,
 filters and sorts, and reports the maximum depth; estimated rows and cost are `null` unless the plan carries them. The
 `json` format returns the stored plan unchanged. A stored plan that is not canonical returns a validation error that
 points at `format='json'`.

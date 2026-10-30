@@ -137,7 +137,7 @@ With `--capture-plans`, DataFrame-mode benchmark runs capture a plan per query a
 | Polars | Raw plan text only | `text` | None; the plan is not compared |
 | Pandas, Dask, cuDF | Unsupported | none | None |
 
-Each captured plan records `plan_capture_time_ms`. Pandas, Dask and cuDF have no plan to capture, so every query records a plan capture error with reason `unsupported`; these errors are counted in `capture_failures`, and strict plan capture raises instead. See [Query Plan Analysis](../features/query-plan-analysis.md#dataframe-plan-capture) for the fingerprint contract.
+Each captured plan records `plan_capture_time_ms`. For Polars, DataFusion, PySpark and LakeSail, capture runs after collection and its time is excluded from the measured execution time; Databricks capture is deferred to the post-measurement phase, outside the timed windows. Pandas, Dask and cuDF have no plan to capture, so every query records a plan capture error with reason `unsupported`; these errors are counted in `capture_failures`, and strict plan capture raises instead. See [Query Plan Analysis](../features/query-plan-analysis.md#dataframe-plan-capture) for the fingerprint contract.
 
 ## SQL vs DataFrame Comparison
 
