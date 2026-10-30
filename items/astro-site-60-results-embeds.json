@@ -1,0 +1,20 @@
+{
+  "acceptance": [
+    "Both components exist with tests; the cited variant shows snapshot identity",
+    "A withdrawn result fixture renders as withdrawn in both variants",
+    "Metric values match the Explorer for the same snapshot (shared-code test)",
+    "Pages without embeds still fetch zero Explorer bytes; axe clean"
+  ],
+  "context": "2026-10-17, after the site split: still a future feature that needs its own owner approval before starting. Needs moved from astro-site-54 to site-browser-acceptance-ci-20261017, because the zero-Explorer-bytes and axe checks this item relies on only run once those browser checks are in CI. Corrections to the description: components import from the explorer/ workspace in BenchBox-dev/benchbox-site (there is no separate Explorer package); embeds read the snapshot the site-inputs bundle delivers (results/data/results.duckdb), identified by the bundle's snapshot_sha256.\n\nMoved from the BenchBox core tracker on 2026-10-30, when this repository gained its own tracker.",
+  "description": "A post-cutover feature with its own owner approval before starting. Add two distinct Preact-island components:\n- **Cited result.** Frozen to a named corpus snapshot or bundle id. Shows that id and date, and never changes after publication. Use this in blog analysis.\n- **Current results.** Explicitly labelled live, reading the current published snapshot.\n\nBoth use the Explorer's canonical metric definitions, imported from the Explorer package, never reimplemented. Both honour the same visibility, admission and withdrawal rules as the Explorer: a withdrawn result renders as withdrawn and is never silently dropped or kept. Both load DuckDB only when scrolled into view, and pages without embeds ship zero Explorer bytes.",
+  "sessions": [
+    {
+      "actor": "mcp:omp-coding-agent:joe@joe-mac-mini.local:2b2975333a407fd7c2ce08ce",
+      "at": "2026-10-30T23:03:58Z",
+      "client": "omp-coding-agent",
+      "op": "create",
+      "op_id": "a77861ae054240c0bc5a7d4211d3ef61",
+      "session_id": "82c0d7d9603c4b7cb3497f18a64ea231"
+    }
+  ]
+}
