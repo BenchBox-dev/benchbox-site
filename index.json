@@ -1,6 +1,13 @@
 {
   "batches": {},
   "items": {
+    "blog-draft-byte-sha-of-snapshot-stale-20261029": {
+      "claim": null,
+      "needs": [],
+      "priority": "low",
+      "status": "open",
+      "title": "Replace the byte SHA-256 of the deployed snapshot cited in blog draft 17 with a content digest or remove the claim"
+    },
     "canonical-snapshot-digest-looseness-20261029": {
       "claim": null,
       "needs": [],
