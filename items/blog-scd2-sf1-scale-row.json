@@ -1,0 +1,14 @@
+{
+  "context": "Small factual addition. Re-measure SF1 rather than reuse the audit's ~13.3 ms,\nthen extend the existing table and soften the \"~1.7x\" sentence to acknowledge the\nnon-constant per-decade rate. Draft is unpublished, so this is low urgency.\n\n\nMoved from the BenchBox core tracker on 2026-10-30, when this repository gained its own tracker.\n\nThe draft now lives in this repository at drafts/platform-deep-dives/drafts/apply-changes-into-vs-standard-sql.md; the _blog/ and _project/DONE/ paths above predate the move. Rules carried over from the core item: no em or en dashes in blog content; re-measure SF1 rather than reuse the audit's ~13.3 ms; leave the SF0.01 and SF0.1 rows and their sources unchanged unless re-measured; keep the change-batch-bound framing accurate and do not overstate flatness.",
+  "description": "Follow-up deferred from scd2-docs-and-count-hygiene-followup (audit finding N12)\nand re-deferred from scd2-basic-idempotency-and-cleanup-scoping w4, which updated\nthe blog line counts (18 -> 20) but did not add the third scale point.\n\nThe SCD2 blog draft\n(_blog/platform-deep-dives/drafts/apply-changes-into-vs-standard-sql.md) presents\nthe \"change-batch-bound, not dimension-bound\" scale claim on only two points\n(SF0.01 and SF0.1, ~1.7x). Adding an SF1 row makes the growth curve honest: the\naudit re-derivation measured SF1.0 basic median ~13.3 ms against a 150,000-row\ndimension, i.e. 100x data costs ~6.4x, and the per-decade rate is NOT constant\n(~1.74x then ~3.66x). The two-point presentation reads flatter than the curve.\n\nScope: blog draft only (the research note already records the SF1 figure in its\nscale-independence section). Re-measure SF1 before publishing rather than\ntrusting the stale audit number, since the idempotency guard changed basic's SQL.\n",
+  "sessions": [
+    {
+      "actor": "mcp:omp-coding-agent:joe@joe-mac-mini.local:2b2975333a407fd7c2ce08ce",
+      "at": "2026-10-30T23:04:08Z",
+      "client": "omp-coding-agent",
+      "op": "create",
+      "op_id": "094ada8f00da469db6e480cc9e016299",
+      "session_id": "82c0d7d9603c4b7cb3497f18a64ea231"
+    }
+  ]
+}
