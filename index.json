@@ -89,6 +89,13 @@
       "status": "open",
       "title": "Decide whether to keep or retire the site's MyST-to-Markdown converter"
     },
+    "site-parity-header-shrink-toggle": {
+      "claim": null,
+      "needs": [],
+      "priority": "medium",
+      "status": "open",
+      "title": "Fix the site-parity header shrink-toggle mismatch between docs and results sites"
+    },
     "tuning-page-empty-aliases-sentence-20261029": {
       "claim": null,
       "needs": [],
