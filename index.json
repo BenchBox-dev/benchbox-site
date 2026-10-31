@@ -66,15 +66,10 @@
       "title": "Make redeploy ship the bundle that is live, not the newest bundle"
     },
     "deploy-resolver-reads-every-deployment-20261031": {
-      "claim": {
-        "expires_at": "2026-11-01T23:44:29Z",
-        "generation": "4936e2a1b94c4069a1429c2844ca5017",
-        "renewals": 0,
-        "worker": "mcp:omp-coding-agent:joe@joe-mac-mini.local:89fe2914d27056f15d362461"
-      },
+      "claim": null,
       "needs": [],
       "priority": "high",
-      "status": "active",
+      "status": "done",
       "title": "Bound the deploy resolver to the newest recorded receipt instead of reading every deployment and old receipt"
     },
     "deploy-superseded-bundle-reported-as-failure-20261031": {
