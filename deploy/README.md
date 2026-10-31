@@ -32,8 +32,11 @@ variables.
    receipt: `gh workflow run deploy.yml -R BenchBox-dev/benchbox-site --ref
    main -f mode=rollback -f receipt_run_id=<receipt run>`. The run looks the
    receipt up among those recorded for the current `SITE_DEPLOY_TARGET`, so a
-   receipt recorded for another target is not found, and only the `deploy`
-   job, which needs `rehearsal` or `production`, publishes it.
+   receipt recorded for another target is refused, and only the `deploy`
+   job, which needs `rehearsal` or `production`, publishes it. The lookup
+   loads that run's receipt and reads only the deployment named by its
+   `deployment_id`, which must be a github-pages deployment with a success
+   status recording the run and the receipt hash.
 2. Wait for the rollback run to finish and its probes to pass.
 3. Unset `SITE_DEPLOY_TARGET`. Later runs, including `core-bundle`
    dispatches, still resolve, build and gate, then stop before the `deploy`
@@ -44,3 +47,15 @@ variables.
 
 Unsetting the variable before step 2 completes leaves the rollback run
 without a `deploy` job, so nothing is restored.
+
+## Deployed-generation lookup
+
+`resolve`, `recheck` and the visual workflow find the deployed generation by
+reading deployments newest first and stopping at the newest success status
+recorded for the current `SITE_DEPLOY_TARGET`. A status without a target is
+resolved by loading its receipt, only when it is reached before a match. The
+scan stops after three pages of 100 deployments; a miss inside that bound
+fails with `ReceiptLookupBoundError` instead of reporting nothing deployed.
+Each lookup logs `deploy lookup: <n> REST calls, <n> receipt loads`. API
+failures log the route, status, rate-limit headers and the first 200 characters
+of the message, and GET requests retry network errors twice.
