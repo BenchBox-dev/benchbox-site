@@ -25,6 +25,19 @@ export function rebaseDocsLinks(html: string, prefix: string, origin: string): s
   return html.replace(URL_ATTRIBUTE, (_match, attribute: string, quote: string, value: string) => `${attribute}${quote}${rebaseValue(value, prefix, origin)}${quote}`);
 }
 
+const CANONICAL_TAG = /<(?:link|meta)\b[^>]*>/gi;
+const CANONICAL_MARKER = /\srel\s*=\s*(["'])canonical\1|\sproperty\s*=\s*(["'])og:url\2/i;
+
+export function rebaseDocsPage(html: string, prefix: string, origin: string): string {
+  const kept: string[] = [];
+  const masked = html.replace(CANONICAL_TAG, (tag: string) => {
+    if (!CANONICAL_MARKER.test(tag)) return tag;
+    kept.push(tag);
+    return `<!--canonical:${kept.length - 1}-->`;
+  });
+  return rebaseDocsLinks(masked, prefix, origin).replace(/<!--canonical:(\d+)-->/g, (_match, index: string) => kept[Number(index)]);
+}
+
 function htmlFiles(root: string): string[] {
   return readdirSync(root, { withFileTypes: true }).flatMap((entry) => {
     const full = path.join(root, entry.name);
@@ -45,7 +58,7 @@ export function mountDevDocs(siteDir: string, origin: string): number {
   let changed = 0;
   for (const page of htmlFiles(dev)) {
     const original = readFileSync(page, "utf8");
-    const rebased = rebaseDocsLinks(original, DEV_DOCS_PREFIX, origin);
+    const rebased = rebaseDocsPage(original, DEV_DOCS_PREFIX, origin);
     if (rebased !== original) {
       writeFileSync(page, rebased);
       changed += 1;
