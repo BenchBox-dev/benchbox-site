@@ -54,6 +54,13 @@
       "status": "open",
       "title": "Extend the site docs contract checks to option values beyond --platform, other pages, and non-bash code fences"
     },
+    "docs-dev-canonical-to-docs-20261030": {
+      "claim": null,
+      "needs": [],
+      "priority": "medium",
+      "status": "open",
+      "title": "Point the canonical link of every /docs/dev/ page at its /docs/ counterpart"
+    },
     "public-site-visual-regression-false-mismatch-20261014": {
       "claim": null,
       "needs": [],
