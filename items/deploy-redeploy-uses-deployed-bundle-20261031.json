@@ -1,0 +1,26 @@
+{
+  "acceptance": [
+    "A redeploy run fetches the bundle by the deployed receipt's core_sha and fails closed unless the fetched digest equals the receipt's bundle_digest",
+    "When no receipt is deployed for the target, redeploy fails with a named error instead of picking the newest bundle",
+    "Tests cover a matching digest, a digest mismatch and no deployed receipt",
+    "deploy/README.md and the workflow input description say what redeploy ships"
+  ],
+  "context": "Found 2026-10-31 by the review of deploy-superseded-bundle-reported-as-failure-20261031.",
+  "description": "The Deploy workflow's 'redeploy (same bundle again)' mode (.github/workflows/deploy.yml:11) fetches the newest successful site-inputs bundle by run creation time (scripts/bundle-fetch.mjs:88-96), and redeploy skips the freshness compare (deploy/cli.ts:114 runs it only in deploy mode). A redeploy can therefore ship a core bundle older than the live one, or a newer one that never passed the freshness check, contrary to its label. The deployed receipt records core_sha and bundle_digest, and bundle-fetch accepts SITE_INPUTS_CORE_SHA (bundle-fetch.mjs:80-87; SITE_INPUTS_RUN_ID takes precedence at :73 and must be cleared). The superseded-bundle item adds a fetch-by-deployed-core_sha path with a digest check; reuse it.",
+  "links": [
+    ".github/workflows/deploy.yml",
+    "deploy/cli.ts",
+    "scripts/bundle-fetch.mjs",
+    "deploy/README.md"
+  ],
+  "sessions": [
+    {
+      "actor": "mcp:omp-coding-agent:joe@joe-mac-mini.local:f49e5d07dc7a5f74ab116b22",
+      "at": "2026-10-31T15:13:31Z",
+      "client": "omp-coding-agent",
+      "op": "create",
+      "op_id": "8a8cddcb6c5442dc9e5cd5df329e8aa2",
+      "session_id": "da31eb4604bb4e9685337e08ec0df489"
+    }
+  ]
+}
