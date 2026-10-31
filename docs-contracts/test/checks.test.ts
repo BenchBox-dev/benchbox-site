@@ -70,6 +70,8 @@ const SEEDS: Seed[] = [
   { name: "release marker version drift", check: "version-token", page: "README.md", pages: (p) => replace(p, "README.md", `v${VERSION}`, "v1.2.2") },
   { name: "install page claims DuckDB default", check: "install-surface", page: "usage/faq.md", pages: (p) => (p["usage/faq.md"] += "DuckDB is included with BenchBox by default.\n") },
   { name: "required page not published", check: "page-present", page: "design/architecture.md", pages: (p) => delete p["design/architecture.md"] },
+  { name: "pull request number on a user page", check: "user-page-sources", page: "usage/faq.md", pages: (p) => (p["usage/faq.md"] += "Shipped in PR #980.\n") },
+  { name: "source documentation path on a user page", check: "user-page-sources", page: "usage/faq.md", pages: (p) => (p["usage/faq.md"] += "See `docs/development/adr/adr-example.md`.\n") },
 ];
 
 describe("seeded documentation drift fails with the page and the violated invariant", () => {
@@ -229,5 +231,21 @@ describe("a real schema 4 bundle", { skip: !existsSync(process.env.DOC_CONTRACTS
     const outcome = runChecks({ inputs: process.env.DOC_CONTRACTS_SCHEMA4_BUNDLE as string, mode: "block" });
     assert.deepEqual(outcome.blocking, []);
     assert.deepEqual(outcome.reported, []);
+  });
+});
+
+describe("user-page source references", () => {
+  it("allows maintainer pages to cite pull requests and source paths", () => {
+    const outcome = run({
+      pages: (p) => {
+        p["design/architecture.md"] += "Shipped in PR #980; see `docs/development/adr/adr-example.md`.\n";
+      },
+    });
+    assert.deepEqual(outcome.blocking, []);
+  });
+
+  it("ignores source paths inside code fences", () => {
+    const outcome = run({ pages: (p) => (p["usage/faq.md"] += "```bash\ncat docs/development/adr/adr-example.md\n```\n") });
+    assert.deepEqual(outcome.blocking, []);
   });
 });

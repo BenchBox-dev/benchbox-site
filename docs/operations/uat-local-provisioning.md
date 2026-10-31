@@ -21,7 +21,7 @@ started by the operator.
 `resolve_container_cli()` picks the compose-compatible binary: `BENCHBOX_CONTAINER_CLI`
 env override (verbatim) > macOS: `mocker` if on `PATH`, else `docker` > every
 other platform: always `docker`. A missing resolved binary is a hard error.
-Full contract and mocker teardown interaction: `docs/operations/uat-framework.md`
+Full contract and mocker teardown interaction: [UAT framework](uat-framework.md)
 "Container engine resolution".
 
 ## Automated Docker-backed platforms
@@ -95,7 +95,7 @@ only.
    running in the same sweep. Apple container/mocker sizes each container's
    VM independently — confirm the host has equivalent headroom free rather
    than raising a shared ceiling.
-4. **Doris `vm.max_map_count` ≥ 2000000** — see `docs/platforms/doris.md`.
+4. **Doris `vm.max_map_count` ≥ 2000000** — see the [Doris platform guide](../platforms/doris.md).
    Skip this → Doris fails its startup preflight check inside the container
    unless `DORIS_PRIVILEGED=true` is also set.
 5. **`make uat-prepull PLATFORM=<name>`** for slow/first-run stacks

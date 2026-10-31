@@ -174,12 +174,14 @@ AuthenticationError: Invalid credentials
 Access Denied
 ```
 
+Cloud platforms authenticate with the credentials saved by `benchbox setup --platform <name>`. Re-run setup, or `benchbox setup --platform <name> --validate-only`, to fix or check them. The commands below test the same values from your shell, using the variable names setup reads.
+
 **Platform-Specific Solutions:**
 
 #### Snowflake
 
 ```bash
-snowsql -a $SNOWFLAKE_ACCOUNT -u $SNOWFLAKE_USER
+snowsql -a $SNOWFLAKE_ACCOUNT -u $SNOWFLAKE_USERNAME
 
 echo $SNOWFLAKE_ACCOUNT
 ```
@@ -207,7 +209,7 @@ gcloud projects describe $BIGQUERY_PROJECT
 #### Redshift
 
 ```bash
-psql -h $REDSHIFT_HOST -p 5439 -U $REDSHIFT_USER -d dev
+psql -h $REDSHIFT_HOST -p 5439 -U $REDSHIFT_USERNAME -d dev
 
 aws sts get-caller-identity
 ```

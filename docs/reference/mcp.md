@@ -308,11 +308,11 @@ modes remain available because they do not hold the request for execution.
   with a `deprecations` entry. The `mode` spelling is not accepted over MCP.
   Velox `velox:remote` is rejected for the same reason as the Velox
   `deployment` option below.
-- The authoritative option-to-consumer, security-class, alias, and rejection
-  matrix is maintained in
-  `docs/development/mcp-platform-option-contract.md`. Every allow-listed key
-  must have a matching matrix entry; a missing entry fails closed before
-  adapter construction or durable-job persistence.
+- `platform_options` accepts only the keys in the table after this list. Any
+  other key is rejected before an adapter is built or a durable job is
+  persisted. The
+  [MCP platform-option contract](../development/mcp-platform-option-contract.md)
+  gives the maintainer-side background for each entry.
 - Normal execution uses `BaseBenchmark.run_with_platform()` through public
   benchmark and adapter APIs.
 - MCP execution intentionally suppresses console output and returns structured
@@ -322,6 +322,45 @@ modes remain available because they do not hold the request for execution.
   that needs real paths and hostnames to act on results; a remote tenant is a
   different trust boundary, so `run_benchmark`, durable job publication, and
   `analyze_results` comparisons all export with anonymization enabled there.
+
+**Accepted `platform_options` keys:**
+
+A platform ending in `-df` uses the keys of its base platform (for example
+`polars-df` uses the `polars` keys). String values must be 1 to 256
+characters.
+
+| Platform | Key | Type and range | Effect |
+|---|---|---|---|
+| `clickhouse` | `deployment_mode` | string: `local` or `server` | Deprecated spelling of `clickhouse:local` / `clickhouse:server`; answered with a `deprecations` entry |
+| `clickhouse`, `clickhouse-server` | `connection_profile` | string | Names a server-side connection profile defined by the operator; the request cannot set a host, port or TLS flag |
+| `cudf` | `device_id` | integer 0 to 255 | GPU device index |
+| `cudf` | `spill_to_host` | boolean | Spill GPU memory to host memory |
+| `dask` | `memory_limit` | string, bounded size such as `2GB` | Memory per worker |
+| `dask` | `n_workers` | integer 1 to 256 | Worker count; bounded in aggregate by the server budget |
+| `dask` | `threads_per_worker` | integer 1 to 256 | Threads per worker |
+| `dask` | `use_distributed` | boolean | Use the distributed local cluster |
+| `datafusion` | `batch_size` | integer 1 to 1000000 | Execution batch size |
+| `datafusion` | `memory_limit` | string | Memory limit |
+| `datafusion` | `parquet_pushdown` | boolean | Parquet filter pushdown |
+| `datafusion` | `repartition_joins` | boolean | Repartition join inputs |
+| `datafusion` | `target_partitions` | integer 1 to 1024 | Target partition count |
+| `duckdb` | `memory_limit` | string, such as `2GB` | Memory limit |
+| `duckdb` | `threads` | integer 1 to 256 | Thread count |
+| `firebolt` | `disable_result_cache` | boolean | Disable the result cache |
+| `firebolt` | `strict_validation` | boolean | Strict result validation |
+| `databricks` | `databricks_clustering_strategy` | string: `z_order`, `liquid_clustering`, `liquid_clustering_auto` or `none` | Table clustering strategy |
+| `databricks` | `liquid_clustering_columns` | string | Columns for liquid clustering; contradictory combinations are rejected |
+| `pandas` | `dtype_backend` | string: `numpy_nullable` or `pyarrow` | DataFrame dtype backend |
+| `polars` | `n_rows` | integer 1 to 10000000 | Row limit on input |
+| `polars` | `rechunk` | boolean | Rechunk after reading |
+| `polars` | `streaming` | boolean | Streaming execution |
+| `spark` | `adaptive_enabled` | boolean | Adaptive query execution |
+| `sqlite` | `check_same_thread` | boolean | SQLite thread check |
+| `sqlite` | `timeout` | number 0 to 300 | Connection timeout in seconds |
+| `velox` | `adaptive_enabled` | boolean | Adaptive execution |
+| `velox` | `driver_memory` | string | Driver memory |
+| `velox` | `offheap_size` | string | Off-heap size |
+| `velox` | `shuffle_partitions` | integer 1 to 1024 | Shuffle partition count |
 
 **Scoped-surface omission ledger:**
 
@@ -431,7 +470,34 @@ the same three categories as above.
 | Gateway connection options (`--platform-option`) | Omitted | security-scoped | Gateway connection parameters (`gateway_host`, `gateway_port`, `gateway_protocol`, `gateway_ca_bundle`, `gateway_ocsp_fail_open`, `allow_insecure_gateway`) configure network endpoints and TLS trust. Server operators configure endpoints locally; MCP requests must not name arbitrary network hosts or bypass TLS verification. |
 | `--allow-greybeam-inline-load` | Omitted | security-scoped | Overrides a runtime guardrail that blocks generate/load phases through the greybeam gateway and yields invalid data. MCP requests must not bypass it; the gateway itself is not reachable through MCP. |
 
-The textcharts MCP server remains a separate-client integration, not a bundled or proxied part of `benchbox-mcp`. See `docs/design/textcharts-mcp-boundary.md` for the accepted separate textcharts configuration and the rejected bundle/proxy alternatives.
+### Textcharts Server
+
+`benchbox-mcp` publishes only the result-aware chart tools `suggest_charts` and `generate_chart`. For raw chart primitives that take arbitrary data arrays, run the separate `textcharts` MCP server next to it as its own client entry. BenchBox does not bundle, start or proxy it.
+
+```bash
+pip install "textcharts[mcp]"
+```
+
+The install provides the `textcharts-mcp` command. Register both servers in your MCP client, for example in `.mcp.json`:
+
+```json
+{
+  "mcpServers": {
+    "benchbox": {
+      "type": "stdio",
+      "command": "benchbox-mcp",
+      "args": []
+    },
+    "textcharts": {
+      "type": "stdio",
+      "command": "textcharts-mcp",
+      "args": []
+    }
+  }
+}
+```
+
+See the [Textcharts MCP setup guide](https://joeharris76.github.io/textcharts/latest/mcp-setup.html) for its tools and client options. The [Textcharts boundary decision](../design/textcharts-mcp-boundary.md) records why the two stay separate; it is optional background.
 
 ### Discovery Tools
 
@@ -752,21 +818,36 @@ Resources provide read-only access to BenchBox data. Currently, resources are ac
 
 ## Error Handling
 
-All tools return structured error information:
+Tool failures return a structured error object:
 
 ```json
 {
-  "error": "Description of the error",
-  "error_type": "ExceptionClassName",
-  "suggestion": "How to resolve the issue"
+  "error": true,
+  "error_code": "VALIDATION_UNSUPPORTED_MODE",
+  "error_category": "client",
+  "message": "Platform 'sqlite' does not support dataframe mode",
+  "details": {"platform": "sqlite", "requested_mode": "dataframe", "supported_modes": ["sql"]},
+  "suggestion": "Use one of: sql"
 }
 ```
 
-Common error types:
+| Field | Meaning |
+|---|---|
+| `error` | Always `true` for an error response |
+| `error_code` | Stable machine-readable code, such as `VALIDATION_UNKNOWN_PLATFORM` |
+| `error_category` | One of `client`, `platform`, `execution` or `server` |
+| `message` | Human-readable description |
+| `details` | Context for the failure; present only when there is some |
+| `suggestion` | How to resolve the issue; present only when one applies |
+| `retry_hint` | `true` when retrying may succeed; omitted otherwise |
 
-- **ConfigurationError**: Invalid platform or benchmark configuration
-- **DependencyError**: Missing required dependencies
-- **FileNotFoundError**: Result file not found
+Error codes fall into these families:
+
+- **`VALIDATION_*`** (client): the request was rejected, for example an unknown platform or benchmark, an invalid scale factor, query ID, phase or format, or an unsupported platform or mode
+- **`PLATFORM_*`** and **`DEPENDENCY_MISSING`** (platform): the platform is unavailable, its dependencies or credentials are missing, or the connection failed
+- **`BENCHMARK_*`** (execution): execution, data generation, a query or validation failed
+- **`RESOURCE_*`**: a result or file was not found, has an invalid format, or access was denied
+- **`INTERNAL_*`** (server): an internal error, timeout or out-of-memory condition
 
 ## Related Documentation
 

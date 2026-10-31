@@ -122,6 +122,8 @@ These variables control lower-level behaviors, useful for CI, offline environmen
 
 ### Platform Authentication
 
+`benchbox setup --platform <name>` saves cloud credentials, and `benchbox run` reads the saved credentials. The variables below are read by setup when you accept its environment auto-detection prompt; setting them does not authenticate `run` by itself.
+
 **Databricks:**
 
 - `DATABRICKS_TOKEN`: Authentication token
@@ -129,18 +131,23 @@ These variables control lower-level behaviors, useful for CI, offline environmen
 
 **BigQuery:**
 
-- `GOOGLE_APPLICATION_CREDENTIALS`: Service account key file path
+- `GOOGLE_APPLICATION_CREDENTIALS`: Service account key file path (required by setup)
+- `BIGQUERY_PROJECT`: Google Cloud project ID (required by setup)
+- `BIGQUERY_DATASET`, `BIGQUERY_LOCATION`, `BIGQUERY_STORAGE_BUCKET`: Optional dataset, location and staging bucket
 
 **Snowflake:**
 
-- `SNOWFLAKE_USER`: Username
-- `SNOWFLAKE_PASSWORD`: Password
 - `SNOWFLAKE_ACCOUNT`: Account identifier
+- `SNOWFLAKE_USERNAME`: Username
+- `SNOWFLAKE_PASSWORD`: Password
+- `SNOWFLAKE_WAREHOUSE`, `SNOWFLAKE_DATABASE`: Warehouse and database (required by setup)
+- `SNOWFLAKE_SCHEMA`, `SNOWFLAKE_ROLE`: Optional schema and role
 
 **Redshift:**
 
-- `AWS_ACCESS_KEY_ID`: AWS access key
-- `AWS_SECRET_ACCESS_KEY`: AWS secret key
+- `REDSHIFT_HOST`, `REDSHIFT_USERNAME`, `REDSHIFT_PASSWORD`, `REDSHIFT_DATABASE`: Connection details (required by setup)
+- `REDSHIFT_PORT`, `REDSHIFT_SCHEMA`, `REDSHIFT_S3_BUCKET`, `REDSHIFT_IAM_ROLE`: Optional port, schema and S3 staging settings
+- `AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY`, `AWS_DEFAULT_REGION`: Optional AWS credentials and region for S3 staging
 
 **ClickHouse:**
 

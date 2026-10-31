@@ -191,23 +191,14 @@ Generated data is stored in `benchmark_runs/*/data/` by default.
 
 ### How do I configure cloud platform credentials?
 
-Use environment variables (recommended) or the interactive setup wizard:
-
-**Environment variables**:
+Run the credential setup for the platform. `benchbox run` reads the credentials that setup saves:
 
 ```bash
-export DATABRICKS_HOST="https://your-workspace.cloud.databricks.com"
-export DATABRICKS_TOKEN="your-token"
-export SNOWFLAKE_ACCOUNT="your-account"
-export SNOWFLAKE_USER="your-user"
-export SNOWFLAKE_PASSWORD="your-password"
+benchbox setup --platform snowflake
+benchbox run --platform snowflake --benchmark tpch --scale 1.0
 ```
 
-**Setup wizard**:
-
-```bash
-benchbox platforms setup
-```
+Setup can read its answers from environment variables when you accept auto-detection. Snowflake uses `SNOWFLAKE_ACCOUNT`, `SNOWFLAKE_USERNAME`, `SNOWFLAKE_PASSWORD`, `SNOWFLAKE_WAREHOUSE` and `SNOWFLAKE_DATABASE`; Redshift uses `REDSHIFT_HOST`, `REDSHIFT_USERNAME`, `REDSHIFT_PASSWORD` and `REDSHIFT_DATABASE`; BigQuery needs `GOOGLE_APPLICATION_CREDENTIALS` and `BIGQUERY_PROJECT`. List the supported platforms with `benchbox setup --list-platforms` and check saved credentials with `benchbox setup --status`.
 
 See the [Platform Selection Guide](../platforms/platform-selection-guide.md) for platform-specific details.
 

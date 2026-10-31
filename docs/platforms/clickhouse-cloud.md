@@ -64,12 +64,32 @@ benchbox run --platform clickhouse-cloud --benchmark tpch --scale 1.0 \
     --platform-option username=default
 ```
 
+### OAuth Token Authentication
+
+Instead of a password, BenchBox can authenticate with an OAuth bearer token. Set `CLICKHOUSE_CLOUD_OAUTH_TOKEN` or pass `oauth_token`; when a token is present it is used in place of the username and password.
+
+```bash
+export CLICKHOUSE_CLOUD_HOST=abc123.us-east-2.aws.clickhouse.cloud
+export CLICKHOUSE_CLOUD_OAUTH_TOKEN=your-oauth-token
+
+benchbox run --platform clickhouse-cloud --benchmark tpch --scale 1.0
+```
+
+```bash
+benchbox run --platform clickhouse-cloud --benchmark tpch --scale 1.0 \
+    --platform-option host=abc123.us-east-2.aws.clickhouse.cloud \
+    --platform-option oauth_token=your-oauth-token
+```
+
+Supply either a password or an OAuth token; without one of them the run stops with an authentication error before connecting.
+
 ## Configuration Options
 
 | Option | Environment Variable | Default | Description |
 |--------|---------------------|---------|-------------|
 | `host` | `CLICKHOUSE_CLOUD_HOST` | - | Cloud hostname (required) |
-| `password` | `CLICKHOUSE_CLOUD_PASSWORD` | - | Authentication password (required) |
+| `password` | `CLICKHOUSE_CLOUD_PASSWORD` | - | Authentication password (required unless `oauth_token` is set) |
+| `oauth_token` | `CLICKHOUSE_CLOUD_OAUTH_TOKEN` | - | OAuth bearer token, used in place of the password |
 | `username` | `CLICKHOUSE_CLOUD_USER` | `default` | Username |
 | `database` | - | `default` | Target database |
 | `max_memory_usage` | - | `0` | Max memory per query (bytes) |

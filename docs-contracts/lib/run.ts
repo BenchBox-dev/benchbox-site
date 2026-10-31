@@ -9,6 +9,7 @@ import { consistencyViolations } from "../checks/consistency.ts";
 import { countViolations } from "../checks/counts.ts";
 import { optionViolations } from "../checks/options.ts";
 import { pageViolations } from "../checks/pages.ts";
+import { sourceReferenceViolations } from "../checks/sources.ts";
 import type { Context, Contracts, Manifest, Page, Violation } from "./types.ts";
 
 export type Mode = "report" | "block";
@@ -39,6 +40,7 @@ export function docsChecks(ctx: Context): Violation[] {
     ...guarded("commands", () => commandViolations(ctx)),
     ...guarded("mcp", () => mcpViolations(ctx)),
     ...guarded("pages", () => pageViolations(ctx)),
+    ...guarded("user-page-sources", () => sourceReferenceViolations(ctx)),
   ];
 }
 
