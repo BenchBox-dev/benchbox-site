@@ -1,0 +1,24 @@
+{
+  "acceptance": [
+    "bundle-fetch proceeds as soon as the producing run's bundle-building job has succeeded and the bundle artifact is listed, regardless of other jobs in that run; it still fails closed when that job failed or the artifact is missing",
+    "If the bundle job itself is still queued or running, the existing bounded wait applies to that job",
+    "Tests cover a run whose bundle job succeeded while a later job is queued, a failed bundle job, and a missing artifact",
+    "The first core-bundle dispatch deploy after merge whose producing run still has a queued trailing job deploys without waiting for it; run id recorded"
+  ],
+  "context": "Found 2026-10-31 while checking the first deploys after the bounded-resolver and bundle-order changes; the wait predates them.",
+  "description": "scripts/bundle-fetch.mjs (wait added in #47, 2026-10-19) waits up to 600 s for the producing core site-inputs run to complete before downloading its bundle. Core dispatches the bundle as soon as its 'build bundle' job succeeds, but the run then still has a trailing job ('close the bundle-failure issue') that needs a runner. Under the org's shared 20-job cap that job can wait far longer than 600 s, so the deploy fails even though the bundle artifact is ready: deploy run 41250152375 (2026-10-31, core d1a724dec) waited on producing run 41248555826, whose 'build bundle' job finished at 22:53:14Z while 'close the bundle-failure issue' only started at 23:22:06Z; the deploy gave up at 23:13:57Z ('did not complete within the 600s wait cap'), posted to #58 and the core relay.",
+  "links": [
+    "scripts/bundle-fetch.mjs",
+    "https://github.com/BenchBox-dev/benchbox-site/issues/58"
+  ],
+  "sessions": [
+    {
+      "actor": "mcp:omp-coding-agent:joe@joe-mac-mini.local:89fe2914d27056f15d362461",
+      "at": "2026-10-31T23:43:22Z",
+      "client": "omp-coding-agent",
+      "op": "create",
+      "op_id": "70cf57f19d7d439886059f198f4708a5",
+      "session_id": "1dd70b50f5c94dfeab9b3c308cd31311"
+    }
+  ]
+}
