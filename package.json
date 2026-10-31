@@ -25,8 +25,7 @@
     "deploy": "node --experimental-strip-types --disable-warning=ExperimentalWarning deploy/cli.ts",
     "test:deploy": "node --experimental-strip-types --disable-warning=ExperimentalWarning --test deploy/test/*.test.ts",
     "docs:check": "node --experimental-strip-types --disable-warning=ExperimentalWarning docs-contracts/cli.ts",
-    "test:docs-contracts": "node --experimental-strip-types --disable-warning=ExperimentalWarning --test docs-contracts/test/*.test.ts",
-    "shadow:compare": "node scripts/shadow-compare.mjs"
+    "test:docs-contracts": "node --experimental-strip-types --disable-warning=ExperimentalWarning --test docs-contracts/test/*.test.ts"
   },
   "devDependencies": {
     "@duckdb/duckdb-wasm": "1.32.0",

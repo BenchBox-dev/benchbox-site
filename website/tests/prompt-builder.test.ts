@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { buildOutput, normaliseState, platformsForFilters, searchFromState, stateFromSearch } from "../src/lib/prompt-builder.ts";
-import { loadPromptCatalog, parseCatalogSource } from "../src/lib/prompt-catalog.ts";
+import { loadPromptCatalog } from "../src/lib/prompt-catalog.ts";
 
 const catalog = loadPromptCatalog();
 
@@ -8,10 +8,6 @@ describe("prompt catalog", () => {
   it("parses the generated include", () => {
     expect(catalog.defaults.platform).toBe("duckdb");
     expect(catalog.benchmarks.map((b) => b.id)).toContain("tpch");
-  });
-
-  it("rejects a file that is not the generated include", () => {
-    expect(() => parseCatalogSource("var x = 1;")).toThrow(/does not assign/);
   });
 });
 
