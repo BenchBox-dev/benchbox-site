@@ -8,7 +8,7 @@ on:
   workflow_dispatch:
     inputs:
       mode:
-        description: "deploy (newest certified bundle; a bundle older than the live one is skipped or replaced by the live one), redeploy (same bundle again) or rollback (restore a receipt's artifact)"
+        description: "deploy (newest certified bundle; a bundle older than the live one is skipped or replaced by the live one), redeploy (this site commit with the core bundle that is live) or rollback (restore a receipt's artifact)"
         type: choice
         options: [deploy, redeploy, rollback]
         default: deploy

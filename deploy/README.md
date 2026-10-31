@@ -61,6 +61,24 @@ Each lookup logs `deploy lookup: <n> REST calls, <n> receipt loads`. API
 failures log the route, status, rate-limit headers and the first 200 characters
 of the message, and GET requests retry network errors twice.
 
+## Choosing the core bundle
+
+Core's site-inputs runs are created in the order Trunk finishes, not in commit
+order, so run creation time does not say which bundle is newest. `bundle:fetch`
+looks at the ten most recent successful `develop` site-inputs runs that still
+have an unexpired bundle and takes the bundle whose `core_sha` is newest by
+commit order, found with the core compare API (at most nine compares, 20 API
+calls in all). If two candidates have diverged, or a compare fails or returns an
+unknown status, the run fails; divergence is class `diverged-bundle`.
+
+A `core-bundle` dispatch names a run. If a recent bundle is a descendant of the
+dispatched `core_sha`, the run deploys the newest descendant instead, which
+also covers a newer dispatch that the `pages-deploy` concurrency group
+replaced. The notice names both core commits. The dispatch's digest belongs to
+the replaced bundle, so it is not compared; the replacement still passes the
+bundle schema, digest and certification verification. Descendants that have
+diverged from each other fail the run.
+
 ## Bundles behind the deployed one
 
 Core's site-inputs runs finish in the order Trunk finishes, not in commit
@@ -82,4 +100,14 @@ the candidate's and acts on the result:
 - `diverged`, an unknown status or a failed compare: the run fails and is
   reported. A diverged candidate has its own failure class, `diverged-bundle`.
 
-`rollback` and `redeploy` runs do not compare and behave as before.
+A `rollback` run does not compare and behaves as before.
+
+## Redeploy
+
+`mode=redeploy` builds this site commit with the core bundle that is live. It
+reads the deployed receipt for the current `SITE_DEPLOY_TARGET`, fetches the
+bundle by the receipt's `core_sha` and fails closed unless the fetched bundle
+carries that `core_sha` and its digest equals the receipt's `bundle_digest`.
+It never picks the newest bundle and runs no freshness compare. With no
+receipt deployed for the target it fails with "redeploy needs a deployed
+receipt".

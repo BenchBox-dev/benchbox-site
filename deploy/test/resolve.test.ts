@@ -1,6 +1,6 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { chainErrors, freshness } from "../lib/resolve.ts";
+import { chainErrors, deployedBundleErrors, freshness, redeployErrors } from "../lib/resolve.ts";
 import { classifyFailure } from "../lib/relay.ts";
 import { recheckErrors } from "../lib/recheck.ts";
 import { verifyBundle } from "../../scripts/bundle-lib.mjs";
@@ -86,4 +86,28 @@ test("overlapping runs: a run that resolves after another deployed is checked ag
   const otherDeployed = { core_sha: "b".repeat(40), corpus_sha: "c".repeat(40), site_sha: "7".repeat(40) };
   assert.equal(freshness(otherDeployed, "d".repeat(40), newSiteSha, { status: 200, body: { status: "behind" } }).action, "use-deployed-bundle");
   assert.equal(freshness(otherDeployed, "d".repeat(40), newSiteSha, { status: 200, body: { status: "ahead" } }).action, "fresh");
+});
+
+const receipt = { core_sha: deployed.core_sha, bundle_digest: `sha256:${"d".repeat(64)}` };
+
+test("redeploy accepts the deployed bundle when the core commit and digest match the receipt", () => {
+  assert.deepEqual(redeployErrors(deployed, "production"), []);
+  assert.deepEqual(deployedBundleErrors(receipt, { core_sha: receipt.core_sha, digest: receipt.bundle_digest }), []);
+});
+
+test("redeploy fails closed on a digest or core commit that differs from the receipt", () => {
+  const digest = `sha256:${"e".repeat(64)}`;
+  const mismatch = deployedBundleErrors(receipt, { core_sha: receipt.core_sha, digest });
+  assert.equal(mismatch.length, 1);
+  assert.match(mismatch[0], /does not match the receipt/);
+  assert.ok(mismatch[0].includes(digest) && mismatch[0].includes(receipt.bundle_digest));
+  const wrongCommit = deployedBundleErrors(receipt, { core_sha: "f".repeat(40), digest: receipt.bundle_digest });
+  assert.match(wrongCommit[0], /carries core_sha f{40}/);
+});
+
+test("redeploy with no deployed receipt fails with a named error instead of choosing the newest bundle", () => {
+  const errors = redeployErrors(null, "production");
+  assert.equal(errors.length, 1);
+  assert.match(errors[0], /redeploy needs a deployed receipt for target production/);
+  assert.match(redeployErrors(null, "")[0], /target any/);
 });
