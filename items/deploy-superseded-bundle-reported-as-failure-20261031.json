@@ -1,0 +1,24 @@
+{
+  "acceptance": [
+    "A candidate whose core_sha is an ancestor of the deployed core_sha ends without a failed conclusion, logs a notice naming both SHAs, and posts nothing to issue #58",
+    "A candidate that has diverged from the deployed core_sha still fails closed and is reported as today",
+    "Tests cover the behind and diverged cases"
+  ],
+  "context": "Found 2026-10-31 while classifying failed production deploy runs; see deploy-resolver-reads-every-deployment-20261031 for the other classes.",
+  "description": "A core-bundle repository_dispatch that waits in the runner queue can start after a newer core commit is already live. The deploy then refuses it with 'candidate core_sha is behind relative to the deployed core_sha <sha>; refusing an older or diverged bundle'. Refusing is correct, but the run fails, the failure is classed 'infrastructure' by the default at .github/workflows/deploy.yml:254, and a comment is posted on issue #58. Runs 41130311775, 41139487358 and 41161657057 (2026-10-30/31). The org stays on the GitHub Free 20-job cap with 15-40 minute queue waits under load, so these false failures will keep recurring and hide real failures in #58.",
+  "links": [
+    "https://github.com/BenchBox-dev/benchbox-site/issues/58",
+    ".github/workflows/deploy.yml",
+    "deploy/cli.ts"
+  ],
+  "sessions": [
+    {
+      "actor": "mcp:omp-coding-agent:joe@joe-mac-mini.local:a860bfc49b3ad9b32ac0eccc",
+      "at": "2026-10-31T14:57:18Z",
+      "client": "omp-coding-agent",
+      "op": "create",
+      "op_id": "f2d2280f7a9c40209b588f3f775afdb6",
+      "session_id": "6f1bd5a3eac742f1a914c310b08605ca"
+    }
+  ]
+}

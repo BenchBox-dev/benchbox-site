@@ -54,6 +54,13 @@
       "status": "open",
       "title": "Stop the deploy resolver reading every deployment and old receipt on each run"
     },
+    "deploy-superseded-bundle-reported-as-failure-20261031": {
+      "claim": null,
+      "needs": [],
+      "priority": "medium",
+      "status": "open",
+      "title": "Report a core bundle older than the deployed one as superseded, not as a failed deploy"
+    },
     "doc-external-links-fragments-20261017": {
       "claim": null,
       "needs": [],
