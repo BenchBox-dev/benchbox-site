@@ -57,12 +57,17 @@
       "title": "Choose the core bundle to deploy by core commit order, not by site-inputs run creation time"
     },
     "deploy-redeploy-uses-deployed-bundle-20261031": {
-      "claim": null,
+      "claim": {
+        "expires_at": "2026-11-01T23:44:40Z",
+        "generation": "4f5db569f6ff41739202b75916314726",
+        "renewals": 0,
+        "worker": "mcp:omp-coding-agent:joe@joe-mac-mini.local:89fe2914d27056f15d362461"
+      },
       "needs": [
         "deploy-superseded-bundle-reported-as-failure-20261031"
       ],
       "priority": "medium",
-      "status": "open",
+      "status": "active",
       "title": "Make redeploy ship the bundle that is live, not the newest bundle"
     },
     "deploy-resolver-reads-every-deployment-20261031": {
