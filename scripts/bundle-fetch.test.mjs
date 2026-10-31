@@ -2,6 +2,7 @@ import { test, afterEach } from "node:test";
 import assert from "node:assert/strict";
 import {
   newestBundle,
+  newestByCommitOrder,
   producingRunErrors,
   producingRun,
   MAX_PRODUCING_RUN_WAIT_MS,
@@ -31,6 +32,7 @@ afterEach(() => {
 function stubFetch(run) {
   globalThis.fetch = async (url) => {
     const route = String(url).replace("https://api.github.com/", "");
+    if (route.includes("/workflows/site-inputs.yml/runs")) return { ok: true, json: async () => ({ workflow_runs: [] }) };
     if (route.endsWith("/artifacts")) return { ok: true, json: async () => ({ artifacts: [ARTIFACT] }) };
     if (route.includes("/actions/runs/")) return { ok: true, json: async () => run };
     throw new Error(`unexpected route ${route}`);
@@ -265,4 +267,106 @@ test("wait budget is below the actual deploy workflow timeout", () => {
   assert.equal(MAX_PRODUCING_RUN_WAIT_MS, 600000);
   assert.deepEqual(DOWNLOAD_RETRY_INTERVALS_MS, [5000, 15000]);
   assert.ok(MAX_PRODUCING_RUN_WAIT_MS + DOWNLOAD_RETRY_INTERVALS_MS.reduce((a, b) => a + b, 0) < timeoutMinutes * 60000);
+});
+
+const sha = (letter) => letter.repeat(40);
+
+function stubRecentRuns(shas) {
+  const calls = [];
+  globalThis.fetch = async (url) => {
+    const route = String(url).replace("https://api.github.com/", "");
+    calls.push(route);
+    if (route.includes("/workflows/site-inputs.yml/runs")) {
+      return { ok: true, json: async () => ({ workflow_runs: shas.map((_, index) => ({ id: 1000 + index })) }) };
+    }
+    const artifacts = route.match(/\/actions\/runs\/(\d+)\/artifacts$/);
+    if (artifacts) {
+      const index = Number(artifacts[1]) - 1000;
+      return { ok: true, json: async () => ({ artifacts: [{ name: `site-inputs-${shas[index]}`, expired: false }] }) };
+    }
+    if (route.includes("/actions/runs/")) return { ok: true, json: async () => RUN };
+    throw new Error(`unexpected route ${route}`);
+  };
+  return calls;
+}
+
+function orderCompare(order, diverged = []) {
+  const rank = (value) => order.indexOf(value);
+  return async (base, head) => {
+    if (diverged.includes(base) || diverged.includes(head)) return "diverged";
+    if (base === head) return "identical";
+    return rank(head) > rank(base) ? "ahead" : "behind";
+  };
+}
+
+test("the bundle with the newest core commit wins over the newest run creation time", async () => {
+  const order = [sha("1"), sha("2"), sha("3")];
+  stubRecentRuns([order[1], order[0], order[2], order[0]]);
+  const found = await newestBundle({}, { compare: orderCompare(order) });
+  assert.equal(found.artifact.name, `site-inputs-${order[2]}`);
+  assert.equal(found.runId, "1002");
+});
+
+test("the newest-created bundle wins when it is also the newest commit", async () => {
+  const order = [sha("1"), sha("2")];
+  stubRecentRuns([order[1], order[0]]);
+  const found = await newestBundle({}, { compare: orderCompare(order) });
+  assert.equal(found.runId, "1000");
+});
+
+test("diverged candidate bundles fail closed with the diverged-bundle class", async () => {
+  const order = [sha("1"), sha("2"), sha("3")];
+  stubRecentRuns([order[0], order[1], order[2]]);
+  await assert.rejects(newestBundle({}, { compare: orderCompare(order, [order[1]]) }), /diverged-bundle/);
+});
+
+test("an unknown compare status fails closed", async () => {
+  await assert.rejects(
+    newestByCommitOrder([{ coreSha: sha("1") }, { coreSha: sha("2") }], async () => "unknown"),
+    /returned status unknown/,
+  );
+});
+
+test("a failed compare request fails the selection", async () => {
+  stubRecentRuns([sha("1"), sha("2")]);
+  const compareFetch = globalThis.fetch;
+  globalThis.fetch = async (url) =>
+    String(url).includes("/compare/") ? { ok: false, status: 404 } : compareFetch(url);
+  await assert.rejects(newestBundle({}), /returned 404/);
+});
+
+test("selection makes a bounded number of API calls", async () => {
+  const order = Array.from({ length: 10 }, (_, index) => String(index).repeat(40));
+  const calls = stubRecentRuns([...order].reverse());
+  await newestBundle({}, { compare: orderCompare(order) });
+  assert.equal(calls.length, 11);
+});
+
+test("a dispatched bundle with a newer descendant is replaced by the newest descendant", async () => {
+  const order = [sha("1"), sha("2"), sha("3")];
+  const dispatched = { SITE_INPUTS_RUN_ID: "1001" };
+  stubRecentRuns([order[1], order[0], order[2]]);
+  const notices = [];
+  const log = console.log;
+  console.log = (line) => notices.push(String(line));
+  let found;
+  try {
+    found = await newestBundle(dispatched, { compare: orderCompare(order), maxWaitMs: 1000 });
+  } finally {
+    console.log = log;
+  }
+  assert.equal(found.artifact.name, `site-inputs-${order[2]}`);
+  assert.equal(found.replaced, order[0]);
+  assert.ok(notices.some((line) => line.includes(order[0]) && line.includes(order[2])));
+});
+
+test("a dispatched bundle that is the newest, or whose neighbours are behind or diverged, is kept", async () => {
+  const order = [sha("1"), sha("2"), sha("3")];
+  stubRecentRuns([order[0], order[1], order[2]]);
+  const found = await newestBundle({ SITE_INPUTS_RUN_ID: "1002" }, { compare: orderCompare(order), maxWaitMs: 1000 });
+  assert.equal(found.runId, "1002");
+  assert.equal(found.replaced, undefined);
+  stubRecentRuns([order[0], order[1], order[2]]);
+  const kept = await newestBundle({ SITE_INPUTS_RUN_ID: "1000" }, { compare: orderCompare(order, [order[2]]), maxWaitMs: 1000 });
+  assert.equal(kept.runId, "1001");
 });

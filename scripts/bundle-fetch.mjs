@@ -13,6 +13,45 @@ import { downloadArtifact } from "./github-download.mjs";
 const ARTIFACT_PREFIX = "site-inputs-";
 export const MAX_PRODUCING_RUN_WAIT_MS = 10 * 60 * 1000;
 export const PRODUCING_RUN_POLL_INTERVALS_MS = [5000, 10000, 15000, 30000];
+export const RECENT_RUNS = 10;
+
+const coreShaOf = (artifact) => artifact.name.slice(ARTIFACT_PREFIX.length);
+
+async function compareStatus(base, head, env) {
+  const result = await githubJson(`repos/${CORE_REPO}/compare/${base}...${head}?per_page=1`, env);
+  return result.status;
+}
+
+export async function newestByCommitOrder(candidates, compare) {
+  let best = candidates[0];
+  for (const candidate of candidates.slice(1)) {
+    const status = await compare(best.coreSha, candidate.coreSha);
+    if (status === "ahead") best = candidate;
+    else if (status === "diverged") {
+      throw new Error(`diverged-bundle: bundles for core ${best.coreSha} and ${candidate.coreSha} have diverged; refusing to choose between them`);
+    } else if (status !== "behind" && status !== "identical") {
+      throw new Error(`comparing core ${best.coreSha} with ${candidate.coreSha} returned status ${status ?? "unknown"}`);
+    }
+  }
+  return best;
+}
+
+async function recentBundles(env) {
+  const { workflow_runs: runs } = await githubJson(
+    `repos/${CORE_REPO}/actions/workflows/site-inputs.yml/runs?branch=develop&status=success&per_page=${RECENT_RUNS}`,
+    env,
+  );
+  const bundles = [];
+  for (const run of runs) {
+    const { artifacts } = await githubJson(`repos/${CORE_REPO}/actions/runs/${run.id}/artifacts`, env);
+    const artifact = artifacts.find((item) => item.name.startsWith(ARTIFACT_PREFIX) && !item.expired);
+    if (!artifact) continue;
+    const coreSha = coreShaOf(artifact);
+    if (bundles.some((bundle) => bundle.coreSha === coreSha)) continue;
+    bundles.push({ runId: String(run.id), artifact, coreSha });
+  }
+  return bundles;
+}
 
 function producingRunProvenanceErrors(run) {
   const errors = [];
@@ -75,7 +114,18 @@ export async function newestBundle(env = process.env, options = {}) {
     const artifact = artifacts.find((item) => item.name.startsWith(ARTIFACT_PREFIX) && !item.expired);
     if (!artifact) throw new Error(`run ${env.SITE_INPUTS_RUN_ID} has no unexpired site-inputs artifact`);
     await producingRun(env.SITE_INPUTS_RUN_ID, env, options);
-    return { runId: env.SITE_INPUTS_RUN_ID, artifact };
+    const dispatchedSha = coreShaOf(artifact);
+    const compare = options.compare ?? ((base, head) => compareStatus(base, head, env));
+    const descendants = [];
+    for (const bundle of await recentBundles(env)) {
+      if (bundle.coreSha !== dispatchedSha && (await compare(dispatchedSha, bundle.coreSha)) === "ahead") descendants.push(bundle);
+    }
+    if (descendants.length === 0) return { runId: env.SITE_INPUTS_RUN_ID, artifact };
+    const newest = await newestByCommitOrder(descendants, compare);
+    console.log(
+      `::notice::core bundle ${dispatchedSha} has a newer descendant bundle ${newest.coreSha}; deploying ${newest.coreSha} (run ${newest.runId}) instead`,
+    );
+    return { runId: newest.runId, artifact: newest.artifact, replaced: dispatchedSha };
   }
   if (env.SITE_INPUTS_CORE_SHA) {
     const name = `${ARTIFACT_PREFIX}${env.SITE_INPUTS_CORE_SHA}`;
@@ -85,16 +135,11 @@ export async function newestBundle(env = process.env, options = {}) {
     await producingRun(artifact.workflow_run.id, env, options);
     return { runId: String(artifact.workflow_run.id), artifact };
   }
-  const { workflow_runs: runs } = await githubJson(
-    `repos/${CORE_REPO}/actions/workflows/site-inputs.yml/runs?branch=develop&status=success&per_page=10`,
-    env,
-  );
-  for (const run of runs) {
-    const { artifacts } = await githubJson(`repos/${CORE_REPO}/actions/runs/${run.id}/artifacts`, env);
-    const artifact = artifacts.find((item) => item.name.startsWith(ARTIFACT_PREFIX) && !item.expired);
-    if (artifact) return { runId: String(run.id), artifact };
-  }
-  throw new Error("no successful site-inputs run on develop has an unexpired bundle");
+  const bundles = await recentBundles(env);
+  if (bundles.length === 0) throw new Error("no successful site-inputs run on develop has an unexpired bundle");
+  const compare = options.compare ?? ((base, head) => compareStatus(base, head, env));
+  const newest = await newestByCommitOrder(bundles, compare);
+  return { runId: newest.runId, artifact: newest.artifact };
 }
 
 export function unpackArchive(archive, destination) {
@@ -115,13 +160,13 @@ export function unpackArchive(archive, destination) {
 
 async function main() {
   const destination = siteInputsDir();
-  const { runId, artifact } = await newestBundle();
+  const { runId, artifact, replaced } = await newestBundle();
   const work = mkdtempSync(path.join(tmpdir(), "site-inputs-fetch-"));
   try {
     downloadArtifact(CORE_REPO, runId, artifact.name, work);
     const archive = path.join(work, readdirSync(work).find((name) => name.endsWith(".tar.zst")) ?? "");
     const digest = `sha256:${createHash("sha256").update(readFileSync(archive)).digest("hex")}`;
-    if (process.env.SITE_INPUTS_DIGEST && process.env.SITE_INPUTS_DIGEST !== digest) {
+    if (!replaced && process.env.SITE_INPUTS_DIGEST && process.env.SITE_INPUTS_DIGEST !== digest) {
       throw new Error(`bundle digest ${digest} does not match ${process.env.SITE_INPUTS_DIGEST}`);
     }
     unpackArchive(archive, destination);

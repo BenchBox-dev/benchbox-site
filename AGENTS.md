@@ -20,7 +20,8 @@ versioned core bundle; it reads nothing else from core.
 
 ## The core bundle
 
-- `npm run bundle:fetch` downloads the newest certified core bundle into
+- `npm run bundle:fetch` downloads the newest certified core bundle, newest
+  by core commit order among the recent successful site-inputs runs, into
   `.site-inputs/` (git-ignored) and verifies its digest, schema and
   certification before anything reads it.
 - The bundle schema is an integer major version. A schema change lands in

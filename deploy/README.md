@@ -61,6 +61,24 @@ Each lookup logs `deploy lookup: <n> REST calls, <n> receipt loads`. API
 failures log the route, status, rate-limit headers and the first 200 characters
 of the message, and GET requests retry network errors twice.
 
+## Choosing the core bundle
+
+Core's site-inputs runs are created in the order Trunk finishes, not in commit
+order, so run creation time does not say which bundle is newest. `bundle:fetch`
+looks at the ten most recent successful `develop` site-inputs runs that still
+have an unexpired bundle and takes the bundle whose `core_sha` is newest by
+commit order, found with the core compare API (at most nine compares, 20 API
+calls in all). If two candidates have diverged, or a compare fails or returns an
+unknown status, the run fails; divergence is class `diverged-bundle`.
+
+A `core-bundle` dispatch names a run. If a recent bundle is a descendant of the
+dispatched `core_sha`, the run deploys the newest descendant instead, which
+also covers a newer dispatch that the `pages-deploy` concurrency group
+replaced. The notice names both core commits. The dispatch's digest belongs to
+the replaced bundle, so it is not compared; the replacement still passes the
+bundle schema, digest and certification verification. Descendants that have
+diverged from each other fail the run.
+
 ## Bundles behind the deployed one
 
 Core's site-inputs runs finish in the order Trunk finishes, not in commit

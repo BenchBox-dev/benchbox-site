@@ -99,7 +99,9 @@ for (const consumer of ["bundle", "receipt"]) {
 Atomics.wait = () => 'timed-out';
 globalThis.fetch = async (url) => ({
   ok: true,
-  json: async () => String(url).endsWith('/artifacts')
+  json: async () => String(url).includes('/workflows/site-inputs.yml/runs')
+    ? { workflow_runs: [] }
+    : String(url).endsWith('/artifacts')
     ? { artifacts: [{ name: 'site-inputs-${FIXTURE_CORE}', expired: false }] }
     : String(url).endsWith('/runs/1')
       ? { path: '.github/workflows/trunk.yml', event: 'push', head_branch: 'develop', conclusion: 'success', head_sha: '${FIXTURE_CORE}' }
