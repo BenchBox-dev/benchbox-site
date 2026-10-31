@@ -179,7 +179,18 @@ benchbox run --platform bigquery --benchmark tpch --scale 1.0
 benchbox run --platform snowflake --benchmark tpch --scale 1.0
 ```
 
-Databricks requires `DATABRICKS_TOKEN` and `DATABRICKS_HOST`. BigQuery requires `GOOGLE_APPLICATION_CREDENTIALS`. Snowflake requires `SNOWFLAKE_USER`, `SNOWFLAKE_PASSWORD` and `SNOWFLAKE_ACCOUNT`.
+Databricks requires `DATABRICKS_TOKEN` and `DATABRICKS_HOST`.
+
+For BigQuery, Snowflake and Redshift, `benchbox setup --platform <name>` saves the credentials, and `benchbox run` reads those saved credentials rather than environment variables. If none are saved, `run` offers to start setup (and stops in non-interactive mode). Setup can fill its answers from environment variables when you accept auto-detection:
+
+- BigQuery setup needs both `GOOGLE_APPLICATION_CREDENTIALS` (a service account JSON key file) and `BIGQUERY_PROJECT`; `BIGQUERY_DATASET`, `BIGQUERY_LOCATION` and `BIGQUERY_STORAGE_BUCKET` are optional. Without them, setup prompts for the project ID and key file path.
+- Snowflake setup reads `SNOWFLAKE_ACCOUNT`, `SNOWFLAKE_USERNAME`, `SNOWFLAKE_PASSWORD`, `SNOWFLAKE_WAREHOUSE` and `SNOWFLAKE_DATABASE`.
+- Redshift setup reads `REDSHIFT_HOST`, `REDSHIFT_USERNAME`, `REDSHIFT_PASSWORD` and `REDSHIFT_DATABASE`.
+
+```bash
+benchbox setup --platform bigquery
+benchbox run --platform bigquery --benchmark tpch --scale 1.0
+```
 
 ## Future Platforms
 

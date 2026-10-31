@@ -178,10 +178,13 @@ keys require a public-contract update and consumer tests.
 ##### Round-trip and platform timing fields (schema 2.4)
 
 These fields are optional and omitted until a producer supplies them, and
-bundles older than 2.4 may not carry them. They
-support comparing an in-process engine with a networked one once the client
-round trip is removed; see the
-[locality ADR amendment](../development/adr/adr-client-link-locality-disclosure.md#amendment-round-trip-removed-and-platform-timings).
+bundles older than 2.4 may not carry them. They support comparing an
+in-process engine with a networked one once the client round trip is
+removed. End-to-end time stays the default view; the round-trip-removed view
+is an opt-in estimate, shown only for runs whose `run.net_estimate_status` is
+`eligible`, and embedded runs have no round trip to remove. The
+[locality ADR amendment](../development/adr/adr-client-link-locality-disclosure.md#amendment-round-trip-removed-and-platform-timings)
+is optional background.
 
 | Field | Meaning |
 |-------|---------|
@@ -251,15 +254,16 @@ not recorded. The one exception is a bundle with no block that still has an
 status recorded in that ledger. Consumers must treat a missing block or a
 missing `validation_status` as "not recorded". All requested-configuration
 values are **self-attested** - they describe what was *requested*, not an
-independently verified record of what physically applied (see
-`docs/development/tuning-adr-001-trust-and-hash-semantics.md`).
+independently verified record of what physically applied. The
+[tuning trust and hash semantics decision](../development/tuning-adr-001-trust-and-hash-semantics.md)
+is optional background.
 
 | Field | Type | Description |
 | ------- | ------ | ------------- |
 | `tuning_source` | string | Raw `TuningSource` enum value: `explicit_file`, `auto_discovered`, `smart_defaults`, `baseline`, `wizard`, or `fallback`. |
 | `requested_config_hash` | string | Full 64-hex-char SHA-256 over the requested `UnifiedTuningConfiguration.to_dict()` (canonical JSON, sorted keys). Identifies the requested template regardless of platform or dict ordering. |
 | `validation_status` | string | Execution-derived tuning verification state: `not_applicable`, `noop`, `applied_unverified`, `applied_verified`, or `failed`. Unlike the requested-config fields (which describe intent), this reflects what the execution path *actually did*: `applied_unverified` means at least one tuning statement executed (self-attested), and `applied_verified` means it was additionally **corroborated by a post-load introspection receipt** against the live catalog (the per-statement receipt itself is recorded in `platform.tuning.applied.receipt`). When `platform.tuning.applied` is present, its `status` equals this field. Emitted for runs executed by this version: an untuned run reports `not_applicable`, as does a DataFrame run whose configuration is empty or all defaults; a run that requested tuning and applied nothing reports `noop`; a tuned run reports the status its execution path derived, or the applied ledger's status when none was, and omits the field when it has neither. Absent from bundles whose run never recorded it, and a re-export of such a bundle keeps it absent (apart from the `.applied.json` case described above). |
-| `tuning_policy_generation` | string | Explicit tuning-policy generation marker, currently `"adr-003-spark-baseline"` (earlier bundles carry `"adr-003"`). Identifies which generation of the tuning policy this run was produced under, so tuned results from different generations can be flagged as not directly comparable. Sourced from the `TUNING_POLICY_GENERATION` constant (`benchbox/core/tuning/policy_generation.py`), **never** derived from `benchbox_version`. Bundles predating this field omit it; consumers treat that absence as the generation before the marker existed. See `docs/development/tuning-adr-003-baseline-and-single-renderer.md`. |
+| `tuning_policy_generation` | string | Explicit tuning-policy generation marker, currently `"adr-003-spark-baseline"` (earlier bundles carry `"adr-003"`). Identifies which generation of the tuning policy this run was produced under, so tuned results from different generations can be flagged as not directly comparable. Sourced from the `TUNING_POLICY_GENERATION` constant (`benchbox/core/tuning/policy_generation.py`), **never** derived from `benchbox_version`. Bundles predating this field omit it; consumers treat that absence as the generation before the marker existed. Optional background: [tuning baseline and single renderer decision](../development/tuning-adr-003-baseline-and-single-renderer.md). |
 | `template_evidence` | string | One of `unmeasured`, `measured-benefit`, `measured-neutral`, or `measured-regression`. These values describe a comparison with `notuning`: no measurement, benefit beyond noise, neutral within noise, or regression beyond noise / an untuned query failure. Each measurement's `evidence` field names its source and method; not every measurement includes an A/A calibration. Each registry entry has a `measurements` list scoped by scale factor, engine version, and a memory object `{basis, value}`: `container_limit` uses the captured container limit, `host_total_gb` uses captured host memory in GB, and `warehouse_size` uses the observed `platform.compute.warehouse_size` of a managed-cloud run. A multi-cluster warehouse, or a size that was requested but not observed, gets no scope. Missing or invalid memory metadata cannot match; a mismatch returns `unmeasured`. Only applies to runs sourced from a shipped `*_tuned.yaml` template present in the registry. Never enters `requested_config_hash`. Sourced from `benchbox/core/tuning/profiles/template_evidence.yaml`. |
 | `counts.tables_tuned` | number | Number of tables with at least one table-level tuning (partitioning/clustering/distribution/sorting). |
 | `counts.tuning_types` | array | Sorted list of tuning categories actually active (constraint names, platform optimization flags, table-tuning clause types). |

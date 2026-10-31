@@ -58,7 +58,7 @@ service equivalence for every platform.
   cleanup equivalence.
 - No adapter in this surface currently claims native mid-query cancellation.
 
-Live container and cloud evidence belongs to `docs/operations/uat-framework.md`.
+Live container and cloud evidence belongs to the [UAT framework](uat-framework.md).
 An unsupported classification is a safe product limit, not proof that the
 platform can never support throughput.
 

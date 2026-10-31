@@ -53,7 +53,7 @@ See [Velox Docker Dev Workflow](velox_docker_dev.md) for a full walkthrough of b
 ### Option B - Native Linux
 
 Install the Velox extra, which pulls in `pyspark[connect]>=3.5.0`. Also download the Gluten Velox bundle jar for your
-Spark 4.0, Scala 2.13 and architecture (see `docs/platforms/velox_jar_setup.md` for release tarballs and verification
+Spark 4.0, Scala 2.13 and architecture (see the [Velox Jar Setup](velox_jar_setup.md) guide for release tarballs and verification
 steps). The `benchbox run` command then runs locally with Gluten wired into an in-process SparkSession.
 
 ```bash

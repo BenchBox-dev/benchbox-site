@@ -111,8 +111,8 @@ can fully describe is `local`; `remote` would require a caller-supplied
 authenticated caller steer the server at a listener the operator never approved
 (the default `sc://localhost:50051` is host-local). Until a server-owned
 Velox endpoint registry with execution-time resolution exists, both `remote`
-and `docker` are rejected at admission (see `docs/reference/mcp.md` omission
-ledger, security-scoped). Direct `VeloxAdapter(deployment_mode='remote',
+and `docker` are rejected at admission (see the omission ledger in the
+[MCP Server Reference](../reference/mcp.md), security-scoped). Direct `VeloxAdapter(deployment_mode='remote',
 endpoint=...)` construction outside MCP keeps working for CLI and Python-API
 callers.
 

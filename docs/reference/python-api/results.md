@@ -1175,7 +1175,7 @@ tpch_sf1_duckdb_baseline.json
 
 ## Cost Calculation and Result Enrichment
 
-These APIs estimate costs from packaged prices and resource metadata. Query and phase totals do not certify invoices or infrastructure idle costs. See {doc}`../../development/adr/adr-billing-unit-tb-tib-contract` for billing units.
+These APIs estimate costs from packaged prices and resource metadata. Query and phase totals do not certify invoices or infrastructure idle costs. Byte-priced tables bill per tebibyte (`1024**4` bytes) or per terabyte (`10**12` bytes) depending on the platform, so supply byte counts in the unit the price table declares. The [billing unit decision](../../development/adr/adr-billing-unit-tb-tib-contract.md) is optional background.
 
 ### validate_resource_usage
 

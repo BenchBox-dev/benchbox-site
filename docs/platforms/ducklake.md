@@ -8,7 +8,7 @@
 DuckLake is an open lakehouse table format shipped as a DuckDB extension: table **data** is stored as Parquet files, while table **metadata** (the catalog) lives in a SQL database. BenchBox runs DuckLake through the same DuckDB engine used by the `duckdb` platform, inheriting DuckDB's SQL dialect and benchmark compatibility unchanged.
 
 ```{warning}
-The DuckLake platform is **beta**. BenchBox has tested four catalog/storage deployment modes with TPC-H; other backend-by-storage combinations have not been tested separately. See [Catalog Backends](#catalog-backends) below and [ADR: DuckLake Maturity, Publishability, and Compaction Bias](../development/adr/adr-ducklake-maturity-and-publishability.md).
+The DuckLake platform is **beta**. BenchBox has tested four catalog/storage deployment modes with TPC-H; other backend-by-storage combinations have not been tested separately. Runs with a PostgreSQL catalog or S3 storage are publishable and are not demoted in rankings, but their results record the catalog backend and storage location, because those are part of the configuration under test and a remote-backed number partly measures object-store latency. See [Catalog Backends](#catalog-backends) below. The [DuckLake maturity decision](../development/adr/adr-ducklake-maturity-and-publishability.md) is optional background.
 ```
 
 ## Features
@@ -234,9 +234,11 @@ bulk loading via few large inserts produces few large files and little bias,
 while row-wise loading produces many small ones.
 
 Treat a DuckLake-vs-other-engine gap accordingly, and do not read it as the
-best DuckLake can do. See
-[ADR: DuckLake Maturity, Publishability, and Compaction Bias](../development/adr/adr-ducklake-maturity-and-publishability.md)
-for why this is documented rather than instrumented.
+best DuckLake can do. BenchBox documents this bias rather than correcting it:
+invoking compaction would change what is measured, and recording file layouts
+would add a new result field. The
+[DuckLake maturity decision](../development/adr/adr-ducklake-maturity-and-publishability.md)
+is optional background.
 
 ## Lakehouse-Feature Benchmarks (Time Travel, Schema Evolution, Snapshots)
 

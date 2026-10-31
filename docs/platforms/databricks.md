@@ -300,7 +300,7 @@ BenchBox does not run `VACUUM` as part of tuning.
 The resolved strategy is recorded per run in the result bundle at
 `platform.config.databricks_clustering_strategy` (`"z_order"`,
 `"liquid_clustering"`, `"liquid_clustering_auto"`, or `"none"` for untuned
-runs); see `docs/reference/result-formats.md`.
+runs); see [Result formats](../reference/result-formats.md).
 
 ### Photon Acceleration
 

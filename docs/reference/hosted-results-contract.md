@@ -69,7 +69,7 @@ corpus. In the explorer publication pipeline this is the same value as
 |---|---|
 | Format | `{benchmark}-{platform}-sf{scale_factor}-{yyyymmdd}-{sha8}` (e.g., `tpch-duckdb-sf1.0-20260315-a1b2c3d4`) |
 | `sha8` | First 8 hex characters of `sha256(published_bundle_bytes)`. Published bytes are the anonymized, canonical-JSON payload written to `bundles/{public_result_id}.json` — not the raw private capture. |
-| Stability | Permanent once minted for a given set of published bytes. Same published bytes always re-derive the same id. Permanence attaches at **publication** (content address of public artifact), not at local run capture. See `docs/development/adr/adr-public-result-id-permanence.md`. |
+| Stability | Permanent once minted for a given set of published bytes. Same published bytes always re-derive the same id. Permanence attaches at **publication** (content address of public artifact), not at local run capture. Optional background: [public result ID permanence decision](../development/adr/adr-public-result-id-permanence.md). |
 | Uniqueness | Unique within the public corpus. Identical published digests under the same id are idempotent (publish once). Distinct published content that collides on the same id fails the build closed (`DuplicateResultIdError`); the Phase 1 pipeline does **not** append `-{n}`. |
 | Minting | Phase 1: by the explorer static pipeline when projecting `results-data/` into the public corpus. Phase 2+: after validation passes, using the same format over the published payload. |
 | Phase introduced | Phase 1 |
@@ -451,8 +451,7 @@ Redaction does not change archive acceptance. Redaction before publication is
 reflected in the anonymized published bytes and therefore in the minted
 `public_result_id` (the `sha8` is `sha256` over published bytes). Redaction of
 an already-live result that changes published bytes (replacing a field with
-`"[redacted]"`) is a compatibility event per
-`docs/development/adr/adr-public-result-id-permanence.md`: it mints a new
+`"[redacted]"`) is a compatibility event: it mints a new
 content-addressed `public_result_id` (new `sha8`) and the old URL is preserved
 via an explicit alias or redirect to the new bundle, so existing links remain
 resolvable. Presentation visibility and ranking remain separate policy decisions;
