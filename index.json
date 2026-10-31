@@ -62,10 +62,15 @@
       "title": "Extend the site docs contract checks to option values beyond --platform, other pages, and non-bash code fences"
     },
     "docs-dev-canonical-to-docs-20261030": {
-      "claim": null,
+      "claim": {
+        "expires_at": "2026-11-01T06:55:46Z",
+        "generation": "37ece02f8fde41a2b85894d7656bab3e",
+        "renewals": 0,
+        "worker": "mcp:omp-coding-agent:joe@joe-mac-mini.local:7459db9ace2a96b770fd98c9"
+      },
       "needs": [],
       "priority": "medium",
-      "status": "open",
+      "status": "active",
       "title": "Point the canonical link of every /docs/dev/ page at its /docs/ counterpart"
     },
     "public-site-visual-regression-false-mismatch-20261014": {
