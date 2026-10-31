@@ -103,7 +103,7 @@ describe.skipIf(!dist)("built site", () => {
       ];
       if (required.some((value) => !value)) missing.push(file);
       else if (!canonical?.startsWith(origin)) missing.push(`${file} (canonical origin)`);
-      else if (file !== "404.html" && canonical !== `${origin}${sitemapPathForFile(file)}`) missing.push(`${file} (canonical ${canonical})`);
+      else if (file !== "404.html" && canonical !== `${origin}${sitemapPathForFile(file.replace(/^docs\/dev\//, "docs/"))}`) missing.push(`${file} (canonical ${canonical})`);
       else if (content(markup, "property", "og:url") !== canonical) missing.push(`${file} (og:url)`);
       else if (content(markup, "name", "twitter:card") !== "summary_large_image") missing.push(`${file} (twitter:card)`);
     }

@@ -1,9 +1,12 @@
-import { existsSync, mkdirSync, mkdtempSync, readFileSync, writeFileSync } from "node:fs";
+import { existsSync, mkdirSync, mkdtempSync, readdirSync, readFileSync, writeFileSync } from "node:fs";
 import os from "node:os";
 import path from "node:path";
 import { describe, expect, it } from "vitest";
-import { DEV_DOCS_PREFIX, mountDevDocs, rebaseDocsLinks } from "../src/lib/dev-docs.ts";
+import { siteOrigin } from "../src/lib/site-origin.ts";
+import { builtSite } from "./built-site.ts";
+import { DEV_DOCS_PREFIX, mountDevDocs, rebaseDocsLinks, rebaseDocsPage } from "../src/lib/dev-docs.ts";
 
+const dist = builtSite();
 const ORIGIN = "https://benchbox.dev";
 
 describe("docs mounted at /docs/dev/", () => {
@@ -40,5 +43,65 @@ describe("docs mounted at /docs/dev/", () => {
     expect(readFileSync(path.join(site, "docs", "dev", "index.html"), "utf8")).toBe('<a href="/docs/dev/guide/a.html">a</a>');
     expect(readFileSync(path.join(site, "docs", "dev", "objects.inv"), "utf8")).toBe("inventory");
     expect(existsSync(path.join(site, "docs", "dev", "dev"))).toBe(false);
+  });
+
+  it("keeps the canonical URL and og:url on the /docs/ page while links move to /docs/dev/", () => {
+    const html =
+      '<link rel="canonical" href="https://benchbox.dev/docs/a.html"/><meta content="https://benchbox.dev/docs/a.html" property="og:url"/>' +
+      '<meta property="og:image" content="https://benchbox.dev/docs/i.png"/><a href="/docs/b.html">b</a>';
+    expect(rebaseDocsPage(html, DEV_DOCS_PREFIX, ORIGIN)).toBe(
+      '<link rel="canonical" href="https://benchbox.dev/docs/a.html"/><meta content="https://benchbox.dev/docs/a.html" property="og:url"/>' +
+        '<meta property="og:image" content="https://benchbox.dev/docs/dev/i.png"/><a href="/docs/dev/b.html">b</a>',
+    );
+  });
+
+  it("mounts pages whose canonical names the /docs/ page", () => {
+    const site = mkdtempSync(path.join(os.tmpdir(), "dev-docs-"));
+    mkdirSync(path.join(site, "docs"), { recursive: true });
+    writeFileSync(path.join(site, "docs", "index.html"), '<link rel="canonical" href="https://benchbox.dev/docs/"/><a href="/docs/x.html">x</a>');
+    mountDevDocs(site, ORIGIN);
+    expect(readFileSync(path.join(site, "docs", "dev", "index.html"), "utf8")).toBe(
+      '<link rel="canonical" href="https://benchbox.dev/docs/"/><a href="/docs/dev/x.html">x</a>',
+    );
+  });
+});
+
+function pages(root: string): string[] {
+  return readdirSync(root, { withFileTypes: true }).flatMap((entry) => {
+    const full = path.join(root, entry.name);
+    if (entry.isDirectory()) return pages(full);
+    return entry.name.endsWith(".html") ? [full] : [];
+  });
+}
+
+describe.skipIf(dist === undefined)("built dist/docs/dev", () => {
+  const dev = path.join(dist ?? "", "docs", "dev");
+  const files = dist === undefined ? [] : pages(dev);
+
+  const canonicalOf = (file: string): string => {
+    const tag = /<link\b[^>]*\srel="canonical"[^>]*>/i.exec(readFileSync(file, "utf8"))?.[0] ?? "";
+    return /\shref="([^"]*)"/.exec(tag)?.[1] ?? "";
+  };
+
+  it("keeps each page's canonical identical to its /docs/ twin and never under /docs/dev/", () => {
+    expect(files.length).toBeGreaterThan(0);
+    const origin = siteOrigin();
+    const bad: string[] = [];
+    let onSite = 0;
+    for (const file of files) {
+      const relative = path.relative(dev, file).split(path.sep).join("/");
+      const twin = path.join(dist ?? "", "docs", relative);
+      const href = canonicalOf(file);
+      if (!existsSync(twin) || href === "" || href !== canonicalOf(twin) || href.startsWith(`${origin}/docs/dev/`)) bad.push(`${relative}: ${href}`);
+      if (href.startsWith(`${origin}/docs/`)) onSite += 1;
+    }
+    expect(bad).toEqual([]);
+    expect(onSite).toBeGreaterThan(0);
+  });
+
+  it("keeps in-page links under /docs/dev/", () => {
+    const index = readFileSync(path.join(dev, "index.html"), "utf8");
+    expect(index).toContain('href="/docs/dev/');
+    expect(index).not.toMatch(/href="\/docs\/(?!dev\/)/);
   });
 });
