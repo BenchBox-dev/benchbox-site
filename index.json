@@ -52,7 +52,7 @@
       "needs": [],
       "priority": "high",
       "status": "open",
-      "title": "Stop the deploy resolver reading every deployment and old receipt on each run"
+      "title": "Bound the deploy resolver to the newest recorded receipt instead of reading every deployment and old receipt"
     },
     "deploy-superseded-bundle-reported-as-failure-20261031": {
       "claim": null,

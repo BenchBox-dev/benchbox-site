@@ -1,18 +1,25 @@
 {
   "acceptance": [
-    "The number of GitHub API calls and artifact downloads one deploy run makes no longer grows with deployment history, shown by a test with a long fake history",
-    "Resolution never needs a receipt artifact older than the retention window; a test where old receipts are unavailable still resolves the current deployed generation and rollback target",
-    "A non-200 GitHub response in the resolver logs the status, the rate-limit headers and a short body summary",
-    "The source of the 'fetch failed' errors is identified and either fixed or retried with a bound",
-    "Production deploys over a stated window after the change show no resolve failures from HTTP 403, receipt downloads or fetch errors, with run ids"
+    "currentDeployed returns the newest deployment whose newest success receipt status matches SITE_DEPLOY_TARGET (any target when unset) and stops there. A counting-stub test with 100 and 1,000 fake deployments shows the same counts at both sizes: resolve at most 2 REST calls for the lookup and exactly 1 receipt load; recheck at most 2 REST calls and 0 loads; deployed at most 2 REST calls and 1 load",
+    "Manual rollback with ROLLBACK_RUN_ID loads only that run's receipt and reads only receipt.deployment_id's deployment and statuses; it refuses when that deployment is not github-pages, has no success status with that run and receipt sha, or the receipt target differs from SITE_DEPLOY_TARGET. Tested, including a deployment beyond the first 100",
+    "In a test where load throws for every run except the current deployed one and the rollback target, resolve, recheck, deployed and rollback still succeed",
+    "When no matching receipt exists within a stated page bound but the history is not empty, the resolver throws a named error rather than returning null. Tested",
+    "Every non-2xx response from githubApi logs method, route, status, x-ratelimit-limit/remaining/used/reset/resource, retry-after and the first 200 characters of the message; deploymentId checks the status of its statuses calls. Unit tested",
+    "GET requests in githubApi retry network errors (fetch failed, UND_ERR_SOCKET, ECONNRESET) at most twice with backoff and do not retry HTTP errors. Tested",
+    "The deployment lookup logs one line with its REST call and receipt load counts. The first 10 production Deploy runs after merge that reach resolve show bounded counts and no resolve or recheck failure from HTTP 403, fetch failed or an untargeted receipt download, and one visual.yml run shows a bounded lookup; run ids listed. Any egress 503 on the single remaining receipt download is filed as its own item"
   ],
-  "context": "Found 2026-10-31 while waiting for production deploys of site PRs #92-#94. Classification of the 24 failed deploy runs created after 2026-10-28: 10 docs-contract refusals on 2026-10-29 (fixed by site PR #90; core now warns on contract changes), 6 HTTP 403, 4 fetch failed, 2 receipt download, 3 superseded-bundle refusals (separate item).",
-  "description": "recordedReceipts (deploy/lib/github.ts:34-66) pages through every github-pages deployment and reads the statuses of each one, with no early exit. On 2026-10-31 there were 621 deployments, and deploy/cli.ts calls it twice per run (lines 57 and 89), so one run makes about 1,250 GitHub API calls against the GITHUB_TOKEN limit of 1,000 per hour per repository. Success statuses created before about 2026-10-15 carry no 'target:' (the oldest, run 37964514016, has none; sampled entries from 2026-10-17 on do), so for each of those the resolver downloads the receipt artifact with gh run download. Failures this caused or likely caused since 2026-10-28: HTTP 403 listing or reading deployments in runs 40912712326, 41186210649, 41186484597, 41186718676, 41187011071 and 41187314394; receipt downloads failing in 41061585379 (run 38111055936) and 41087113431 (run 38604879932); 'Error: fetch failed' in 41054414458, 41062462857, 41103893795 and 41115529339 (step not yet identified). The 403 bodies are discarded, so rate limiting is inferred from the call count, not confirmed. Latent failure: receipt artifacts are kept 90 days, so once the pre-2026-10-15 receipts expire (from about 2027-01-07) every resolve that loads them fails closed and no production deploy can pass.",
+  "context": "Found 2026-10-31 while waiting for production deploys of site PRs #92-#94. Classification of the 24 failed deploy runs created after 2026-10-28: 10 docs-contract refusals on 2026-10-29 (fixed by site PR #90; core now warns on contract changes), 6 HTTP 403, 4 fetch failed, 2 receipt download, 3 superseded-bundle refusals (separate item).\n\nReviewed 2026-10-31: corrected the caller map, the failure lists (11 HTTP 403, 5 fetch failed, 2 egress 503), the rate-limit claim and the receipt-download cause; added the null-result and rehearsal-receipt constraints. Land this before deploy-superseded-bundle-reported-as-failure-20261031, which also edits cli.ts resolve().",
+  "description": "recordedReceipts (deploy/lib/github.ts:34-68) lists every github-pages deployment, reads each one's statuses, and for every success status without 'target:' downloads that run's receipt with gh run download, with no early exit. On 2026-10-31 there were 621 deployments and 598 receipt statuses. 80 of them have no target: deployments from 2026-10-09T17:23Z to 2026-10-15T03:19Z, and they include rehearsal receipts (run 37964514016). One full read is 629 REST calls plus 80 receipt downloads and takes about 3 minutes.\n\nCallers: currentDeployed (cli.ts:55-62), used by resolve (build job, cli.ts:66), recheck (deploy job, cli.ts:168) and deployed (visual.yml:33 on every PR push); and the rollback lookup (cli.ts:87-90), only in rollback mode. A deploy run reads the full history twice and a rollback run three times, all with github.token. The callers use only recorded[0], its sha, or one run id.\n\nFailures since 2026-10-28, all inside recordedReceipts (18 of 35 failed Deploy runs):\n- HTTP 403: 40723133549, 40725622828, 40796225047, 40796927144, 40819026053, 40912712326, 41186210649, 41186484597, 41186718676, 41187011071, 41187314394.\n- 'fetch failed' (SocketError: other side closed, github.ts:11 called from github.ts:48): 40812519315, 41054414458, 41062462857, 41103893795, 41115529339. Three came right after receipt downloads that slept between retries; the likely cause is that synchronous downloads and sleeps block the event loop while the pooled socket is closed.\n- 'HTTP 503 Egress is over the account limit' on receipt downloads: 41061585379, 41087113431. The ~160 receipt downloads per deploy run are the likely main driver of that egress.\n\nThe 403 bodies and headers are discarded, so the exhausted bucket is unknown; twelve full reads (about 7,500 calls) succeeded on 2026-10-31 07:50-08:56Z before the first 403, so the documented 1,000/hr GITHUB_TOKEN limit is not what bound them.\n\nLatent: receipts are kept 90 days (deploy.yml:177). The 80 untargeted receipts expire from 2027-01-07T17:11Z to 2027-01-13T03:14Z; after that, load throws inside the read and every resolve, recheck and deployed call fails closed.\n\nConstraints: deployed=null disables the freshness and chain checks (resolve.ts:12,20), so a search that gives up must throw, not return null. Untargeted statuses cannot be assumed to be production. Receipts carry deployment_id, so a rollback lookup can go straight from the run to its deployment. Deployments and statuses come back newest first; the list API filters only by sha, ref, task and environment.",
   "links": [
     "https://github.com/BenchBox-dev/benchbox-site/issues/58",
     "deploy/lib/github.ts",
     "deploy/cli.ts",
-    "deploy/lib/receipt.ts"
+    "deploy/lib/receipt.ts",
+    "deploy/lib/resolve.ts",
+    ".github/workflows/deploy.yml",
+    ".github/workflows/visual.yml",
+    "scripts/github-download.mjs",
+    "deploy/test/github.test.ts"
   ],
   "sessions": [
     {
@@ -22,6 +29,14 @@
       "op": "create",
       "op_id": "020853ac844c498d8da2a4d46beef064",
       "session_id": "6f1bd5a3eac742f1a914c310b08605ca"
+    },
+    {
+      "actor": "mcp:omp-coding-agent:joe@joe-mac-mini.local:f49e5d07dc7a5f74ab116b22",
+      "at": "2026-10-31T15:13:25Z",
+      "client": "omp-coding-agent",
+      "op": "update",
+      "op_id": "a5e97cc49089461f9f769272f2267f98",
+      "session_id": "da31eb4604bb4e9685337e08ec0df489"
     }
   ]
 }
