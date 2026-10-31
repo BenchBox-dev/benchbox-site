@@ -81,7 +81,7 @@ test("gh process smoke preserves creation body through A B B A, closes only rela
 test("failure capture propagates actual failing signatures without passing gate contamination", () => {
   const dir = mkdtempSync(join(tmpdir(), "site-step-"));
   try {
-    for (const [text, expected] of [["producing run concluded null", "producer-not-concluded"], ["Explorer read-model version 16 expected, got 17", "contract-version-mismatch"], ["fail snapshot_digest: changed", "snapshot-digest"], ["probe FAILED: mismatch", "probe-mismatch"], ["pass snapshot_digest: matched\nfail privacy: unknown", "infrastructure"]]) {
+    for (const [text, expected] of [["producing run concluded null", "producer-not-concluded"], ["Explorer read-model version 16 expected, got 17", "contract-version-mismatch"], ["fail snapshot_digest: changed", "snapshot-digest"], ["probe FAILED: mismatch", "probe-mismatch"], ["deploy: candidate core_sha has diverged; refusing a diverged bundle (diverged-bundle)", "diverged-bundle"], ["pass snapshot_digest: matched\nfail privacy: unknown", "infrastructure"]]) {
       const output = join(dir, "output");
       writeFileSync(output, "");
       const result = spawnSync(process.execPath, ["--experimental-strip-types", join(root, "deploy/run-step.ts"), process.execPath, "-e", `console.error(${JSON.stringify(text)}); process.exit(7)`], { env: { ...process.env, GITHUB_OUTPUT: output }, encoding: "utf8" });
@@ -112,4 +112,23 @@ test("workflow keeps bridge permissions and scopes while wiring failure outputs 
   assert.match(workflow.jobs["report-failure"].steps.at(-1).env.ERROR_TEXT, /needs.build.outputs.failure_class.*needs.deploy.outputs.failure_class/);
   assert.match(workflow.jobs.build.outputs.failure_class, /steps.resolve.outputs.failure_class.*steps.build.outputs.failure_class.*steps.gates.outputs.failure_class/);
   assert.match(workflow.jobs.deploy.outputs.failure_class, /steps.probe.outputs.probes_ok == 'false'/);
+});
+
+test("a superseded resolve skips the build steps, the artifact uploads, the stop summary and the deploy job", () => {
+  const gated = "steps.resolve.outputs.superseded != 'true'";
+  assert.equal(workflow.jobs.build.outputs.superseded, "${{ steps.resolve.outputs.superseded }}");
+  const steps = workflow.jobs.build.steps;
+  const afterResolve = steps.slice(steps.findIndex((step: { id?: string }) => step.id === "resolve") + 1);
+  for (const step of afterResolve) {
+    if (step.name === "Restore the receipt's artifact") continue;
+    assert.ok(String(step.if ?? "").includes(gated), `${step.name ?? step.uses} runs when the bundle is superseded`);
+  }
+  assert.equal(afterResolve.filter((step: { uses?: string }) => step.uses?.startsWith("actions/upload-artifact@")).length, 2);
+  assert.match(workflow.jobs.deploy.if, /needs.build.outputs.superseded != 'true'/);
+  assert.match(workflow.jobs.deploy.if, /^\(vars.SITE_DEPLOY_TARGET == 'rehearsal' \|\| vars.SITE_DEPLOY_TARGET == 'production'\) &&/);
+});
+
+test("a superseded run neither reports a failure nor closes a core relay issue", () => {
+  assert.equal(workflow.jobs["report-failure"].if, "failure()");
+  assert.match(workflow.jobs["report-success"].if, /needs.deploy.result == 'success'/);
 });

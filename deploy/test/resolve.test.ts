@@ -1,23 +1,53 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { chainErrors, freshnessErrors } from "../lib/resolve.ts";
+import { chainErrors, freshness } from "../lib/resolve.ts";
+import { classifyFailure } from "../lib/relay.ts";
 import { recheckErrors } from "../lib/recheck.ts";
 import { verifyBundle } from "../../scripts/bundle-lib.mjs";
 import { fixtureBundle } from "../../scripts/fixture-bundle.mjs";
 
-const deployed = { core_sha: "a".repeat(40), corpus_sha: "c".repeat(40) };
+const deployed = { core_sha: "a".repeat(40), corpus_sha: "c".repeat(40), site_sha: "5".repeat(40) };
+const candidateSha = "b".repeat(40);
+const newSiteSha = "6".repeat(40);
 
-test("a fresh bundle is accepted and a stale or diverged one is refused", () => {
-  assert.deepEqual(freshnessErrors(null, { status: 404 }), []);
-  assert.deepEqual(freshnessErrors(deployed, { status: 200, body: { status: "ahead" } }), []);
-  assert.deepEqual(freshnessErrors(deployed, { status: 200, body: { status: "identical" } }), []);
-  assert.match(freshnessErrors(deployed, { status: 200, body: { status: "behind" } })[0], /behind relative to the deployed/);
-  assert.match(freshnessErrors(deployed, { status: 200, body: { status: "diverged" } })[0], /diverged/);
+test("an ahead or identical bundle is fresh and no deployed receipt skips the check", () => {
+  assert.deepEqual(freshness(null, candidateSha, newSiteSha, { status: 404 }), { action: "fresh" });
+  assert.deepEqual(freshness(deployed, candidateSha, newSiteSha, { status: 200, body: { status: "ahead" } }), { action: "fresh" });
+  assert.deepEqual(freshness(deployed, candidateSha, newSiteSha, { status: 200, body: { status: "identical" } }), { action: "fresh" });
 });
 
-test("an unverifiable freshness check fails closed", () => {
+test("a behind bundle with the deployed site commit is superseded and names both core commits", () => {
+  const verdict = freshness(deployed, candidateSha, deployed.site_sha, { status: 200, body: { status: "behind" } });
+  assert.equal(verdict.action, "superseded");
+  if (verdict.action !== "superseded") return;
+  assert.ok(verdict.notice.includes(candidateSha) && verdict.notice.includes(deployed.core_sha));
+});
+
+test("a behind bundle with a new site commit deploys the site commit with the deployed bundle", () => {
+  const verdict = freshness(deployed, candidateSha, newSiteSha, { status: 200, body: { status: "behind" } });
+  assert.equal(verdict.action, "use-deployed-bundle");
+  if (verdict.action !== "use-deployed-bundle") return;
+  for (const sha of [candidateSha, deployed.core_sha, newSiteSha]) assert.ok(verdict.notice.includes(sha));
+});
+
+test("a diverged bundle is refused with its own failure class", () => {
+  const verdict = freshness(deployed, candidateSha, newSiteSha, { status: 200, body: { status: "diverged" } });
+  assert.equal(verdict.action, "refuse");
+  if (verdict.action !== "refuse") return;
+  assert.match(verdict.errors[0], /diverged/);
+  assert.equal(classifyFailure(verdict.errors.join("\n")), "diverged-bundle");
+});
+
+test("an unknown status or an unverifiable comparison fails closed", () => {
+  const unknown = freshness(deployed, candidateSha, newSiteSha, { status: 200, body: {} });
+  assert.equal(unknown.action, "refuse");
+  assert.equal(classifyFailure(unknown.action === "refuse" ? unknown.errors.join("\n") : ""), "infrastructure");
   for (const status of [403, 404, 500, 502]) {
-    assert.match(freshnessErrors(deployed, { status })[0], new RegExp(`failed closed \\(HTTP ${status}\\)`));
+    const verdict = freshness(deployed, candidateSha, newSiteSha, { status });
+    assert.equal(verdict.action, "refuse");
+    if (verdict.action !== "refuse") return;
+    assert.match(verdict.errors[0], new RegExp(`failed closed \\(HTTP ${status}\\)`));
+    assert.equal(classifyFailure(verdict.errors[0]), "infrastructure");
   }
 });
 
@@ -53,7 +83,7 @@ test("overlapping runs: a run that resolved before another deployed refuses to d
 });
 
 test("overlapping runs: a run that resolves after another deployed is checked against it", () => {
-  const otherDeployed = { core_sha: "b".repeat(40), corpus_sha: "c".repeat(40) };
-  assert.match(freshnessErrors(otherDeployed, { status: 200, body: { status: "behind" } })[0], /refusing an older or diverged bundle/);
-  assert.deepEqual(freshnessErrors(otherDeployed, { status: 200, body: { status: "ahead" } }), []);
+  const otherDeployed = { core_sha: "b".repeat(40), corpus_sha: "c".repeat(40), site_sha: "7".repeat(40) };
+  assert.equal(freshness(otherDeployed, "d".repeat(40), newSiteSha, { status: 200, body: { status: "behind" } }).action, "use-deployed-bundle");
+  assert.equal(freshness(otherDeployed, "d".repeat(40), newSiteSha, { status: 200, body: { status: "ahead" } }).action, "fresh");
 });

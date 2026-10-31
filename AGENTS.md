@@ -101,6 +101,13 @@ versioned core bundle; it reads nothing else from core.
   `core-bundle` dispatch from core, and by hand with `mode` set to
   `deploy`, `redeploy` (the same bundle again) or `rollback` (restore the
   artifact of the receipt run named in `receipt_run_id`).
+- A `deploy` run whose resolved core bundle is behind the deployed one does
+  not fail. If the deployed receipt's `site_sha` is this run's commit, the
+  run is superseded: it logs a notice, skips the build and the `deploy` job
+  and reports nothing. Otherwise it deploys this site commit with the
+  deployed core bundle, fetched by `core_sha` and checked against the
+  receipt's `bundle_digest`. A diverged bundle, an unknown status or a failed
+  compare still fails; divergence is class `diverged-bundle`.
 - The repository variable `SITE_DEPLOY_TARGET` decides what a run does.
   Unset, it resolves, builds and gates, then stops. `rehearsal` deploys to
   `SITE_ORIGIN` with every page marked `noindex`. `production` deploys

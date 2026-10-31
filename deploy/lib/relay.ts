@@ -5,12 +5,14 @@ export const FAILURE_CLASSES = [
   "contract-version-mismatch",
   "snapshot-digest",
   "probe-mismatch",
+  "diverged-bundle",
   "infrastructure",
 ] as const;
 export type FailureClass = (typeof FAILURE_CLASSES)[number];
 
 export function classifyFailure(errorText: string): FailureClass {
   const text = (errorText || "").toLowerCase();
+  if (text.includes("diverged-bundle")) return "diverged-bundle";
   if (
     text.includes("producing run concluded null") ||
     text.includes("wait cap") ||

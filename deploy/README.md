@@ -43,7 +43,8 @@ variables.
    job and write a summary saying nothing was deployed.
 4. To resume, set the variable back to the recorded target and dispatch
    `mode=deploy` or wait for the next bundle. A candidate bundle must not be
-   older than or diverged from the deployed core commit.
+   older than or diverged from the deployed core commit; see "Bundles behind
+   the deployed one".
 
 Unsetting the variable before step 2 completes leaves the rollback run
 without a `deploy` job, so nothing is restored.
@@ -59,3 +60,26 @@ fails with `ReceiptLookupBoundError` instead of reporting nothing deployed.
 Each lookup logs `deploy lookup: <n> REST calls, <n> receipt loads`. API
 failures log the route, status, rate-limit headers and the first 200 characters
 of the message, and GET requests retry network errors twice.
+
+## Bundles behind the deployed one
+
+Core's site-inputs runs finish in the order Trunk finishes, not in commit
+order, so a `deploy` run can resolve a bundle whose core commit is an ancestor
+of the deployed one. `resolve` compares the deployed receipt's `core_sha` with
+the candidate's and acts on the result:
+
+- `ahead` or `identical`: the candidate deploys.
+- `behind` and the deployed receipt's `site_sha` equals this run's commit:
+  the run is superseded. It logs a notice naming both core commits, sets the
+  build output `superseded=true`, skips the docs check, build, gates, artifact
+  uploads and the `deploy` job, and concludes success. It opens no
+  site-deploy-failed comment and neither opens nor closes a core
+  site-bundle-undeployed issue.
+- `behind` and this run's commit is not the deployed one: the run deploys
+  this site commit with the deployed core bundle. It fetches the bundle by the
+  receipt's `core_sha` and fails closed unless its digest equals the
+  receipt's `bundle_digest`. The notice names both core commits.
+- `diverged`, an unknown status or a failed compare: the run fails and is
+  reported. A diverged candidate has its own failure class, `diverged-bundle`.
+
+`rollback` and `redeploy` runs do not compare and behave as before.
