@@ -1,0 +1,26 @@
+{
+  "acceptance": [
+    "Push and manual deploy runs select, among recent successful develop site-inputs runs, the bundle whose core_sha is newest by commit order, not newest by run creation time; if the candidates have diverged, the run fails closed with a named class. Tested with out-of-order creation times",
+    "A core-bundle dispatch whose core_sha has a newer descendant bundle available deploys the newest descendant instead, with a notice naming both SHAs and the same digest verification as any other bundle; this also covers a newer dispatch that was replaced in the concurrency group. Tested",
+    "deploy/README.md describes how the bundle is chosen",
+    "In the first 10 production deploy runs after merge, none deploys a core_sha that has a newer descendant among successful site-inputs runs created before that run's resolve step; run ids listed"
+  ],
+  "context": "Found 2026-10-31 by the review of deploy-superseded-bundle-reported-as-failure-20261031.",
+  "description": "Core's site-inputs runs are created in the order Trunk runs finish, not in commit order: b2044c6's run 41099461819 was created at 2026-10-30T17:30:47Z, 13 minutes after 786bfad8's run 41097447792, and its dispatch went out an hour later. Two failures follow. (1) Push and manual deploy runs take the newest successful site-inputs run by creation time (scripts/bundle-fetch.mjs:88-96), so they can pick a bundle behind the deployed one: push run 41139487358 did, and its site commit 184e3433 waited 2 hours. (2) The pages-deploy concurrency group keeps one pending run and replaces it with whichever run arrives next, so a dispatch for an older core commit can displace one for a newer commit: 41182554357 (cee1108f) was cancelled by 41182864346 (1f96a62, 4 commits older), which deployed; the next success (41183511440, 361228c) was still 2 commits behind cee1108f. The site then stays behind the newest certified bundle, with no failure reported, until a later dispatch happens to carry a newer commit. Cancel-in-progress is not a fix: it would kill a running Pages deploy between deploy-pages and record.",
+  "links": [
+    "scripts/bundle-fetch.mjs",
+    "deploy/cli.ts",
+    ".github/workflows/deploy.yml",
+    "deploy/README.md"
+  ],
+  "sessions": [
+    {
+      "actor": "mcp:omp-coding-agent:joe@joe-mac-mini.local:f49e5d07dc7a5f74ab116b22",
+      "at": "2026-10-31T15:13:33Z",
+      "client": "omp-coding-agent",
+      "op": "create",
+      "op_id": "852dd3596e9747bc84ef0b9554a5759a",
+      "session_id": "da31eb4604bb4e9685337e08ec0df489"
+    }
+  ]
+}
