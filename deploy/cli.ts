@@ -6,7 +6,7 @@ import { runGates } from "./gates/index.ts";
 import type { BrokenLink } from "./gates/links.ts";
 import { SNAPSHOT_PATH, snapshotSha } from "./gates/snapshot-digest.ts";
 import { canonicalDigest } from "./lib/canonical-digest.ts";
-import { downloadReceipt, githubApi, recordedReceipts, verifiedReceipt } from "./lib/github.ts";
+import { countingLookup, downloadReceipt, githubApi, latestRecordedReceipt, lookupSummary, recordedReceiptForRun, verifiedReceipt } from "./lib/github.ts";
 import { checksumManifest, probe } from "./lib/probe.ts";
 import { latencySeconds, receiptBytes, receiptSha, RECEIPT_SCHEMA, statusDescription, type Receipt, type ProbeSummary } from "./lib/receipt.ts";
 import { recheckErrors } from "./lib/recheck.ts";
@@ -52,13 +52,22 @@ type Resolution = {
   rollback_target: Receipt | null;
 };
 
-async function currentDeployed(): Promise<{ receipt: Receipt; sha: string } | null> {
+async function lookupDeployed(loadReceipts: boolean): Promise<{ receipt: Receipt | null; sha: string } | null> {
   const target = process.env.SITE_DEPLOY_TARGET || undefined;
-  const recorded = await recordedReceipts(githubApi(), SITE_REPO, "github-pages", target, (runId) =>
-    downloadReceipt(SITE_REPO, runId),
-  );
-  if (recorded.length === 0) return null;
-  return { receipt: verifiedReceipt(recorded[0], (runId) => downloadReceipt(SITE_REPO, runId)), sha: recorded[0].sha };
+  const counted = countingLookup(githubApi(), (runId) => downloadReceipt(SITE_REPO, runId));
+  try {
+    const found = await latestRecordedReceipt(counted.api, SITE_REPO, "github-pages", target, counted.load);
+    if (!found) return null;
+    const receipt = found.receipt ?? (loadReceipts ? verifiedReceipt(found.recorded, counted.load) : null);
+    return { receipt, sha: found.recorded.sha };
+  } finally {
+    console.log(lookupSummary(counted.stats));
+  }
+}
+
+async function currentDeployed(): Promise<{ receipt: Receipt; sha: string } | null> {
+  const found = await lookupDeployed(true);
+  return found && { receipt: found.receipt as Receipt, sha: found.sha };
 }
 
 async function resolve(): Promise<void> {
@@ -84,11 +93,12 @@ async function resolve(): Promise<void> {
     const runId = process.env.ROLLBACK_RUN_ID ?? "";
     if (!/^\d+$/.test(runId)) failWith(["rollback needs a numeric receipt run id"]);
     const deployTarget = process.env.SITE_DEPLOY_TARGET || undefined;
-    const recorded =
-      (
-        await recordedReceipts(githubApi(), SITE_REPO, "github-pages", deployTarget, (id) => downloadReceipt(SITE_REPO, id))
-      ).find((entry) => entry.runId === runId) ?? null;
-    const target = recorded ? verifiedReceipt(recorded, (id) => downloadReceipt(SITE_REPO, id)) : null;
+    let target: Receipt | null = null;
+    try {
+      target = await recordedReceiptForRun(githubApi(), SITE_REPO, "github-pages", runId, deployTarget, (id) => downloadReceipt(SITE_REPO, id));
+    } catch (error) {
+      failWith([(error as Error).message]);
+    }
     const errors = rollbackTargetErrors(target, runId);
     if (errors.length > 0) failWith(errors);
     const restored = target as Receipt;
@@ -165,7 +175,7 @@ async function gates(): Promise<void> {
 
 async function recheck(): Promise<void> {
   const resolution = readJson<Resolution>(path.join(WORK, "resolve.json"));
-  const current = await currentDeployed();
+  const current = await lookupDeployed(false);
   const errors = recheckErrors(resolution.deployed?.receipt_sha ?? null, current?.sha ?? null);
   if (errors.length > 0) failWith(errors);
   console.log("deploy: the deployed generation is unchanged since resolve");
@@ -242,6 +252,7 @@ async function deploymentId(): Promise<void> {
   const bound = new RegExp(`/actions/runs/${runId}(?:[/?#]|$)`);
   for (const deployment of listed.body as { id: number }[]) {
     const statuses = await api(`repos/${SITE_REPO}/deployments/${deployment.id}/statuses?per_page=20`);
+    if (statuses.status !== 200) failWith([`reading deployment ${deployment.id} statuses failed (HTTP ${statuses.status})`]);
     const urls = (statuses.body as { log_url?: string; target_url?: string }[]).flatMap((status) => [status.log_url ?? "", status.target_url ?? ""]);
     if (urls.some((url) => bound.test(url))) {
       output("deployment_id", String(deployment.id));
