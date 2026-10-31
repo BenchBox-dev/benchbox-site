@@ -8,7 +8,7 @@ on:
   workflow_dispatch:
     inputs:
       mode:
-        description: "deploy (newest certified bundle), redeploy (same bundle again) or rollback (restore a receipt's artifact)"
+        description: "deploy (newest certified bundle; a bundle older than the live one is skipped or replaced by the live one), redeploy (same bundle again) or rollback (restore a receipt's artifact)"
         type: choice
         options: [deploy, redeploy, rollback]
         default: deploy
@@ -47,6 +47,7 @@ jobs:
       deployments: read
     outputs:
       core_sha: ${{ steps.resolve.outputs.core_sha }}
+      superseded: ${{ steps.resolve.outputs.superseded }}
       failure_class: ${{ steps.resolve.outputs.failure_class || steps.build.outputs.failure_class || steps.gates.outputs.failure_class }}
     steps:
       - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09
@@ -64,11 +65,11 @@ jobs:
           SITE_INPUTS_DIGEST: ${{ github.event.client_payload.digest }}
         run: node --experimental-strip-types deploy/run-step.ts npm run -s deploy -- resolve
       - name: Check documentation contracts before building
-        if: env.DEPLOY_MODE != 'rollback'
+        if: env.DEPLOY_MODE != 'rollback' && steps.resolve.outputs.superseded != 'true'
         run: npm run -s docs:check -- --docs-mode block
       - name: Build from the bundle
         id: build
-        if: env.DEPLOY_MODE != 'rollback'
+        if: env.DEPLOY_MODE != 'rollback' && steps.resolve.outputs.superseded != 'true'
         env:
           SITE_ORIGIN: ${{ vars.SITE_ORIGIN }}
           SITE_HOST: ${{ vars.SITE_HOST }}
@@ -82,16 +83,18 @@ jobs:
           rm -rf website/dist
           gh run download "$RUN" -R "$GITHUB_REPOSITORY" -n "site-artifact-$RUN" -D website/dist
       - name: Mark a rehearsal artifact noindex
-        if: env.SITE_DEPLOY_TARGET == 'rehearsal' && env.DEPLOY_MODE != 'rollback'
+        if: env.SITE_DEPLOY_TARGET == 'rehearsal' && env.DEPLOY_MODE != 'rollback' && steps.resolve.outputs.superseded != 'true'
         run: npm run -s deploy -- rehearsal
       - name: Gate the artifact
         id: gates
+        if: steps.resolve.outputs.superseded != 'true'
         env:
           SITE_HOST: ${{ vars.SITE_HOST }}
           SITE_SNAPSHOT_APPROVED_CHANGE: ${{ vars.SITE_SNAPSHOT_APPROVED_CHANGE }}
           SITE_SNAPSHOT_APPROVAL_REASON: ${{ vars.SITE_SNAPSHOT_APPROVAL_REASON }}
         run: node --experimental-strip-types deploy/run-step.ts npm run -s deploy -- gates
       - uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f
+        if: steps.resolve.outputs.superseded != 'true'
         with:
           name: site-artifact-${{ github.run_id }}
           path: website/dist
@@ -99,13 +102,14 @@ jobs:
           retention-days: 90
           if-no-files-found: error
       - uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f
+        if: steps.resolve.outputs.superseded != 'true'
         with:
           name: deploy-work-${{ github.run_id }}
           path: deploy-work
           retention-days: 90
           if-no-files-found: error
       - name: Stop before deploy when no target is set
-        if: env.SITE_DEPLOY_TARGET != 'rehearsal' && env.SITE_DEPLOY_TARGET != 'production'
+        if: env.SITE_DEPLOY_TARGET != 'rehearsal' && env.SITE_DEPLOY_TARGET != 'production' && steps.resolve.outputs.superseded != 'true'
         run: |
           {
             echo "SITE_DEPLOY_TARGET is '${SITE_DEPLOY_TARGET}': the bundle resolved, the site built and every gate ran; nothing was deployed.";
@@ -114,7 +118,7 @@ jobs:
   deploy:
     name: deploy, probe and record
     needs: build
-    if: vars.SITE_DEPLOY_TARGET == 'rehearsal' || vars.SITE_DEPLOY_TARGET == 'production'
+    if: (vars.SITE_DEPLOY_TARGET == 'rehearsal' || vars.SITE_DEPLOY_TARGET == 'production') && needs.build.outputs.superseded != 'true'
     runs-on: ubuntu-latest
     timeout-minutes: 30
     environment:

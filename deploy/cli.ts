@@ -11,7 +11,7 @@ import { checksumManifest, probe } from "./lib/probe.ts";
 import { latencySeconds, receiptBytes, receiptSha, RECEIPT_SCHEMA, statusDescription, type Receipt, type ProbeSummary } from "./lib/receipt.ts";
 import { recheckErrors } from "./lib/recheck.ts";
 import { markRehearsal } from "./lib/rehearsal.ts";
-import { chainErrors, freshnessErrors, type Deployed } from "./lib/resolve.ts";
+import { chainErrors, freshness, type Deployed } from "./lib/resolve.ts";
 import { automaticRollback, rollbackTargetErrors } from "./lib/rollback.ts";
 import { treeDigest } from "../website/src/lib/tree-digest.ts";
 
@@ -52,6 +52,32 @@ type Resolution = {
   rollback_target: Receipt | null;
 };
 
+function siteSha(): string {
+  return process.env.GITHUB_SHA ?? execFileSync("git", ["rev-parse", "HEAD"], { encoding: "utf8" }).trim();
+}
+
+function notice(message: string): void {
+  console.log(`::notice::${message}`);
+  if (process.env.GITHUB_STEP_SUMMARY) writeFileSync(process.env.GITHUB_STEP_SUMMARY, `${message}\n`, { flag: "a" });
+}
+
+type FetchedBundle = { manifest: { core_sha: string; corpus_sha: string }; digest: string };
+
+function fetchBundle(env: NodeJS.ProcessEnv): FetchedBundle {
+  execFileSync(process.execPath, [path.join(ROOT, "scripts", "bundle-fetch.mjs")], { stdio: "inherit", env });
+  return {
+    manifest: readJson<{ core_sha: string; corpus_sha: string }>(path.join(SITE_INPUTS, "manifest.json")),
+    digest: readJson<{ digest: string }>(path.join(SITE_INPUTS, ".fetched.json")).digest,
+  };
+}
+
+function fetchDeployedBundle(receipt: Receipt): FetchedBundle {
+  const bundle = fetchBundle({ ...process.env, SITE_INPUTS_CORE_SHA: receipt.core_sha, SITE_INPUTS_RUN_ID: "", SITE_INPUTS_DIGEST: receipt.bundle_digest });
+  if (bundle.manifest.core_sha !== receipt.core_sha) failWith([`the bundle fetched for core_sha ${receipt.core_sha} carries core_sha ${bundle.manifest.core_sha}`]);
+  if (bundle.digest !== receipt.bundle_digest) failWith([`the deployed core bundle digest ${bundle.digest} does not match the receipt's ${receipt.bundle_digest}`]);
+  return bundle;
+}
+
 async function lookupDeployed(loadReceipts: boolean): Promise<{ receipt: Receipt | null; sha: string } | null> {
   const target = process.env.SITE_DEPLOY_TARGET || undefined;
   const counted = countingLookup(githubApi(), (runId) => downloadReceipt(SITE_REPO, runId));
@@ -82,6 +108,7 @@ async function resolve(): Promise<void> {
         core_sha: current.receipt.core_sha,
         corpus_sha: current.receipt.corpus_sha,
         receipt_sha: current.sha,
+        site_sha: current.receipt.site_sha,
         snapshot_sha256: current.receipt.snapshot_sha256,
         snapshot_canonical_sha256: current.receipt.snapshot_canonical_sha256 ?? null,
         ui: current.receipt.explorer_read_model_version,
@@ -114,24 +141,31 @@ async function resolve(): Promise<void> {
     output("core_sha", restored.core_sha);
     return;
   }
-  execFileSync(process.execPath, [path.join(ROOT, "scripts", "bundle-fetch.mjs")], { stdio: "inherit", env: process.env });
-  const manifest = readJson<{ core_sha: string; corpus_sha: string }>(path.join(SITE_INPUTS, "manifest.json"));
-  const fetched = readJson<{ digest: string }>(path.join(SITE_INPUTS, ".fetched.json"));
+  let { manifest, digest } = fetchBundle(process.env);
+  if (deployed && current && mode === "deploy") {
+    const compare = await githubApi()(`repos/${CORE_REPO}/compare/${deployed.core_sha}...${manifest.core_sha}`);
+    const verdict = freshness(deployed, manifest.core_sha, siteSha(), { status: compare.status, body: compare.body as { status?: "ahead" } });
+    if (verdict.action === "refuse") failWith(verdict.errors);
+    if (verdict.action === "superseded") {
+      notice(verdict.notice);
+      output("superseded", "true");
+      return;
+    }
+    if (verdict.action === "use-deployed-bundle") {
+      notice(verdict.notice);
+      ({ manifest, digest } = fetchDeployedBundle(current.receipt));
+    }
+  }
   const attestations = readJson<{ name: string; result: string; compared?: { base?: string } }[]>(path.join(SITE_INPUTS, "attestations.json"));
   const parity = attestations.find((entry) => entry.name === "validator_parity");
   const contract = readJson<{ read_model_version: number }>(path.join(SITE_INPUTS, "explorer", "contract.json"));
-  const errors: string[] = [];
-  if (deployed && mode === "deploy") {
-    const compare = await githubApi()(`repos/${CORE_REPO}/compare/${deployed.core_sha}...${manifest.core_sha}`);
-    errors.push(...freshnessErrors(deployed, { status: compare.status, body: compare.body as { status?: "ahead" } }));
-  }
-  errors.push(...chainErrors(deployed, { core_sha: manifest.core_sha, corpus_sha: manifest.corpus_sha, validator_parity: parity && { result: parity.result, base: parity.compared?.base } }));
+  const errors = chainErrors(deployed, { core_sha: manifest.core_sha, corpus_sha: manifest.corpus_sha, validator_parity: parity && { result: parity.result, base: parity.compared?.base } });
   if (errors.length > 0) failWith(errors);
   writeWork("resolve.json", {
     mode,
     core_sha: manifest.core_sha,
     corpus_sha: manifest.corpus_sha,
-    bundle_digest: fetched.digest,
+    bundle_digest: digest,
     snapshot_read_model_version: contract.read_model_version,
     deployed,
     rollback_target: null,
@@ -208,7 +242,7 @@ async function receipt(): Promise<void> {
     schema: RECEIPT_SCHEMA,
     mode: resolution.mode,
     target: process.env.SITE_DEPLOY_TARGET || "none",
-    site_sha: process.env.GITHUB_SHA ?? execFileSync("git", ["rev-parse", "HEAD"], { encoding: "utf8" }).trim(),
+    site_sha: siteSha(),
     run_id: process.env.GITHUB_RUN_ID ?? "0",
     deployment_id: process.env.DEPLOYMENT_ID ? Number(process.env.DEPLOYMENT_ID) : null,
     core_sha: resolution.core_sha,
