@@ -48,6 +48,8 @@
     --hero-glow-secondary: rgba(30, 58, 120, 0.06);
     --card-shadow: 0 10px 26px rgba(75, 44, 58, 0.08);
     --bb-site-header-text: var(--text-muted);
+    --bb-site-header-cta-text: #ffffff;
+    --warning-color: #b45309;
 
     --bb-brand-50: #eef3fb;
     --bb-brand-100: #dce7f7;
@@ -184,6 +186,8 @@
     --hero-glow-secondary: rgba(167, 198, 237, 0.06);
     --card-shadow: 0 10px 30px rgba(20, 4, 9, 0.35);
     --bb-site-header-text: var(--text-muted);
+    --bb-site-header-cta-text: #0d1117;
+    --warning-color: #d29922;
 
     --bb-bg-primary: #4a1526;
     --bb-bg-panel: #5a1e31;

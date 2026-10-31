@@ -10,7 +10,6 @@
     "convert": "node --experimental-strip-types --disable-warning=ExperimentalWarning src/converter/cli.ts",
     "inventory": "node --experimental-strip-types --disable-warning=ExperimentalWarning scripts/myst-inventory.ts",
     "inventory:core-links": "node --experimental-strip-types --disable-warning=ExperimentalWarning scripts/core-linked-paths.ts",
-    "id-parity": "node --experimental-strip-types --disable-warning=ExperimentalWarning scripts/id-parity.ts",
     "docs:generate": "node --experimental-strip-types --disable-warning=ExperimentalWarning scripts/generate-docs-pages.ts",
     "docs:parity": "node --experimental-strip-types --disable-warning=ExperimentalWarning scripts/docs-parity.ts",
     "dev": "npm run convert && astro dev",

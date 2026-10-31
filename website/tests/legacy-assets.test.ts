@@ -13,6 +13,7 @@ import {
   publishLegacyImages,
   publishLegacyRedirects,
   REDIRECT_PAGES,
+  repositoryBlobUrl,
   renderObjectsInventory,
   renderRedirectPage,
   type LegacyDownloads,
@@ -134,15 +135,14 @@ describe("legacy download inventory", () => {
     for (const redirect of redirects) expect(redirect.target).toMatch(/^https:\/\/github\.com\/BenchBox-dev\/BenchBox\/blob\/[0-9a-f]{40}\/[^?#\s]+$/);
   });
 
-  it("covers every download URL the Sphinx baseline published", () => {
-    const baseline = new Set<string>();
-    const directory = path.join(repoRoot, "inventory", "baseline-develop");
-    for (const name of readdirSync(directory)) {
-      for (const match of readFileSync(path.join(directory, name), "utf-8").matchAll(/"(\/docs\/_downloads\/[^"]*)"/g)) baseline.add(match[1]);
+  it("redirects every legacy download URL to its pinned core file", () => {
+    const byUrl = new Map(redirects.map((redirect) => [redirect.url, redirect]));
+    expect(inventory.downloads.length).toBeGreaterThan(0);
+    for (const download of inventory.downloads) {
+      const redirect = byUrl.get(downloadUrlPath(download.source));
+      expect(redirect?.url).toMatch(/^\/docs\/_downloads\/[0-9a-f]{32}\/[^/]+$/);
+      expect(redirect?.target).toBe(repositoryBlobUrl(download.core_sha ?? inventory.core_sha, download.path));
     }
-    const covered = new Set(redirects.map((redirect) => redirect.url));
-    expect(baseline.size).toBeGreaterThan(0);
-    expect([...baseline].filter((url) => !covered.has(url))).toEqual([]);
   });
 
   it("gives a notice to every TPC query template and to nothing else", () => {

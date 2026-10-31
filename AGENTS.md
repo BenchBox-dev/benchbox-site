@@ -157,9 +157,6 @@ versioned core bundle; it reads nothing else from core.
 - `.github/workflows/nightly-browser.yml` runs the Explorer `@smoke` suite on
   Firefox and WebKit daily and on dispatch. A failure opens or updates the one
   open issue labelled `t3:browser`.
-- `npm run shadow:compare -- <core tree> website/dist
-  inventory/shadow-allowlist.json` compares a build with core's build of
-  the same bundle. Every allowed difference in that file carries a reason.
 - The Visual comparison workflow screenshots a PR's build and the deployed
   artifact and reports the differences. It is advisory: it is not part of
   `ci` and never fails on a difference.

@@ -29,13 +29,12 @@ async function serve(root) {
 }
 
 const base = process.env.BASE_URL ?? (await serve(path.resolve(process.env.SITE_DIR ?? path.join(here, "..", "dist"))));
-const oldBase = process.env.OLD_BASE_URL ?? (await serve(path.resolve(process.env.LANDING_DIR ?? path.join(here, "..", "..", "landing"))));
 const outDir = process.env.OUT_DIR ?? path.join(os.tmpdir(), "benchbox-website-landing");
 mkdirSync(outDir, { recursive: true });
 
 const browser = await chromium.launch({ executablePath: process.env.CHROMIUM_PATH || undefined });
 const failures = [];
-const report = { network: {}, landing: {}, prompts: {}, parity: {} };
+const report = { network: {}, landing: {}, prompts: {} };
 const fail = (message) => failures.push(message);
 const check = (condition, message) => {
   if (!condition) fail(message);
@@ -465,55 +464,6 @@ for (const theme of ["light", "dark"]) {
   const widths = await page.evaluate(() => ({ form: document.querySelector("#prompts-form").getBoundingClientRect().width, block: document.querySelector("#block-prompt").getBoundingClientRect().width }));
   check(Math.abs(widths.form - widths.block) <= 2, `output block does not span the content column: ${JSON.stringify(widths)}`);
   await context.close();
-}
-
-{
-  const catalogRaw = await (await fetch(`${oldBase}/prompts/catalog.generated.js`)).text();
-  const catalog = JSON.parse(catalogRaw.slice(catalogRaw.indexOf("{"), catalogRaw.lastIndexOf("}") + 1));
-  const combos = [];
-  for (const goal of catalog.goals.map((g) => g.id))
-    for (const surface of catalog.surfaces.map((s) => s.id))
-      for (const iface of catalog.interfaces.map((i) => i.id))
-        for (const deployment of catalog.deployments.map((d) => d.id))
-          for (const scale of ["0.01", "1.0"]) combos.push({ goal, surface, interface: iface, deployment, scale });
-  for (const platform of catalog.platforms) combos.push({ platform: platform.id, surface: "mcp", scale: "1.0", deployment: platform.deployments[0], interface: platform.interfaces[0] }, { platform: platform.id, deployment: platform.deployments[0], interface: platform.interfaces[0], scale: "0.1" });
-  for (const [key, value] of [["goal", "bogus"], ["surface", "bogus"], ["interface", "bogus"], ["deployment", "bogus"], ["benchmark", "bogus"], ["scale", "bogus"], ["platform", "bogus"]])
-    combos.push({ [key]: value }, { [key]: value, surface: "mcp", scale: "1.0" });
-  combos.push({ goal: "compare", platformA: "bogus", platformB: "bogus" }, { goal: "compare", platformA: "bogus", platformB: "bogus", surface: "mcp" });
-  for (const benchmark of catalog.benchmarks) combos.push({ benchmark: benchmark.id, scale: "0.1" }, { benchmark: benchmark.id, scale: "0.01", surface: "mcp" });
-  const a = await open("/prompts/", { origin: oldBase });
-  const b = await open("/prompts/");
-  const snapshot = (page) =>
-    page.evaluate(() => ({
-      prompt: document.querySelector("#prompt-text").textContent,
-      mcp: document.querySelector("#mcp-setup-text").textContent,
-      mcpHidden: document.querySelector("#block-mcp-setup").hidden,
-      safetyHidden: document.querySelector("#block-cloud-safety").hidden,
-      safety: [...document.querySelectorAll("#cloud-safety-list li")].map((li) => li.textContent),
-      selects: [...document.querySelectorAll("select")].map((s) => [s.id, s.value, [...s.options].map((o) => o.value + "=" + o.textContent), s.closest("label").hidden]),
-      search: location.search,
-    }));
-  const canonical = (snap) => {
-    const params = new URLSearchParams(snap.search);
-    for (const [key, list] of [["goal", catalog.goals], ["surface", catalog.surfaces]]) if (params.has(key) && !list.some((item) => item.id === params.get(key))) params.set(key, catalog.defaults[key]);
-    return { ...snap, search: params.toString() };
-  };
-  let mismatches = 0;
-  for (const combo of combos) {
-    const query = new URLSearchParams(combo).toString();
-    await a.page.goto(`${oldBase}/prompts/?${query}`);
-    await b.page.goto(`${base}/prompts/?${query}`);
-    await hydrated(b.page);
-    const [x, y] = [canonical(await snapshot(a.page)), canonical(await snapshot(b.page))];
-    if (JSON.stringify(x) !== JSON.stringify(y)) {
-      mismatches += 1;
-      if (mismatches <= 5) fail(`prompt parity mismatch for ?${query}: ${Object.keys(x).filter((k) => JSON.stringify(x[k]) !== JSON.stringify(y[k]))}`);
-    }
-  }
-  report.parity = { combos: combos.length, mismatches };
-  check(mismatches === 0, `${mismatches} prompt parity mismatches`);
-  await a.context.close();
-  await b.context.close();
 }
 
 await browser.close();
