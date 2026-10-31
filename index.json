@@ -73,10 +73,15 @@
       "title": "Bound the deploy resolver to the newest recorded receipt instead of reading every deployment and old receipt"
     },
     "deploy-superseded-bundle-reported-as-failure-20261031": {
-      "claim": null,
+      "claim": {
+        "expires_at": "2026-11-01T23:44:35Z",
+        "generation": "322fc0633088437aa66096c8d6505cda",
+        "renewals": 0,
+        "worker": "mcp:omp-coding-agent:joe@joe-mac-mini.local:89fe2914d27056f15d362461"
+      },
       "needs": [],
       "priority": "medium",
-      "status": "open",
+      "status": "active",
       "title": "Treat a core bundle older than the deployed one as superseded: skip it, or deploy the site commit with the deployed bundle, instead of failing"
     },
     "deploy-waits-for-whole-producing-run-20261031": {
