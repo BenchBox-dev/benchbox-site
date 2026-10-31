@@ -1,0 +1,26 @@
+{
+  "acceptance": [
+    "Every file under landing/ except landing/prompts/a11y-checklist.md is imported or copied by the site or Explorer build, and git grep for site-header.(css|js), site-theme.(css|js), landing/index.html, landing/script.js and landing/style.css finds nothing outside drafts/ and blog/",
+    "site-tokens.css (or its moved copy) is the only stylesheet that defines theme variables, and /prompts/ shows no change in the advisory Visual comparison run",
+    "The header contract tests run against the built Astro pages, and site ci is green",
+    "No file in inventory/ or scripts/ remains that only the removed Sphinx-era parity or shadow tooling read",
+    "A production deploy after the change is green with probes"
+  ],
+  "context": "Split on 2026-10-30 from the core item of the same id, which covered both repositories; the core part is core-sphinx-leftovers-20261030 in the core tracker. Re-scoped 2026-10-17 when the owner chose 'Drop delivered, re-scope rest' for the astro-site chain. Revalidated 2026-10-30 against origin/main 184e343: none of the site scope was delivered yet.",
+  "description": "benchbox.dev is served by the Astro build in this repository. The site split copied files that the build no longer uses; none of the legacy pages is served (/script.js, /style.css, /shared/site-header.js and /prompts/prompts.js return 404).\n\n- Delete the unserved static pages and scripts: landing/index.html, landing/script.js, landing/style.css, landing/prompts/index.html, landing/prompts/prompts.js, landing/prompts/catalog.generated.js and landing/prompts/catalog.yaml (the catalog now comes from the bundle's landing/prompt-catalog.json).\n- Delete landing/shared/site-header.css, site-header.js and site-theme.js, used only by the deleted pages.\n- Retire the second theme file: move the two variables landing/prompts/prompts.css reads from landing/shared/site-theme.css (--bb-site-header-cta-text, --warning-color) into site-tokens.css, then drop site-theme.css and its import in website/src/styles/landing-theme.css.\n- Point the explorer/e2e/routes/header.spec.ts static-surface tests (around lines 23-24) at the built / and /prompts/ pages, or delete them in favour of website/tests/shell.test.ts.\n- Remove the legacy old-vs-new comparison from website/e2e/landing.mjs (LANDING_DIR / OLD_BASE_URL, around lines 32 and 471).\n- Keep files the build imports: landing/shared/site-tokens.css, site-shell.css, landing/prompts/prompts.css, landing/hero.png (they may move to a neutral path, updating explorer/src/index.css, Shell.astro, astro.config.ts and tests). Keep landing/prompts/a11y-checklist.md, which site-browser-acceptance-ci-20261017 updates.\n- Remove the Sphinx-era parity data and tools: inventory/baseline-develop/, expected-removals-*.json, added-paths.json, allowed-inventory-losses.json, website/scripts/id-parity.ts and the id-parity script in website/package.json. website/tests/legacy-assets.test.ts also reads inventory/baseline-develop/ (the case that covers every download URL the Sphinx baseline published, around lines 137-147): rewrite that case against inventory/legacy-downloads.json or remove it.\n- Remove scripts/shadow-compare.mjs, scripts/shadow-compare.test.mjs, inventory/shadow-allowlist.json, the shadow:compare script in package.json and their AGENTS.md mention.\n- Remove inventory files nothing reads (allowed-differences.json, redirect-pages.json, release-known-broken/, api-public-symbols.json) and the .js branch of parseCatalogSource in prompt-catalog.ts that only a test exercises.\n- Keep inventory/known-broken-links.json, inventory/api-reference-url-map.json (core docs link to it) and anything the build, deploy or CI still reads.\n\nThe MyST converter decision stays with site-myst-converter-retirement-20261017.",
+  "links": [
+    "BenchBox-dev/benchbox-site: landing/",
+    "BenchBox-dev/benchbox-site: inventory/",
+    "BenchBox-dev/benchbox-site: website/tests/legacy-assets.test.ts"
+  ],
+  "sessions": [
+    {
+      "actor": "mcp:omp-coding-agent:joe@joe-mac-mini.local:7459db9ace2a96b770fd98c9",
+      "at": "2026-10-31T00:18:29Z",
+      "client": "omp-coding-agent",
+      "op": "create",
+      "op_id": "07400ea1ab5f444e8cc6b8c2d6d56898",
+      "session_id": "834c45f120c740e0b59620b3f36c8764"
+    }
+  ]
+}
