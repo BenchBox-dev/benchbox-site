@@ -4,7 +4,7 @@
     "Links and other URLs inside /docs/dev/ pages keep their /docs/dev/ prefix",
     "The deploy probe for docs/dev/index.html still passes"
   ],
-  "context": "Created 2026-10-30 when the core item site-release-pinned-docs-20261017 was dropped as superseded by the trunk-only decision; this is the part of it that still applies.",
+  "context": "Created 2026-10-30 when the core item site-release-pinned-docs-20261017 was dropped as superseded by the trunk-only decision; this is the part of it that still applies.\n\nClosed 2026-10-31 by PR #92 (merged as 7584bf9): mountDevDocs now leaves the canonical link and og:url of each /docs/dev/ page pointing at its /docs/ URL while every other /docs/ URL becomes /docs/dev/; website/tests/dev-docs.test.ts checks the rewrite on fixtures and on built output, and site-meta.test.ts expects the /docs/ canonical. Production deploy run 41165708201 at 7584bf9 succeeded with probes, including docs/dev/index.html. Live check: https://benchbox.dev/docs/dev/index.html carries <link rel=\"canonical\" href=\"https://benchbox.dev/docs/index.html\"/> and its links keep /docs/dev/ (for example /docs/dev/usage/installation.html). Not changed: /docs/dev/_downloads/* redirect stubs keep their canonical to GitHub.",
   "description": "/docs/dev/ is a copy of /docs/ made after the build (website/src/lib/dev-docs.ts, mountDevDocs). The copy rewrites every /docs/ URL to /docs/dev/, including the canonical link that website/src/lib/page-meta.ts sets, so each /docs/dev/ page names itself canonical. Both trees render the same develop bundle, so search engines see two copies of every docs page with no preferred one. /docs/dev/ is not in the sitemap and nothing links to it, but it is crawlable. The owner keeps trunk-only documentation (core docs/internal/adr/adr-site-docs-ownership.md: release-pinned documentation is not introduced), so /docs/dev/ stays and each of its pages should name the /docs/ page as canonical.",
   "links": [
     "BenchBox-dev/benchbox-site: website/src/lib/dev-docs.ts",
@@ -27,6 +27,14 @@
       "generation": "37ece02f8fde41a2b85894d7656bab3e",
       "op": "take",
       "op_id": "975a42ffd20647b6bd6ecb52251e3a6c",
+      "session_id": "834c45f120c740e0b59620b3f36c8764"
+    },
+    {
+      "actor": "mcp:omp-coding-agent:joe@joe-mac-mini.local:7459db9ace2a96b770fd98c9",
+      "at": "2026-10-31T06:55:48Z",
+      "client": "omp-coding-agent",
+      "op": "update",
+      "op_id": "a6b8a8c8405a40da953edc0f0b56a396",
       "session_id": "834c45f120c740e0b59620b3f36c8764"
     }
   ]
