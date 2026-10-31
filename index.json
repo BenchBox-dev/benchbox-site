@@ -48,12 +48,17 @@
       "title": "Tighten or document what the deploy's canonical snapshot digest ignores"
     },
     "deploy-bundle-selection-by-commit-order-20261031": {
-      "claim": null,
+      "claim": {
+        "expires_at": "2026-11-01T23:44:47Z",
+        "generation": "2178248c2d1146e5889ebe5cfcf845b0",
+        "renewals": 0,
+        "worker": "mcp:omp-coding-agent:joe@joe-mac-mini.local:89fe2914d27056f15d362461"
+      },
       "needs": [
         "deploy-superseded-bundle-reported-as-failure-20261031"
       ],
       "priority": "medium",
-      "status": "open",
+      "status": "active",
       "title": "Choose the core bundle to deploy by core commit order, not by site-inputs run creation time"
     },
     "deploy-redeploy-uses-deployed-bundle-20261031": {
