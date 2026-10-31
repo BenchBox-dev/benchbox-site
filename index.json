@@ -59,7 +59,7 @@
       "needs": [],
       "priority": "medium",
       "status": "open",
-      "title": "Report a core bundle older than the deployed one as superseded, not as a failed deploy"
+      "title": "Treat a core bundle older than the deployed one as superseded: skip it, or deploy the site commit with the deployed bundle, instead of failing"
     },
     "doc-external-links-fragments-20261017": {
       "claim": null,

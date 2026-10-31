@@ -1,15 +1,24 @@
 {
   "acceptance": [
-    "A candidate whose core_sha is an ancestor of the deployed core_sha ends without a failed conclusion, logs a notice naming both SHAs, and posts nothing to issue #58",
-    "A candidate that has diverged from the deployed core_sha still fails closed and is reported as today",
-    "Tests cover the behind and diverged cases"
+    "When a deploy-mode candidate's compare status is behind and the deployed receipt's site_sha equals the run's commit, the run concludes success, skips the build steps after resolve and the deploy job, logs a notice naming the candidate and deployed core SHAs, posts nothing to site #58, and does not create, comment on or close a core site-bundle-undeployed issue",
+    "When the status is behind and the site commit differs from the deployed receipt's, the run deploys the current site commit with the deployed core bundle, fetched by core_sha with a digest that must equal the receipt's bundle_digest; the notice names both SHAs; a fetch or digest failure fails closed as today",
+    "A diverged, unknown-status or non-200 compare still fails and is reported; a diverged refusal carries its own failure class instead of infrastructure",
+    "Rollback and redeploy runs behave as before, shown by tests",
+    "Tests cover behind with the same site commit, behind with a new site commit, diverged and HTTP failure; a workflow test asserts the deploy job and artifact uploads are skipped when resolve reports superseded",
+    "deploy/README.md and AGENTS.md describe the behaviour",
+    "The first production deploy run with a behind candidate after merge matches criterion 1 or 2, listed by run id with no #58 comment or core relay issue; if none occurs within 72 hours of merge, that is recorded with the query used"
   ],
-  "context": "Found 2026-10-31 while classifying failed production deploy runs; see deploy-resolver-reads-every-deployment-20261031 for the other classes.",
-  "description": "A core-bundle repository_dispatch that waits in the runner queue can start after a newer core commit is already live. The deploy then refuses it with 'candidate core_sha is behind relative to the deployed core_sha <sha>; refusing an older or diverged bundle'. Refusing is correct, but the run fails, the failure is classed 'infrastructure' by the default at .github/workflows/deploy.yml:254, and a comment is posted on issue #58. Runs 41130311775, 41139487358 and 41161657057 (2026-10-30/31). The org stays on the GitHub Free 20-job cap with 15-40 minute queue waits under load, so these false failures will keep recurring and hide real failures in #58.",
+  "context": "Found 2026-10-31 while classifying failed production deploy runs; see deploy-resolver-reads-every-deployment-20261031 for the other classes.\n\nReviewed 2026-10-31: one example is a push, not a dispatch; the infrastructure class comes from run-step.ts/relay.ts, not deploy.yml:254; core relay issues #3822 and #3852 were also opened; a plain skip would strand undeployed site commits. Lands after, or rebases on, deploy-resolver-reads-every-deployment-20261031 (both edit cli.ts resolve()); reuse the receipt resolve already has rather than reading history again. Related items filed from this review: deploy-redeploy-uses-deployed-bundle-20261031 and deploy-bundle-selection-by-commit-order-20261031.",
+  "description": "Core site-inputs runs are created in the order Trunk finishes, not commit order, so core-bundle dispatches can arrive out of order (b2044c6's run 41099461819 was created 13 minutes after 786bfad8's run 41097447792 and dispatched an hour later). Push and manual deploy runs pick the newest site-inputs run by creation time (scripts/bundle-fetch.mjs:88-96), so they can also pick a bundle behind the deployed one.\n\nfreshnessErrors (deploy/lib/resolve.ts:11-17, called at deploy/cli.ts:114-117) refuses any compare status other than ahead or identical, so a candidate whose core_sha is an ancestor of the deployed core_sha fails the run. run-step.ts classes it 'infrastructure' (the classifyFailure fallback, relay.ts:41); report-failure comments on site #58 (deploy.yml:217-237) and, for dispatches, opens or comments on the core site-bundle-undeployed issue (deploy.yml:247-257).\n\nExamples: 41130311775 (dispatch, b2044c6 behind 786bfad8; core #3822); 41139487358 (push, same bundle; its site commit 184e3433 waited 2 hours for the next dispatch); 41161657057 (dispatch, 5635b14 behind ec3b57c; core #3852). These false failures recur under the Free-plan runner queue and hide real failures in #58 and in core.\n\nA behind bundle must not deploy, but the run may carry a site commit that is not live yet (including one whose push run was replaced in the pages-deploy concurrency group), and that commit must still ship. Diverged candidates, failed compares and unknown statuses keep failing closed. Rollback (cli.ts:83-106) and redeploy (no compare) keep their behaviour here; redeploy's bundle choice is fixed separately.",
   "links": [
     "https://github.com/BenchBox-dev/benchbox-site/issues/58",
     ".github/workflows/deploy.yml",
-    "deploy/cli.ts"
+    "deploy/cli.ts",
+    "deploy/lib/resolve.ts",
+    "deploy/lib/relay.ts",
+    "scripts/bundle-fetch.mjs",
+    "deploy/test/resolve.test.ts",
+    "deploy/test/relay-process.test.ts"
   ],
   "sessions": [
     {
@@ -19,6 +28,14 @@
       "op": "create",
       "op_id": "f2d2280f7a9c40209b588f3f775afdb6",
       "session_id": "6f1bd5a3eac742f1a914c310b08605ca"
+    },
+    {
+      "actor": "mcp:omp-coding-agent:joe@joe-mac-mini.local:f49e5d07dc7a5f74ab116b22",
+      "at": "2026-10-31T15:13:28Z",
+      "client": "omp-coding-agent",
+      "op": "update",
+      "op_id": "b9d8369fc64448c88308bf1c9541d47a",
+      "session_id": "da31eb4604bb4e9685337e08ec0df489"
     }
   ]
 }
