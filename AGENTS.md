@@ -99,7 +99,9 @@ versioned core bundle; it reads nothing else from core.
 
 - `.github/workflows/deploy.yml` runs on a push to `main`, on a
   `core-bundle` dispatch from core, and by hand with `mode` set to
-  `deploy`, `redeploy` (the same bundle again) or `rollback` (restore the
+  `deploy`, `redeploy` (this site commit with the core bundle that is live, fetched
+  by the deployed receipt's `core_sha` and checked against its `bundle_digest`;
+  it fails when no receipt is deployed) or `rollback` (restore the
   artifact of the receipt run named in `receipt_run_id`).
 - A `deploy` run whose resolved core bundle is behind the deployed one does
   not fail. If the deployed receipt's `site_sha` is this run's commit, the

@@ -82,4 +82,14 @@ the candidate's and acts on the result:
 - `diverged`, an unknown status or a failed compare: the run fails and is
   reported. A diverged candidate has its own failure class, `diverged-bundle`.
 
-`rollback` and `redeploy` runs do not compare and behave as before.
+A `rollback` run does not compare and behaves as before.
+
+## Redeploy
+
+`mode=redeploy` builds this site commit with the core bundle that is live. It
+reads the deployed receipt for the current `SITE_DEPLOY_TARGET`, fetches the
+bundle by the receipt's `core_sha` and fails closed unless the fetched bundle
+carries that `core_sha` and its digest equals the receipt's `bundle_digest`.
+It never picks the newest bundle and runs no freshness compare. With no
+receipt deployed for the target it fails with "redeploy needs a deployed
+receipt".

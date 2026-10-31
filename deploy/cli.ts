@@ -11,7 +11,7 @@ import { checksumManifest, probe } from "./lib/probe.ts";
 import { latencySeconds, receiptBytes, receiptSha, RECEIPT_SCHEMA, statusDescription, type Receipt, type ProbeSummary } from "./lib/receipt.ts";
 import { recheckErrors } from "./lib/recheck.ts";
 import { markRehearsal } from "./lib/rehearsal.ts";
-import { chainErrors, freshness, type Deployed } from "./lib/resolve.ts";
+import { chainErrors, deployedBundleErrors, freshness, redeployErrors, type Deployed } from "./lib/resolve.ts";
 import { automaticRollback, rollbackTargetErrors } from "./lib/rollback.ts";
 import { treeDigest } from "../website/src/lib/tree-digest.ts";
 
@@ -73,8 +73,8 @@ function fetchBundle(env: NodeJS.ProcessEnv): FetchedBundle {
 
 function fetchDeployedBundle(receipt: Receipt): FetchedBundle {
   const bundle = fetchBundle({ ...process.env, SITE_INPUTS_CORE_SHA: receipt.core_sha, SITE_INPUTS_RUN_ID: "", SITE_INPUTS_DIGEST: receipt.bundle_digest });
-  if (bundle.manifest.core_sha !== receipt.core_sha) failWith([`the bundle fetched for core_sha ${receipt.core_sha} carries core_sha ${bundle.manifest.core_sha}`]);
-  if (bundle.digest !== receipt.bundle_digest) failWith([`the deployed core bundle digest ${bundle.digest} does not match the receipt's ${receipt.bundle_digest}`]);
+  const errors = deployedBundleErrors(receipt, { core_sha: bundle.manifest.core_sha, digest: bundle.digest });
+  if (errors.length > 0) failWith(errors);
   return bundle;
 }
 
@@ -141,7 +141,11 @@ async function resolve(): Promise<void> {
     output("core_sha", restored.core_sha);
     return;
   }
-  let { manifest, digest } = fetchBundle(process.env);
+  if (mode === "redeploy") {
+    const errors = redeployErrors(deployed, process.env.SITE_DEPLOY_TARGET ?? "");
+    if (errors.length > 0) failWith(errors);
+  }
+  let { manifest, digest } = mode === "redeploy" ? fetchDeployedBundle((current as { receipt: Receipt }).receipt) : fetchBundle(process.env);
   if (deployed && current && mode === "deploy") {
     const compare = await githubApi()(`repos/${CORE_REPO}/compare/${deployed.core_sha}...${manifest.core_sha}`);
     const verdict = freshness(deployed, manifest.core_sha, siteSha(), { status: compare.status, body: compare.body as { status?: "ahead" } });

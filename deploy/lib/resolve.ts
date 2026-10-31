@@ -48,6 +48,22 @@ export function freshness(
   };
 }
 
+export function redeployErrors(deployed: Deployed, target: string): string[] {
+  if (deployed) return [];
+  return [`redeploy needs a deployed receipt for target ${target || "any"} and found none; it ships the bundle that is live`];
+}
+
+export function deployedBundleErrors(receipt: { core_sha: string; bundle_digest: string }, fetched: { core_sha: string; digest: string }): string[] {
+  const errors: string[] = [];
+  if (fetched.core_sha !== receipt.core_sha) {
+    errors.push(`the bundle fetched for the deployed core_sha ${receipt.core_sha} carries core_sha ${fetched.core_sha}`);
+  }
+  if (fetched.digest !== receipt.bundle_digest) {
+    errors.push(`the deployed core bundle digest ${fetched.digest} does not match the receipt's bundle_digest ${receipt.bundle_digest}`);
+  }
+  return errors;
+}
+
 export function chainErrors(deployed: Deployed, candidate: Candidate): string[] {
   if (!deployed || deployed.corpus_sha === candidate.corpus_sha) return [];
   const parity = candidate.validator_parity;
