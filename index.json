@@ -2,15 +2,10 @@
   "batches": {},
   "items": {
     "astro-site-54-retire-sphinx-and-legacy-site": {
-      "claim": {
-        "expires_at": "2026-11-01T06:01:38Z",
-        "generation": "f3e265d04c6b4db5a363e7e87013e707",
-        "renewals": 0,
-        "worker": "mcp:omp-coding-agent:joe@joe-mac-mini.local:7459db9ace2a96b770fd98c9"
-      },
+      "claim": null,
       "needs": [],
       "priority": "medium",
-      "status": "active",
+      "status": "done",
       "title": "Remove the legacy static landing and Sphinx-era parity files from benchbox-site"
     },
     "astro-site-60-results-embeds": {
