@@ -1,0 +1,27 @@
+{
+  "acceptance": [
+    "The number of GitHub API calls and artifact downloads one deploy run makes no longer grows with deployment history, shown by a test with a long fake history",
+    "Resolution never needs a receipt artifact older than the retention window; a test where old receipts are unavailable still resolves the current deployed generation and rollback target",
+    "A non-200 GitHub response in the resolver logs the status, the rate-limit headers and a short body summary",
+    "The source of the 'fetch failed' errors is identified and either fixed or retried with a bound",
+    "Production deploys over a stated window after the change show no resolve failures from HTTP 403, receipt downloads or fetch errors, with run ids"
+  ],
+  "context": "Found 2026-10-31 while waiting for production deploys of site PRs #92-#94. Classification of the 24 failed deploy runs created after 2026-10-28: 10 docs-contract refusals on 2026-10-29 (fixed by site PR #90; core now warns on contract changes), 6 HTTP 403, 4 fetch failed, 2 receipt download, 3 superseded-bundle refusals (separate item).",
+  "description": "recordedReceipts (deploy/lib/github.ts:34-66) pages through every github-pages deployment and reads the statuses of each one, with no early exit. On 2026-10-31 there were 621 deployments, and deploy/cli.ts calls it twice per run (lines 57 and 89), so one run makes about 1,250 GitHub API calls against the GITHUB_TOKEN limit of 1,000 per hour per repository. Success statuses created before about 2026-10-15 carry no 'target:' (the oldest, run 37964514016, has none; sampled entries from 2026-10-17 on do), so for each of those the resolver downloads the receipt artifact with gh run download. Failures this caused or likely caused since 2026-10-28: HTTP 403 listing or reading deployments in runs 40912712326, 41186210649, 41186484597, 41186718676, 41187011071 and 41187314394; receipt downloads failing in 41061585379 (run 38111055936) and 41087113431 (run 38604879932); 'Error: fetch failed' in 41054414458, 41062462857, 41103893795 and 41115529339 (step not yet identified). The 403 bodies are discarded, so rate limiting is inferred from the call count, not confirmed. Latent failure: receipt artifacts are kept 90 days, so once the pre-2026-10-15 receipts expire (from about 2027-01-07) every resolve that loads them fails closed and no production deploy can pass.",
+  "links": [
+    "https://github.com/BenchBox-dev/benchbox-site/issues/58",
+    "deploy/lib/github.ts",
+    "deploy/cli.ts",
+    "deploy/lib/receipt.ts"
+  ],
+  "sessions": [
+    {
+      "actor": "mcp:omp-coding-agent:joe@joe-mac-mini.local:a860bfc49b3ad9b32ac0eccc",
+      "at": "2026-10-31T14:57:16Z",
+      "client": "omp-coding-agent",
+      "op": "create",
+      "op_id": "020853ac844c498d8da2a4d46beef064",
+      "session_id": "6f1bd5a3eac742f1a914c310b08605ca"
+    }
+  ]
+}

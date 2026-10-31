@@ -47,6 +47,13 @@
       "status": "open",
       "title": "Tighten or document what the deploy's canonical snapshot digest ignores"
     },
+    "deploy-resolver-reads-every-deployment-20261031": {
+      "claim": null,
+      "needs": [],
+      "priority": "high",
+      "status": "open",
+      "title": "Stop the deploy resolver reading every deployment and old receipt on each run"
+    },
     "doc-external-links-fragments-20261017": {
       "claim": null,
       "needs": [],
