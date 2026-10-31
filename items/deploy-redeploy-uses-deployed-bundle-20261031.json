@@ -5,7 +5,7 @@
     "Tests cover a matching digest, a digest mismatch and no deployed receipt",
     "deploy/README.md and the workflow input description say what redeploy ships"
   ],
-  "context": "Found 2026-10-31 by the review of deploy-superseded-bundle-reported-as-failure-20261031.",
+  "context": "Found 2026-10-31 by the review of deploy-superseded-bundle-reported-as-failure-20261031.\n\nClosed by PR #98 (merged as 1f0d3b7, head 9468a70, ci green): redeploy fetches the bundle by the deployed receipt's core_sha and fails unless core_sha and digest match the receipt (deployedBundleErrors, redeployErrors in deploy/lib/resolve.ts); with no deployed receipt it fails with a named error; tests cover match, mismatch and no receipt (npm run test:deploy 73 passed); the workflow input description, deploy/README.md and AGENTS.md say what redeploy ships.",
   "description": "The Deploy workflow's 'redeploy (same bundle again)' mode (.github/workflows/deploy.yml:11) fetches the newest successful site-inputs bundle by run creation time (scripts/bundle-fetch.mjs:88-96), and redeploy skips the freshness compare (deploy/cli.ts:114 runs it only in deploy mode). A redeploy can therefore ship a core bundle older than the live one, or a newer one that never passed the freshness check, contrary to its label. The deployed receipt records core_sha and bundle_digest, and bundle-fetch accepts SITE_INPUTS_CORE_SHA (bundle-fetch.mjs:80-87; SITE_INPUTS_RUN_ID takes precedence at :73 and must be cleared). The superseded-bundle item adds a fetch-by-deployed-core_sha path with a digest check; reuse it.",
   "links": [
     ".github/workflows/deploy.yml",
@@ -29,6 +29,14 @@
       "generation": "4f5db569f6ff41739202b75916314726",
       "op": "take",
       "op_id": "7db48b720e374cb5ab8fa37cb0888025",
+      "session_id": "1dd70b50f5c94dfeab9b3c308cd31311"
+    },
+    {
+      "actor": "mcp:omp-coding-agent:joe@joe-mac-mini.local:89fe2914d27056f15d362461",
+      "at": "2026-10-31T23:44:43Z",
+      "client": "omp-coding-agent",
+      "op": "update",
+      "op_id": "2c1bdc8f09b84ca7b35b707dc0d10a8b",
       "session_id": "1dd70b50f5c94dfeab9b3c308cd31311"
     }
   ]
