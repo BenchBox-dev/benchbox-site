@@ -80,15 +80,10 @@
       "title": "Treat a core bundle older than the deployed one as superseded: skip it, or deploy the site commit with the deployed bundle, instead of failing"
     },
     "deploy-waits-for-whole-producing-run-20261031": {
-      "claim": {
-        "expires_at": "2026-11-02T03:16:40Z",
-        "generation": "8b97b694e29746d6aaf373ba3db8ae7d",
-        "renewals": 0,
-        "worker": "mcp:omp-coding-agent:joe@joe-mac-mini.local:ca188c9ed3b22d97f5e76627"
-      },
+      "claim": null,
       "needs": [],
       "priority": "high",
-      "status": "active",
+      "status": "done",
       "title": "Wait only for the core bundle job, not the whole producing site-inputs run, before fetching a bundle"
     },
     "doc-external-links-fragments-20261017": {
