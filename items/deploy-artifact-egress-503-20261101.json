@@ -1,0 +1,25 @@
+{
+  "acceptance": [
+    "The limit behind the 503 (which account, quantity and window) is identified with its source and recorded in deploy/README.md",
+    "Artifact download bytes per deploy run and per day are computed for the 7 days after PR #95 merged (2026-10-31T19:33Z), with run ids, and compared with the limit",
+    "Every egress 503 in deploy.yml or visual.yml runs in those 7 days is listed by run id; if any occurred, or usage exceeds half the limit, a change that reduces downloads is merged and the measurement repeated for 7 days with no egress 503"
+  ],
+  "context": "Found 2026-10-31 by the review of deploy-resolver-reads-every-deployment-20261031, which deferred it to its own item.",
+  "description": "On 2026-10-30, receipt downloads in production deploy runs 41061585379 (five 503 responses across its retries) and 41087113431 failed with 'HTTP 503: 503 Egress is over the account limit.' after scripts/github-download.mjs exhausted its retries, failing the recheck step. The review of the deploy resolver found egress 503s in 5 of the 7 failures that involved receipt downloads. The bounded resolver (PR #95) cut receipt downloads from about 160 per deploy run to one or two, which likely removes the main driver, but each deploy still downloads the site artifact (about 113 MB), rollbacks restore one, and visual.yml downloads artifacts on every PR push. Which account limit this is, its window and its size are not recorded anywhere in the repo, so there is no way to tell how close deploys run to it.",
+  "links": [
+    "scripts/github-download.mjs",
+    ".github/workflows/deploy.yml",
+    ".github/workflows/visual.yml",
+    "deploy/README.md"
+  ],
+  "sessions": [
+    {
+      "actor": "mcp:omp-coding-agent:joe@joe-mac-mini.local:ccbf24e815408472019f3d98",
+      "at": "2026-11-01T13:45:47Z",
+      "client": "omp-coding-agent",
+      "op": "create",
+      "op_id": "fdacc43ea6ea4ef1bc539dab19ce08ea",
+      "session_id": "ea29fdf857af4561aaa9ba743e60a0e6"
+    }
+  ]
+}
