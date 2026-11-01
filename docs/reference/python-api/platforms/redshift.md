@@ -123,7 +123,7 @@ S3 and credentials:
 | `aws_access_key_id`, `aws_secret_access_key`, `aws_session_token` | `str` or `None` | `None` | Explicit credentials for the S3 upload and for `COPY` when no `iam_role` is set. The first two must be given together. |
 | `aws_region` | `str` | `"us-east-1"` | Region for the S3 and Glue clients. |
 
-The adapter also accepts the keys every BenchBox adapter takes: see [Constructor Parameters](#constructor-parameters). Keys it does not recognise are accepted and ignored. `compression_encoding` is not a parameter; the `COPY` compression option is `compupdate`. The constructor reads no environment variables: `REDSHIFT_HOST`, `REDSHIFT_USER` and `REDSHIFT_PASSWORD` are mentioned in its error message but not consulted, so pass the values yourself.
+The adapter also accepts the keys every BenchBox adapter takes: see [Constructor Parameters](#constructor-parameters). Keys it does not recognise are accepted and ignored. `compression_encoding` is not a parameter; the `COPY` compression option is `compupdate`. The constructor reads no environment variables: no `REDSHIFT_*` variable is consulted, so pass the values yourself. Its error message says so and points to `benchbox setup --platform redshift`, which can read `REDSHIFT_HOST`, `REDSHIFT_USERNAME`, `REDSHIFT_PASSWORD` and `REDSHIFT_DATABASE` from your environment and saves the credentials.
 
 #### Returns
 
@@ -168,7 +168,7 @@ Output on 0.4.1 with `redshift-connector` 2.1.17, run without a network connecti
 ```text
 serverless 5439 dev my-bucket benchbox/tpch OFF
 Redshift redshift True True
-ConfigurationError Redshift configuration is incomplete. Missing: host (or REDSHIFT_HOST), username (or REDSHIFT_USER), password (or REDSHIFT_PASSWORD)
+ConfigurationError Redshift configuration is incomplete. Missing: host, username, password
 ValueError Invalid COMPUPDATE value: 'bogus'. Must be one of: OFF, ON, PRESET
 ValueError Redshift requires S3 (s3://) staging location, got: gs://
 ```

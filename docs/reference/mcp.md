@@ -841,6 +841,21 @@ Tool failures return a structured error object:
 | `suggestion` | How to resolve the issue; present only when one applies |
 | `retry_hint` | `true` when retrying may succeed; omitted otherwise |
 
+A benchmark that cannot load because a Python package is missing returns `DEPENDENCY_MISSING`. `details` names the benchmark, the missing module and the benchbox extras that provide it, and `suggestion` carries the install command:
+
+```json
+{
+  "error": true,
+  "error_code": "DEPENDENCY_MISSING",
+  "error_category": "platform",
+  "message": "Benchmark 'tpcdi' requires the Python package 'pandas', which is not installed.",
+  "details": {"benchmark": "tpcdi", "module": "pandas", "extras": ["tpcdi"]},
+  "suggestion": "Install the 'tpcdi' extra: uv pip install \"benchbox[tpcdi]\""
+}
+```
+
+When no benchbox extra provides the module, `extras` is empty and the suggestion asks you to install the module itself and links the installation guide. The install command in a source checkout is `uv sync --extra <extra>`. Any other failure to load a benchmark is reported as `INTERNAL_ERROR`.
+
 Error codes fall into these families:
 
 - **`VALIDATION_*`** (client): the request was rejected, for example an unknown platform or benchmark, an invalid scale factor, query ID, phase or format, or an unsupported platform or mode

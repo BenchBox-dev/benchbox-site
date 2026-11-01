@@ -6,9 +6,8 @@ Thank you for contributing to the BenchBox community results dataset! Community-
 
 1. **Install BenchBox** - follow the [Getting Started](usage/getting-started.md) guide
 2. **Run a benchmark** - you need a complete benchmark result to submit
-3. **Configure a private public-submission salt** - set a stable, non-empty
-   `BENCHBOX_MACHINE_ID_SALT` before the first `benchbox submit`; store and
-   reuse it through a secret manager or protected local environment config
+3. **Keep your pseudonym salt** - `benchbox submit` creates it for you on
+   first use; see [Configure the public-submission salt](#2-configure-the-public-submission-salt)
 
 ## Step-by-Step Submission Flow
 
@@ -39,19 +38,34 @@ and the ledger of what it applied are recorded inside the result JSON under
 
 ### 2. Configure the public-submission salt
 
-`benchbox submit` pseudonymizes retained public identifiers and refuses to
-package a public contribution when `BENCHBOX_MACHINE_ID_SALT` is unset or
-empty. Before your first public submission, set it to a stable, private,
-non-empty random value:
+`benchbox submit` pseudonymizes retained public identifiers with a private
+salt. You need no setup: the first `benchbox submit`, `benchbox export` or
+`benchbox publish run` creates a random salt in `~/.benchbox/submission_salt`
+and prints where it was written. Later runs reuse the same file.
 
-```bash
-export BENCHBOX_MACHINE_ID_SALT="<stable-private-random-value>"
-```
+- **Back it up.** The salt decides your pseudonymous identifiers. Keep the file
+  to keep them stable across submissions; deleting it or losing it makes the
+  next run create a new salt, which changes the pseudonyms of results you
+  stage again.
+- **Override it.** A non-empty `BENCHBOX_MACHINE_ID_SALT` takes precedence over
+  the file. Use it to share one salt across machines or to match a CI secret:
 
-Store and reuse the value through a secret manager or protected local
-environment configuration. Do not commit it, include it in the submission
-package, or paste it into the pull request. Setting a new value for every run
-would make pseudonymous identifiers inconsistent across your submissions.
+  ```bash
+  export BENCHBOX_MACHINE_ID_SALT="<stable-private-random-value>"
+  ```
+
+- **Previews write nothing.** `--dry-run` on `benchbox submit` and
+  `benchbox publish run` never creates the file. A submit preview with no salt
+  yet uses a temporary one.
+- **Containers and CI.** A container or CI job whose `HOME` is discarded after
+  each run creates a new salt every time, which changes the pseudonyms and the
+  hosted idempotency keys of each run. Mount a persistent `HOME` or set
+  `BENCHBOX_MACHINE_ID_SALT` from a secret.
+
+Do not commit the salt, include it in the submission package, or paste it into
+the pull request. If the file is unreadable, empty or cannot be created,
+the command refuses and tells you to fix or delete the file or to set
+`BENCHBOX_MACHINE_ID_SALT`.
 
 ### 3. Package the submission
 

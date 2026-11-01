@@ -747,6 +747,33 @@ Class method that builds a configuration whose `machine_id_salt` comes from the 
 
 **Raises:** `MissingPublicPseudonymSaltError` (a `ValueError` subclass in `benchbox.core.results.anonymization`) when `require_salt` is true and no salt is set.
 
+With `require_salt=False` this method reads the environment only. With `require_salt=True` it falls back to the contents of `~/.benchbox/submission_salt` when the variable is unset, and raises when that file does not exist. It never creates the file; use `ensure_public_pseudonym_salt` for that.
+
+#### `ensure_public_pseudonym_salt(*, explicit=None, environ=None)`
+
+<span id="benchbox.core.results.anonymization.ensure_public_pseudonym_salt"></span>
+
+Function in `benchbox.core.results.anonymization` that returns the public pseudonym salt and creates one when none exists. `benchbox submit`, `benchbox export` and `benchbox publish run` call it on first use.
+
+| Name | Type | Default | Meaning |
+| --- | --- | --- | --- |
+| `explicit` | `str` or `None` | `None` | A salt to use. A blank value counts as unset. |
+| `environ` | `dict[str, str]` or `None` | `None` | The environment to read. `None` reads `os.environ`. |
+
+The salt comes from the first of these that is non-empty after stripping:
+
+1. `explicit`.
+2. The `BENCHBOX_MACHINE_ID_SALT` environment variable.
+3. The file `~/.benchbox/submission_salt`, whose path `public_pseudonym_salt_path()` returns.
+
+When none is set, the function creates the file with a random 64-character hexadecimal value and mode `0600`, in a `~/.benchbox` directory of mode `0700`. Two processes that create it at the same time end up with the same value. The salt is never part of an exported result.
+
+**Returns:** a tuple `(salt, created)`. `created` is `True` only when this call wrote the file.
+
+**Raises:** `MissingPublicPseudonymSaltError` when the home directory cannot be located, or when the file cannot be read, is empty or cannot be created. The message names the file and tells the caller to fix or delete it, or to set `BENCHBOX_MACHINE_ID_SALT`.
+
+A new `HOME`, a container with an ephemeral home directory or a deleted file gives a new salt, which changes the pseudonyms of results exported afterwards. Back the file up to keep them stable. See [Contributing Benchmark Results](../../contributing-results.md).
+
 #### Example
 
 ```python

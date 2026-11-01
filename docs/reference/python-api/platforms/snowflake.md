@@ -109,7 +109,7 @@ Session and loading:
 | `delta_table_format` | `str` | `"DELTA"` | `TABLE_FORMAT` for Delta external tables. |
 | `force_recreate` | `bool` | `False` | Drop an existing database when a connection is created. |
 
-Defaulted string settings use the default when you supply a falsey value. The adapter also accepts the keys every BenchBox adapter takes: see [Constructor Parameters](#constructor-parameters). Keys it does not recognise are accepted and ignored. The constructor reads no environment variables: `SNOWFLAKE_ACCOUNT`, `SNOWFLAKE_USER` and `SNOWFLAKE_PASSWORD` are mentioned in its error message but not consulted, so pass the values yourself.
+Defaulted string settings use the default when you supply a falsey value. The adapter also accepts the keys every BenchBox adapter takes: see [Constructor Parameters](#constructor-parameters). Keys it does not recognise are accepted and ignored. The constructor reads no environment variables: no `SNOWFLAKE_*` variable is consulted, so pass the values yourself. Its error message says so and points to `benchbox setup --platform snowflake`, which can read `SNOWFLAKE_ACCOUNT`, `SNOWFLAKE_USERNAME`, `SNOWFLAKE_PASSWORD`, `SNOWFLAKE_WAREHOUSE` and `SNOWFLAKE_DATABASE` from your environment and saves the credentials.
 
 #### Returns
 
@@ -149,9 +149,9 @@ Output on 0.4.1 with `snowflake-connector-python` 4.8.0, run without a network c
 ```text
 COMPUTE_WH BENCHBOX PUBLIC MEDIUM False
 Snowflake snowflake
-ConfigurationError Snowflake configuration is incomplete. Missing: account (or SNOWFLAKE_ACCOUNT), username (or SNOWFLAKE_USER), password (or SNOWFLAKE_PASSWORD)
-ConfigurationError Snowflake configuration is incomplete. Missing: password (or SNOWFLAKE_PASSWORD)
-ConfigurationError Snowflake configuration is incomplete. Missing: password (or SNOWFLAKE_PASSWORD)
+ConfigurationError Snowflake configuration is incomplete. Missing: account, username, password
+ConfigurationError Snowflake configuration is incomplete. Missing: password
+ConfigurationError Snowflake configuration is incomplete. Missing: password
 ValueError Snowflake native loads do not reuse named or table stage references as staging_root; use the documented user stage @~/... or a cloud URI for external mode.
 ```
 
