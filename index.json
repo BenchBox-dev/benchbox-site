@@ -72,6 +72,13 @@
       "status": "done",
       "title": "Make redeploy ship the bundle that is live, not the newest bundle"
     },
+    "deploy-resolve-end-to-end-test-20261101": {
+      "claim": null,
+      "needs": [],
+      "priority": "medium",
+      "status": "open",
+      "title": "Test deploy/cli.ts resolve() end to end for the superseded, use-deployed-bundle and redeploy paths"
+    },
     "deploy-resolver-reads-every-deployment-20261031": {
       "claim": null,
       "needs": [],

@@ -1,0 +1,24 @@
+{
+  "acceptance": [
+    "A test runs resolve() with stubbed GitHub API responses, bundle fetch and receipt for: behind with the deployed site commit (superseded=true output, no work written, no report), behind with a new site commit (bundle fetched by the deployed core_sha with run id and digest cleared; a digest mismatch fails closed), redeploy (bundle fetched by the deployed core_sha; no deployed receipt fails with the named error) and fresh",
+    "The test fails if the clearing of SITE_INPUTS_RUN_ID is removed or the superseded early return is removed"
+  ],
+  "context": "Found 2026-10-31: the implementer of #97 reported that no test runs resolve end to end, and the item closed on first evidence without a live behind run.",
+  "description": "PR #97 added the superseded and use-deployed-bundle outcomes, and PR #98 the redeploy-by-deployed-core_sha path, but only the pure freshness()/redeployErrors helpers and a workflow-gating test cover them; resolve() in deploy/cli.ts has no test. No production deploy has hit a behind candidate since #97 merged, so the code that sets superseded=true and returns before writeWork, and the code that re-runs bundle-fetch with SITE_INPUTS_CORE_SHA set and SITE_INPUTS_RUN_ID/SITE_INPUTS_DIGEST cleared (SITE_INPUTS_RUN_ID takes precedence in scripts/bundle-fetch.mjs) and then compares the digest with the receipt, has never run in a test or in production.",
+  "links": [
+    "deploy/cli.ts",
+    "deploy/lib/resolve.ts",
+    "scripts/bundle-fetch.mjs",
+    "deploy/test/resolve.test.ts"
+  ],
+  "sessions": [
+    {
+      "actor": "mcp:omp-coding-agent:joe@joe-mac-mini.local:ccbf24e815408472019f3d98",
+      "at": "2026-11-01T13:45:49Z",
+      "client": "omp-coding-agent",
+      "op": "create",
+      "op_id": "c4701066140249ea884fdd2f4c05bca6",
+      "session_id": "ea29fdf857af4561aaa9ba743e60a0e6"
+    }
+  ]
+}
