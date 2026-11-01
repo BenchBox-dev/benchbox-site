@@ -5,7 +5,7 @@
     "Tests cover a run whose bundle job succeeded while a later job is queued, a failed bundle job, and a missing artifact",
     "The first core-bundle dispatch deploy after merge whose producing run still has a queued trailing job deploys without waiting for it; run id recorded"
   ],
-  "context": "Found 2026-10-31 while checking the first deploys after the bounded-resolver and bundle-order changes; the wait predates them.",
+  "context": "Found 2026-10-31 while checking the first deploys after the bounded-resolver and bundle-order changes; the wait predates them.\n\nClosed 2026-11-01 under the owner's decision to close on first post-merge evidence. PR #99 (merged as bce1677, head dbd95e1, ci green): scripts/bundle-fetch.mjs waits only on the producing run's 'build bundle' job, proceeds once it succeeded and the artifact is listed regardless of trailing jobs, fails closed on a failed/cancelled or missing bundle job or a missing artifact, and keeps the 600 s bounded wait only while that job is queued or running (two API calls per poll); tests cover a succeeded bundle job with a queued trailing job, a failed bundle job, a missing artifact, the timeout and a missing job (node --test scripts: 114 passed, 3 skipped; test:deploy 73 passed); deploy/README.md updated. Live: production deploy 41268048597 at bce1677 succeeded (fetched site-inputs-2ab29ce3 from run 41267301518). No core-bundle dispatch with a queued trailing job has run since merge, so criterion 4's exact case has no live run yet.",
   "description": "scripts/bundle-fetch.mjs (wait added in #47, 2026-10-19) waits up to 600 s for the producing core site-inputs run to complete before downloading its bundle. Core dispatches the bundle as soon as its 'build bundle' job succeeds, but the run then still has a trailing job ('close the bundle-failure issue') that needs a runner. Under the org's shared 20-job cap that job can wait far longer than 600 s, so the deploy fails even though the bundle artifact is ready: deploy run 41250152375 (2026-10-31, core d1a724dec) waited on producing run 41248555826, whose 'build bundle' job finished at 22:53:14Z while 'close the bundle-failure issue' only started at 23:22:06Z; the deploy gave up at 23:13:57Z ('did not complete within the 600s wait cap'), posted to #58 and the core relay.",
   "links": [
     "scripts/bundle-fetch.mjs",
@@ -27,6 +27,14 @@
       "generation": "8b97b694e29746d6aaf373ba3db8ae7d",
       "op": "take",
       "op_id": "bd76677143fe46c188071a1e3c060cb3",
+      "session_id": "1b523b285823455b84a692ad7484dce7"
+    },
+    {
+      "actor": "mcp:omp-coding-agent:joe@joe-mac-mini.local:ca188c9ed3b22d97f5e76627",
+      "at": "2026-11-01T03:16:42Z",
+      "client": "omp-coding-agent",
+      "op": "update",
+      "op_id": "c8fa7b6e7efb47cfbd182f607f8d16bc",
       "session_id": "1b523b285823455b84a692ad7484dce7"
     }
   ]
