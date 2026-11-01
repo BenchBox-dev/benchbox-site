@@ -23,16 +23,19 @@ const RUN = {
 
 const ARTIFACT = { name: "site-inputs-d16a0761bfc79dbfdaa253bf121d194c2b8c7bd7", expired: false };
 
+const BUNDLE_JOB = { name: "build bundle", status: "completed", conclusion: "success" };
+
 const realFetch = globalThis.fetch;
 
 afterEach(() => {
   globalThis.fetch = realFetch;
 });
 
-function stubFetch(run) {
+function stubFetch(run, job = BUNDLE_JOB) {
   globalThis.fetch = async (url) => {
     const route = String(url).replace("https://api.github.com/", "");
     if (route.includes("/workflows/site-inputs.yml/runs")) return { ok: true, json: async () => ({ workflow_runs: [] }) };
+    if (route.includes("/jobs?")) return { ok: true, json: async () => ({ jobs: [job] }) };
     if (route.endsWith("/artifacts")) return { ok: true, json: async () => ({ artifacts: [ARTIFACT] }) };
     if (route.includes("/actions/runs/")) return { ok: true, json: async () => run };
     throw new Error(`unexpected route ${route}`);
@@ -87,8 +90,8 @@ test("a non-success conclusion is refused", () => {
   assert.ok(errors[0].includes("failure"));
 });
 
-test("a run id fetch refuses a failing producing run", async () => {
-  stubFetch({ ...RUN, conclusion: "failure" });
+test("a run id fetch refuses a failed bundle job", async () => {
+  stubFetch(RUN, { ...BUNDLE_JOB, conclusion: "failure" });
   await assert.rejects(newestBundle({ SITE_INPUTS_RUN_ID: "38607974569" }), /concluded failure/);
 });
 
@@ -98,73 +101,99 @@ test("a run id fetch accepts the recorded develop run", async () => {
   assert.equal(found.runId, "38607974569");
 });
 
-test("producer in_progress then success proceeds", async () => {
-  let calls = 0;
-  const slept = [];
-  let clock = 0;
-  const run = await producingRun(
-    "38607974569",
-    {},
-    {
-      now: () => clock,
-      fetchJson: async () => {
-        calls += 1;
-        if (calls === 1) return { ...RUN, status: "in_progress", conclusion: null };
-        return { ...RUN, status: "completed", conclusion: "success" };
-      },
-      sleep: async (ms) => {
-        slept.push(ms);
-        clock += ms;
-      },
-      log: () => {},
+const jobsFetch = (run, jobsFor) => {
+  const calls = [];
+  const fetchJson = async (route) => {
+    calls.push(route);
+    if (route.includes("/jobs?")) return { jobs: jobsFor(calls.filter((item) => item.includes("/jobs?")).length) };
+    return run;
+  };
+  return { calls, fetchJson };
+};
+
+function clockedOptions(extra = {}) {
+  const state = { clock: 0, slept: [] };
+  state.options = {
+    now: () => state.clock,
+    sleep: async (ms) => {
+      state.slept.push(ms);
+      state.clock += ms;
     },
-  );
-  assert.equal(run.conclusion, "success");
-  assert.equal(calls, 2);
-  assert.deepEqual(slept, [5000]);
+    log: () => {},
+    ...extra,
+  };
+  return state;
+}
+
+test("bundle job in_progress then success proceeds", async () => {
+  const stub = jobsFetch({ ...RUN, status: "in_progress", conclusion: null }, (poll) => [
+    poll === 1 ? { ...BUNDLE_JOB, status: "in_progress", conclusion: null } : BUNDLE_JOB,
+  ]);
+  const state = clockedOptions({ fetchJson: stub.fetchJson });
+  await producingRun("38607974569", {}, state.options);
+  assert.deepEqual(state.slept, [5000]);
 });
 
-test("in_progress beyond the cap fails with a clear message", async () => {
-  const slept = [];
-  let clock = 0;
-  await assert.rejects(
-    producingRun(
-      "38607974569",
-      {},
-      {
-        now: () => clock,
-        maxWaitMs: 15000,
-        fetchJson: async () => ({ ...RUN, status: "in_progress", conclusion: null }),
-        sleep: async (ms) => {
-          slept.push(ms);
-          clock += ms;
-        },
-        log: () => {},
-      },
-    ),
-    /did not complete within the 15s wait cap/,
-  );
-  assert.equal(clock, 15000);
-  assert.deepEqual(slept, [5000, 10000]);
+test("a succeeded bundle job proceeds while a later job is queued", async () => {
+  const stub = jobsFetch({ ...RUN, status: "in_progress", conclusion: null }, () => [
+    BUNDLE_JOB,
+    { name: "close the bundle-failure issue", status: "queued", conclusion: null },
+  ]);
+  const state = clockedOptions({ fetchJson: stub.fetchJson });
+  await producingRun("38607974569", {}, state.options);
+  assert.deepEqual(state.slept, []);
+  assert.equal(stub.calls.length, 2);
 });
 
-test("concluded failure fails immediately without waiting", async () => {
-  let sleepCalled = false;
-  await assert.rejects(
-    producingRun(
-      "38607974569",
-      {},
-      {
-        fetchJson: async () => ({ ...RUN, status: "completed", conclusion: "failure" }),
-        sleep: async () => {
-          sleepCalled = true;
-        },
-        log: () => {},
-      },
-    ),
-    /concluded failure/,
-  );
-  assert.equal(sleepCalled, false);
+test("a queued bundle job waits and then times out at the cap", async () => {
+  const stub = jobsFetch({ ...RUN, status: "queued", conclusion: null }, () => [{ ...BUNDLE_JOB, status: "queued", conclusion: null }]);
+  const state = clockedOptions({ fetchJson: stub.fetchJson, maxWaitMs: 15000 });
+  await assert.rejects(producingRun("38607974569", {}, state.options), /bundle job did not complete within the 15s wait cap/);
+  assert.equal(state.clock, 15000);
+  assert.deepEqual(state.slept, [5000, 10000]);
+});
+
+test("a failed bundle job fails immediately without waiting", async () => {
+  const stub = jobsFetch({ ...RUN, status: "in_progress", conclusion: null }, () => [
+    { ...BUNDLE_JOB, conclusion: "failure" },
+    { name: "report failed bundle", status: "queued", conclusion: null },
+  ]);
+  const state = clockedOptions({ fetchJson: stub.fetchJson });
+  await assert.rejects(producingRun("38607974569", {}, state.options), /"build bundle" concluded failure/);
+  assert.deepEqual(state.slept, []);
+});
+
+test("a completed run without a finished bundle job fails closed", async () => {
+  const stub = jobsFetch(RUN, () => [{ name: "close the bundle-failure issue", status: "completed", conclusion: "success" }]);
+  const state = clockedOptions({ fetchJson: stub.fetchJson });
+  await assert.rejects(producingRun("38607974569", {}, state.options), /completed without a finished "build bundle" job/);
+  assert.deepEqual(state.slept, []);
+});
+
+test("a run fetch fails closed when the bundle artifact is missing", async () => {
+  globalThis.fetch = async (url) => {
+    const route = String(url).replace("https://api.github.com/", "");
+    if (route.includes("/jobs?")) return { ok: true, json: async () => ({ jobs: [BUNDLE_JOB] }) };
+    if (route.endsWith("/artifacts")) return { ok: true, json: async () => ({ artifacts: [] }) };
+    if (route.includes("/actions/runs/")) return { ok: true, json: async () => ({ ...RUN, status: "in_progress", conclusion: null }) };
+    throw new Error(`unexpected route ${route}`);
+  };
+  await assert.rejects(newestBundle({ SITE_INPUTS_RUN_ID: "38607974569" }), /has no unexpired site-inputs artifact/);
+});
+
+test("a run id fetch proceeds with the artifact while a trailing job is queued", async () => {
+  globalThis.fetch = async (url) => {
+    const route = String(url).replace("https://api.github.com/", "");
+    if (route.includes("/workflows/site-inputs.yml/runs")) return { ok: true, json: async () => ({ workflow_runs: [] }) };
+    if (route.includes("/jobs?")) {
+      return { ok: true, json: async () => ({ jobs: [BUNDLE_JOB, { name: "close the bundle-failure issue", status: "queued", conclusion: null }] }) };
+    }
+    if (route.endsWith("/artifacts")) return { ok: true, json: async () => ({ artifacts: [ARTIFACT] }) };
+    if (route.includes("/actions/runs/")) return { ok: true, json: async () => ({ ...RUN, status: "in_progress", conclusion: null }) };
+    throw new Error(`unexpected route ${route}`);
+  };
+  const found = await newestBundle({ SITE_INPUTS_RUN_ID: "38607974569" });
+  assert.equal(found.runId, "38607974569");
 });
 
 test("download retry on 503 then success proceeds", () => {
@@ -284,6 +313,7 @@ function stubRecentRuns(shas) {
       const index = Number(artifacts[1]) - 1000;
       return { ok: true, json: async () => ({ artifacts: [{ name: `site-inputs-${shas[index]}`, expired: false }] }) };
     }
+    if (route.includes("/jobs?")) return { ok: true, json: async () => ({ jobs: [BUNDLE_JOB] }) };
     if (route.includes("/actions/runs/")) return { ok: true, json: async () => RUN };
     throw new Error(`unexpected route ${route}`);
   };
