@@ -86,7 +86,7 @@ A `TPCDI` instance. It subclasses `BaseBenchmark`; see {doc}`/reference/python-a
 
 ##### Raises
 
-- `ImportError` (an `ImportErrorWithVersion`) at import time when the `tpcdi` extra is missing: `Could not import benchmark 'TPCDI'. Optional dependency extras required: tpcdi`.
+- `ImportError` (an `ImportErrorWithVersion`) at import time when the `tpcdi` extra is missing: `Benchmark 'TPCDI' requires the Python package 'pandas', which is not installed. Install the 'tpcdi' extra: uv pip install "benchbox[tpcdi]"`. In a source checkout the install command is `uv sync --extra tpcdi`.
 - `ValueError` when `scale_factor` is zero or negative, or is 1 or more and not a whole number.
 - `TypeError` when `scale_factor` is not a number.
 

@@ -197,11 +197,10 @@ That keeps the site cheap to run and the evidence portable: use the pages, query
 
 2. Package with `benchbox submit`
 
-   - Public submissions require a private salt setting for retained identifiers
-   - Keep the value out of the repo and the PR
+   - The first submit creates a private salt for retained identifiers in `~/.benchbox/submission_salt`
+   - Keep that file out of the repo and the PR; `BENCHBOX_MACHINE_ID_SALT` overrides it
 
    ```bash
-   export BENCHBOX_MACHINE_ID_SALT="<private-random-value>"
    uv run -- benchbox submit --last --dry-run
    uv run -- benchbox submit --last --output ./submission
    ```
