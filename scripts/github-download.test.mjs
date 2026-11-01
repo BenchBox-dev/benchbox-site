@@ -11,23 +11,28 @@ import { isRetryableDownloadError } from "./github-download.mjs";
 import { producingRun } from "./bundle-fetch.mjs";
 
 const RUN = { repository: { full_name: "BenchBox-dev/BenchBox" }, path: ".github/workflows/site-inputs.yml", head_branch: "develop", event: "workflow_run", status: "in_progress", conclusion: null };
+const JOB = { name: "build bundle", status: "queued", conclusion: null };
+const routed = (run, job, onCall = () => {}) => async (route) => {
+  onCall(route);
+  return route.includes("/jobs?") ? { jobs: [job] } : run;
+};
 
 for (const conclusion of ["failure", "cancelled", "timed_out"]) {
-  test(`${conclusion} fails without sleeping even with an unfinished status`, async () => {
+  test(`${conclusion} bundle job fails without sleeping even with an unfinished run`, async () => {
     await assert.rejects(producingRun("503", {}, {
-      fetchJson: async () => ({ ...RUN, conclusion }),
+      fetchJson: routed(RUN, { ...JOB, status: "completed", conclusion }),
       sleep: () => assert.fail("must not sleep"),
     }), new RegExp(`concluded ${conclusion}`));
   });
 }
 
-for (const status of [undefined, "in_progress"]) {
-  test(`success with status ${status} cannot bypass completion`, async () => {
+for (const status of ["queued", "in_progress"]) {
+  test(`a ${status} bundle job cannot bypass completion`, async () => {
     let clock = 0;
     await assert.rejects(producingRun("503", {}, {
       maxWaitMs: 100,
       now: () => clock,
-      fetchJson: async () => ({ ...RUN, status, conclusion: "success" }),
+      fetchJson: routed(RUN, { ...JOB, status }),
       sleep: async (ms) => { clock += ms; },
       log: () => {},
     }), /wait cap/);
@@ -42,7 +47,7 @@ test("API elapsed time consumes the deadline and clips the final sleep", async (
   await assert.rejects(producingRun("1", {}, {
     maxWaitMs: 15000,
     now: () => clock,
-    fetchJson: async () => { calls += 1; clock += 4000; return RUN; },
+    fetchJson: routed(RUN, JOB, (route) => { if (route.includes("/jobs?")) { calls += 1; clock += 4000; } }),
     sleep: async (ms) => { sleeps.push(ms); clock += ms; },
     log: () => {},
   }), /15s wait cap/);
@@ -56,7 +61,10 @@ test("a late successful API response cannot pass the deadline", async () => {
   await assert.rejects(producingRun("1", {}, {
     maxWaitMs: 100,
     now: () => clock,
-    fetchJson: async () => { clock = 101; return { ...RUN, status: "completed", conclusion: "success" }; },
+    fetchJson: async (route) => {
+      if (route.includes("/jobs?")) { clock = 101; return { jobs: [{ ...JOB, status: "completed", conclusion: "success" }] }; }
+      return RUN;
+    },
     sleep: () => assert.fail("must not sleep"),
   }), /wait cap/);
 });
@@ -101,6 +109,8 @@ globalThis.fetch = async (url) => ({
   ok: true,
   json: async () => String(url).includes('/workflows/site-inputs.yml/runs')
     ? { workflow_runs: [] }
+    : String(url).includes('/jobs?')
+    ? { jobs: [{ name: 'build bundle', status: 'completed', conclusion: 'success' }] }
     : String(url).endsWith('/artifacts')
     ? { artifacts: [{ name: 'site-inputs-${FIXTURE_CORE}', expired: false }] }
     : String(url).endsWith('/runs/1')

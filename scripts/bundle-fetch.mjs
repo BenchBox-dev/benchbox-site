@@ -12,6 +12,7 @@ import { downloadArtifact } from "./github-download.mjs";
 
 const ARTIFACT_PREFIX = "site-inputs-";
 export const MAX_PRODUCING_RUN_WAIT_MS = 10 * 60 * 1000;
+const BUNDLE_JOB_NAME = "build bundle";
 export const PRODUCING_RUN_POLL_INTERVALS_MS = [5000, 10000, 15000, 30000];
 export const RECENT_RUNS = 10;
 
@@ -78,7 +79,7 @@ export async function producingRun(runId, env = process.env, options = {}) {
   const deadline = now() + maxWaitMs;
   const sleep = options.sleep ?? ((ms) => new Promise((resolve) => setTimeout(resolve, ms)));
   const log = options.log ?? console.log;
-  const timeout = () => new Error(`producing run ${runId} did not complete within the ${maxWaitMs / 1000}s wait cap`);
+  const timeout = () => new Error(`producing run ${runId} bundle job did not complete within the ${maxWaitMs / 1000}s wait cap`);
   let attempt = 0;
   while (true) {
     const remaining = deadline - now();
@@ -94,15 +95,26 @@ export async function producingRun(runId, env = process.env, options = {}) {
     if (now() >= deadline) throw timeout();
     const errors = producingRunProvenanceErrors(run);
     if (errors.length) throw new Error(errors.join("; "));
-    if (run.conclusion && run.conclusion !== "success") throw new Error(`producing run concluded ${run.conclusion}`);
-    if (run.status === "completed") {
-      if (run.conclusion !== "success") throw new Error(`producing run concluded ${run.conclusion}`);
+    let jobs;
+    try {
+      ({ jobs } = await (options.fetchJson ?? githubJson)(`repos/${CORE_REPO}/actions/runs/${runId}/jobs?per_page=100`, env, signal));
+    } catch (error) {
+      if (signal.aborted || now() >= deadline) throw timeout();
+      throw error;
+    }
+    if (now() >= deadline) throw timeout();
+    const job = jobs?.find((item) => item.name === BUNDLE_JOB_NAME);
+    if (job?.status === "completed") {
+      if (job.conclusion !== "success") throw new Error(`producing run ${runId} job "${BUNDLE_JOB_NAME}" concluded ${job.conclusion}`);
       return run;
     }
+    if (run.status === "completed")
+      throw new Error(`producing run ${runId} completed without a finished "${BUNDLE_JOB_NAME}" job`);
+    const state = job?.status ?? "not yet listed";
     const interval = PRODUCING_RUN_POLL_INTERVALS_MS[Math.min(attempt, PRODUCING_RUN_POLL_INTERVALS_MS.length - 1)];
     const delay = Math.min(interval, deadline - now());
     if (delay <= 0) throw timeout();
-    log(`bundle:fetch: producing run ${runId} is ${run.status}; waiting ${delay / 1000}s...`);
+    log(`bundle:fetch: producing run ${runId} job "${BUNDLE_JOB_NAME}" is ${state}; waiting ${delay / 1000}s...`);
     await sleep(delay);
     attempt += 1;
   }
@@ -110,10 +122,10 @@ export async function producingRun(runId, env = process.env, options = {}) {
 
 export async function newestBundle(env = process.env, options = {}) {
   if (env.SITE_INPUTS_RUN_ID) {
+    await producingRun(env.SITE_INPUTS_RUN_ID, env, options);
     const { artifacts } = await githubJson(`repos/${CORE_REPO}/actions/runs/${env.SITE_INPUTS_RUN_ID}/artifacts`, env);
     const artifact = artifacts.find((item) => item.name.startsWith(ARTIFACT_PREFIX) && !item.expired);
     if (!artifact) throw new Error(`run ${env.SITE_INPUTS_RUN_ID} has no unexpired site-inputs artifact`);
-    await producingRun(env.SITE_INPUTS_RUN_ID, env, options);
     const dispatchedSha = coreShaOf(artifact);
     const compare = options.compare ?? ((base, head) => compareStatus(base, head, env));
     const descendants = [];

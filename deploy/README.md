@@ -79,6 +79,12 @@ the replaced bundle, so it is not compared; the replacement still passes the
 bundle schema, digest and certification verification. Descendants that have
 diverged from each other fail the run.
 
+When a dispatch or a pinned core commit names a producing run, `bundle:fetch`
+waits, up to ten minutes, only for that run's `build bundle` job and never for
+the run's other jobs. It proceeds once that job has succeeded and the run lists
+an unexpired bundle artifact, and fails if the job failed or was cancelled, is
+absent from a completed run, or the artifact is missing.
+
 ## Bundles behind the deployed one
 
 Core's site-inputs runs finish in the order Trunk finishes, not in commit
