@@ -7,7 +7,7 @@ Thank you for contributing to the BenchBox community results dataset! Community-
 1. **Install BenchBox** - follow the [Getting Started](usage/getting-started.md) guide
 2. **Run a benchmark** - you need a complete benchmark result to submit
 3. **Keep your pseudonym salt** - `benchbox submit` creates it for you on
-   first use; see [Configure the public-submission salt](#configure-the-public-submission-salt)
+   first use; see step 2 below
 
 ## Step-by-Step Submission Flow
 
