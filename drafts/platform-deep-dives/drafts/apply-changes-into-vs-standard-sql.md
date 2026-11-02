@@ -171,12 +171,12 @@ PostgreSQL, Snowflake, BigQuery, or ClickHouse.
 
 The portable form runs on the standard-DML engines in that list (ClickHouse, lacking a
 standard UPDATE, needs the insert-only path or a mutation rewrite, as noted above). We
-can show the portable form concretely on one engine. The bundled DuckDB 1.3.2 rejects
-`MERGE INTO` outright, so BenchBox's standard run skips its
-entire MERGE category on DuckDB[^skip]. Yet the portable SCD Type 2 operation, built
-from UPDATE and INSERT rather than `MERGE INTO`, runs on DuckDB and passes its
-correctness checks. The same SQL that an engine refuses in `MERGE INTO` form runs fine
-in the portable form. That is the portability argument in miniature.
+can show the portable form concretely on one engine. BenchBox's standard run skips its
+entire MERGE category on DuckDB[^skip], because the execution filter excludes every
+operation written as `MERGE INTO`. Yet the portable SCD Type 2 operation, built from
+UPDATE and INSERT rather than `MERGE INTO`, runs on DuckDB and passes its correctness
+checks. It needs nothing beyond standard UPDATE and INSERT. That is the portability
+argument in miniature.
 
 ## What we measured
 
@@ -190,32 +190,47 @@ tests use. We loaded real TPC-H data with DuckDB's native `dbgen`, let BenchBox 
 dimension and a mixed change batch (20 changed, 20 unchanged, 20 brand-new business
 keys), then ran each operation with the dimension reset to its seed state between runs.
 
-Results on DuckDB 1.3.2, Apple M4, in-memory. The numbers are the median per-operation
-write time the harness reports, excluding setup and reset[^log].
+Results on DuckDB 1.5.5, Apple M4, in-memory, measured at BenchBox `develop` commit
+`6f5692490e` on 2026-11-02. All three scale points come from the same session. The numbers
+are the median per-operation write time the harness reports, excluding setup and
+reset[^log].
 
 At SF0.01 (dimension of 1,500 current rows, median of 30 runs):
 
 | Operation | median (ms) | min (ms) | p90 (ms) | validation |
 | --- | --- | --- | --- | --- |
-| Basic (close old plus insert new) | 2.517 | 2.323 | 2.737 | passed |
-| No change (idempotent re-run) | 2.066 | 1.921 | 2.196 | passed |
-| New keys only (insert only) | 1.208 | 1.111 | 1.685 | passed |
+| Basic (close old plus insert new) | 2.160 | 1.927 | 2.291 | passed |
+| No change (idempotent re-run) | 1.282 | 1.199 | 1.344 | passed |
+| New keys only (insert only) | 0.689 | 0.651 | 0.720 | passed |
 
 At SF0.1 (dimension of 15,000 current rows, 10x larger, median of 15 runs):
 
 | Operation | median (ms) | min (ms) | p90 (ms) | validation |
 | --- | --- | --- | --- | --- |
-| Basic (close old plus insert new) | 4.360 | 4.040 | 4.972 | passed |
-| No change (idempotent re-run) | 3.690 | 3.031 | 3.806 | passed |
-| New keys only (insert only) | 1.462 | 1.312 | 2.437 | passed |
+| Basic (close old plus insert new) | 3.304 | 2.979 | 3.621 | passed |
+| No change (idempotent re-run) | 2.164 | 2.067 | 2.203 | passed |
+| New keys only (insert only) | 0.733 | 0.690 | 0.770 | passed |
 
-One observation stands out. The dimension grew 10x, but the basic operation rose only
-about 1.7x (2.5 ms to 4.4 ms). The workload is bounded by the fixed change batch plus
-the dimension scans in the close predicate and the validation, so it is
-change-batch-bound rather than dimension-size-bound. It is not perfectly flat, because
-the larger dimension costs more to scan, but it is far from linear in dimension size.
-These are single-machine, DuckDB-only numbers, and we present them as illustration of
-the portable operation working and validating, not as a platform ranking.
+At SF1 (dimension of 150,000 current rows, 100x the first, median of 15 runs):
+
+| Operation | median (ms) | min (ms) | p90 (ms) | validation |
+| --- | --- | --- | --- | --- |
+| Basic (close old plus insert new) | 10.774 | 10.456 | 11.153 | passed |
+| No change (idempotent re-run) | 9.383 | 9.115 | 9.546 | passed |
+| New keys only (insert only) | 0.856 | 0.803 | 0.976 | passed |
+
+One observation stands out. The dimension grew 100x, but the basic operation rose only
+about 5x (2.2 ms to 10.8 ms). The per-decade rate is not constant: about 1.5x from SF0.01
+to SF0.1 (2.2 ms to 3.3 ms), then about 3.3x from SF0.1 to SF1 (3.3 ms to 10.8 ms). The
+curve bends upward as the dimension grows, so we do not claim it is flat. The change batch
+is fixed at 60 rows, and the cost that does not depend on the batch comes from the
+dimension scans in the close predicate and the validation. At the small scales the fixed
+batch dominates, and at SF1 the scans start to. The workload is change-batch-bound at
+small dimensions and increasingly dimension-scan-bound as the dimension grows, and it is
+far from linear in dimension size across this range. The insert-only path, which does
+not close existing rows, stays under 1 ms at every scale. These are single-machine,
+DuckDB-only numbers, and we present them as illustration of the portable operation working
+and validating, not as a platform ranking.
 
 ## Convenience versus portability
 
@@ -240,16 +255,23 @@ Anyone can reproduce the portable measurement. Load real TPC-H data with DuckDB'
 set up the Write Primitives benchmark, and run the operation:
 
 ```python
+import statistics
 import duckdb
 from benchbox import WritePrimitives
 
+scale_factor, iterations = 0.01, 30
 con = duckdb.connect(":memory:")
-con.execute("INSTALL tpch; LOAD tpch; CALL dbgen(sf=0.01);")
-wp = WritePrimitives(scale_factor=0.01, quiet=True)
+con.execute(f"INSTALL tpch; LOAD tpch; CALL dbgen(sf={scale_factor});")
+wp = WritePrimitives(scale_factor=scale_factor, quiet=True)
 wp.setup(con, force=True)
-result = wp.execute_operation("merge_scd_type2_basic", con)
-print(result.write_duration_ms, result.validation_passed)
+runs = [wp.execute_operation("merge_scd_type2_basic", con) for _ in range(iterations)]
+assert all(r.validation_passed for r in runs)
+print(statistics.median(r.write_duration_ms for r in runs))
 ```
+
+Each `execute_operation` call times only the write statements. It then runs validation and
+the operation's cleanup, which restores the dimension to its seed state, so successive runs
+start from the same data. The 90th percentile is the linearly interpolated one.
 
 Limitations we want to be clear about:
 
@@ -289,7 +311,7 @@ compare. Open an issue to share results or to discuss the methodology.
 
 ## References
 
-[^log]: Verification log for this post: `_blog/platform-deep-dives/research/apply-changes-into-vs-merge-verification-2026-06-27.md` (BenchBox repository). Contains the environment snapshot, source quotes, line counts, and measurement runs. Measurements run 2026-06-30; documentation accessed 2026-06-29.
+[^log]: Verification log for this post: `_blog/platform-deep-dives/research/apply-changes-into-vs-merge-verification-2026-06-27.md` (BenchBox repository). Contains the environment snapshot, source quotes, and line counts; it also holds the original 2026-06-30 measurement runs, which the scale tables in this post replace. The scale tables were re-measured on 2026-11-02 at BenchBox `develop` commit `6f5692490e` with DuckDB 1.5.5 (CPython 3.12.15, `uv run`), on an Apple M4 (10 cores, 16 GB), in-memory. Iterations: 30 at SF0.01, 15 at SF0.1, 15 at SF1, one process, scale points run in order. The machine was at least 90 percent CPU idle before the run. Documentation accessed 2026-06-29.
 [^cdc]: [Change data capture with AUTO CDC](https://docs.databricks.com/aws/en/ldp/cdc), Databricks documentation, accessed 2026-06-29. "The `AUTO CDC` APIs replace the `APPLY CHANGES` APIs and have the same syntax."
 [^dlt]: [What happened to Delta Live Tables (DLT)?](https://docs.databricks.com/aws/en/ldp/concepts/where-is-dlt), Databricks documentation, last updated 2026-06-15, accessed 2026-06-29.
 [^op]: Write Primitives SCD Type 2 operations (`merge_scd_type2_basic`, `merge_scd_type2_no_change`, `merge_scd_type2_new_keys_only`), BenchBox repository, `benchbox/core/write_primitives/catalog/operations.yaml`.
@@ -297,6 +319,6 @@ compare. Open an issue to share results or to discuss the methodology.
 [^blog]: [Stop hand-coding change data capture pipelines](https://www.databricks.com/blog/stop-hand-coding-change-data-capture-pipelines), Databricks blog, 2026-04-22, accessed 2026-06-29. Official figure: "~6-10 lines of declarative pipeline definition" versus "40-200+ lines of custom pipeline logic". The "1,500 lines" figure is a customer testimonial, not an official metric.
 [^merge]: [Upsert into a Delta Lake table using merge](https://docs.databricks.com/aws/en/delta/merge), Databricks documentation, accessed 2026-06-29. The SCD section now points to AUTO CDC rather than a hand-written SCD Type 2 MERGE example.
 [^standalone]: [Use standalone streaming tables](https://docs.databricks.com/aws/en/ldp/dbsql/streaming), Databricks documentation, accessed 2026-06-29. "You can create and refresh standalone streaming tables from a Databricks SQL warehouse... Instead, streaming tables rely on serverless pipelines for both creation and refresh."
-[^skip]: DuckDB execution-filter rule for Write Primitives, BenchBox repository, `benchbox/sql_compat/rules/execution_filter/duckdb_write_primitives.py`. The MERGE category is skipped on DuckDB because the legacy operations use `MERGE INTO`, which the bundled DuckDB 1.3.2 rejects.
+[^skip]: DuckDB execution-filter rule for Write Primitives, BenchBox repository, `benchbox/sql_compat/rules/execution_filter/duckdb_write_primitives.py`. The MERGE category is skipped on DuckDB because the legacy operations use `MERGE INTO`. The rule's skip reason cites DuckDB 1.3.2 rejecting that statement; the DuckDB 1.5.5 used for the measurements here accepts a plain `MERGE INTO`, so the skip is now a catalog decision rather than an engine limit.
 
 *Questions or feedback? Open an issue or join the discussion.*
