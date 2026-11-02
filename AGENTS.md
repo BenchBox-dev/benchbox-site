@@ -171,8 +171,9 @@ versioned core bundle; it reads nothing else from core.
   artifact and reports the differences. It is advisory: it is not part of
   `ci` and never fails on a difference.
 - The Nightly workflow's `links` job checks external links in `blog/`, `docs/`
-  and the site pages with `.lychee.toml`, which carries the scoped ignore
-  policy for flaky and login-gated hosts. It then checks the published
+  and the site pages, including their `#fragment` anchors, with `.lychee.toml`,
+  which carries the scoped ignore policy for flaky and login-gated hosts and
+  the fragment allowlist for anchors that JavaScript builds. It then checks the published
   documentation: every `/docs/` page in the `SITE_ORIGIN` sitemap, with
   fragments, for links to that origin (the scoped policy's own-origin exclusion
   yields to the check's include pattern). `scripts/check-published-links.mjs` accepts the

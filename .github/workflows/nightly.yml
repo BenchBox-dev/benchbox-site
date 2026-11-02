@@ -42,7 +42,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ github.token }}
         with:
-          args: --config .lychee.toml --no-progress --max-concurrency 8 --scheme https --scheme http --exclude-loopback "blog/**/*.md" "docs/**/*.md" "website/src/**/*.astro"
+          args: --config .lychee.toml --no-progress --max-concurrency 8 --include-fragments --scheme https --scheme http --exclude-loopback "blog/**/*.md" "docs/**/*.md" "website/src/**/*.astro"
           output: lychee-report.md
           fail: false
       - uses: actions/setup-node@a0853c24544627f65ddf259abe73b1d18a591444
