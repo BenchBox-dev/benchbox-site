@@ -2,7 +2,7 @@
   "acceptance": [
     "The site nightly external-link step fails on an external link whose #fragment does not exist on the target page, shown against a seeded bad fragment; current docs pass or each failing anchor is fixed or allowlisted with a reason."
   ],
-  "context": "Found 2026-10-17 while writing the replacement checker for #3096; at the time it checked 125 links with 0 broken, fragments excluded. Related: site-docs-broken-fragments-20261009 covers internal fragments found by the site link gate.\n\n2026-10-28: the core external-link checker this item extends (scripts/check_doc_external_links.py) was deleted by core PR 3545 with the site-owned pages. The item needs rescoping or dropping; see docs-mig-followup-core-retained-doc-link-gate-20261028. The site nightly crawl now checks fragments on published pages.\n\nMoved from the BenchBox core tracker on 2026-10-30, when this repository gained its own tracker.",
+  "context": "Found 2026-10-17 while writing the replacement checker for #3096; at the time it checked 125 links with 0 broken, fragments excluded. Related: site-docs-broken-fragments-20261009 covers internal fragments found by the site link gate.\n\n2026-10-28: the core external-link checker this item extends (scripts/check_doc_external_links.py) was deleted by core PR 3545 with the site-owned pages. The item needs rescoping or dropping; see docs-mig-followup-core-retained-doc-link-gate-20261028. The site nightly crawl now checks fragments on published pages.\n\nMoved from the BenchBox core tracker on 2026-10-30, when this repository gained its own tracker.\n\n2026-11-02: Done in PR #102 (merge e2af190b1e). The nightly external step runs lychee with --include-fragments; .lychee.toml allowlists JavaScript-built GitHub fragments (comment, review, event and #diff- anchors) with reasons. Seeded https://docs.cloud.google.com/...query-syntax#no_such_anchor_zz failed with 'Cannot find fragment' (exit 2) while the real #join_types passed. Current docs: 993 unique links, no fragment failures; the pre-existing arena.ai 403 and clickhouse.com HTTP/2 errors are unrelated. ci green before merge.",
   "description": "Rescoped 2026-10-28: core's scripts/check_doc_external_links.py was deleted with the site-owned pages, so the core checker no longer exists. Core-retained docs have 81 external links, none with an anchor, and get no external check by design. The remaining gap is in BenchBox-dev/benchbox-site: the Nightly workflow's external step (.github/workflows/nightly.yml, .lychee.toml) does not check fragments of external links; the published-docs step checks fragments only for own-origin links. Add lychee --include-fragments (or equivalent) to the external step, with an allowlist for pages that build anchors with JavaScript.",
   "sessions": [
     {
@@ -12,6 +12,14 @@
       "op": "create",
       "op_id": "70746f1c2342437b887583492777a995",
       "session_id": "82c0d7d9603c4b7cb3497f18a64ea231"
+    },
+    {
+      "actor": "mcp:omp-coding-agent:joe@joe-mac-mini.local:a6d1a76a8fe5c477ca12e1f3",
+      "at": "2026-11-02T02:02:27Z",
+      "client": "omp-coding-agent",
+      "op": "update",
+      "op_id": "7d14df0d82fd4ff4b5d008d024563d64",
+      "session_id": "2708a39948944f4299911f72f62ba6c5"
     }
   ]
 }
