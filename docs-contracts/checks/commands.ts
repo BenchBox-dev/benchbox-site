@@ -1,15 +1,20 @@
-import { bashBlocks, section, shellWords } from "../lib/markdown.ts";
+import { shellBlocks, section, shellWords } from "../lib/markdown.ts";
 import { optionResolver } from "./options.ts";
 import { page, type Context, type Contracts, type Violation } from "../lib/types.ts";
 
-const COMMAND_PAGES = ["usage/getting-started.md", "platforms/singlestore.md", "usage/cli-quick-start.md"];
+const QUICKSTART_PAGE = "usage/getting-started.md";
+const EXCLUDED_PAGES = ["blog/"];
+const SHELL_OPERATOR = /^(\d*>>?(&\d)?|<|\|\|?|&&|;)$/;
+const PLACEHOLDER_COMMAND = /^[A-Z][A-Z0-9_]*$|^\[[A-Z]/;
+const REPEATED_SHORT_FLAG = /^-([A-Za-z])\1+$/;
 const PLACEHOLDER_VALUE = /^[A-Z][A-Z0-9_]*$|\$/;
+const LOWERCASE_PLACEHOLDERS = new Set(["problematic_db", "target_platform"]);
 
 type Command = Contracts["cli"]["commands"][number];
 
 export function invocations(text: string): string[][] {
   const found: string[][] = [];
-  for (const block of bashBlocks(text)) {
+  for (const block of shellBlocks(text)) {
     for (const raw of block.replace(/\\\n/g, " ").split("\n")) {
       const line = raw.trim();
       if (line === "" || line.startsWith("#")) continue;
@@ -17,7 +22,8 @@ export function invocations(text: string): string[][] {
       const index = parts.indexOf("benchbox");
       if (index < 0) continue;
       if (!(index === 0 || parts[index - 1] === "--")) continue;
-      const rest = parts.slice(index + 1);
+      const operator = parts.findIndex((part, position) => position > index && SHELL_OPERATOR.test(part));
+      const rest = parts.slice(index + 1, operator < 0 ? undefined : operator);
       if (rest.some((part) => part.includes("<") || part.includes(">"))) continue;
       if (rest.length > 0) found.push(rest);
     }
@@ -28,11 +34,11 @@ export function invocations(text: string): string[][] {
 type PlatformCheck = (value: string) => boolean;
 
 function valueProblem(node: Command, option: Command["options"][number], value: string, knownPlatform: PlatformCheck | undefined): string | null {
-  if (PLACEHOLDER_VALUE.test(value)) return null;
+  if (PLACEHOLDER_VALUE.test(value) || LOWERCASE_PLACEHOLDERS.has(value)) return null;
   if (option.choices !== null && option.choices.length > 0) {
     return option.choices.includes(value) ? null : `${option.names[0]} value '${value}' is not one of ${option.choices.join(", ")} for ${node.path}`;
   }
-  if (option.names.includes("--platform") && knownPlatform !== undefined && !knownPlatform(value)) return `--platform value '${value}' is not a known platform`;
+  if (option.names.includes("--platform") && knownPlatform !== undefined && !value.includes(":") && !knownPlatform(value)) return `--platform value '${value}' is not a known platform`;
   return null;
 }
 
@@ -41,6 +47,7 @@ export function resolveInvocation(commands: Map<string, Command>, argv: string[]
   if (node === undefined) return "the command tree has no benchbox root";
   let pending: { node: Command; option: Command["options"][number] } | null = null;
   for (const token of argv) {
+    if (pending !== null && token.startsWith("-") && token !== "-" && pending.option.choices === null && node.options.some((candidate) => candidate.names.includes(token.split("=")[0]))) pending = null;
     if (pending !== null) {
       const problem = valueProblem(pending.node, pending.option, token, knownPlatform);
       pending = null;
@@ -51,6 +58,8 @@ export function resolveInvocation(commands: Map<string, Command>, argv: string[]
     if (token.startsWith("-")) {
       const name = token.split("=")[0];
       if (name === "--help") continue;
+      const repeated = REPEATED_SHORT_FLAG.exec(name);
+      if (repeated !== null && node.options.some((candidate) => candidate.names.includes(`-${repeated[1]}`))) continue;
       const option = node.options.find((candidate) => candidate.names.includes(name));
       if (option === undefined) return `option ${name} is not an option of ${node.path}`;
       if (!option.is_flag) {
@@ -61,6 +70,7 @@ export function resolveInvocation(commands: Map<string, Command>, argv: string[]
       }
       continue;
     }
+    if (PLACEHOLDER_COMMAND.test(token)) continue;
     const child = commands.get(`${node.path} ${token}`);
     if (child !== undefined) node = child;
     else if (node.is_group) return `${node.path} has no command ${token}`;
@@ -73,29 +83,25 @@ export function commandViolations(ctx: Context): Violation[] {
   const commands = new Map(ctx.contracts.cli.commands.map((command) => [command.path, command]));
   const { split } = optionResolver(ctx.contracts);
   const knownPlatform: PlatformCheck = (value) => split(value)[0] in ctx.contracts.platforms.entries;
-  for (const path of COMMAND_PAGES) {
-    const entry = page(ctx, path);
-    if (entry === undefined) {
-      found.push({ check: "page-present", page: path, invariant: "page named by a contract check is not published" });
-      continue;
-    }
-    const examples = invocations(entry.text);
-    if (path === COMMAND_PAGES[0] && examples.length === 0) found.push({ check: "quickstart-commands", page: path, invariant: "no benchbox command found in the quickstart fences" });
-    for (const argv of examples) {
+  for (const entry of ctx.pages) {
+    if (EXCLUDED_PAGES.some((prefix) => entry.path.startsWith(prefix))) continue;
+    for (const argv of invocations(entry.text)) {
       const problem = resolveInvocation(commands, argv, knownPlatform);
-      if (problem !== null) found.push({ check: "quickstart-commands", page: path, invariant: `benchbox ${argv.join(" ")}: ${problem}` });
+      if (problem !== null) found.push({ check: "quickstart-commands", page: entry.path, invariant: `benchbox ${argv.join(" ")}: ${problem}` });
     }
   }
-  const quickstart = page(ctx, COMMAND_PAGES[0]);
+  const quickstart = page(ctx, QUICKSTART_PAGE);
+  if (quickstart !== undefined && invocations(quickstart.text).length === 0) found.push({ check: "quickstart-commands", page: QUICKSTART_PAGE, invariant: "no benchbox command found in the quickstart fences" });
+  if (quickstart === undefined) found.push({ check: "page-present", page: QUICKSTART_PAGE, invariant: "page named by a contract check is not published" });
   if (quickstart !== undefined) {
     const stepOne = section(quickstart.text, "## Step 1", "## Step 2");
     const extras = ctx.contracts.package.optional_extras;
-    if (stepOne === null) found.push({ check: "quickstart-extras", page: COMMAND_PAGES[0], invariant: "Step 1 section is missing" });
+    if (stepOne === null) found.push({ check: "quickstart-extras", page: QUICKSTART_PAGE, invariant: "Step 1 section is missing" });
     else {
       const named = [...stepOne.matchAll(/--extra\s+([A-Za-z0-9_-]+)|benchbox\[([A-Za-z0-9_,-]+)\]/g)].flatMap((match) => (match[1] ?? match[2]).split(","));
-      if (!named.includes("duckdb")) found.push({ check: "quickstart-extras", page: COMMAND_PAGES[0], invariant: "Step 1 does not pin the duckdb extra" });
+      if (!named.includes("duckdb")) found.push({ check: "quickstart-extras", page: QUICKSTART_PAGE, invariant: "Step 1 does not pin the duckdb extra" });
       for (const extra of named) {
-        if (!extras.includes(extra)) found.push({ check: "quickstart-extras", page: COMMAND_PAGES[0], invariant: `extra ${extra} is not in package.optional_extras` });
+        if (!extras.includes(extra)) found.push({ check: "quickstart-extras", page: QUICKSTART_PAGE, invariant: `extra ${extra} is not in package.optional_extras` });
       }
     }
   }

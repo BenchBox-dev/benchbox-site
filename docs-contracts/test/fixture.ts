@@ -82,8 +82,9 @@ export function buildContracts(): Contracts {
       commands: [
         { path: "benchbox", is_group: true, options: [{ names: ["--version"], is_flag: true, choices: null }] },
         { path: "benchbox profile", is_group: false, options: [] },
-        { path: "benchbox run", is_group: false, options: [{ names: ["--platform"], is_flag: false, choices: null }, { names: ["--benchmark"], is_flag: false, choices: null }, { names: ["--force"], is_flag: true, choices: null }] },
+        { path: "benchbox run", is_group: false, options: [{ names: ["--verbose", "-v"], is_flag: false, choices: null }, { names: ["--platform-option"], is_flag: false, choices: null }, { names: ["--platform"], is_flag: false, choices: null }, { names: ["--benchmark"], is_flag: false, choices: null }, { names: ["--force"], is_flag: true, choices: null }] },
         { path: "benchbox setup", is_group: false, options: [{ names: ["--platform"], is_flag: false, choices: ["duckdb", "singlestore"] }, { names: ["--validate-only"], is_flag: true, choices: null }] },
+        { path: "benchbox visualize", is_group: false, options: [{ names: ["--template"], is_flag: false, choices: ["default", "flagship"] }, { names: ["--theme"], is_flag: false, choices: ["dark", "light"] }] },
       ],
       help_catalog: { command_examples: { run: { examples: ["benchbox run --platform duckdb --platform-option threads=4"] } } },
     },
@@ -184,6 +185,7 @@ export function buildPages(): Record<string, string> {
       "```",
       "",
     ].join("\n"),
+    "reference/cli/visualize.md": "```bash\nbenchbox visualize result.json --template flagship\n```\n",
     "platforms/singlestore.md": "```bash\nbenchbox setup --platform singlestore --validate-only\n```\n",
     "reference/mcp.md": [
       "### Actual Tool Inventory",

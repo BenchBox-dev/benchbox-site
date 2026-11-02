@@ -57,6 +57,10 @@ const SEEDS: Seed[] = [
   { name: "cli quick start unknown option", check: "quickstart-commands", page: "usage/cli-quick-start.md", pages: (p) => replace(p, "usage/cli-quick-start.md", "--benchmark tpch", "--bench tpch") },
   { name: "cli quick start unknown platform", check: "quickstart-commands", page: "usage/cli-quick-start.md", pages: (p) => replace(p, "usage/cli-quick-start.md", "--platform duckdb", "--platform nonexistent") },
   { name: "cli quick start value outside choices", check: "quickstart-commands", page: "usage/cli-quick-start.md", pages: (p) => replace(p, "usage/cli-quick-start.md", "setup --platform singlestore", "setup --platform duck") },
+  { name: "stale visualize template value", check: "quickstart-commands", page: "reference/cli/visualize.md", pages: (p) => replace(p, "reference/cli/visualize.md", "--template flagship", "--template overview") },
+  { name: "console fence stale template value", check: "quickstart-commands", page: "usage/faq.md", pages: (p) => (p["usage/faq.md"] += "```console\n$ benchbox visualize result.json --template overview\n```\n") },
+  { name: "sh fence unknown option", check: "quickstart-commands", page: "usage/faq.md", pages: (p) => (p["usage/faq.md"] += "```sh\nbenchbox run --bench tpch\n```\n") },
+  { name: "shell fence after a pipe still checks the command", check: "quickstart-commands", page: "usage/faq.md", pages: (p) => (p["usage/faq.md"] += "```shell\nbenchbox run --bench tpch | cat\n```\n") },
   { name: "setup command removed", check: "quickstart-commands", page: "platforms/singlestore.md", contracts: (c) => (c.cli.commands = c.cli.commands.filter((command) => command.path !== "benchbox setup")) },
   { name: "SF1 calibrated size drift", check: "sf1-sizes", page: "benchmarks/sf1-calibrated-sizes.md", pages: (p) => replace(p, "benchmarks/sf1-calibrated-sizes.md", "| ssb | 510 |", "| ssb | 900 |") },
   { name: "SF1 benchmark missing from table", check: "sf1-sizes", page: "benchmarks/sf1-calibrated-sizes.md", pages: (p) => replace(p, "benchmarks/sf1-calibrated-sizes.md", "| ssb | 510 |\n", "") },
@@ -175,6 +179,37 @@ describe("modes and bundle schemas", () => {
   it("fails a release marker the checker cannot translate", () => {
     const outcome = run({ contracts: (c) => (c.package.release_marker.flags = 8) });
     assert.ok(outcome.blocking.some((violation) => violation.invariant.includes("cannot translate")));
+  });
+});
+
+describe("placeholder rules", () => {
+  it("accepts verbosity repeats, uppercase command and option placeholders, pipes and redirects", () => {
+    const outcome = run({
+      pages: (p) => {
+        p["usage/faq.md"] += [
+          "```bash",
+          "benchbox run -vv --platform duckdb",
+          "benchbox run COMMAND [OPTIONS]",
+          "benchbox run --platform duckdb --force > out.txt",
+          "benchbox run --platform duckdb | cat",
+          "benchbox run --platform problematic_db",
+          "benchbox run --platform snowflake:local",
+          "```",
+          "",
+        ].join("\n");
+      },
+    });
+    assert.deepEqual(outcome.blocking, []);
+  });
+
+  it("ignores console output lines and blog pages", () => {
+    const outcome = run({
+      pages: (p) => {
+        p["usage/faq.md"] += "```console\n$ benchbox run --platform duckdb\nbenchbox run --bench tpch\n```\n";
+        p["blog/post.md"] = "```bash\nbenchbox run --bench tpch\n```\n";
+      },
+    });
+    assert.deepEqual(outcome.blocking, []);
   });
 });
 

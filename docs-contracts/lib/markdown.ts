@@ -4,8 +4,18 @@ export function fencedBlocks(text: string): string[] {
   return [...text.matchAll(FENCE)].map((match) => match[1]);
 }
 
-export function bashBlocks(text: string): string[] {
-  return [...text.matchAll(/```bash\n([\s\S]*?)```/g)].map((match) => match[1]);
+const SHELL_FENCE = /^[ \t]*```(bash|sh|shell|console)[ \t]*\n([\s\S]*?)^[ \t]*```/gm;
+const PROMPT = /^\$ /;
+
+export function shellBlocks(text: string): string[] {
+  return [...text.matchAll(SHELL_FENCE)].map((match) => {
+    if (match[1] !== "console") return match[2];
+    return match[2]
+      .split("\n")
+      .filter((line) => PROMPT.test(line))
+      .map((line) => line.replace(PROMPT, ""))
+      .join("\n");
+  });
 }
 
 export function stripFences(text: string): string {
