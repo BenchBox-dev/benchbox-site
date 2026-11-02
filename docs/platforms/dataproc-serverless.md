@@ -1,9 +1,10 @@
+---
+tags: [intermediate, guide, dataproc-serverless, cloud-platform]
+---
+
 <!-- Copyright 2026 Joe Harris / BenchBox Project. Licensed under the MIT License. -->
 
 # Google Cloud Dataproc Serverless Platform
-
-```{tags} intermediate, guide, dataproc-serverless, cloud-platform
-```
 
 Dataproc Serverless is Google Cloud's fully managed Apache Spark service that eliminates cluster management entirely. You submit batches and Google Cloud handles all infrastructure automatically with sub-minute startup times.
 

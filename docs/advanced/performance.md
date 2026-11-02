@@ -1,9 +1,10 @@
+---
+tags: [advanced, guide, performance]
+---
+
 <!-- Copyright 2026 Joe Harris / BenchBox Project. Licensed under the MIT License. -->
 
 # Performance Monitoring
-
-```{tags} advanced, guide, performance
-```
 
 Guide to performance measurement and analysis with BenchBox.
 

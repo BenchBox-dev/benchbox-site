@@ -1,9 +1,10 @@
-(cli-datagen)=
+---
+tags: [reference, cli, data]
+---
+
+<span id="cli-datagen"></span>
 
 # `datagen` - Data Generation
-
-```{tags} reference, cli, data
-```
 
 Generate benchmark data files without running queries. This is a convenience wrapper for `benchbox run --phases generate`.
 

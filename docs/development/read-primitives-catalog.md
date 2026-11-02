@@ -1,7 +1,8 @@
-# Primitives Query Catalog
+---
+tags: [contributor, reference, custom-benchmark]
+---
 
-```{tags} contributor, reference, custom-benchmark
-```
+# Primitives Query Catalog
 
 The Read Primitives benchmark queries now live outside Python source in
 `benchbox/core/read_primitives/catalog/queries.yaml`. This keeps the runtime module
@@ -147,7 +148,7 @@ Some queries cannot be meaningfully tested on certain platforms due to data limi
   full-text search rewritten as `LIKE`, approximate percentile substituted for
   exact percentile, or array capability rewritten as a scalar aggregate
 
-For a complete reference of all current skips, their root causes, and instructions on how to re-enable them, see {doc}`read-primitives-skips-reference`.
+For a complete reference of all current skips, their root causes, and instructions on how to re-enable them, see [Read Primitives: Platform Skip Reference](read-primitives-skips-reference.md).
 
 **How it works:**
 

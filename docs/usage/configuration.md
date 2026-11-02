@@ -1,7 +1,8 @@
-# Configuration Handbook
+---
+tags: [intermediate, guide, configuration]
+---
 
-```{tags} intermediate, guide, configuration
-```
+# Configuration Handbook
 
 BenchBox reads configuration from three layers, highest precedence first:
 

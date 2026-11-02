@@ -1,7 +1,8 @@
-# BenchBox Platform Configuration Audit
+---
+tags: [contributor, reference]
+---
 
-```{tags} contributor, reference
-```
+# BenchBox Platform Configuration Audit
 
 Adversarial sweep of the configs BenchBox **forces or defaults** per platform. Each bullet names the
 file and line span plus the rationale/impact. Focus is on forced session toggles, caches, memory

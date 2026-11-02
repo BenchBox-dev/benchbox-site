@@ -1,7 +1,8 @@
-# Tutorials
+---
+tags: [beginner, tutorial]
+---
 
-```{tags} beginner, tutorial
-```
+# Tutorials
 
 Step-by-step tutorials for common BenchBox tasks. Each tutorial takes 5-15 minutes.
 
@@ -25,12 +26,3 @@ Step-by-step tutorials for common BenchBox tasks. Each tutorial takes 5-15 minut
 - [CLI Quick Reference](../usage/cli-quick-start.md) - Command reference
 - [Examples Directory](../usage/examples-directory.md) - Runnable Python scripts
 - [Platform Guides](../platforms/index.md) - Platform-specific setup
-
-```{toctree}
-:maxdepth: 1
-
-first-benchmark
-understanding-results
-comparing-platforms
-dataframe-quickstart
-```

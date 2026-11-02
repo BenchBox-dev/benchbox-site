@@ -1,9 +1,10 @@
+---
+tags: [intermediate, guide, clickhouse, sql-platform, cloud]
+---
+
 <!-- Copyright 2026 Joe Harris / BenchBox Project. Licensed under the MIT License. -->
 
 # ClickHouse Cloud Platform
-
-```{tags} intermediate, guide, clickhouse, sql-platform, cloud
-```
 
 ClickHouse Cloud is the managed cloud version of ClickHouse, providing serverless and dedicated compute options with automatic scaling. BenchBox provides first-class ClickHouse Cloud support, inheriting ClickHouse's SQL dialect and benchmark compatibility.
 
@@ -117,7 +118,7 @@ benchbox run --platform clickhouse-cloud --benchmark tpch \
 The driver package for ClickHouse Cloud is `clickhouse-connect` (the HTTP-based connector).
 This is distinct from the `[clickhouse]` extra which uses `clickhouse-driver` (the TCP binary protocol).
 
-See {ref}`driver-version-management` for the full guide, including why `uv run` may
+See [Driver Version Management](../usage/driver-version-management.md) for the full guide, including why `uv run` may
 revert a manually-installed version and how to work around it.
 
 ## Usage Examples

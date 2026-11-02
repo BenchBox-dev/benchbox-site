@@ -1,20 +1,17 @@
-# DataFrame Platforms
+---
+tags: [reference, dataframe-platform]
+---
 
-```{tags} reference, dataframe-platform
-```
+# DataFrame Platforms
 
 Native DataFrame API platforms for benchmarking without SQL.
 
-```{toctree}
-:maxdepth: 1
-
-dataframe
-polars
-pandas-dataframe
-pyspark-dataframe
-datafusion-dataframe
-modin-dataframe
-dask-dataframe
-cudf
-databricks-dataframe
-```
+- [DataFrame Platforms](dataframe.md)
+- [Polars Platform](polars.md)
+- [Pandas DataFrame Platform](pandas-dataframe.md)
+- [PySpark Platform (SQL & DataFrame)](pyspark-dataframe.md)
+- [DataFusion DataFrame Platform](datafusion-dataframe.md)
+- [Migrating from the Modin DataFrame platform](modin-dataframe.md)
+- [Dask DataFrame Platform](dask-dataframe.md)
+- [cuDF DataFrame Platform](cudf.md)
+- [Databricks DataFrame Platform](databricks-dataframe.md)

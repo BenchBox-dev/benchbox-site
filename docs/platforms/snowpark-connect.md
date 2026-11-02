@@ -1,9 +1,10 @@
+---
+tags: [intermediate, guide, snowflake, cloud-platform]
+---
+
 <!-- Copyright 2026 Joe Harris / BenchBox Project. Licensed under the MIT License. -->
 
 # Snowpark Connect for Spark
-
-```{tags} intermediate, guide, snowflake, cloud-platform
-```
 
 Snowpark Connect provides a PySpark DataFrame API that executes natively on Snowflake. This is **NOT Apache Spark** - DataFrame operations are translated to Snowflake SQL, providing a familiar API without requiring a Spark cluster.
 

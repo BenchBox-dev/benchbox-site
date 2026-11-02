@@ -1,9 +1,10 @@
+---
+tags: [contributor]
+---
+
 <!-- Copyright 2026 Joe Harris / BenchBox Project. Licensed under the MIT License. -->
 
 # Design & Architecture
-
-```{tags} contributor
-```
 
 How BenchBox works internally.
 
@@ -82,12 +83,3 @@ Code organization and directories.
 
 1. Read [Architecture Design](architecture.md)
 2. Review [Project Structure](structure.md)
-
-```{toctree}
-:maxdepth: 1
-:caption: Design Docs
-:hidden:
-
-architecture
-structure
-```

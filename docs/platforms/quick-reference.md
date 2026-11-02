@@ -1,11 +1,12 @@
+---
+tags: [beginner, reference]
+---
+
 <!-- markdownlint-disable MD024 -->
 
 <!-- Copyright 2026 Joe Harris / BenchBox Project. Licensed under the MIT License. -->
 
 # Multi-Platform Database Support
-
-```{tags} beginner, reference
-```
 
 BenchBox supports running benchmarks across multiple database platforms through its platform adapter architecture. This allows you to compare performance, validate query compatibility, and test your applications across different database systems.
 
@@ -359,9 +360,8 @@ See [LakeSail Platform Guide](lakesail.md) for the full configuration reference.
 
 ### Configuration
 
-```{important}
-Local mode is **Linux-only** - the Gluten Velox bundle jar has no macOS or Windows build. Use Docker (`docker/velox/`) or a remote Linux host on macOS and Windows. The checked-in Docker workflow currently defaults to `linux/amd64`; on Apple Silicon that is for smoke testing only, not timing-valid benchmarks.
-```
+> [!IMPORTANT]
+> Local mode is **Linux-only** - the Gluten Velox bundle jar has no macOS or Windows build. Use Docker (`docker/velox/`) or a remote Linux host on macOS and Windows. The checked-in Docker workflow currently defaults to `linux/amd64`; on Apple Silicon that is for smoke testing only, not timing-valid benchmarks.
 
 ```bash
 uv add benchbox --extra velox

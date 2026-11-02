@@ -1,14 +1,11 @@
-# Performance & Tuning
+---
+tags: [advanced, guide, tuning]
+---
 
-```{tags} advanced, guide, tuning
-```
+# Performance & Tuning
 
 Guides for optimizing benchmark performance and tuning database configurations.
 
-```{toctree}
-:maxdepth: 1
-
-performance
-performance-optimization
-power-run-concurrent-queries
-```
+- [Performance Monitoring](performance.md)
+- [Advanced Performance Optimization Guide](performance-optimization.md)
+- [Power Run Iterations and Concurrent Query Execution](power-run-concurrent-queries.md)

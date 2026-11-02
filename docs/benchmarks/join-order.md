@@ -1,7 +1,8 @@
-# Join Order Benchmark
+---
+tags: [intermediate, concept, join-order, custom-benchmark]
+---
 
-```{tags} intermediate, concept, join-order, custom-benchmark
-```
+# Join Order Benchmark
 
 > **CLI name:** `joinorder` - use `benchbox run --benchmark joinorder --scale 1`
 >

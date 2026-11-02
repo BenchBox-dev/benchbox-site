@@ -1,7 +1,8 @@
-# CLI Reference: `benchbox visualize`
+---
+tags: [intermediate, reference, visualization, cli]
+---
 
-```{tags} intermediate, reference, visualization, cli
-```
+# CLI Reference: `benchbox visualize`
 
 Generate ASCII charts directly from benchmark result JSON files.
 

@@ -1,9 +1,10 @@
+---
+tags: [advanced, guide, tpc-ds, validation]
+---
+
 <!-- Copyright 2026 Joe Harris / BenchBox Project. Licensed under the MIT License. -->
 
 # TPC-DS Official Benchmark Guide
-
-```{tags} advanced, guide, tpc-ds, validation
-```
 
 This guide provides systematic documentation for the TPC-DS official benchmark implementation in BenchBox, including Power@Size and Throughput@Size. BenchBox does not export the composite QphDS@Size; see [QphDS@Size (not exported)](tpc-ds-official-guide.md#qphds-size-not-exported).
 

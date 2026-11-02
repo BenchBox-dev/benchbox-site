@@ -1,9 +1,10 @@
+---
+tags: [beginner, reference]
+---
+
 <!-- Copyright 2026 Joe Harris / BenchBox Project. Licensed under the MIT License. -->
 
 # Glossary
-
-```{tags} beginner, reference
-```
 
 Comprehensive reference for benchmarking, database, and BenchBox-specific terminology.
 

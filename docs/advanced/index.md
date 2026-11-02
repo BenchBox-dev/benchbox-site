@@ -1,9 +1,10 @@
+---
+tags: [advanced]
+---
+
 <!-- Copyright 2026 Joe Harris / BenchBox Project. Licensed under the MIT License. -->
 
 # Advanced Topics
-
-```{tags} advanced
-```
 
 BenchBox exposes advanced tooling for teams that need to tune production workloads, run official TPC submissions, or analyse optimiser behavior. Use this section after you are comfortable with the [5‑minute start](../usage/getting-started.md).
 
@@ -31,19 +32,3 @@ BenchBox exposes advanced tooling for teams that need to tune production workloa
 - [Compression strategies](../guides/compression.md) for large-scale data generation.
 
 If you discover gaps or need new automation hooks, open a GitHub discussion so we can fold them into the roadmap.
-
-```{toctree}
-:maxdepth: 1
-:caption: Advanced Topics
-:hidden:
-
-power-run-concurrent-queries
-optimizer-tests
-performance
-performance-optimization
-performance-tuning
-format-conversion
-custom-benchmarks
-ci-cd-integration
-customization
-```

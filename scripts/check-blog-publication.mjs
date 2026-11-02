@@ -32,20 +32,13 @@ export function isoFromPostDate(value) {
   return `${match[3]}-${String(month + 1).padStart(2, "0")}-${match[2].padStart(2, "0")}`;
 }
 
-export function toctreeEntries(indexSource) {
-  const block = /```\{toctree\}\n([\s\S]*?)\n```/.exec(indexSource);
-  if (!block) return null;
-  return block[1].split("\n").map((line) => line.trim()).filter((line) => line && !line.startsWith(":"));
-}
-
 function hasTags(value) {
   if (Array.isArray(value)) return value.some((tag) => String(tag).trim());
   return typeof value === "string" && value.split(",").some((tag) => tag.trim());
 }
 
-export function postFindings(posts, indexSource) {
+export function postFindings(posts) {
   const findings = [];
-  const stems = new Set();
   for (const { name, source } of posts) {
     const file = `blog/${name}`;
     const nameMatch = POST_NAME.exec(name);
@@ -53,7 +46,6 @@ export function postFindings(posts, indexSource) {
       findings.push(`${file}: file name must be YYYY-MM-DD-slug.md`);
       continue;
     }
-    stems.add(name.slice(0, -3));
     const front = frontMatterOf(source);
     if (!front) {
       findings.push(`${file}: missing or invalid front matter`);
@@ -67,20 +59,6 @@ export function postFindings(posts, indexSource) {
     else if (iso !== `${nameMatch[1]}-${nameMatch[2]}-${nameMatch[3]}`) {
       findings.push(`${file}: date ${front.date} does not match the file name date`);
     }
-  }
-  const entries = toctreeEntries(indexSource);
-  if (!entries) {
-    findings.push("blog/index.md: no toctree block");
-    return findings;
-  }
-  const listed = new Set();
-  for (const entry of entries) {
-    if (listed.has(entry)) findings.push(`blog/index.md: toctree lists ${entry} twice`);
-    listed.add(entry);
-    if (!stems.has(entry)) findings.push(`blog/index.md: toctree lists ${entry} but blog/${entry}.md does not exist`);
-  }
-  for (const stem of stems) {
-    if (!listed.has(stem)) findings.push(`blog/index.md: toctree is missing ${stem}`);
   }
   return findings;
 }
@@ -195,7 +173,7 @@ export function checkPublication(root, today = Date.now()) {
     .filter((name) => name.endsWith(".md") && name !== "index.md")
     .sort()
     .map((name) => ({ name, source: readFileSync(path.join(blogDir, name), "utf8") }));
-  const findings = postFindings(posts, read("blog/index.md") ?? "");
+  const findings = postFindings(posts);
   const scheduleFile = "drafts/PUBLICATION_SCHEDULE.md";
   const scheduleSource = read(scheduleFile) ?? "";
   const queue = queueFindings({ scheduleSource, draftFiles: listDraftFiles(root), readDraft: read, today });

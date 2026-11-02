@@ -1,9 +1,10 @@
-(cli-download-answers)=
+---
+tags: [reference, cli, validation]
+---
+
+<span id="cli-download-answers"></span>
 
 # `download-answers` - Answer Files
-
-```{tags} reference, cli, validation
-```
 
 Pre-download TPC answer files for offline row-count validation of TPC-H and TPC-DS benchmark results.
 

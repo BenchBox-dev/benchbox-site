@@ -1,9 +1,10 @@
+---
+tags: [reference, python-api, bigquery]
+---
+
 <!-- markdownlint-disable MD024 -->
 
 # BigQuery Platform Adapter
-
-```{tags} reference, python-api, bigquery
-```
 
 The BigQuery adapter provides Google Cloud's serverless data warehouse execution for analytical benchmarks with built-in cost optimization.
 
@@ -812,24 +813,24 @@ conn.query("""
 
 ### Platform Documentation
 
-- {doc}`/platforms/platform-selection-guide` - Choosing BigQuery vs other platforms
-- {doc}`/platforms/quick-reference` - Quick setup for all platforms
-- {doc}`/platforms/comparison-matrix` - Feature comparison
-- {doc}`/guides/cloud-storage` - GCS, S3, Azure Blob Storage integration
+- [Platform Selection Guide](../../../platforms/platform-selection-guide.md) - Choosing BigQuery vs other platforms
+- [Multi-Platform Database Support](../../../platforms/quick-reference.md) - Quick setup for all platforms
+- [Platform Comparison Matrix](../../../platforms/comparison-matrix.md) - Feature comparison
+- [Cloud Storage Support](../../../guides/cloud-storage.md) - GCS, S3, Azure Blob Storage integration
 
 ### Benchmark Guides
 
-- {doc}`/benchmarks/tpc-h` - TPC-H on BigQuery
-- {doc}`/benchmarks/tpc-ds` - TPC-DS on BigQuery
-- {doc}`/benchmarks/clickbench` - ClickBench on BigQuery
+- [TPC-H Benchmark](../../../benchmarks/tpc-h.md) - TPC-H on BigQuery
+- [TPC-DS Benchmark](../../../benchmarks/tpc-ds.md) - TPC-DS on BigQuery
+- [ClickBench (ClickHouse Analytics Benchmark)](../../../benchmarks/clickbench.md) - ClickBench on BigQuery
 
 ### API Reference
 
-- {doc}`duckdb` - DuckDB adapter
-- {doc}`clickhouse` - ClickHouse adapter
-- {doc}`databricks` - Databricks adapter
-- {doc}`../base` - Base benchmark interface
-- {doc}`../index` - Python API overview
+- [DuckDB Platform Adapter](duckdb.md) - DuckDB adapter
+- [ClickHouse Platform Adapter](clickhouse.md) - ClickHouse adapter
+- [Databricks Platform Adapter](databricks.md) - Databricks adapter
+- [Base Benchmark API](../base.md) - Base benchmark interface
+- [Python API Reference](../index.md) - Python API overview
 
 ### External Resources
 

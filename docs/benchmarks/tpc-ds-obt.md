@@ -1,9 +1,10 @@
+---
+tags: [advanced, concept, tpc-ds-obt, tpc-ds, experimental]
+---
+
 <!-- Copyright 2026 Joe Harris / BenchBox Project. Licensed under the MIT License. -->
 
 # TPC-DS-OBT Benchmark
-
-```{tags} advanced, concept, tpc-ds-obt, tpc-ds, experimental
-```
 
 > **CLI name:** `tpcds_obt` - use `benchbox run --benchmark tpcds_obt`
 >

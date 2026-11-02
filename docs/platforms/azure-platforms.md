@@ -1,7 +1,8 @@
-# Azure Analytics Platforms
+---
+tags: [intermediate, guide, azure, cloud-platform]
+---
 
-```{tags} intermediate, guide, azure, cloud-platform
-```
+# Azure Analytics Platforms
 
 BenchBox supports Azure-native analytics platforms alongside multi-cloud options (Databricks, Snowflake).
 

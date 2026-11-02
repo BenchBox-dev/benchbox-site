@@ -1,9 +1,10 @@
+---
+tags: [intermediate, guide, motherduck, sql-platform, cloud]
+---
+
 <!-- Copyright 2026 Joe Harris / BenchBox Project. Licensed under the MIT License. -->
 
 # MotherDuck Platform
-
-```{tags} intermediate, guide, motherduck, sql-platform, cloud
-```
 
 MotherDuck is the managed cloud version of DuckDB, providing serverless analytics with cloud storage integration. BenchBox provides first-class MotherDuck support, inheriting DuckDB's SQL dialect and benchmark compatibility.
 
@@ -69,7 +70,7 @@ benchbox run --platform motherduck --benchmark tpch \
   --platform-option driver_auto_install=true
 ```
 
-See {ref}`driver-version-management` for the full guide, including why `uv run` may
+See [Driver Version Management](../usage/driver-version-management.md) for the full guide, including why `uv run` may
 revert a manually-installed version and how to work around it.
 
 ## Usage Examples

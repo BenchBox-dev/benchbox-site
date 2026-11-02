@@ -1,7 +1,8 @@
-# ClickHouse Local Mode
+---
+tags: [intermediate, guide, clickhouse, local-platform]
+---
 
-```{tags} intermediate, guide, clickhouse, local-platform
-```
+# ClickHouse Local Mode
 
 BenchBox supports ClickHouse in two deployment targets, plus a separate first-class cloud platform:
 
@@ -9,9 +10,8 @@ BenchBox supports ClickHouse in two deployment targets, plus a separate first-cl
 - **Server Mode**: Connects to an external ClickHouse server
 - **ClickHouse Cloud**: Separate first-class platform → see [ClickHouse Cloud](clickhouse-cloud.md)
 
-```{note}
-**ClickHouse Cloud** is now a first-class platform (`--platform clickhouse-cloud`), not a deployment mode. This follows the pattern established by MotherDuck and Starburst.
-```
+> [!NOTE]
+> **ClickHouse Cloud** is now a first-class platform (`--platform clickhouse-cloud`), not a deployment mode. This follows the pattern established by MotherDuck and Starburst.
 
 ## Overview
 
@@ -83,9 +83,8 @@ The first command runs TPC-H in ClickHouse local mode. The second runs it with a
 - `--platform clickhouse-server` - Use ClickHouse server (see [ClickHouse Server](clickhouse-server.md))
 - `--platform clickhouse-cloud` - Use ClickHouse Cloud (see [ClickHouse Cloud](clickhouse-cloud.md))
 
-```{deprecated} v0.2.0
-The bare `clickhouse` selector has been removed and now raises an error naming the first-class replacements. The legacy colon syntax (`clickhouse:local`, `clickhouse:server`) still works but emits deprecation warnings. Use the first-class names above. See [Migration Guide](clickhouse-migration.md).
-```
+> [!WARNING]
+> **Deprecated since v0.2.0.** The bare `clickhouse` selector has been removed and now raises an error naming the first-class replacements. The legacy colon syntax (`clickhouse:local`, `clickhouse:server`) still works but emits deprecation warnings. Use the first-class names above. See [Migration Guide](clickhouse-migration.md).
 
 #### Local Mode Specific Arguments
 

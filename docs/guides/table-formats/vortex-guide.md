@@ -1,7 +1,8 @@
-# Vortex Guide
+---
+tags: [guide, formats, vortex, experimental]
+---
 
-```{tags} guide, formats, vortex, experimental
-```
+# Vortex Guide
 
 Vortex is a columnar format with composable encodings, designed for high-performance analytics. This guide covers Vortex's architecture, current status, and when to consider it for benchmarking.
 

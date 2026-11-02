@@ -1,9 +1,10 @@
+---
+tags: [contributor, concept]
+---
+
 <!-- Copyright 2026 Joe Harris / BenchBox Project. Licensed under the MIT License. -->
 
 # BenchBox Architecture
-
-```{tags} contributor, concept
-```
 
 ## Read this first: the contract map
 

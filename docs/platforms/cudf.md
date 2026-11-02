@@ -1,9 +1,10 @@
+---
+tags: [advanced, guide, cudf, dataframe-platform, performance]
+---
+
 <!-- Copyright 2026 Joe Harris / BenchBox Project. Licensed under the MIT License. -->
 
 # cuDF DataFrame Platform
-
-```{tags} advanced, guide, cudf, dataframe-platform, performance
-```
 
 cuDF is NVIDIA's GPU-accelerated DataFrame library, part of the RAPIDS ecosystem. BenchBox supports benchmarking cuDF using its native Pandas-compatible API through the `cudf-df` platform.
 

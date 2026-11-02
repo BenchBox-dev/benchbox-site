@@ -1,9 +1,10 @@
+---
+tags: [reference, python-api, cloud-platform]
+---
+
 <!-- markdownlint-disable MD024 -->
 
 # Amazon Redshift Platform Adapter
-
-```{tags} reference, python-api, cloud-platform
-```
 
 The Redshift adapter provides AWS-native data warehouse execution with S3 integration and columnar storage optimization.
 
@@ -591,17 +592,17 @@ adapter.analyze_table(conn, "lineitem")
 
 ### Platform Documentation
 
-- {doc}`/platforms/platform-selection-guide` - Choosing Redshift vs other platforms
-- {doc}`/platforms/quick-reference` - Quick setup for all platforms
-- {doc}`/platforms/comparison-matrix` - Feature comparison
+- [Platform Selection Guide](../../../platforms/platform-selection-guide.md) - Choosing Redshift vs other platforms
+- [Multi-Platform Database Support](../../../platforms/quick-reference.md) - Quick setup for all platforms
+- [Platform Comparison Matrix](../../../platforms/comparison-matrix.md) - Feature comparison
 
 ### API Reference
 
-- {doc}`snowflake` - Snowflake adapter
-- {doc}`databricks` - Databricks adapter
-- {doc}`bigquery` - BigQuery adapter
-- {doc}`../base` - Base benchmark interface
-- {doc}`../index` - Python API overview
+- [Snowflake Platform Adapter](snowflake.md) - Snowflake adapter
+- [Databricks Platform Adapter](databricks.md) - Databricks adapter
+- [BigQuery Platform Adapter](bigquery.md) - BigQuery adapter
+- [Base Benchmark API](../base.md) - Base benchmark interface
+- [Python API Reference](../index.md) - Python API overview
 
 ### External Resources
 

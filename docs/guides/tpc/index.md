@@ -1,9 +1,10 @@
+---
+tags: [guide, tpc-h, tpc-ds]
+---
+
 <!-- Copyright 2026 Joe Harris / BenchBox Project. Licensed under the MIT License. -->
 
 # TPC Benchmark Guides
-
-```{tags} guide, tpc-h, tpc-ds
-```
 
 Comprehensive guides for running official TPC benchmarks with BenchBox.
 
@@ -43,17 +44,3 @@ Comprehensive guides for running official TPC benchmarks with BenchBox.
 - [TPC-H Specification](https://www.tpc.org/tpch/)
 - [TPC-DS Specification](https://www.tpc.org/tpcds/)
 - [TPC-DI Specification](https://www.tpc.org/tpcdi/)
-
-```{toctree}
-:maxdepth: 1
-:caption: TPC Guides
-:hidden:
-
-tpc-h-official-guide
-tpc-ds-official-guide
-tpc-di-deployment-guide
-tpc-di-etl-guide
-maintenance-phase-guide
-tpc-patterns-usage
-tpc-validation-guide
-```

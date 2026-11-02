@@ -1,9 +1,10 @@
+---
+tags: [contributor, reference]
+---
+
 <!-- Copyright 2026 Joe Harris / BenchBox Project. Licensed under the MIT License. -->
 
 # DB API 2.0: Foundation of BenchBox Platform Support
-
-```{tags} contributor, reference
-```
 
 This document explains BenchBox's use of Python's DB API 2.0 specification ([PEP 249](https://peps.python.org/pep-0249/)) and why it's fundamental to platform selection and implementation.
 

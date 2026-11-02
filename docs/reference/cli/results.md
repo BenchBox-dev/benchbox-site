@@ -1,13 +1,14 @@
+---
+tags: [reference, cli, validation]
+---
+
 <!-- markdownlint-disable MD024 -->
 
 # Results Commands
 
-```{tags} reference, cli, validation
-```
-
 Commands for exporting, viewing, and comparing benchmark results.
 
-(cli-export)=
+<span id="cli-export"></span>
 
 ## `export` - Export Results
 
@@ -105,7 +106,7 @@ This exports all formats for comprehensive archival.
 
 ---
 
-(cli-results)=
+<span id="cli-results"></span>
 
 ## `results` - Show Benchmark Results
 
@@ -146,7 +147,7 @@ The commands, in order, show recent results, show more results, show the exact r
 
 ---
 
-(cli-compare)=
+<span id="cli-compare"></span>
 
 ## `compare` - Compare Benchmark Results
 

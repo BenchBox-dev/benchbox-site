@@ -1,9 +1,10 @@
+---
+tags: [intermediate, guide, starburst, sql-platform, cloud]
+---
+
 <!-- Copyright 2026 Joe Harris / BenchBox Project. Licensed under the MIT License. -->
 
 # Starburst Platform
-
-```{tags} intermediate, guide, starburst, sql-platform, cloud
-```
 
 Starburst Galaxy is a managed Trino service providing serverless distributed SQL query execution. BenchBox provides first-class Starburst support, inheriting Trino's SQL dialect and federated query capabilities.
 

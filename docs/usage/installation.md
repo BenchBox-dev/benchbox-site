@@ -1,7 +1,8 @@
-# Installation and environment setup
+---
+tags: [beginner, quickstart]
+---
 
-```{tags} beginner, quickstart
-```
+# Installation and environment setup
 
 BenchBox requires Python 3.11 or newer and ships as a single Python package. The recommended workflow uses [uv](https://docs.astral.sh/uv/) for fast installs, but the commands below include alternatives for `pip` and `pipx`.
 
@@ -24,7 +25,7 @@ pipx install benchbox
 
 BenchBox installs a `benchbox` executable. If you use `uv`, prefer `uv run -- benchbox <command>` to ensure the project virtual environment is activated automatically.
 
-(installation-extras)=
+<span id="installation-extras"></span>
 
 ## 2. Pick Optional Extras
 

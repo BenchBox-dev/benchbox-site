@@ -1,7 +1,8 @@
-# Customization
+---
+tags: [advanced, guide, visualization]
+---
 
-```{tags} advanced, guide, visualization
-```
+# Customization
 
 BenchBox visualization supports customization for themes, colors, and terminal display options.
 

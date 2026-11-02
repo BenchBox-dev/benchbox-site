@@ -1,9 +1,10 @@
+---
+tags: [intermediate, guide, aws-glue, cloud-platform]
+---
+
 <!-- Copyright 2026 Joe Harris / BenchBox Project. Licensed under the MIT License. -->
 
 # AWS Glue Platform
-
-```{tags} intermediate, guide, aws-glue, cloud-platform
-```
 
 AWS Glue is a fully managed, serverless ETL service that runs Apache Spark for distributed data processing. BenchBox integrates with Glue to execute benchmarks as batch jobs, leveraging the Glue Data Catalog for metadata and S3 for data storage.
 

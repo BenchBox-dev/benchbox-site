@@ -1,9 +1,10 @@
+---
+tags: [beginner, guide]
+---
+
 <!-- Copyright 2026 Joe Harris / BenchBox Project. Licensed under the MIT License. -->
 
 # Frequently Asked Questions (FAQ)
-
-```{tags} beginner, guide
-```
 
 This page answers common questions about BenchBox. For troubleshooting specific errors, see the [Troubleshooting Guide](troubleshooting.md).
 

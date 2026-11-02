@@ -1,9 +1,10 @@
+---
+tags: [contributor, architecture]
+---
+
 <!-- Copyright 2026 Joe Harris / BenchBox Project. Licensed under the MIT License. -->
 
 # Run Lifecycle Branch Map
-
-```{tags} contributor, architecture
-```
 
 This document maps the `benchbox run` lifecycle and its export path.
 

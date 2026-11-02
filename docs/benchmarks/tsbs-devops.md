@@ -1,9 +1,10 @@
+---
+tags: [intermediate, concept, tsbs-devops, custom-benchmark]
+---
+
 <!-- Copyright 2026 Joe Harris / BenchBox Project. Licensed under the MIT License. -->
 
 # TSBS DevOps Benchmark
-
-```{tags} intermediate, concept, tsbs-devops, custom-benchmark
-```
 
 > **CLI name:** `tsbs_devops` - use `benchbox run --benchmark tsbs_devops`
 >

@@ -1,9 +1,10 @@
+---
+tags: [intermediate, concept, flightdata, real-world-benchmark]
+---
+
 <!-- Copyright 2026 Joe Harris / BenchBox Project. Licensed under the MIT License. -->
 
 # Flight Data Benchmark
-
-```{tags} intermediate, concept, flightdata, real-world-benchmark
-```
 
 > **CLI name:** `flightdata` - use `benchbox run --benchmark flightdata`
 >

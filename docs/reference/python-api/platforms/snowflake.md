@@ -1,9 +1,10 @@
+---
+tags: [reference, python-api, snowflake]
+---
+
 <!-- markdownlint-disable MD024 -->
 
 # Snowflake Platform Adapter
-
-```{tags} reference, python-api, snowflake
-```
 
 The Snowflake adapter provides cloud-native data warehouse execution with elastic compute and automatic optimization.
 
@@ -860,23 +861,23 @@ cursor.execute("ALTER TABLE lineitem RESUME RECLUSTER")
 
 ### Platform Documentation
 
-- {doc}`/platforms/platform-selection-guide` - Choosing Snowflake vs other platforms
-- {doc}`/platforms/quick-reference` - Quick setup for all platforms
-- {doc}`/platforms/comparison-matrix` - Feature comparison
+- [Platform Selection Guide](../../../platforms/platform-selection-guide.md) - Choosing Snowflake vs other platforms
+- [Multi-Platform Database Support](../../../platforms/quick-reference.md) - Quick setup for all platforms
+- [Platform Comparison Matrix](../../../platforms/comparison-matrix.md) - Feature comparison
 
 ### Benchmark Guides
 
-- {doc}`/benchmarks/tpc-h` - TPC-H on Snowflake
-- {doc}`/benchmarks/tpc-ds` - TPC-DS on Snowflake
+- [TPC-H Benchmark](../../../benchmarks/tpc-h.md) - TPC-H on Snowflake
+- [TPC-DS Benchmark](../../../benchmarks/tpc-ds.md) - TPC-DS on Snowflake
 
 ### API Reference
 
-- {doc}`duckdb` - DuckDB adapter
-- {doc}`clickhouse` - ClickHouse adapter
-- {doc}`databricks` - Databricks adapter
-- {doc}`bigquery` - BigQuery adapter
-- {doc}`../base` - Base benchmark interface
-- {doc}`../index` - Python API overview
+- [DuckDB Platform Adapter](duckdb.md) - DuckDB adapter
+- [ClickHouse Platform Adapter](clickhouse.md) - ClickHouse adapter
+- [Databricks Platform Adapter](databricks.md) - Databricks adapter
+- [BigQuery Platform Adapter](bigquery.md) - BigQuery adapter
+- [Base Benchmark API](../base.md) - Base benchmark interface
+- [Python API Reference](../index.md) - Python API overview
 
 ### External Resources
 

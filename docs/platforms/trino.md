@@ -1,9 +1,10 @@
+---
+tags: [intermediate, guide, trino, sql-platform]
+---
+
 <!-- Copyright 2026 Joe Harris / BenchBox Project. Licensed under the MIT License. -->
 
 # Trino Platform
-
-```{tags} intermediate, guide, trino, sql-platform
-```
 
 Trino (formerly PrestoSQL) is a distributed SQL query engine designed for interactive analytics against data sources of all sizes. It's widely used by companies like Netflix, Airbnb, and Lyft for data lake analytics.
 
@@ -89,7 +90,7 @@ benchbox run --platform trino --benchmark tpch \
 
 The driver package for Trino is `trino`.
 
-See {ref}`driver-version-management` for the full guide, including why `uv run` may
+See [Driver Version Management](../usage/driver-version-management.md) for the full guide, including why `uv run` may
 revert a manually-installed version and how to work around it.
 
 ## Usage Examples

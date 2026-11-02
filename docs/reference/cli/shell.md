@@ -1,9 +1,10 @@
-(cli-shell)=
+---
+tags: [reference, cli, intermediate]
+---
+
+<span id="cli-shell"></span>
 
 # `shell` - Interactive SQL Shell
-
-```{tags} reference, cli, intermediate
-```
 
 Launch an interactive SQL shell connected to a database platform. Useful for debugging queries, inspecting benchmark data, and exploring database state after benchmark execution.
 

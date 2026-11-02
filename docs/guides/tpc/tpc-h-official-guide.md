@@ -1,9 +1,10 @@
+---
+tags: [advanced, guide, tpc-h, validation]
+---
+
 <!-- Copyright 2026 Joe Harris / BenchBox Project. Licensed under the MIT License. -->
 
 # TPC-H Official Benchmark Guide
-
-```{tags} advanced, guide, tpc-h, validation
-```
 
 This guide documents BenchBox's TPC-H Power@Size and Throughput@Size phases and its opt-in RF1/RF2 integration. QphH@Size is emitted only when the required evidence is present; see [QphH@Size](tpc-h-official-guide.md#qphh-size).
 

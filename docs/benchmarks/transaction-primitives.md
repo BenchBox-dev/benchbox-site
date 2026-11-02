@@ -1,9 +1,10 @@
+---
+tags: [intermediate, concept, transaction-primitives, custom-benchmark]
+---
+
 <!-- Copyright 2026 Joe Harris / BenchBox Project. Licensed under the MIT License. -->
 
 # Transaction Primitives Benchmark
-
-```{tags} intermediate, concept, transaction-primitives, custom-benchmark
-```
 
 > **CLI name:** `transaction_primitives` - use `benchbox run --benchmark transaction_primitives`
 >

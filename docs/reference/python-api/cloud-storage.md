@@ -1,9 +1,10 @@
+---
+tags: [reference, python-api, cloud-storage]
+---
+
 <!-- markdownlint-disable MD024 -->
 
 # Cloud Storage Integration API
-
-```{tags} reference, python-api, cloud-storage
-```
 
 Complete Python API reference for BenchBox cloud storage integration.
 
@@ -1484,13 +1485,13 @@ full_benchmark.generate_data()
 
 ## See Also
 
-- {doc}`/guides/cloud-storage` - Cloud storage usage guide
-- {doc}`/usage/configuration` - Configuration options
-- {doc}`utilities` - Other utility functions
-- {doc}`/usage/troubleshooting` - Troubleshooting guide
-- {doc}`platforms/databricks` - Databricks cloud integration
-- {doc}`platforms/bigquery` - BigQuery cloud integration
-- {doc}`platforms/snowflake` - Snowflake cloud integration
+- [Cloud Storage Support](../../guides/cloud-storage.md) - Cloud storage usage guide
+- [Configuration Handbook](../../usage/configuration.md) - Configuration options
+- [Utility Functions API](utilities.md) - Other utility functions
+- [Troubleshooting Guide](../../usage/troubleshooting.md) - Troubleshooting guide
+- [Databricks Platform Adapter](platforms/databricks.md) - Databricks cloud integration
+- [BigQuery Platform Adapter](platforms/bigquery.md) - BigQuery cloud integration
+- [Snowflake Platform Adapter](platforms/snowflake.md) - Snowflake cloud integration
 
 ### External Resources
 

@@ -1,9 +1,10 @@
-(cli-metrics)=
+---
+tags: [reference, cli, metrics]
+---
+
+<span id="cli-metrics"></span>
 
 # `metrics` - Performance Metrics
-
-```{tags} reference, cli, metrics
-```
 
 Calculate TPC Power@Size, Throughput@Size, and TPC-H QphH@Size from benchmark results.
 

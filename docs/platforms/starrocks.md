@@ -1,9 +1,10 @@
+---
+tags: [intermediate, guide, starrocks, sql-platform, self-hosted, olap]
+---
+
 <!-- Copyright 2026 Joe Harris / BenchBox Project. Licensed under the MIT License. -->
 
 # StarRocks Platform
-
-```{tags} intermediate, guide, starrocks, sql-platform, self-hosted, olap
-```
 
 StarRocks is an open-source MPP (Massively Parallel Processing) columnar OLAP database, hosted under the Linux Foundation. It is designed for sub-second analytics on large-scale datasets. BenchBox connects via the MySQL protocol using PyMySQL (port 9030) and supports Stream Load via the BE HTTP API (port 8040) for high-throughput data ingestion. SQLGlot provides official `starrocks` dialect support for SQL translation.
 

@@ -1,15 +1,12 @@
-# Architecture & Design
+---
+tags: [contributor, concept]
+---
 
-```{tags} contributor, concept
-```
+# Architecture & Design
 
 Deep-dive into BenchBox's architecture, design patterns, and code structure.
 
-```{toctree}
-:maxdepth: 1
-
-../design/index
-../design/architecture
-../design/structure
-import-patterns
-```
+- [Design & Architecture](../design/index.md)
+- [BenchBox Architecture](../design/architecture.md)
+- [BenchBox Repository Structure](../design/structure.md)
+- [Import Patterns and Lazy Loading](import-patterns.md)

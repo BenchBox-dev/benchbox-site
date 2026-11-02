@@ -1,9 +1,10 @@
+---
+tags: [contributor]
+---
+
 <!-- Copyright 2026 Joe Harris / BenchBox Project. Licensed under the MIT License. -->
 
 # Developer Documentation
-
-```{tags} contributor
-```
 
 Documentation for contributors and developers working on BenchBox.
 
@@ -57,32 +58,28 @@ Documentation for contributors and developers working on BenchBox.
 
 - [Concepts](../concepts/index.md) - Core concepts and glossary
 
-```{toctree}
-:maxdepth: 1
-
-roadmap
-getting-started
-development
-platform-development
-adding-new-platforms
-adding-dataframe-platform
-new-platform-acceptance-checklist
-architecture-design
-data-dependencies
-import-patterns
-tpc-compilation-guide
-testing
-test-tier-policy
-pytest-xdist-safety
-read-primitives-catalog
-read-primitives-skips-reference
-runtime-modules
-run-lifecycle-map
-data-sharing
-dependency-compatibility
-db-api-2
-test-quality-guidelines
-result-execution-environment
-result-integrity-validation
-../platform-config-audit
-```
+- [Development Roadmap](roadmap.md)
+- [Getting Started with Development](getting-started.md)
+- [Development Guide](development.md)
+- [Platform Development](platform-development.md)
+- [Adding New Platform Adapters](adding-new-platforms.md)
+- [Adding a New DataFrame Platform](adding-dataframe-platform.md)
+- [New Platform Acceptance Checklist](new-platform-acceptance-checklist.md)
+- [Architecture & Design](architecture-design.md)
+- [Data & Dependencies](data-dependencies.md)
+- [Import Patterns and Lazy Loading](import-patterns.md)
+- [TPC Binary Auto-Compilation Guide](tpc-compilation-guide.md)
+- [BenchBox Testing Guide](testing.md)
+- [Test tiers, duration budgets, and quarantine](test-tier-policy.md)
+- [Pytest xdist Safety](pytest-xdist-safety.md)
+- [Primitives Query Catalog](read-primitives-catalog.md)
+- [Read Primitives: Platform Skip Reference](read-primitives-skips-reference.md)
+- [Runtime Module Architecture Overview](runtime-modules.md)
+- [Run Lifecycle Branch Map](run-lifecycle-map.md)
+- [Data Sharing Between Benchmarks](data-sharing.md)
+- [Dependency Compatibility](dependency-compatibility.md)
+- [DB API 2.0: Foundation of BenchBox Platform Support](db-api-2.md)
+- [BenchBox Test Quality Guidelines](test-quality-guidelines.md)
+- [Result Execution Environment Contract](result-execution-environment.md)
+- [Result Integrity Validation](result-integrity-validation.md)
+- [BenchBox Platform Configuration Audit](../platform-config-audit.md)

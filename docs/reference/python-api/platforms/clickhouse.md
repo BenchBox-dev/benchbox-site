@@ -1,9 +1,10 @@
+---
+tags: [reference, python-api, clickhouse]
+---
+
 <!-- markdownlint-disable MD024 -->
 
 # ClickHouse Platform Adapter
-
-```{tags} reference, python-api, clickhouse
-```
 
 The ClickHouse adapter provides high-performance columnar database execution for analytical benchmarks.
 
@@ -782,23 +783,23 @@ log = conn.execute("""
 
 ### Platform Documentation
 
-- {doc}`/platforms/platform-selection-guide` - Choosing ClickHouse vs other platforms
-- {doc}`/platforms/quick-reference` - Quick setup for all platforms
-- {doc}`/platforms/comparison-matrix` - Feature comparison
-- {doc}`/platforms/clickhouse-local-mode` - Local mode guide
+- [Platform Selection Guide](../../../platforms/platform-selection-guide.md) - Choosing ClickHouse vs other platforms
+- [Multi-Platform Database Support](../../../platforms/quick-reference.md) - Quick setup for all platforms
+- [Platform Comparison Matrix](../../../platforms/comparison-matrix.md) - Feature comparison
+- [ClickHouse Local Mode](../../../platforms/clickhouse-local-mode.md) - Local mode guide
 
 ### Benchmark Guides
 
-- {doc}`/benchmarks/tpc-h` - TPC-H on ClickHouse
-- {doc}`/benchmarks/tpc-ds` - TPC-DS on ClickHouse
-- {doc}`/benchmarks/clickbench` - ClickBench on ClickHouse
+- [TPC-H Benchmark](../../../benchmarks/tpc-h.md) - TPC-H on ClickHouse
+- [TPC-DS Benchmark](../../../benchmarks/tpc-ds.md) - TPC-DS on ClickHouse
+- [ClickBench (ClickHouse Analytics Benchmark)](../../../benchmarks/clickbench.md) - ClickBench on ClickHouse
 
 ### API Reference
 
-- {doc}`duckdb` - DuckDB adapter for comparison
-- {doc}`../base` - Base benchmark interface
-- {doc}`../index` - Python API overview
-- {doc}`/reference/api-reference` - High-level API guide
+- [DuckDB Platform Adapter](duckdb.md) - DuckDB adapter for comparison
+- [Base Benchmark API](../base.md) - Base benchmark interface
+- [Python API Reference](../index.md) - Python API overview
+- [API Reference](../../api-reference.md) - High-level API guide
 
 ### External Resources
 

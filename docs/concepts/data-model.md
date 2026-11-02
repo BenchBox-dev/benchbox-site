@@ -1,9 +1,10 @@
+---
+tags: [concept, intermediate, validation]
+---
+
 <!-- Copyright 2026 Joe Harris / BenchBox Project. Licensed under the MIT License. -->
 
 # Data Model
-
-```{tags} concept, intermediate, validation
-```
 
 Understanding BenchBox's result schema, data structures, and serialization formats.
 

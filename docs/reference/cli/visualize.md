@@ -1,9 +1,10 @@
-(cli-visualize)=
+---
+tags: [reference, cli, visualization]
+---
+
+<span id="cli-visualize"></span>
 
 # `visualize` - Generate Charts
-
-```{tags} reference, cli, visualization
-```
 
 Generate ASCII charts from benchmark result files directly in the terminal.
 

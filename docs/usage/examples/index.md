@@ -1,7 +1,8 @@
-# BenchBox Examples
+---
+tags: [beginner, guide]
+---
 
-```{tags} beginner, guide
-```
+# BenchBox Examples
 
 This section provides detailed documentation for all examples in the `examples/` directory.
 

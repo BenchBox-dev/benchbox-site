@@ -1,7 +1,8 @@
-# Data Vault Benchmark API
+---
+tags: [reference, python-api, datavault]
+---
 
-```{tags} reference, python-api, datavault
-```
+# Data Vault Benchmark API
 
 Python API reference for the Data Vault benchmark.
 
@@ -25,7 +26,7 @@ The constructor creates no files. Data is written by `generate_data()`.
 
 ### Returns
 
-A `DataVault` instance. It subclasses `BaseBenchmark`; see {doc}`/reference/python-api/base` for the shared interface.
+A `DataVault` instance. It subclasses `BaseBenchmark`; see [Base Benchmark API](../base.md) for the shared interface.
 
 It also has three read-only properties:
 
@@ -175,4 +176,4 @@ Output on 0.4.1:
 
 ## Inherited members
 
-`run_with_platform`, `run_benchmark`, `output_dir`, `scale_factor` and every other member come from `BaseBenchmark`. See {doc}`/reference/python-api/base` for what they do.
+`run_with_platform`, `run_benchmark`, `output_dir`, `scale_factor` and every other member come from `BaseBenchmark`. See [Base Benchmark API](../base.md) for what they do.

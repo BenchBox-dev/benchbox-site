@@ -1,7 +1,8 @@
-# Time-Series Benchmarks
+---
+tags: [reference, time-series]
+---
 
-```{tags} reference, time-series
-```
+# Time-Series Benchmarks
 
 Benchmarks for infrastructure monitoring, IoT, and observability workloads - the
 workloads that time-series databases (TimescaleDB, InfluxDB, QuestDB) and
@@ -22,17 +23,9 @@ stress:
 
 ## Time-Series Benchmarks in BenchBox
 
-```{list-table}
-:header-rows: 1
-:widths: 20 30 50
-
-* - Benchmark
-  - Data Source
-  - Focus
-* - **TSBS DevOps**
-  - Simulated infrastructure monitoring (TSBS)
-  - Time-series aggregation, host tags, DevOps dashboards, 18 queries
-```
+| Benchmark | Data Source | Focus |
+| --- | --- | --- |
+| **TSBS DevOps** | Simulated infrastructure monitoring (TSBS) | Time-series aggregation, host tags, DevOps dashboards, 18 queries |
 
 ## When to Use
 
@@ -43,13 +36,9 @@ stress:
 
 ## Included Benchmarks
 
-```{toctree}
-:maxdepth: 1
-
-tsbs-devops
-```
+- [TSBS DevOps Benchmark](tsbs-devops.md)
 
 ## See Also
 
-- {doc}`real-world-benchmarks` - Real-world datasets (NYC Taxi, Flight Data)
-- {doc}`industry-benchmarks` - Vendor / practitioner benchmarks
+- [Real-World Data Benchmarks](real-world-benchmarks.md) - Real-world datasets (NYC Taxi, Flight Data)
+- [Industry Benchmarks](industry-benchmarks.md) - Vendor / practitioner benchmarks

@@ -1,7 +1,8 @@
-# Hosted Result Submission
+---
+tags: [guide, results]
+---
 
-```{tags} guide, results
-```
+# Hosted Result Submission
 
 Use this flow when you want a local BenchBox run to appear on the hosted
 BenchBox results platform.

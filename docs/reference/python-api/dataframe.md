@@ -1,9 +1,10 @@
+---
+tags: [reference, python-api]
+---
+
 <!-- markdownlint-disable MD024 -->
 
 # DataFrame query registries
-
-```{tags} reference, python-api
-```
 
 Constants that describe the DataFrame platforms and the DataFrame query sets that BenchBox ships. The TPC-H DataFrame query names currently do not import in a fresh process; see the sections below.
 

@@ -1,9 +1,10 @@
+---
+tags: [intermediate, guide, dataframe-platform]
+---
+
 <!-- Copyright 2026 Joe Harris / BenchBox Project. Licensed under the MIT License. -->
 
 # DataFrame Cross-Platform Comparison
-
-```{tags} intermediate, guide, dataframe-platform
-```
 
 ## Comparing DataFrame Platforms
 

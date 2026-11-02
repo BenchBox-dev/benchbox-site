@@ -1,9 +1,10 @@
+---
+tags: [intermediate, guide, databend, sql-platform, cloud, olap, cloud-native]
+---
+
 <!-- Copyright 2026 Joe Harris / BenchBox Project. Licensed under the MIT License. -->
 
 # Databend Platform
-
-```{tags} intermediate, guide, databend, sql-platform, cloud, olap, cloud-native
-```
 
 Databend is a cloud-native, Rust-based data warehouse with Snowflake-compatible SQL, compute/storage separation, and object storage backends (S3, GCS, Azure Blob, MinIO). BenchBox connects via the `databend-driver` Python package (DB-API 2.0 compliant) and uses the Snowflake dialect as a SQLGlot translation proxy for SQL compatibility.
 

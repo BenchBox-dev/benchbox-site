@@ -1,7 +1,8 @@
-# Templates
+---
+tags: [intermediate, reference, visualization]
+---
 
-```{tags} intermediate, reference, visualization
-```
+# Templates
 
 BenchBox templates bundle predefined chart sets for common content workflows. Instead of manually selecting chart types, choose a template that matches your content goal.
 

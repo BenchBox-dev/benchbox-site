@@ -1,9 +1,10 @@
+---
+tags: [intermediate, concept, clickbench]
+---
+
 <!-- Copyright 2026 Joe Harris / BenchBox Project. Licensed under the MIT License. -->
 
 # ClickBench (ClickHouse Analytics Benchmark)
-
-```{tags} intermediate, concept, clickbench
-```
 
 > **CLI name:** `clickbench` - use `benchbox run --benchmark clickbench`
 
@@ -110,11 +111,10 @@ The HITS table contains realistic web analytics distributions:
 
 ClickBench includes 43 queries that test different aspects of analytical performance.
 
-```{tip}
-Each query has a [query template](queries/clickbench/index.md) with a
-representative SQL and DataFrame rendering, plus how to extract the exact
-statement for your platform and scale.
-```
+> [!TIP]
+> Each query has a [query template](queries/clickbench/index.md) with a
+> representative SQL and DataFrame rendering, plus how to extract the exact
+> statement for your platform and scale.
 
 ### Basic Aggregation Queries (Q1-Q7)
 

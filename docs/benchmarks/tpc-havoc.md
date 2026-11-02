@@ -1,9 +1,10 @@
+---
+tags: [advanced, concept, tpc-havoc, tpc-h, custom-benchmark]
+---
+
 <!-- Copyright 2026 Joe Harris / BenchBox Project. Licensed under the MIT License. -->
 
 # TPC-Havoc Benchmark
-
-```{tags} advanced, concept, tpc-havoc, tpc-h, custom-benchmark
-```
 
 > **CLI name:** `tpchavoc` - use `benchbox run --benchmark tpchavoc`
 >

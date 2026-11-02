@@ -1,7 +1,8 @@
-# Common platform adapter API
+---
+tags: [reference, python-api, sql-platform]
+---
 
-```{tags} reference, python-api, sql-platform
-```
+# Common platform adapter API
 
 All adapters on the platform pages implement or inherit this lifecycle. Use the adapter page for configuration and platform-specific operations.
 

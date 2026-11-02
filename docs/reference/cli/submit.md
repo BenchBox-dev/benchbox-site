@@ -1,9 +1,10 @@
-(cli-submit)=
+---
+tags: [reference, cli, results]
+---
+
+<span id="cli-submit"></span>
 
 # `submit` - Submit Results
-
-```{tags} reference, cli, results
-```
 
 Package or upload a benchmark result bundle for the BenchBox results platform.
 
@@ -177,5 +178,5 @@ In order, the commands:
 
 - [auth](auth.md) - Manage hosted submission credentials
 - [results](results.md) - View benchmark result files
-- [export](results.md#cli-export) - Export results to CSV, HTML, or JSON formats
+- [export](results.md#export-export-results) - Export results to CSV, HTML, or JSON formats
 - [report](report.md) - Historical analysis and trend detection

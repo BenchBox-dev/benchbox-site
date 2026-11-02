@@ -1,9 +1,10 @@
+---
+tags: [intermediate, guide, athena, cloud-platform]
+---
+
 <!-- Copyright 2026 Joe Harris / BenchBox Project. Licensed under the MIT License. -->
 
 # Amazon Athena Platform
-
-```{tags} intermediate, guide, athena, cloud-platform
-```
 
 Amazon Athena is AWS's serverless interactive query service for analyzing data directly in Amazon S3 using standard SQL. Under the hood, Athena runs Trino, optimized for ad-hoc querying of data lakes.
 

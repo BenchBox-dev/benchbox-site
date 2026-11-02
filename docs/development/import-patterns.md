@@ -1,7 +1,8 @@
-# Import Patterns and Lazy Loading
+---
+tags: [contributor, reference]
+---
 
-```{tags} contributor, reference
-```
+# Import Patterns and Lazy Loading
 
 BenchBox uses a lightweight lazy-loading system so benchmarks are only imported
 when they are first accessed. This keeps the initial import of `benchbox`

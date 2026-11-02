@@ -1,9 +1,10 @@
-(cli-run)=
+---
+tags: [reference, cli, intermediate]
+---
+
+<span id="cli-run"></span>
 
 # `run` - Run Benchmarks
-
-```{tags} reference, cli, intermediate
-```
 
 The primary command for executing benchmarks. Supports interactive mode, direct execution, and various execution phases.
 
@@ -409,8 +410,6 @@ These flags control monitoring, progress display, memory handling, and caching b
 > `create_plan_metadata_from_results(..., normalize_literals=True)`), which masks
 > literals so seed-varied plans compare equal. See
 > [Query Plan Analysis → Literal normalization](../../features/query-plan-analysis.md#literal-normalization-seed-independent-fingerprints).
-
-(deprecated-run-official)=
 
 ## Deprecated: `run-official`
 

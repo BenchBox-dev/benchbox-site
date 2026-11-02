@@ -1,9 +1,10 @@
+---
+tags: [intermediate, concept, ssb]
+---
+
 <!-- Copyright 2026 Joe Harris / BenchBox Project. Licensed under the MIT License. -->
 
 # Star Schema Benchmark (SSB)
-
-```{tags} intermediate, concept, ssb
-```
 
 > **CLI name:** `ssb` - use `benchbox run --benchmark ssb`
 
@@ -59,7 +60,7 @@ SSB transforms TPC-H's normalized schema by:
 
 ### Schema Relationships
 
-```{mermaid}
+```mermaid
 erDiagram
     DATE ||--o{ LINEORDER : lo_orderdate
     CUSTOMER ||--o{ LINEORDER : lo_custkey
@@ -138,11 +139,10 @@ erDiagram
 
 The 13 SSB queries are organized into 4 flights that test different aspects of analytical query performance.
 
-```{tip}
-Each query has a [query template](queries/ssb/index.md) with a representative
-SQL and DataFrame rendering, plus how to extract the exact statement for your
-platform and scale.
-```
+> [!TIP]
+> Each query has a [query template](queries/ssb/index.md) with a representative
+> SQL and DataFrame rendering, plus how to extract the exact statement for your
+> platform and scale.
 
 ### Flight 1: Simple Aggregation Queries (Q1.1 - Q1.3)
 

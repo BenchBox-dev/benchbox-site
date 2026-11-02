@@ -1,9 +1,10 @@
+---
+tags: [reference, advanced]
+---
+
 <!-- Copyright 2026 Joe Harris / BenchBox Project. Licensed under the MIT License. -->
 
 # MCP Server Reference
-
-```{tags} reference, advanced
-```
 
 Complete reference for the BenchBox MCP (Model Context Protocol) server, including all available tools, resources, and prompts.
 

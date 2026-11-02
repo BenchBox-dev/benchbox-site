@@ -1,9 +1,10 @@
+---
+tags: [intermediate, guide, dataframe-platform, performance]
+---
+
 <!-- Copyright 2026 Joe Harris / BenchBox Project. Licensed under the MIT License. -->
 
 # DataFrame Performance Benchmarks
-
-```{tags} intermediate, guide, dataframe-platform, performance
-```
 
 This guide covers DataFrame performance profiling, optimization, and benchmarking across platforms.
 

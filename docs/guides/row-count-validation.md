@@ -1,7 +1,8 @@
-# Row Count Validation
+---
+tags: [intermediate, guide, validation]
+---
 
-```{tags} intermediate, guide, validation
-```
+# Row Count Validation
 
 **Automatic validation of query results against expected row counts.**
 

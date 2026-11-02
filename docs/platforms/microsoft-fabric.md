@@ -1,9 +1,10 @@
+---
+tags: [intermediate, guide, fabric, cloud-platform]
+---
+
 <!-- Copyright 2026 Joe Harris / BenchBox Project. Licensed under the MIT License. -->
 
 # Microsoft Fabric
-
-```{tags} intermediate, guide, fabric, cloud-platform
-```
 
 BenchBox supports Microsoft Fabric Warehouse for read/write SQL benchmarking, plus separate Fabric Spark and Fabric Lakehouse SQL adapters for Lakehouse workflows.
 

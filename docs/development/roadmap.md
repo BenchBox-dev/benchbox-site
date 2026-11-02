@@ -1,9 +1,10 @@
+---
+tags: [contributor, advanced]
+---
+
 <!-- Copyright 2026 Joe Harris / BenchBox Project. Licensed under the MIT License. -->
 
 # Development Roadmap
-
-```{tags} contributor, advanced
-```
 
 This document describes planned platform and benchmark additions for BenchBox. Items are organized by priority and implementation phase.
 
@@ -192,8 +193,8 @@ See the [Platform Development Guide](platform-development.md) and [Adding New Pl
 
 ## Related Documentation
 
-- {doc}`adding-new-platforms` - Platform implementation guide
-- {doc}`platform-development` - Platform adapter architecture
+- [Adding New Platform Adapters](adding-new-platforms.md) - Platform implementation guide
+- [Platform Development](platform-development.md) - Platform adapter architecture
 
 ---
 

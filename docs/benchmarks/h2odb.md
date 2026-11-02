@@ -1,9 +1,10 @@
+---
+tags: [intermediate, concept, h2odb]
+---
+
 <!-- Copyright 2026 Joe Harris / BenchBox Project. Licensed under the MIT License. -->
 
 # H2O DB Benchmark
-
-```{tags} intermediate, concept, h2odb
-```
 
 > **CLI name:** `h2odb` - use `benchbox run --benchmark h2odb`
 
@@ -77,11 +78,10 @@ The TRIPS table contains realistic data distributions that reflect actual taxi u
 
 The H2O DB benchmark includes analytical queries that test different aspects of database performance.
 
-```{tip}
-Each query has a [query template](queries/h2odb/index.md) with a representative
-SQL and DataFrame rendering, plus how to extract the exact statement for your
-platform and scale.
-```
+> [!TIP]
+> Each query has a [query template](queries/h2odb/index.md) with a representative
+> SQL and DataFrame rendering, plus how to extract the exact statement for your
+> platform and scale.
 
 ### Basic Aggregation Queries
 

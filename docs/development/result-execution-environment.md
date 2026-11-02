@@ -1,9 +1,10 @@
+---
+tags: [contributor, architecture, results]
+---
+
 <!-- Copyright 2026 Joe Harris / BenchBox Project. Licensed under the MIT License. -->
 
 # Result Execution Environment Contract
-
-```{tags} contributor, architecture, results
-```
 
 BenchBox schema v2.1 result artifacts separate the machine that runs BenchBox
 from the database, DataFrame engine, container, or cloud service that executes

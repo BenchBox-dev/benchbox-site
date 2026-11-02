@@ -1,7 +1,8 @@
-# MetadataPrimitives Benchmark API
+---
+tags: [reference, python-api, metadata-primitives]
+---
 
-```{tags} reference, python-api, metadata-primitives
-```
+# MetadataPrimitives Benchmark API
 
 Python API reference for the Metadata Primitives benchmark.
 
@@ -25,7 +26,7 @@ The constructor creates no files and does not connect to a database.
 
 ### Returns
 
-A `MetadataPrimitives` instance. It subclasses `BaseBenchmark`; see {doc}`/reference/python-api/base` for the shared interface.
+A `MetadataPrimitives` instance. It subclasses `BaseBenchmark`; see [Base Benchmark API](../base.md) for the shared interface.
 
 ### Raises
 
@@ -232,4 +233,4 @@ Output on 0.4.1:
 
 ## Inherited members
 
-`run_with_platform` and every other member that this page does not describe come from `BaseBenchmark`. See {doc}`/reference/python-api/base` for what they do.
+`run_with_platform` and every other member that this page does not describe come from `BaseBenchmark`. See [Base Benchmark API](../base.md) for what they do.

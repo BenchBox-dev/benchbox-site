@@ -1,9 +1,10 @@
+---
+tags: [advanced, guide]
+---
+
 <!-- Copyright 2026 Joe Harris / BenchBox Project. Licensed under the MIT License. -->
 
 # MCP Integration Guide
-
-```{tags} advanced, guide
-```
 
 This guide explains how to integrate BenchBox with AI assistants using the Model Context Protocol (MCP). Supported clients include Claude Code, ChatGPT, OpenCode, and other MCP-compatible tools.
 

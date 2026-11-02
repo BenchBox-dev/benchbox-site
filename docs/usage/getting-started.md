@@ -1,9 +1,10 @@
+---
+tags: [beginner, quickstart, cli, duckdb]
+---
+
 <!-- Copyright 2026 Joe Harris / BenchBox Project. Licensed under the MIT License. -->
 
 # Getting Started in 5 Minutes
-
-```{tags} beginner, quickstart, cli, duckdb
-```
 
 Follow these steps to install BenchBox, verify your environment, and run a reproducible benchmark. Everything below works on macOS, Linux, and Windows with Python 3.11+.
 

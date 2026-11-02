@@ -1,7 +1,8 @@
-# Platform Selection Guide
+---
+tags: [beginner, guide, sql-platform]
+---
 
-```{tags} beginner, guide, sql-platform
-```
+# Platform Selection Guide
 
 This guide helps you choose the optimal database platform for your BenchBox benchmarking needs based on your specific requirements, constraints, and objectives. Start by running `uv run benchbox check-deps --matrix` to see which optional connectors are installed locally, then use `benchbox platforms install <name>` and `benchbox platforms enable <name>` to activate the adapters that match your shortlist.
 

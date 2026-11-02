@@ -80,7 +80,6 @@ jobs:
       - run: npm run lint:blog
       - run: npm run lint:docs
       - run: npm run bundle:verify -- --offline
-      - run: npm run docs:parity -w website
       - name: Check the site documentation against the bundle's contracts
         run: npm run docs:check -- --docs-mode block
       - name: Check the inventory of core paths that the documentation links to

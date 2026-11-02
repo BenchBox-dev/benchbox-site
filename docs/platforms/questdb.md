@@ -1,9 +1,10 @@
+---
+tags: [intermediate, guide, questdb, sql-platform, self-hosted, timeseries]
+---
+
 <!-- Copyright 2026 Joe Harris / BenchBox Project. Licensed under the MIT License. -->
 
 # QuestDB Platform
-
-```{tags} intermediate, guide, questdb, sql-platform, self-hosted, timeseries
-```
 
 QuestDB is a high-performance open-source time-series database optimized for fast ingestion and SQL queries. It supports the PostgreSQL wire protocol (port 8812) for query execution and a REST API (port 9000) for efficient bulk data import. BenchBox connects via psycopg 3 over the PG wire protocol and uses the REST API `/imp` endpoint for high-throughput CSV ingestion. SQL translation targets the `postgres` dialect via SQLGlot.
 

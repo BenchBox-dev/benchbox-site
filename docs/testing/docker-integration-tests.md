@@ -1,9 +1,10 @@
+---
+tags: [contributor, guide, testing]
+---
+
 <!-- Copyright 2026 Joe Harris / BenchBox Project. Licensed under the MIT License. -->
 
 # Docker Integration Tests
-
-```{tags} contributor, guide, testing
-```
 
 Run real integration tests against database engines in Docker containers. No cloud credentials needed.
 

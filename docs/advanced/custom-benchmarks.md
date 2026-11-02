@@ -1,9 +1,10 @@
+---
+tags: [advanced, guide, custom-benchmark, python-api]
+---
+
 <!-- Copyright 2026 Joe Harris / BenchBox Project. Licensed under the MIT License. -->
 
 # Custom Benchmarks
-
-```{tags} advanced, guide, custom-benchmark, python-api
-```
 
 Complete guide to creating, implementing, and integrating custom benchmarks with the BenchBox framework.
 

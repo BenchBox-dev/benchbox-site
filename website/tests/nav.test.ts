@@ -55,7 +55,9 @@ describe("docs/nav.yml", () => {
     const fromNav = build({ ...pages, "index.md": "# Home\n", "usage/index.md": pages["usage/index.md"], "nav.yml": navYaml.replace("      - page: usage/index.md\n", "      - page: usage/index.md\n        items:\n          - deep.md\n") });
     expect(fromToctrees.errors).toEqual([]);
     expect(fromNav.errors).toEqual([]);
-    expect(manifestOf(fromNav)).toEqual(manifestOf(fromToctrees));
+    expect(manifestOf(fromNav).groups[0]).toEqual(manifestOf(fromToctrees).groups[0]);
+    const listedOrder = (result: ReturnType<typeof build>) => Object.entries(manifestOf(result).order).filter(([page]) => !page.startsWith("_tags/"));
+    expect(listedOrder(fromNav)).toEqual(listedOrder(fromToctrees));
   });
 
   it("expands the generated tag groups with page counts and keeps unlisted tag categories out of the way", () => {

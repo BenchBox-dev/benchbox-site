@@ -1,9 +1,10 @@
+---
+tags: [intermediate, guide, athena-spark, cloud-platform]
+---
+
 <!-- Copyright 2026 Joe Harris / BenchBox Project. Licensed under the MIT License. -->
 
 # Amazon Athena for Apache Spark Platform
-
-```{tags} intermediate, guide, athena-spark, cloud-platform
-```
 
 Athena for Apache Spark is AWS's interactive Spark service with sub-second startup times. Unlike EMR Serverless or Glue, it uses a notebook-style execution model with persistent sessions.
 
@@ -98,7 +99,7 @@ benchbox run --platform athena-spark --benchmark tpch \
 
 The driver package for Athena Spark is `pyathena`.
 
-See {ref}`driver-version-management` for the full guide, including why `uv run` may
+See [Driver Version Management](../usage/driver-version-management.md) for the full guide, including why `uv run` may
 revert a manually-installed version and how to work around it.
 
 ## Python API

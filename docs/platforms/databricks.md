@@ -1,9 +1,10 @@
+---
+tags: [intermediate, guide, databricks, cloud-platform]
+---
+
 <!-- Copyright 2026 Joe Harris / BenchBox Project. Licensed under the MIT License. -->
 
 # Databricks Platform
-
-```{tags} intermediate, guide, databricks, cloud-platform
-```
 
 Databricks provides a unified lakehouse platform combining data lakes with warehouse capabilities. BenchBox supports Databricks SQL Warehouses and classic clusters with Delta Lake optimizations.
 
@@ -152,7 +153,7 @@ benchbox run --platform databricks --benchmark tpch \
 
 The driver package for Databricks is `databricks-sql-connector`.
 
-See {ref}`driver-version-management` for the full guide, including why `uv run` may
+See [Driver Version Management](../usage/driver-version-management.md) for the full guide, including why `uv run` may
 revert a manually-installed version and how to work around it.
 
 ## Authentication Methods

@@ -1,7 +1,8 @@
-# Read Primitives: Platform Skip Reference
+---
+tags: [contributor, reference, platform-compatibility]
+---
 
-```{tags} contributor, reference, platform-compatibility
-```
+# Read Primitives: Platform Skip Reference
 
 This document is the authoritative reference for every `skip_on` entry in
 `benchbox/core/read_primitives/catalog/queries.yaml`. For each skipped query it
@@ -543,7 +544,7 @@ it still fails, so the next maintainer has a complete picture.
 
 3. If the base SQL works unchanged, no variant is needed. If the platform
    requires different syntax, add a `variants:` entry (see
-   {doc}`read-primitives-catalog` for format).
+   [Primitives Query Catalog](read-primitives-catalog.md) for format).
 
 4. Run the unit test to confirm the skip set is consistent:
 

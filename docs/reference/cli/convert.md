@@ -1,9 +1,10 @@
-(cli-convert)=
+---
+tags: [reference, cli]
+---
+
+<span id="cli-convert"></span>
 
 # `convert` - Convert Data Formats
-
-```{tags} reference, cli
-```
 
 Convert benchmark data from TBL (pipe-delimited) format to optimized columnar formats like Parquet, Vortex, Delta Lake, Apache Iceberg, or DuckLake.
 
