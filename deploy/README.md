@@ -20,6 +20,14 @@ Run `npm run test:deploy` to check mismatch evidence, receipt serialization, and
 rollback behavior. `npm run deploy -- probe` writes `deploy-work/probe.json`;
 `npm run deploy -- receipt` includes that evidence in the deployment receipt.
 
+## Gates on a rollback
+
+A rollback re-runs only the gates that read the restored bytes themselves:
+privacy, Explorer compatibility and the origin check. It skips the links and
+snapshot digest gates, which compare the artifact with current repository
+inventory and the deployed snapshot, because a restored artifact passed them
+when it was first deployed. The links allowance file is not read.
+
 ## Holding a rollback
 
 A rollback restores an older generation but does not stop later runs. A
