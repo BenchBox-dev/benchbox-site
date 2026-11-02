@@ -4,7 +4,7 @@ Owner: maintainer who lands changes to `landing/prompts/`. Run the manual
 items on every nontrivial change to `index.html`, `prompts.js`, or
 `prompts.css`. Sign off in the PR description with the date checked.
 
-Items marked **[auto]** are asserted by `website/e2e/landing.mjs`
+Items marked **[auto]** are asserted by `website/e2e/landing.mjs`, which the `Site browser acceptance` job in `.github/workflows/ci.yml` runs on every pull request and on main
 (`npm --prefix website run verify:landing`) against the built `/prompts/`
 page, together with an axe-core scan in light and dark at several widths.
 Items marked **[auto + manual]** are asserted in part; the parenthetical names the remainder. Items marked **[manual]** need a human or a real assistive technology.

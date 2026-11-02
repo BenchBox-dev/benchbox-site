@@ -123,7 +123,7 @@ for (const [name, route] of Object.entries(pages)) {
   report.header.nav = await page.evaluate(() => document.querySelector("[data-site-header-nav]").getAttribute("aria-label"));
   report.header.searchButton = await page.getByRole("button", { name: "Search" }).count();
   report.header.breadcrumbs = await page.locator(".breadcrumbs li").allInnerTexts();
-  report.header.editLink = await page.locator('a[href*="/edit/develop/docs/"]').first().getAttribute("href");
+  report.header.editLink = await page.locator('a[href$="/benchbox-site/edit/main/docs/usage/getting-started.md"]').first().getAttribute("href");
   report.header.sidebar = await page.locator("nav[aria-label='Main'] a, #starlight__sidebar a").count();
   report.header.toc = await page.locator("starlight-toc a, .right-sidebar a").count();
   if (!report.header.editLink) fail("docs page has no edit link");

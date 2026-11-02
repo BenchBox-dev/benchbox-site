@@ -143,6 +143,45 @@ jobs:
             explorer/test-results
           retention-days: 7
 
+  browser-acceptance:
+    name: Site browser acceptance
+    needs: bundle
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09
+      - uses: actions/setup-node@a0853c24544627f65ddf259abe73b1d18a591444
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+      - run: npm ci --ignore-scripts
+      - uses: actions/download-artifact@37930b1c2abaa49bbe596cd826c3c89aef350131
+        with:
+          name: site-inputs
+          path: .site-inputs
+      - run: npx playwright install --with-deps chromium
+      - run: npm run build
+      - run: npm run verify:shell -w website
+      - run: npm run verify:parity -w website
+      - run: npm run verify:not-found -w website
+      - run: npm run verify:explorer -w website
+      - run: npm run verify:landing -w website
+      - name: Check the Pages-shaped Explorer routes against the built site
+        env:
+          E2E_PAGES_SHAPED: "1"
+          E2E_SITE_DIR: ${{ github.workspace }}/website/dist
+        run: npx playwright test --project=chromium --workers=1 --retries=0 e2e/routes/pages-artifact.spec.ts
+        working-directory: explorer
+      - name: Upload failure artifacts
+        if: failure()
+        uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f
+        with:
+          name: browser-acceptance-report
+          path: |
+            explorer/playwright-report
+            explorer/test-results
+          retention-days: 7
+
   audit:
     name: dependency audit
     runs-on: ubuntu-latest
@@ -182,7 +221,7 @@ jobs:
   ci:
     name: ci
     if: always()
-    needs: [bundle, checks, e2e, audit, bundle-schema]
+    needs: [bundle, checks, e2e, browser-acceptance, audit, bundle-schema]
     runs-on: ubuntu-latest
     timeout-minutes: 2
     steps:

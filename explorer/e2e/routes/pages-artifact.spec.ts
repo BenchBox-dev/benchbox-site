@@ -36,13 +36,13 @@ test.describe("assembled GitHub Pages artifact", () => {
 
     await page.goto("/results/benchmarks/");
     await waitForDataElement(page, page.getByTestId("benchmarks-index-list").getByRole("listitem").first());
-    await expect(page.getByRole("heading", { name: "Benchmarks" })).toBeVisible();
+    await expect(page.getByRole("heading", { name: "Benchmarks", level: 1 })).toBeVisible();
     await expect(page).toHaveURL(/\/results\/benchmarks\/$/);
     expect(benchmarkIndexStatuses).toContain(404);
 
     await page.goto("/results/platforms/");
     await waitForDataElement(page, page.getByTestId("platforms-index-list").getByRole("listitem").first());
-    await expect(page.getByRole("heading", { name: "Platforms" })).toBeVisible();
+    await expect(page.getByRole("heading", { name: "Platforms", level: 1 })).toBeVisible();
     await expect(page).toHaveURL(/\/results\/platforms\/$/);
     expect(platformIndexStatuses).toContain(404);
 
