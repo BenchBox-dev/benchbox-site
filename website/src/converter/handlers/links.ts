@@ -38,8 +38,8 @@ function withFragment(url: string, fragment: string): string {
 
 function repositoryKind(relative: string, absolute: string, docsRoot: string): "file" | "tree" | undefined {
   if (relative === "") return "tree";
-  const listed = repoFilesFor(docsRoot)?.kinds.get(relative);
-  if (listed) return listed;
+  const repoFiles = repoFilesFor(docsRoot);
+  if (repoFiles) return repoFiles.kinds.get(relative);
   const stats = statOf(absolute);
   if (stats === undefined) return undefined;
   return stats.isDirectory() ? "tree" : "file";
