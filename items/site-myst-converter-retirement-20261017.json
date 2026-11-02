@@ -1,9 +1,10 @@
 {
   "acceptance": [
     "A recorded decision (ADR row or decision note) with the reason",
-    "If retiring: core docs converted, converter files deleted, site build and link gate green"
+    "MyST constructs removed from site docs, blog and generators (nav from docs/nav.yml, front matter tags, plain links and span anchors), with identical sidebar.json and tags.json and the link gate green",
+    "MyST-only converter parts deleted, a guard rejects MyST syntax, objects.inv retired with its deploy probe requirement, and the leftover core {tags} blocks and toctree removed"
   ],
-  "context": "Found 2026-10-17 at site-split closeout (follow-up list in site-split-99).\n\nMoved from the BenchBox core tracker on 2026-10-30, when this repository gained its own tracker.\n\n2026-11-02: Owner decision: retire MyST now. Core docs use 159 {toctree} blocks (they drive the site sidebar and docs index), 17 {tags} blocks and `(label)=` targets in 158 files; the converter is 3,331 lines, part of which serves plain Markdown too. Retirement needs a replacement navigation source, a core docs conversion PR, then removal of the MyST handlers here once a bundle with converted docs reaches the site.",
+  "context": "Found 2026-10-17 at site-split closeout (follow-up list in site-split-99).\n\nMoved from the BenchBox core tracker on 2026-10-30, when this repository gained its own tracker.\n\n2026-11-02: Owner decision: retire MyST now. Core docs use 159 {toctree} blocks (they drive the site sidebar and docs index), 17 {tags} blocks and `(label)=` targets in 158 files; the converter is 3,331 lines, part of which serves plain Markdown too. Retirement needs a replacement navigation source, a core docs conversion PR, then removal of the MyST handlers here once a bundle with converted docs reaches the site.\n\n2026-11-02: Premise corrected: since site PR #66 the published docs are authored in benchbox-site/docs/; core keeps only 17 unrendered {tags} blocks and one hidden toctree, so retirement is site-side plus a small core cleanup, no bundle schema change. The converter stays as the plain-Markdown pipeline. Owner decisions: docs/nav.yml navigation; flatten section index lists; front matter tags; keep old label and {#id} anchors as <span id>; retire objects.inv; keep duplicate sidebar entries; retire docs:parity; keep heading-id algorithm; permanent MyST guard; native blog index; core PR limited to leftover blocks. Plan: three site PRs (add support with byte-identical output; convert content; delete MyST handlers) and one core PR.",
   "description": "The site build converts core's MyST docs at build time with a custom converter (benchbox-site website/src/converter/build.ts, document.ts, handlers/, inventory.ts, plus website/scripts/myst-inventory.ts and inventory/expected-removals-rst-to-myst.json). It was built for the Astro migration (astro-site-31) while Sphinx still rendered the same sources. Sphinx is gone from core since #3096, so the converter is now the only renderer and the MyST dialect is kept only for it.\n\nDecide: keep MyST and the converter, or convert core docs to plain Markdown/MDX once and delete the converter. Record the choice with its cost (core tests that lock doc text, README links, benchbox/utils/version.py reading docs/README.md).",
   "sessions": [
     {
@@ -20,6 +21,14 @@
       "client": "omp-coding-agent",
       "op": "update",
       "op_id": "53d46d28db404cb8880244936bfb0f45",
+      "session_id": "2708a39948944f4299911f72f62ba6c5"
+    },
+    {
+      "actor": "mcp:omp-coding-agent:joe@joe-mac-mini.local:a6d1a76a8fe5c477ca12e1f3",
+      "at": "2026-11-02T02:13:10Z",
+      "client": "omp-coding-agent",
+      "op": "update",
+      "op_id": "4d822ec1b6774b33a7078df25efb0394",
       "session_id": "2708a39948944f4299911f72f62ba6c5"
     }
   ]
