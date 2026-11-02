@@ -3,7 +3,7 @@
     "site-parity check passes on a docs-touching PR",
     "Docs and results sites agree on header shrink behavior"
   ],
-  "context": "Observed on PR #2688 (CI run 37361216876, site-parity job): header behaviour differs between docs and results for shrinkFocusOnToggle false vs true, in the page-chrome parity assertion. The PR touched only qualification code plus two markdown docs, so the failure is unrelated to its content — likely fallout from the Astro cutover work. site-parity is not a required check, so nothing is blocked, but it fails on any PR that triggers the site build.\n\nMoved from the BenchBox core tracker on 2026-10-30, when this repository gained its own tracker.\n\nObserved in core's site-parity CI job before the site moved out of core; core no longer builds the site. Check whether the header mismatch exists in this repository's build before working on it, and drop the item if it does not.",
+  "context": "Observed on PR #2688 (CI run 37361216876, site-parity job): header behaviour differs between docs and results for shrinkFocusOnToggle false vs true, in the page-chrome parity assertion. The PR touched only qualification code plus two markdown docs, so the failure is unrelated to its content — likely fallout from the Astro cutover work. site-parity is not a required check, so nothing is blocked, but it fails on any PR that triggers the site build.\n\nMoved from the BenchBox core tracker on 2026-10-30, when this repository gained its own tracker.\n\nObserved in core's site-parity CI job before the site moved out of core; core no longer builds the site. Check whether the header mismatch exists in this repository's build before working on it, and drop the item if it does not.\n\n2026-11-02: Dropped as not reproducible in this repository. website/e2e/explorer.mjs asserts shrinkFocusOnToggle true and compares docs and results headers on every key; it passed locally against a fresh build and in the new required 'Site browser acceptance' CI job on PR #111. The mismatch was specific to core's former site-parity job. Owner authorized dropping stale items on evidence.",
   "description": "The site-parity CI job fails comparing docs-vs-results header behavior (shrinkFocusOnToggle false vs true) on PRs that trigger the site build, including PRs whose diff cannot affect site chrome. The mismatch needs a root cause and fix on the site side.",
   "sessions": [
     {
@@ -13,6 +13,14 @@
       "op": "create",
       "op_id": "87a08a84a1fc48f8b918cfbc63ac5a60",
       "session_id": "82c0d7d9603c4b7cb3497f18a64ea231"
+    },
+    {
+      "actor": "mcp:omp-coding-agent:joe@joe-mac-mini.local:a6d1a76a8fe5c477ca12e1f3",
+      "at": "2026-11-02T02:12:47Z",
+      "client": "omp-coding-agent",
+      "op": "update",
+      "op_id": "33a3ce8018f94f01b52d971cc61128e2",
+      "session_id": "2708a39948944f4299911f72f62ba6c5"
     }
   ]
 }
