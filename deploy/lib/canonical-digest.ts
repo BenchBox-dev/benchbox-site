@@ -15,7 +15,6 @@ type NodeBlocking = { createDuckDB(bundles: object, logger: object, runtime: obj
 const require = createRequire(import.meta.url);
 const duckdb = require("@duckdb/duckdb-wasm/dist/duckdb-node-blocking.cjs") as NodeBlocking;
 
-const EXCLUDED_COLUMNS = new Set(["generated_at"]);
 const FLOAT_TYPES = new Set(["DOUBLE", "FLOAT", "REAL"]);
 
 export function formatSignificant(value: number, digits = 9): string {
@@ -67,17 +66,25 @@ export async function canonicalDigest(dbFile: string): Promise<string> {
       const columns = rows(
         `SELECT column_name, data_type FROM information_schema.columns WHERE table_catalog = 'snapshot' AND table_schema = 'main' AND table_name = '${table.replaceAll("'", "''")}' ORDER BY ordinal_position`,
       ).map((row) => ({ name: String(row.column_name), type: String(row.data_type) }));
-      const kept = columns.filter((column) => !EXCLUDED_COLUMNS.has(column.name));
-      if (kept.length === 0) throw new Error(`table ${table} has no comparable columns after exclusions`);
-      const list = kept.map((column) => quote(column.name)).join(", ");
+      if (columns.length === 0) throw new Error(`table ${table} has no columns`);
+      const list = columns.map((column) => quote(column.name)).join(", ");
       const result = connection.query(`SELECT ${list} FROM snapshot.main.${quote(table)} ORDER BY ${list}`);
-      const vectors = kept.map((_, index) => result.getChildAt(index));
-      digest.update(`table:${table}\ncolumns:${kept.map((column) => column.name).join(",")}\nrows:${result.numRows}\n`);
+      const vectors = columns.map((_, index) => result.getChildAt(index));
+      digest.update(`table:${table}\ncolumns:${columns.map((column) => `${column.name} ${column.type}`).join(",")}\nrows:${result.numRows}\n`);
       for (let row = 0; row < result.numRows; row += 1) {
-        digest.update(kept.map((column, index) => canonicalValue(vectors[index]?.get(row), column.type)).join("|"));
+        digest.update(columns.map((column, index) => canonicalValue(vectors[index]?.get(row), column.type)).join("|"));
         digest.update("\n");
       }
     }
+    const definitions = (kind: string, sql: string) =>
+      rows(sql)
+        .map((row) => `${kind}:${String(row.name)}=${String(row.sql)}`)
+        .sort();
+    const schemaObjects = [
+      ...definitions("view", "SELECT view_name AS name, sql FROM duckdb_views() WHERE database_name = 'snapshot' AND schema_name = 'main' AND NOT internal"),
+      ...definitions("index", "SELECT index_name AS name, sql FROM duckdb_indexes() WHERE database_name = 'snapshot' AND schema_name = 'main'"),
+    ];
+    for (const definition of schemaObjects) digest.update(`${definition}\n`);
     return digest.digest("hex");
   } finally {
     connection.close();
