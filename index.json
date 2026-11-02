@@ -101,15 +101,10 @@
       "title": "Wait only for the core bundle job, not the whole producing site-inputs run, before fetching a bundle"
     },
     "doc-external-links-fragments-20261017": {
-      "claim": {
-        "expires_at": "2026-11-03T02:02:29Z",
-        "generation": "b6c849d383b24aa8a69693fd7970be03",
-        "renewals": 0,
-        "worker": "mcp:omp-coding-agent:joe@joe-mac-mini.local:a6d1a76a8fe5c477ca12e1f3"
-      },
+      "claim": null,
       "needs": [],
       "priority": "low",
-      "status": "active",
+      "status": "done",
       "title": "Check #fragment anchors on external links in the site's nightly external-link step"
     },
     "docs-contracts-option-values-and-fences-coverage-20261029": {
