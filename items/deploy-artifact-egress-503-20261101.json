@@ -4,7 +4,7 @@
     "Artifact download bytes per deploy run and per day are computed for the 7 days after PR #95 merged (2026-10-31T19:33Z), with run ids, and compared with the limit",
     "Every egress 503 in deploy.yml or visual.yml runs in those 7 days is listed by run id; if any occurred, or usage exceeds half the limit, a change that reduces downloads is merged and the measurement repeated for 7 days with no egress 503"
   ],
-  "context": "Found 2026-10-31 by the review of deploy-resolver-reads-every-deployment-20261031, which deferred it to its own item.",
+  "context": "Found 2026-10-31 by the review of deploy-resolver-reads-every-deployment-20261031, which deferred it to its own item.\n\n2026-11-02: PR #109 (merge 21c556f67b) recorded the limit and the first measurement in deploy/README.md 'Artifact download 503s'. GitHub publishes no artifact egress limit; the failing URLs are GitHub-owned Azure Blob accounts (productionresultssa3/4) and the message is Azure Storage ServerBusy for the per-account bandwidth ceiling (200 Gbps default in US regions), i.e. GitHub's shared account, not a per-org volume (inference, stated as such). Run 41087113431's 503s fell inside a GitHub Actions incident. Window 2026-10-31T19:33Z to 2026-11-02T01:50Z: 3.4 GB downloaded (94% the 114 MB site artifact; 21 deploy and 7 visual downloads), no egress 503 in 49 runs; 4 in-progress CI runs not log-searched. Remaining: after 2026-11-07T19:33Z re-run the README commands for the full 7 days; if any 'Egress is over' appears, stop visual.yml downloading the site artifact per PR push and measure 7 more days; otherwise finish.",
   "description": "On 2026-10-30, receipt downloads in production deploy runs 41061585379 (five 503 responses across its retries) and 41087113431 failed with 'HTTP 503: 503 Egress is over the account limit.' after scripts/github-download.mjs exhausted its retries, failing the recheck step. The review of the deploy resolver found egress 503s in 5 of the 7 failures that involved receipt downloads. The bounded resolver (PR #95) cut receipt downloads from about 160 per deploy run to one or two, which likely removes the main driver, but each deploy still downloads the site artifact (about 113 MB), rollbacks restore one, and visual.yml downloads artifacts on every PR push. Which account limit this is, its window and its size are not recorded anywhere in the repo, so there is no way to tell how close deploys run to it.",
   "links": [
     "scripts/github-download.mjs",
@@ -12,6 +12,7 @@
     ".github/workflows/visual.yml",
     "deploy/README.md"
   ],
+  "not_before": "2026-11-07T19:45:00Z",
   "sessions": [
     {
       "actor": "mcp:omp-coding-agent:joe@joe-mac-mini.local:ccbf24e815408472019f3d98",
@@ -20,6 +21,14 @@
       "op": "create",
       "op_id": "fdacc43ea6ea4ef1bc539dab19ce08ea",
       "session_id": "ea29fdf857af4561aaa9ba743e60a0e6"
+    },
+    {
+      "actor": "mcp:omp-coding-agent:joe@joe-mac-mini.local:a6d1a76a8fe5c477ca12e1f3",
+      "at": "2026-11-02T02:09:28Z",
+      "client": "omp-coding-agent",
+      "op": "update",
+      "op_id": "2ec0395ed48d4f4890f7136d35c4d937",
+      "session_id": "2708a39948944f4299911f72f62ba6c5"
     }
   ]
 }
