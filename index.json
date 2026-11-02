@@ -157,15 +157,10 @@
       "title": "Check that site docs links to core directories resolve against every ancestor directory, as repo-files.json now lists them"
     },
     "site-myst-converter-retirement-20261017": {
-      "claim": {
-        "expires_at": "2026-11-03T03:27:41Z",
-        "generation": "5cc9fb4cbb9a4e6590aab59ec40f65e6",
-        "renewals": 0,
-        "worker": "mcp:omp-coding-agent:joe@joe-mac-mini.local:19c40f82a7ecdc483ce560ab"
-      },
+      "claim": null,
       "needs": [],
       "priority": "low",
-      "status": "active",
+      "status": "done",
       "title": "Decide whether to keep or retire the site's MyST-to-Markdown converter"
     },
     "site-parity-header-shrink-toggle": {
