@@ -4,7 +4,7 @@
     "The check runs in lefthook pre-commit",
     "Existing allowed comments are recorded so main passes"
   ],
-  "context": "Found 2026-10-17 at site-split closeout by grepping benchbox-site main 8812af7 for comment-policy (no matches). Listed as a follow-up in site-split-99.\n\nMoved from the BenchBox core tracker on 2026-10-30, when this repository gained its own tracker.\n\nOn 2026-10-30 this repository already had scripts/check-comments.mjs, run by `npm run lint:comments` in ci and by the lefthook pre-commit `comments` step, so the acceptance may already be met. Verify, and close the item if so.",
+  "context": "Found 2026-10-17 at site-split closeout by grepping benchbox-site main 8812af7 for comment-policy (no matches). Listed as a follow-up in site-split-99.\n\nMoved from the BenchBox core tracker on 2026-10-30, when this repository gained its own tracker.\n\nOn 2026-10-30 this repository already had scripts/check-comments.mjs, run by `npm run lint:comments` in ci and by the lefthook pre-commit `comments` step, so the acceptance may already be met. Verify, and close the item if so.\n\n2026-11-02: Verified met on main 07167a6. scripts/check-comments.mjs exits 1 on a seeded file with a new comment (website/src/zz-seed.ts:2 reported); `npm run lint:comments` passes on main; ci.yml runs it in the `checks` job, which the required `ci` aggregate needs; lefthook.yml pre-commit `comments` runs it on staged files. Closed on this evidence (owner authorized closing stale items on evidence).",
   "description": "Core enforces its comment policy on every PR (quality/comment-policy.json, scripts/check_comment_policy.py, the required comment-policy check, .pre-commit-config.yaml:7-13), and that scope used to cover website/ and results-explorer/ (quality/comment-policy.json:252,257). Those trees now live in benchbox-site, and nothing there checks comments: no workflow, lefthook.yml entry or script in benchbox-site mentions a comment policy (.github/workflows/ has only ci.yml, deploy.yml, nightly.yml and visual.yml). New comments in the site's TypeScript and Astro source are unchecked.\n\nPort an equivalent check to the site in Node (ADR D9: no Python in the site repo), run it in site CI and lefthook, and seed it with the current state.",
   "sessions": [
     {
@@ -14,6 +14,14 @@
       "op": "create",
       "op_id": "90f80b1b95134adea59f05ce7ec8b0e9",
       "session_id": "82c0d7d9603c4b7cb3497f18a64ea231"
+    },
+    {
+      "actor": "mcp:omp-coding-agent:joe@joe-mac-mini.local:a6d1a76a8fe5c477ca12e1f3",
+      "at": "2026-11-02T01:46:19Z",
+      "client": "omp-coding-agent",
+      "op": "update",
+      "op_id": "3d0d9da7d7a840c99c90a27eff460cef",
+      "session_id": "2708a39948944f4299911f72f62ba6c5"
     }
   ]
 }
