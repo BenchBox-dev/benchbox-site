@@ -27,15 +27,10 @@
       "title": "Generate static, searchable result summary pages for platforms and benchmarks"
     },
     "blog-draft-byte-sha-of-snapshot-stale-20261029": {
-      "claim": {
-        "expires_at": "2026-11-03T02:01:13Z",
-        "generation": "89effc87490d4399a3e3bb321dec3d28",
-        "renewals": 0,
-        "worker": "mcp:omp-coding-agent:joe@joe-mac-mini.local:a6d1a76a8fe5c477ca12e1f3"
-      },
+      "claim": null,
       "needs": [],
       "priority": "low",
-      "status": "active",
+      "status": "done",
       "title": "Replace the byte SHA-256 of the deployed snapshot cited in blog draft 17 with a content digest or remove the claim"
     },
     "blog-scd2-sf1-scale-row": {
