@@ -1,8 +1,7 @@
 import type { RootContent } from "mdast";
 import { UnknownConstructError } from "../errors.ts";
 import type { DirectiveCall, DirectiveHandler } from "../types.ts";
-
-type CalloutType = "note" | "tip" | "caution" | "danger";
+import { calloutNode, type CalloutType } from "./components.ts";
 
 const KINDS: Readonly<Record<string, { type: CalloutType; title: string }>> = {
   note: { type: "note", title: "Note" },
@@ -35,16 +34,6 @@ export const admonitionDirective: DirectiveHandler = {
     if (lead === "") children = context.convertMarkdown(call.body, call.bodyAt);
     else if (separate) children = [...context.convertMarkdown(lead, call.at), ...context.convertMarkdown(call.body, call.bodyAt)];
     else children = context.convertMarkdown(`${lead}\n${call.body}`, call.at);
-    return [
-      {
-        type: "mdxJsxFlowElement",
-        name: "Callout",
-        attributes: [
-          { type: "mdxJsxAttribute", name: "type", value: kind.type },
-          { type: "mdxJsxAttribute", name: "title", value: title },
-        ],
-        children,
-      } as unknown as RootContent,
-    ];
+    return [calloutNode(kind.type, title, children)];
   },
 };

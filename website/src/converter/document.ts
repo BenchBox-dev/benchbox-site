@@ -1,3 +1,4 @@
+import { splitAlert, type AlertBlock } from "./handlers/alerts.ts";
 import { lineStarts } from "./handlers/colon-fence.ts";
 import { mergeDefinitionLists } from "./handlers/deflist.ts";
 import type { Code, FootnoteDefinition, Html, Paragraph, PhrasingContent, Root, RootContent } from "mdast";
@@ -40,6 +41,7 @@ type PendingLabel = { label: string; at: SourcePosition; node: Html };
 
 type PendingFootnote = { label: string; node: Html };
 
+const NATIVE_BLOG_INDEX = "blog/index.md";
 const AUTOMATIC_ID = /^id\d+$/;
 const DEFINITION_LINE = /^:\s/;
 const CONTAINER_PREFIX = /^(?:[ \t]*>[ \t]?)*[ \t]*/;
@@ -117,6 +119,7 @@ class DocumentConverter implements ConvertContext {
   readonly toc: TocNode[] = [];
   private sections: { depth: number; node: TocSection }[] = [];
   private nesting = 0;
+  private readonly directives = new Set<string>();
   readonly labels = new Map<string, LabelInfo>();
   readonly headingIds: string[] = [];
   title: TitleNode[] | undefined;
@@ -364,10 +367,25 @@ class DocumentConverter implements ConvertContext {
       case "footnoteDefinition":
         this.releaseOnContent();
         return this.footnoteDefinition(node, at, frame);
+      case "blockquote": {
+        this.releaseOnContent();
+        const alert = splitAlert(node);
+        return alert ? this.alert(alert, at, frame) : this.container(node, at, frame);
+      }
       default:
         this.releaseOnContent();
         return this.container(node, at, frame);
     }
+  }
+
+  private alert(alert: AlertBlock, at: SourcePosition, frame: Frame): RootContent[] {
+    this.nesting += 1;
+    try {
+      alert.children = this.blocks(alert.children, frame);
+    } finally {
+      this.nesting -= 1;
+    }
+    return this.registry.syntaxHandler("alert", at).handle(alert, at, this);
   }
 
   private footnoteDefinition(node: FootnoteDefinition, at: SourcePosition, frame: Frame): RootContent[] {
@@ -429,8 +447,10 @@ class DocumentConverter implements ConvertContext {
   }
 
   private code(node: Code, at: SourcePosition, frame: Frame): RootContent[] {
+    if (node.lang === "mermaid") return this.registry.syntaxHandler("mermaid-fence", at).handle(node, at, this);
     const directive = node.lang?.match(DIRECTIVE_LANG);
     if (!directive) return [node];
+    this.directives.add(directive[1]);
     const call = parseDirectiveBody(node, directive[1], frame.lineOffset, this.file);
     const handler = this.registry.directive(call.name, at);
     if (handler.argument === "none" && call.argument !== "") {
@@ -558,6 +578,7 @@ class DocumentConverter implements ConvertContext {
     if (description !== undefined) data.description = description;
     this.pageData.delete("description");
     if (tags.length > 0) data.tags = [...tags];
+    if (this.file === NATIVE_BLOG_INDEX && !this.directives.has("postlist")) data.nativeIndex = true;
     data.sourcePath = `docs/${this.file}`;
     if (this.titleId !== undefined) data.titleId = this.titleId;
     if (this.headingIds.length > 0) data.headingIds = [...this.headingIds];

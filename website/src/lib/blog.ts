@@ -82,6 +82,24 @@ export function toPost(source: PostSource): BlogPost {
   };
 }
 
+const PARAGRAPH = /<p>([\s\S]*?)<\/p>/g;
+
+function inlineMarkup(paragraph: string): string {
+  return paragraph
+    .replace(/<img\b[^>]*>/g, "")
+    .replace(/<\/?a\b[^>]*>/g, "")
+    .replace(/\s*\n\s*/g, " ")
+    .trim();
+}
+
+export function excerptOf(html: string | undefined): string | undefined {
+  for (const [, paragraph] of (html ?? "").matchAll(PARAGRAPH)) {
+    const markup = inlineMarkup(paragraph);
+    if (markup.replace(/<[^>]*>/g, "").trim() !== "") return markup;
+  }
+  return undefined;
+}
+
 export function postPath(post: Pick<BlogPost, "slug">): string {
   return `/blog/${post.slug}.html`;
 }
