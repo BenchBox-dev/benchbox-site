@@ -1,12 +1,9 @@
 import { mkdtempSync, readFileSync, readdirSync, statSync, utimesSync, writeFileSync } from "node:fs";
 import os from "node:os";
 import path from "node:path";
-import type { RootContent } from "mdast";
 import { afterEach, describe, expect, it } from "vitest";
 import { assertBuilt, buildSite, writeOutput } from "../src/converter/build.ts";
 import { ConversionFailedError } from "../src/converter/errors.ts";
-import { createDefaultRegistry } from "../src/converter/handlers/index.ts";
-import type { DirectiveHandler } from "../src/converter/types.ts";
 import { toStarlightSidebar, type SidebarManifest } from "../src/converter/sidebar.ts";
 import { docutilsMakeId } from "../src/lib/docutils-slug.ts";
 import { IdAllocator } from "../src/converter/ids.ts";
@@ -14,36 +11,18 @@ import { build, bodyOf, cleanup, pageOf, writeDocs } from "./support.ts";
 
 afterEach(cleanup);
 
-const callout: DirectiveHandler = {
-  kind: "directive",
-  names: ["callout"],
-  options: ["kind"],
-  argument: "none",
-  handle(call, context) {
-    context.useComponent("Callout");
-    const node = {
-      type: "mdxJsxFlowElement",
-      name: "Callout",
-      attributes: [{ type: "mdxJsxAttribute", name: "kind", value: call.options.kind ?? "note" }],
-      children: context.convertMarkdown(call.body, call.bodyAt),
-    };
-    return [node as unknown as RootContent];
-  },
-};
-
 describe("output format", () => {
   it("emits mdx only for pages that use a component", () => {
-    const registry = createDefaultRegistry().register(callout);
-    const result = build(
-      { "plain.md": "# Plain\n\nText with {braces} and a \\<not-html\\> escape.\n", "rich.md": "# Rich\n\n```{callout}\n:kind: warning\nCareful, {braces}.\n```\n" },
-      registry,
-    );
+    const result = build({
+      "plain.md": "# Plain\n\nText with {braces} and a \\<not-html\\> escape.\n",
+      "rich.md": "# Rich\n\n> [!WARNING]\n> Careful, {braces}.\n",
+    });
     expect(result.errors).toEqual([]);
     expect([...result.files.keys()].filter((name) => name.startsWith("content/"))).toEqual(["content/docs/plain.md", "content/docs/rich.mdx"]);
     expect(result.summary).toEqual({ pages: 2, md: 1, mdx: 1, mdxPages: ["rich.md"] });
     const rich = pageOf(result, "docs/rich.mdx");
     expect(rich).toContain('import Callout from "../../../src/components/docs/Callout.astro";');
-    expect(rich).toContain('<Callout kind="warning">');
+    expect(rich).toContain('<Callout type="caution" title="Warning">');
     expect(rich).toContain("Careful, \\{braces}.");
     expect(pageOf(result, "docs/plain.md")).not.toContain("import");
   });
@@ -51,9 +30,10 @@ describe("output format", () => {
 
 describe("determinism", () => {
   const files = {
-    "index.md": "# Home\n\n```{toctree}\n:hidden:\n\na\nb\n```\n",
-    "a.md": "# A\n\n```{tags} z, y\n```\n\n## Same\n\n## Same\n",
-    "b.md": "# B\n\n```{tags} y\n```\n\n{doc}`a`\n",
+    "index.md": "# Home\n",
+    "nav.yml": "groups:\n  - label: Docs\n    items:\n      - a.md\n      - b.md\n",
+    "a.md": "---\ntags: [z, y]\n---\n\n# A\n\n## Same\n\n## Same\n",
+    "b.md": "---\ntags: [y]\n---\n\n# B\n\n[A](a.md)\n",
   };
 
   it("produces byte-identical output for the same input", () => {
@@ -93,7 +73,7 @@ describe("writeOutput", () => {
   });
 
   it("does not modify the docs tree", () => {
-    const docsRoot = writeDocs({ "a.md": "# A\n\n% c\n" });
+    const docsRoot = writeDocs({ "a.md": "# A\n\n<!-- c -->\n" });
     const before = readFileSync(path.join(docsRoot, "a.md"), "utf-8");
     buildSite({ docsRoot });
     expect(readFileSync(path.join(docsRoot, "a.md"), "utf-8")).toBe(before);
@@ -144,7 +124,7 @@ describe("sidebar config", () => {
     const manifest: SidebarManifest = {
       groups: [
         { label: "Guides", items: [{ label: "One", link: "/docs/one.html", items: [{ label: "Deep", link: "/docs/deep.html" }] }] },
-        { label: null, items: [{ label: "Last", link: "/docs/last.html" }] },
+        { label: "Other", items: [{ label: "Last", link: "/docs/last.html" }] },
       ],
       order: {},
     };
@@ -163,7 +143,7 @@ describe("sidebar config", () => {
           },
         ],
       },
-      { label: "Section 2", collapsed: false, items: [{ label: "Last", link: "/docs/last.html" }] },
+      { label: "Other", collapsed: false, items: [{ label: "Last", link: "/docs/last.html" }] },
     ]);
   });
 });

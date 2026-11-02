@@ -1,6 +1,5 @@
 import { createHash } from "node:crypto";
 import { cpSync, existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
-import { deflateSync } from "node:zlib";
 import path from "node:path";
 import { REPOSITORY_URL } from "./repo-files.ts";
 
@@ -100,11 +99,3 @@ export const REDIRECT_PAGES: Readonly<Record<string, string>> = {
   "docs/search.html": "/docs/",
   "docs/blog.html": "/blog/",
 };
-
-export type InventoryEntry = { name: string; role: "doc" | "label"; uri: string; title: string };
-
-export function renderObjectsInventory(entries: readonly InventoryEntry[], project: string, version: string): Buffer {
-  const header = `# Sphinx inventory version 2\n# Project: ${project}\n# Version: ${version}\n# The remainder of this file is compressed using zlib.\n`;
-  const lines = entries.map((entry) => `${entry.name} std:${entry.role} -1 ${entry.uri} ${entry.title.replace(/\s+/g, " ").trim() || "-"}\n`);
-  return Buffer.concat([Buffer.from(header, "utf-8"), deflateSync(Buffer.from(lines.join(""), "utf-8"))]);
-}

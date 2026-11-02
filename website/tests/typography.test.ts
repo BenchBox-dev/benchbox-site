@@ -21,7 +21,8 @@ describe("docutils smart quotes and dashes", () => {
 
   it("applies to page titles and sidebar labels", () => {
     const result = build({
-      "index.md": '# Home\n\n```{toctree}\n:caption: Guides -- "all"\n\nPage -- one <a>\nb\n```\n',
+      "index.md": "# Home\n",
+      "nav.yml": 'groups:\n  - label: Guides -- "all"\n    items:\n      - page: a.md\n        label: Page -- one\n      - b.md\n',
       "a.md": '# A "title" -- here\n',
       "b.md": "# B --- it's\n",
     });

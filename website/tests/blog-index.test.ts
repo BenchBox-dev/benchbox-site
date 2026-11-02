@@ -4,8 +4,6 @@ import { build, cleanup, frontMatterOf } from "./support.ts";
 
 afterEach(cleanup);
 
-const LIST = "```{postlist}\n:excerpts:\n```";
-
 describe("blog index", () => {
   it("is native when the index has no post list, and keeps its own anchors", () => {
     const result = build({ "blog/index.md": '<span id="id1"></span>\n\n# Blog\n\nIntro.\n' });
@@ -13,11 +11,6 @@ describe("blog index", () => {
     const front = frontMatterOf(result, "blog/index.md");
     expect(front).toContain("nativeIndex: true");
     expect(front).toContain("titleId: blog");
-  });
-
-  it("stays converter-rendered while the index still carries a post list", () => {
-    const result = build({ "blog/index.md": `# Blog\n\n${LIST}\n` });
-    expect(frontMatterOf(result, "blog/index.md")).not.toContain("nativeIndex");
   });
 
   it("does not mark other blog pages or docs", () => {

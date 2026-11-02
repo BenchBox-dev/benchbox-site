@@ -163,7 +163,6 @@ dbset
 decorrelation
 dedup
 defaultdict
-deflist
 delaycompress
 deltalake
 deol
@@ -529,7 +528,6 @@ pluralises
 popen
 postgen
 postgis
-postlist
 postrotate
 precombine
 preconfiguring
@@ -678,7 +676,6 @@ sparkline
 sparklines
 sparkpool
 spezial
-sphx
 splitlines
 sqlfluff
 sqlglot
@@ -730,10 +727,7 @@ tigerdata
 timedelta
 timescaledb
 titlebar
-titlesonly
 tnot
-toctree
-toctrees
 tolist
 tomllib
 topk

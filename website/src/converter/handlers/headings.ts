@@ -8,8 +8,7 @@ export const headingSyntax: SyntaxHandler<"heading"> = {
   handle(node, _at, context) {
     const text = plainText(node);
     const title = smartenTitle(flattenTitle(node.children));
-    const id = context.allocateHeadingId(text, title);
-    context.addSection(node.depth, title, id);
+    const id = context.allocateHeadingId(text);
     if (node.depth === 1 && context.needsTitle()) {
       context.claimTitle(title, id);
       return context.collection === "docs" ? [{ type: "html", value: `<span id="${id}"></span>` }] : [];

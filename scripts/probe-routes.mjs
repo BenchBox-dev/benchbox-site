@@ -8,7 +8,6 @@ export const ROUTE_CLASSES = [
   { name: "blog", path: "/blog/" },
   { name: "results", path: "/results/" },
   { name: "not-found", path: "/404.html" },
-  { name: "inventory", path: "/docs/objects.inv" },
 ];
 
 export async function probeRoutes(origin, fetchImpl = fetch) {
