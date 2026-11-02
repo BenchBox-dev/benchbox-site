@@ -1,4 +1,4 @@
-import { lstatSync, mkdirSync, readFileSync, readdirSync, rmSync, writeFileSync } from "node:fs";
+import { existsSync, lstatSync, mkdirSync, readFileSync, readdirSync, rmSync, writeFileSync } from "node:fs";
 import path from "node:path";
 import { convertDocument, type ConvertedDocument } from "./document.ts";
 import { DocsIndex, placeholderInfo } from "./docs-index.ts";
@@ -8,8 +8,9 @@ import type { InventoryEntry } from "../lib/legacy-assets.ts";
 import type { DocInfo } from "./model.ts";
 import type { HandlerRegistry } from "./registry.ts";
 import { findMdxProblem, serializeDocument } from "./serialize.ts";
-import { generateTagSources } from "./tag-pages.ts";
-import { buildSidebar } from "./sidebar.ts";
+import { NAV_FILE, parseNav } from "./nav.ts";
+import { generateTagSources, tagCounts, type TaggedDocument } from "./tag-pages.ts";
+import { buildNavSidebar, buildSidebar, type SidebarManifest } from "./sidebar.ts";
 import { listDocSources } from "./sources.ts";
 
 export type BuildOptions = { docsRoot: string; registry?: HandlerRegistry; knownBrokenLinks?: ReadonlySet<string> };
@@ -61,6 +62,18 @@ function hasUnknownToctreeTarget(document: ConvertedDocument, index: DocsIndex):
   return document.info.toctrees.some((block) => block.entries.some((entry) => entry.kind === "doc" && index.get(entry.path) === undefined));
 }
 
+function sidebarFor(docsRoot: string, index: DocsIndex, tagged: readonly TaggedDocument[], errors: ConverterError[]): SidebarManifest {
+  const navPath = path.join(docsRoot, NAV_FILE);
+  if (!existsSync(navPath)) return buildSidebar(index);
+  try {
+    return buildNavSidebar(index, parseNav(readFileSync(navPath, "utf-8")), tagCounts(tagged));
+  } catch (error) {
+    if (!(error instanceof ConverterError)) throw error;
+    errors.push(error);
+    return { groups: [], order: {} };
+  }
+}
+
 export function buildSite(options: BuildOptions): BuildResult {
   const run: Run = { registry: options.registry ?? createDefaultRegistry(), docsRoot: options.docsRoot, knownBroken: options.knownBrokenLinks ?? new Set() };
   const sources: SourceText[] = listDocSources(options.docsRoot).map((source) => ({ relative: source.relative, raw: readFileSync(source.absolute, "utf-8") }));
@@ -69,7 +82,8 @@ export function buildSite(options: BuildOptions): BuildResult {
   );
   const seed = new DocsIndex(sources.map((source) => placeholderInfo(source)));
   const firstPass = convertAll(sources, seed, run, "collect");
-  const generated = generateTagSources(firstPass.map((document) => document.info).filter((info) => info.collection === "docs").map((info) => ({ path: info.path, tags: info.tags })));
+  const tagged = firstPass.map((document) => document.info).filter((info) => info.collection === "docs").map((info) => ({ path: info.path, tags: info.tags }));
+  const generated = generateTagSources(tagged);
   const generatedSeed = new DocsIndex([...seed.paths().map((path) => seed.get(path) as DocInfo), ...generated.map((source) => placeholderInfo(source))]);
   const collected = firstPass.map((document, position) =>
     hasUnknownToctreeTarget(document, seed) ? convertAll([sources[position]], generatedSeed, run, "collect")[0] : document,
@@ -87,8 +101,8 @@ export function buildSite(options: BuildOptions): BuildResult {
   for (const document of documents) errors.push(...document.errors);
   const summary: BuildSummary = { pages: documents.length, md: 0, mdx: 0, mdxPages: [] };
   const infos = documents.map((document) => document.info);
+  const sidebar = sidebarFor(options.docsRoot, index, tagged, errors);
   if (errors.length > 0) return { files: new Map(), errors, summary, infos };
-  const sidebar = buildSidebar(index);
   const files = new Map<string, string>();
   const tags = new Map<string, { path: string; route: string; title: string }[]>();
   for (const document of documents) {

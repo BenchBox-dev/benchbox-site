@@ -1,5 +1,6 @@
 import type { TitleNode } from "../lib/smartypants.ts";
-import type { Definition, Heading, Html, Image, ImageReference, Link, Paragraph, PhrasingContent, RootContent } from "mdast";
+import type { AlertBlock } from "./handlers/alerts.ts";
+import type { Code, Definition, Heading, Html, Image, ImageReference, Link, Paragraph, PhrasingContent, RootContent } from "mdast";
 import type { DocsIndex } from "./docs-index.ts";
 import type { Collection, ResolvedDoc, ResolvedLabel, SourcePosition, ToctreeBlock } from "./model.ts";
 
@@ -79,6 +80,8 @@ export type SyntaxNodes = {
   "raw-html-inline": Html;
   deflist: Paragraph;
   "colon-fence": Paragraph;
+  alert: AlertBlock;
+  "mermaid-fence": Code;
 };
 
 export type SyntaxName = keyof SyntaxNodes;

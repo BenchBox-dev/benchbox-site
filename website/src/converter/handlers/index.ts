@@ -1,4 +1,5 @@
 import { HandlerRegistry } from "../registry.ts";
+import { alertSyntax } from "./alerts.ts";
 import { admonitionDirective } from "./admonitions.ts";
 import { colonFenceSyntax } from "./colon-fence.ts";
 import { commentSyntax, htmlCommentSyntax } from "./comments.ts";
@@ -10,6 +11,7 @@ import { imageSyntax } from "./images.ts";
 import { labelSyntax } from "./labels.ts";
 import { linkSyntax } from "./links.ts";
 import { mermaidDirective } from "./mermaid.ts";
+import { mermaidFenceSyntax } from "./mermaid-fence.ts";
 import { postlistDirective } from "./postlist.ts";
 import { listTableDirective } from "./list-table.ts";
 import { rawHtmlInlineSyntax, rawHtmlSyntax } from "./raw-html.ts";
@@ -31,6 +33,8 @@ export function createDefaultRegistry(): HandlerRegistry {
     .register(postlistDirective)
     .register(admonitionDirective)
     .register(mermaidDirective)
+    .register(mermaidFenceSyntax)
+    .register(alertSyntax)
     .register(deflistSyntax)
     .register(listTableDirective)
     .register(toctreeDirective)

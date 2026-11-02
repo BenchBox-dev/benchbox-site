@@ -1,11 +1,12 @@
 ---
-import { formatBlogDate, postPath, type BlogPost } from "../../lib/blog.ts";
+import { excerptOf, formatBlogDate, postPath, type BlogPost } from "../../lib/blog.ts";
 
 interface Props {
   posts: BlogPost[];
+  excerpts?: boolean;
 }
 
-const { posts } = Astro.props;
+const { posts, excerpts = false } = Astro.props;
 ---
 
 <ul class="post-list">
@@ -15,6 +16,7 @@ const { posts } = Astro.props;
         <time datetime={post.date.toISOString().slice(0, 10)}>{formatBlogDate(post.date)}</time>
         {" - "}
         <a href={postPath(post)}>{post.title}</a>
+        {excerpts && excerptOf(post.html) !== undefined && <p class="post-list__excerpt" set:html={excerptOf(post.html)} />}
       </li>
     ))
   }
@@ -27,5 +29,8 @@ const { posts } = Astro.props;
   }
   .post-list li {
     margin: 0.5rem 0;
+  }
+  .post-list__excerpt {
+    margin: 0.25rem 0 0;
   }
 </style>

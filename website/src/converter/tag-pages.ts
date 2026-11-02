@@ -40,6 +40,10 @@ function groupByTag(documents: readonly TaggedDocument[]): Map<string, { name: s
   return groups;
 }
 
+export function tagCounts(documents: readonly TaggedDocument[]): Map<string, number> {
+  return new Map([...groupByTag(documents)].map(([basename, group]) => [basename, group.paths.length]));
+}
+
 function tagPage(name: string, basename: string, paths: readonly string[]): string {
   const lines = [`(sphx_tag_${basename})=`, `# Tagged with: ${name}`, "", "**Pages with this tag**", ""];
   for (const path of paths) lines.push(`- {doc}\`../${path.replace(/\.(md|rst)$/, "")}\``);
