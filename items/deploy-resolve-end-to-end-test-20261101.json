@@ -3,7 +3,7 @@
     "A test runs resolve() with stubbed GitHub API responses, bundle fetch and receipt for: behind with the deployed site commit (superseded=true output, no work written, no report), behind with a new site commit (bundle fetched by the deployed core_sha with run id and digest cleared; a digest mismatch fails closed), redeploy (bundle fetched by the deployed core_sha; no deployed receipt fails with the named error) and fresh",
     "The test fails if the clearing of SITE_INPUTS_RUN_ID is removed or the superseded early return is removed"
   ],
-  "context": "Found 2026-10-31: the implementer of #97 reported that no test runs resolve end to end, and the item closed on first evidence without a live behind run.",
+  "context": "Found 2026-10-31: the implementer of #97 reported that no test runs resolve end to end, and the item closed on first evidence without a live behind run.\n\n2026-11-02: Done in PR #104 (merge 356a0728fd). deploy/test/resolve-cli.test.ts runs the real `deploy/cli.ts resolve` as a subprocess with deploy/test/fixtures/resolve-stub.mjs stubbing fetch (deployments, statuses, compare) and execFileSync (gh run download, bundle-fetch.mjs with real SITE_INPUTS_RUN_ID precedence). Covers superseded (no work, no report), behind with new site commit (fetch by deployed core_sha, run id cleared, digest mismatch fails closed), redeploy (missing receipt fails with the named error) and fresh. Mutation checks: removing SITE_INPUTS_RUN_ID clearing fails 2 tests; removing the superseded early return fails 1. npm run test:deploy 79/79; ci green before merge.",
   "description": "PR #97 added the superseded and use-deployed-bundle outcomes, and PR #98 the redeploy-by-deployed-core_sha path, but only the pure freshness()/redeployErrors helpers and a workflow-gating test cover them; resolve() in deploy/cli.ts has no test. No production deploy has hit a behind candidate since #97 merged, so the code that sets superseded=true and returns before writeWork, and the code that re-runs bundle-fetch with SITE_INPUTS_CORE_SHA set and SITE_INPUTS_RUN_ID/SITE_INPUTS_DIGEST cleared (SITE_INPUTS_RUN_ID takes precedence in scripts/bundle-fetch.mjs) and then compares the digest with the receipt, has never run in a test or in production.",
   "links": [
     "deploy/cli.ts",
@@ -19,6 +19,14 @@
       "op": "create",
       "op_id": "c4701066140249ea884fdd2f4c05bca6",
       "session_id": "ea29fdf857af4561aaa9ba743e60a0e6"
+    },
+    {
+      "actor": "mcp:omp-coding-agent:joe@joe-mac-mini.local:a6d1a76a8fe5c477ca12e1f3",
+      "at": "2026-11-02T02:02:42Z",
+      "client": "omp-coding-agent",
+      "op": "update",
+      "op_id": "0d593cdcd2df43b2a372a87ef5031a31",
+      "session_id": "2708a39948944f4299911f72f62ba6c5"
     }
   ]
 }
