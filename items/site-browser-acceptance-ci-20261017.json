@@ -8,7 +8,7 @@
     "The composer filter and copy behave correctly on the built /prompts/ page, and landing/prompts/a11y-checklist.md names the CI job",
     "The owner decides whether the job joins the required ci aggregate or stays advisory like visual.yml, recorded in context"
   ],
-  "context": "Moved from the BenchBox core tracker on 2026-10-30, when this repository gained its own tracker.",
+  "context": "Moved from the BenchBox core tracker on 2026-10-30, when this repository gained its own tracker.\n\n2026-11-02: Done in PR #111 (merge 59b11ff8fe). New ci.yml job 'Site browser acceptance' builds from the site-inputs artifact and runs verify:shell, verify:parity, verify:not-found, verify:explorer, verify:landing and pages-artifact.spec.ts (E2E_PAGES_SHAPED=1, E2E_SITE_DIR=website/dist) on every PR and main. Owner decision 2026-11-02: the job is required, in the needs of the ci aggregate. Fixed stale assertions: docs edit link now benchbox-site/edit/main/docs, and level-1 headings on the Benchmarks/Platforms index pages. shell.mjs fails if search returns any /results/ page (no Results section). landing.mjs no longer reads the legacy landing/ tree; a11y-checklist names the job. Job green in 7m44s; ci green.",
   "description": "benchbox-site has browser acceptance scripts that passed in the Astro build PR (core #2606) but run in no workflow; site ci.yml runs only vitest and the Explorer Playwright suite.\n- website/e2e/shell.mjs: axe at 1280, 390 and 320 px in both themes, 44 px targets, theme persistence, Pagefind docs and blog search.\n- website/e2e/parity.mjs: axe over every page template and a Pagefind smoke search.\n- website/e2e/not-found.mjs: deep links and query-string URLs through the 404 fallback on a Pages-like server.\n- website/e2e/explorer.mjs: shell parity, back and forward, query-string restore, worker and WASM recovery, zero Explorer bytes on docs and blog pages.\n- website/e2e/landing.mjs: composer filter and copy, no third-party scripts on /, axe on / and /prompts/. Part of it compares against the legacy static landing/ tree, which astro-site-54 removes.\n- explorer/e2e/routes/pages-artifact.spec.ts: Pages-shaped direct routes, skipped unless E2E_PAGES_SHAPED and E2E_SITE_DIR are set.\n\nAdd a CI job that builds the site from the fetched bundle and runs these checks against website/dist. Drop the parts of landing.mjs that need the legacy landing/ tree. These criteria come from astro-site-22, 35, 36 and 40, which were dropped as delivered.",
   "links": [
     "https://github.com/BenchBox-dev/benchbox-site"
@@ -21,6 +21,14 @@
       "op": "create",
       "op_id": "6d1d5e27520f4f378f0a52e775d64073",
       "session_id": "82c0d7d9603c4b7cb3497f18a64ea231"
+    },
+    {
+      "actor": "mcp:omp-coding-agent:joe@joe-mac-mini.local:a6d1a76a8fe5c477ca12e1f3",
+      "at": "2026-11-02T02:12:41Z",
+      "client": "omp-coding-agent",
+      "op": "update",
+      "op_id": "92283313e3ef45f890400caeb02b774f",
+      "session_id": "2708a39948944f4299911f72f62ba6c5"
     }
   ]
 }
