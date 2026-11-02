@@ -150,15 +150,10 @@
       "title": "Enforce a comment and docstring policy on the site repo's source"
     },
     "site-converter-tree-link-kind-immediate-parents-20261029": {
-      "claim": {
-        "expires_at": "2026-11-03T02:12:36Z",
-        "generation": "4163c90b1e0040d190f9c2714c7b707a",
-        "renewals": 0,
-        "worker": "mcp:omp-coding-agent:joe@joe-mac-mini.local:a6d1a76a8fe5c477ca12e1f3"
-      },
+      "claim": null,
       "needs": [],
       "priority": "low",
-      "status": "active",
+      "status": "done",
       "title": "Check that site docs links to core directories resolve against every ancestor directory, as repo-files.json now lists them"
     },
     "site-myst-converter-retirement-20261017": {
