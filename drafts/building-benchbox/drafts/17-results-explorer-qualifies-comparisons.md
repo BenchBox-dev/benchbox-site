@@ -201,7 +201,7 @@ The preview refuses some unsupported winner claims, shows why rows are excluded,
 ## References
 
 [^release]: [BenchBox 0.4.0 release](https://github.com/BenchBox-dev/BenchBox/releases/tag/v0.4.0), published August 28, 2026.
-[^snapshot]: [Deployed Results Explorer DuckDB snapshot](https://benchbox.dev/results/data/results.duckdb), read August 28, 2026. Captured SHA-256: `83cf3c7ffe56ad6f89c53944e66d9c18aa794d3985c89ae87588fb57a2398863`.
+[^snapshot]: [Deployed Results Explorer DuckDB snapshot](https://benchbox.dev/results/data/results.duckdb), read August 28, 2026.
 [^compare-urls]: Live Compare pages for the walkthrough pairs: [TPC-H SF1 DataFusion SQL vs Polars DataFrame](https://benchbox.dev/results/compare?ids=e3aaa125,9187e38f) and [DuckDB TPC-DS SF1 vs SF10](https://benchbox.dev/results/compare?ids=f552fd5d,aa8b0fad). GitHub Pages serves unknown `/results/` paths through a 404 restore into the SPA; those URLs open Compare in a browser.
 [^eligibility]: [Display and comparison eligibility implementation at the v0.4.0 tag commit](https://raw.githubusercontent.com/BenchBox-dev/BenchBox/f841b85f1d40cc2396f16fb185d1dfbb371ac1a3/results-explorer/src/lib/displayEligibility.ts).
 [^compare]: [Compare page cohort and claim-suppression logic at the v0.4.0 tag commit](https://raw.githubusercontent.com/BenchBox-dev/BenchBox/f841b85f1d40cc2396f16fb185d1dfbb371ac1a3/results-explorer/src/pages/Compare.tsx) and [Comparability Receipt implementation](https://raw.githubusercontent.com/BenchBox-dev/BenchBox/f841b85f1d40cc2396f16fb185d1dfbb371ac1a3/results-explorer/src/components/ComparabilityReceipt.tsx).
