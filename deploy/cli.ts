@@ -187,7 +187,7 @@ async function gates(): Promise<void> {
   const resolution = readJson<Resolution>(path.join(WORK, "resolve.json"));
   const rollback = resolution.rollback_target;
   const uiVersion = rollback ? rollback.explorer_read_model_version : uiVersionFromSource(readFileSync(path.join(ROOT, "explorer", "src", "db.ts"), "utf8"));
-  const allowance = readJson<BrokenLink[]>(path.join(ROOT, "inventory", "known-broken-links.json"));
+  const allowance = rollback ? [] : readJson<BrokenLink[]>(path.join(ROOT, "inventory", "known-broken-links.json"));
   const originAllowlist = readJson<string[]>(path.join(ROOT, "deploy", "origin-allowlist.json")).map((pattern) => new RegExp(pattern));
   const host = process.env.SITE_HOST;
   const snapshot = path.join(SITE_DIR, SNAPSHOT_PATH);
