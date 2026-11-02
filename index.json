@@ -34,15 +34,10 @@
       "title": "Replace the byte SHA-256 of the deployed snapshot cited in blog draft 17 with a content digest or remove the claim"
     },
     "blog-scd2-sf1-scale-row": {
-      "claim": {
-        "expires_at": "2026-11-03T06:20:18Z",
-        "generation": "fe714b1a9d1d46bcb8d8d11f964a7f08",
-        "renewals": 0,
-        "worker": "mcp:omp-coding-agent:joe@joe-mac-mini.local:19c40f82a7ecdc483ce560ab"
-      },
+      "claim": null,
       "needs": [],
       "priority": "low",
-      "status": "active",
+      "status": "done",
       "title": "Add the SF1 basic row to the SCD2 blog scale table for balance"
     },
     "canonical-snapshot-digest-looseness-20261029": {
