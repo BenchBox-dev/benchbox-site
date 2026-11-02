@@ -117,3 +117,34 @@ carries that `core_sha` and its digest equals the receipt's `bundle_digest`.
 It never picks the newest bundle and runs no freshness compare. With no
 receipt deployed for the target it fails with "redeploy needs a deployed
 receipt".
+
+## Snapshot digest
+
+While the corpus is unchanged, the deploy compares the candidate
+`results.duckdb` with the deployed one by a canonical digest
+(`deploy/lib/canonical-digest.ts`), because two builds of the same data differ
+byte for byte. The invariant: the digest changes if and only if what a reader
+of the snapshot sees changes.
+
+Covered:
+
+- every table and view in the `main` schema, by name
+- every column's name and type, in declared order, so a schema change changes
+  the digest
+- every row of every column, including a column named `generated_at` if one
+  ever appears; nothing is excluded
+- view and index definitions (the SQL text)
+
+Ignored:
+
+- row order: rows are sorted by every column before hashing, because storage
+  order is a build accident
+- floating-point digits beyond the ninth significant digit: `DOUBLE`, `FLOAT`
+  and `REAL` values are rounded to nine significant digits, which absorbs
+  build-to-build noise without hiding a real change
+- file layout, block sizes, statistics and anything else that is not content
+
+Changing what the digest covers changes the digest of an unchanged corpus. The
+next deploy after such a change fails the snapshot gate once, printing the
+`old->new` pair. The owner reviews it and sets `SITE_SNAPSHOT_APPROVED_CHANGE`
+to that pair and `SITE_SNAPSHOT_APPROVAL_REASON` to the reason.
