@@ -66,7 +66,7 @@ export function pageViolations(ctx: Context): Violation[] {
   const names = new Set<string>();
   for (const entry of ctx.pages.filter((candidate) => candidate.path.startsWith("reference/python-api/"))) {
     for (const heading of entry.text.matchAll(/^#{1,6}\s+(.*)$/gm)) for (const word of heading[1].matchAll(/[A-Za-z_][A-Za-z0-9_.]*/g)) names.add(word[0]);
-    for (const anchor of entry.text.matchAll(/(?:\(([A-Za-z0-9_.-]+)\)=|\bid=["']([^"']+)["']|<a\s+name=["']([^"']+)["'])/g)) {
+    for (const anchor of entry.text.matchAll(/(?:\bid=["']([^"']+)["']|<a\s+name=["']([^"']+)["'])/g)) {
       for (const group of anchor.slice(1)) if (group) names.add(group);
     }
   }

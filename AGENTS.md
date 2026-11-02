@@ -73,9 +73,14 @@ versioned core bundle; it reads nothing else from core.
   `reference/tuning-platform-support.md`) and with `blog/`. An authored page
   in the generated scope or under `docs/blog/` fails the assembly.
 - Pages are plain GitHub-flavoured Markdown. They render the same on GitHub
-  as on the site. The converter still reads some MyST syntax while it is
-  being retired, so do not write new MyST: no directives, `{doc}` or `{ref}`
-  roles, `(label)=` lines or definition lists.
+  as on the site. The converter does not read MyST, and a guard
+  (`website/src/converter/myst-guard.ts`) fails the build with the file and
+  line on the constructs that would otherwise render as stray text: a
+  directive fence (```` ```{name} ````), a role before an inline code span
+  a `(label)=` line and a `myst` front matter key. Write the plain form instead: GitHub alerts, `.md`
+  links, `<span id>` anchors and bold lead-ins in place of definition lists.
+- The site publishes no `objects.inv` Sphinx inventory. Nothing consumed it,
+  and the deploy probe no longer requires it.
 - The sidebar is the tree in `docs/nav.yml`: groups with a `label` and
   `items`, where an item is a page path, `{page, label, items}` for a page
   with a label override or children, or `{label, url}` for an external link.

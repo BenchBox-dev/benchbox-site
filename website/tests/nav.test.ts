@@ -1,6 +1,5 @@
 import { afterEach, describe, expect, it } from "vitest";
 import { parseNav } from "../src/converter/nav.ts";
-import { TAG_CATEGORIES } from "../src/converter/tag-categories.ts";
 import { build, cleanup, frontMatterOf } from "./support.ts";
 
 afterEach(cleanup);
@@ -14,25 +13,6 @@ const pages = {
   "a.md": "---\ntags: [beginner, cli]\n---\n\n# A\n",
   "b.md": "---\ntags: [beginner, advanced]\n---\n\n# B\n",
 };
-
-const toctreeIndex = [
-  "# Home",
-  "",
-  "```{toctree}",
-  ":caption: Guides",
-  "",
-  "guides/one",
-  "Custom Two <guides/two.md>",
-  "usage/index",
-  "```",
-  "",
-  "```{toctree}",
-  ":caption: Browse by Tag",
-  "",
-  ...TAG_CATEGORIES.map((category) => `_tags/cat-${category.slug}`),
-  "```",
-  "",
-].join("\n");
 
 const navYaml = [
   "groups:",
@@ -50,14 +30,20 @@ const navYaml = [
 const manifestOf = (result: ReturnType<typeof build>) => JSON.parse(result.files.get("manifest/sidebar.json") ?? "{}") as { groups: { label: string; items: { label: string; link: string; items?: unknown[] }[] }[]; order: Record<string, number> };
 
 describe("docs/nav.yml", () => {
-  it("builds the sidebar from the file, reproducing the toctree-derived sidebar", () => {
-    const fromToctrees = build({ ...pages, "index.md": toctreeIndex, "usage/index.md": `${pages["usage/index.md"]}\n\`\`\`{toctree}\n:hidden:\n\n../deep\n\`\`\`\n` });
-    const fromNav = build({ ...pages, "index.md": "# Home\n", "usage/index.md": pages["usage/index.md"], "nav.yml": navYaml.replace("      - page: usage/index.md\n", "      - page: usage/index.md\n        items:\n          - deep.md\n") });
-    expect(fromToctrees.errors).toEqual([]);
-    expect(fromNav.errors).toEqual([]);
-    expect(manifestOf(fromNav).groups[0]).toEqual(manifestOf(fromToctrees).groups[0]);
-    const listedOrder = (result: ReturnType<typeof build>) => Object.entries(manifestOf(result).order).filter(([page]) => !page.startsWith("_tags/"));
-    expect(listedOrder(fromNav)).toEqual(listedOrder(fromToctrees));
+  it("builds the sidebar from the file: groups, custom labels, nested children and depth-first order", () => {
+    const nav = navYaml.replace("      - page: usage/index.md\n", "      - page: usage/index.md\n        items:\n          - deep.md\n");
+    const result = build({ ...pages, "index.md": "# Home\n", "nav.yml": nav });
+    expect(result.errors).toEqual([]);
+    expect(manifestOf(result).groups[0]).toEqual({
+      label: "Guides",
+      items: [
+        { label: "One", link: "/docs/guides/one.html" },
+        { label: "Custom Two", link: "/docs/guides/two.html" },
+        { label: "Usage", link: "/docs/usage/index.html", items: [{ label: "Deep", link: "/docs/deep.html" }] },
+      ],
+    });
+    const listedOrder = Object.entries(manifestOf(result).order).filter(([page]) => !page.startsWith("_tags/"));
+    expect(listedOrder).toEqual([["index.md", 0], ["guides/one.md", 1], ["guides/two.md", 2], ["usage/index.md", 3], ["deep.md", 4]]);
   });
 
   it("expands the generated tag groups with page counts and keeps unlisted tag categories out of the way", () => {

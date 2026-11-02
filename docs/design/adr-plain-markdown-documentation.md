@@ -39,8 +39,14 @@ pages and the sidebar, but it no longer understands MyST.
   fences, tables are pipe tables, and definition lists are bold lead-in
   paragraphs.
 - Index pages list their children as a flat Markdown list. The nested section
-  lists that the toctree directive generated are gone.
+  lists that the old contents directive generated are gone.
 - The blog index is rendered by the blog template from the published posts.
+- A permanent guard in the converter (`myst-guard.ts`) fails the build, with
+  file and line, on a directive fence, a role before an inline code span, a
+  `(label)=` line and a `myst` front matter key, so MyST cannot return unnoticed and render as stray text.
+- The site no longer publishes `objects.inv`, the Sphinx cross-reference
+  inventory. Sphinx is gone, nothing consumed the file, and it is removed from
+  the build, the manifest, the deploy probe and the route probe.
 
 ## Consequences
 

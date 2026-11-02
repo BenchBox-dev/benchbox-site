@@ -86,7 +86,7 @@ describe("converter output directory", () => {
 
 describe("MDX validity", () => {
   it("fails with file and line on raw html that would break a page using a component", () => {
-    const result = build({ "a.md": "# A\n\n```{note}\nhi\n```\n\nText\n\n<div>\nopen <br> here\n</div>\n" });
-    expect(result.errors.map((error) => error.message)).toEqual([expect.stringMatching(/^a\.md:9: content is not valid MDX on this page, which uses a component: Expected a closing tag for `<br>`/)]);
+    const result = build({ "a.md": "# A\n\n> [!NOTE]\n> hi\n\nText\n\n<div>\nopen <br> here\n</div>\n" });
+    expect(result.errors.map((error) => error.message)).toEqual([expect.stringMatching(/^a\.md:8: content is not valid MDX on this page, which uses a component: Expected a closing tag for `<br>`/)]);
   });
 });

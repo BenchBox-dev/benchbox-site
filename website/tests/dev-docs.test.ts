@@ -37,11 +37,11 @@ describe("docs mounted at /docs/dev/", () => {
     mkdirSync(path.join(site, "docs", "guide"), { recursive: true });
     writeFileSync(path.join(site, "docs", "index.html"), '<a href="/docs/guide/a.html">a</a>');
     writeFileSync(path.join(site, "docs", "guide", "a.html"), '<a href="/docs/">home</a>');
-    writeFileSync(path.join(site, "docs", "objects.inv"), "inventory");
+    writeFileSync(path.join(site, "docs", "example.json"), "{}");
     expect(mountDevDocs(site, ORIGIN)).toBe(2);
     expect(readFileSync(path.join(site, "docs", "index.html"), "utf8")).toBe('<a href="/docs/guide/a.html">a</a>');
     expect(readFileSync(path.join(site, "docs", "dev", "index.html"), "utf8")).toBe('<a href="/docs/dev/guide/a.html">a</a>');
-    expect(readFileSync(path.join(site, "docs", "dev", "objects.inv"), "utf8")).toBe("inventory");
+    expect(readFileSync(path.join(site, "docs", "dev", "example.json"), "utf8")).toBe("{}");
     expect(existsSync(path.join(site, "docs", "dev", "dev"))).toBe(false);
   });
 
