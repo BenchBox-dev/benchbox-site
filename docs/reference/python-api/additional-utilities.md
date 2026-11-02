@@ -1,14 +1,10 @@
 ---
-myst:
-  enable_extensions:
-    - attrs_block
+tags: [reference, python-api]
 ---
+
 <!-- markdownlint-disable MD024 -->
 
 # Additional Utilities API
-
-```{tags} reference, python-api
-```
 
 Complete Python API reference for additional BenchBox utilities.
 
@@ -113,7 +109,7 @@ Returns a benchmark name with the scale-factor token appended, as used for resul
 
 **Import:** `from benchbox.utils.scale_factor import format_benchmark_name` · **Extras:** none
 
-{#format-benchmark-name-parameters}
+<span id="format-benchmark-name-parameters"></span>
 
 ##### Parameters
 
@@ -122,19 +118,19 @@ Returns a benchmark name with the scale-factor token appended, as used for resul
 | `benchmark_name` | `str` | required | The benchmark name. It is used as given: case, spaces and an empty string are not changed or rejected. |
 | `scale_factor` | `float` | required | The benchmark scale factor. |
 
-{#format-benchmark-name-returns}
+<span id="format-benchmark-name-returns"></span>
 
 ##### Returns
 
 `str`: `<benchmark_name>_<token>`, where the token is the `format_scale_factor` result for `scale_factor`.
 
-{#format-benchmark-name-raises}
+<span id="format-benchmark-name-raises"></span>
 
 ##### Raises
 
 The same errors as `format_scale_factor`: `OverflowError` for infinity and `TypeError` for a value that is not a number, such as `"1"`.
 
-{#format-benchmark-name-example}
+<span id="format-benchmark-name-example"></span>
 
 ##### Example
 
@@ -160,7 +156,7 @@ Returns the name of the directory that holds generated data for a benchmark at a
 
 **Import:** `from benchbox.utils.scale_factor import format_data_directory` · **Extras:** none
 
-{#format-data-directory-parameters}
+<span id="format-data-directory-parameters"></span>
 
 ##### Parameters
 
@@ -169,19 +165,19 @@ Returns the name of the directory that holds generated data for a benchmark at a
 | `benchmark_name` | `str` | required | The benchmark name, used as given. |
 | `scale_factor` | `float` | required | The benchmark scale factor. |
 
-{#format-data-directory-returns}
+<span id="format-data-directory-returns"></span>
 
 ##### Returns
 
 `str`: `<benchmark_name>_<token>_data`. It is a name only: no directory is created and no path separator is added.
 
-{#format-data-directory-raises}
+<span id="format-data-directory-raises"></span>
 
 ##### Raises
 
 The same errors as `format_scale_factor`: `OverflowError` for infinity and `TypeError` for a value that is not a number.
 
-{#format-data-directory-example}
+<span id="format-data-directory-example"></span>
 
 ##### Example
 
@@ -207,7 +203,7 @@ Returns the database schema name for a benchmark at a scale factor.
 
 **Import:** `from benchbox.utils.scale_factor import format_schema_name` · **Extras:** none
 
-{#format-schema-name-parameters}
+<span id="format-schema-name-parameters"></span>
 
 ##### Parameters
 
@@ -216,19 +212,19 @@ Returns the database schema name for a benchmark at a scale factor.
 | `benchmark_name` | `str` | required | The benchmark name, used as given. |
 | `scale_factor` | `float` | required | The benchmark scale factor. |
 
-{#format-schema-name-returns}
+<span id="format-schema-name-returns"></span>
 
 ##### Returns
 
 `str`: `<benchmark_name>_<token>`. The result is always equal to the `format_benchmark_name` result for the same arguments. It is a name only: no schema is created.
 
-{#format-schema-name-raises}
+<span id="format-schema-name-raises"></span>
 
 ##### Raises
 
 The same errors as `format_scale_factor`: `OverflowError` for infinity and `TypeError` for a value that is not a number.
 
-{#format-schema-name-example}
+<span id="format-schema-name-example"></span>
 
 ##### Example
 
@@ -353,7 +349,7 @@ Checks that every dependency declared in `pyproject.toml` has a locked version i
 
 **Import:** `from benchbox.utils.dependency_validation import validate_dependency_versions` · **Extras:** none
 
-{#validate-dependency-versions-parameters}
+<span id="validate-dependency-versions-parameters"></span>
 
 ##### Parameters
 
@@ -362,7 +358,7 @@ Checks that every dependency declared in `pyproject.toml` has a locked version i
 | `pyproject_data` | `Mapping[str, object]` | required | Parsed `pyproject.toml`. Its `[project]` table supplies `dependencies` and `optional-dependencies`. |
 | `lock_data` | `Mapping[str, object]` | required | Parsed `uv.lock`. Its `[[package]]` entries supply the locked names and versions. |
 
-{#validate-dependency-versions-returns}
+<span id="validate-dependency-versions-returns"></span>
 
 ##### Returns
 
@@ -373,13 +369,13 @@ Checks that every dependency declared in `pyproject.toml` has a locked version i
 - **Matching:** names are compared in canonical form. A requirement with no specifier is satisfied by any locked version of that package. Pre-release versions can satisfy a specifier.
 - **Not checked:** environment markers on a requirement are ignored, and the Python version is not checked.
 
-{#validate-dependency-versions-raises}
+<span id="validate-dependency-versions-raises"></span>
 
 ##### Raises
 
 `DependencyValidationError` (a `RuntimeError` subclass defined in the same module) when `pyproject_data` has no `[project]` table. An invalid requirement string raises the `packaging` library's `InvalidRequirement`.
 
-{#validate-dependency-versions-example}
+<span id="validate-dependency-versions-example"></span>
 
 ##### Example
 
@@ -422,7 +418,7 @@ Summarises the Python range and the optional dependency groups of a project.
 
 **Import:** `from benchbox.utils.dependency_validation import build_matrix_summary` · **Extras:** none
 
-{#build-matrix-summary-parameters}
+<span id="build-matrix-summary-parameters"></span>
 
 ##### Parameters
 
@@ -431,7 +427,7 @@ Summarises the Python range and the optional dependency groups of a project.
 | `pyproject_data` | `Mapping[str, object]` | required | Parsed `pyproject.toml`. |
 | `lock_data` | `Mapping[str, object]` | required | Parsed `uv.lock`. |
 
-{#build-matrix-summary-returns}
+<span id="build-matrix-summary-returns"></span>
 
 ##### Returns
 
@@ -443,7 +439,7 @@ Summarises the Python range and the optional dependency groups of a project.
 
 The function never validates: it does not raise for a missing `[project]` table or an unsatisfied requirement.
 
-{#build-matrix-summary-example}
+<span id="build-matrix-summary-example"></span>
 
 ##### Example
 
@@ -627,13 +623,13 @@ Returns a snapshot of the operating system, CPU, memory and Python version of th
 
 **Import:** `from benchbox.utils.system_info import get_system_info` · **Extras:** none
 
-{#get-system-info-parameters}
+<span id="get-system-info-parameters"></span>
 
 ##### Parameters
 
 None.
 
-{#get-system-info-returns}
+<span id="get-system-info-returns"></span>
 
 ##### Returns
 
@@ -647,7 +643,7 @@ A `SystemInfo` object. The examples on this page read these attributes:
 
 The `SystemInfo` class is not part of the public contract. The readings come from `psutil`, which is a core dependency of BenchBox.
 
-{#get-system-info-example}
+<span id="get-system-info-example"></span>
 
 ##### Example
 
@@ -674,13 +670,13 @@ Returns the current memory usage of the host as a dictionary.
 
 **Import:** `from benchbox.utils.system_info import get_memory_info` · **Extras:** none
 
-{#get-memory-info-parameters}
+<span id="get-memory-info-parameters"></span>
 
 ##### Parameters
 
 None.
 
-{#get-memory-info-returns}
+<span id="get-memory-info-returns"></span>
 
 ##### Returns
 
@@ -693,7 +689,7 @@ None.
 
 The call returns immediately.
 
-{#get-memory-info-example}
+<span id="get-memory-info-example"></span>
 
 ##### Example
 
@@ -721,13 +717,13 @@ Returns the core counts and the current CPU usage of the host as a dictionary.
 
 **Import:** `from benchbox.utils.system_info import get_cpu_info` · **Extras:** none
 
-{#get-cpu-info-parameters}
+<span id="get-cpu-info-parameters"></span>
 
 ##### Parameters
 
 None.
 
-{#get-cpu-info-returns}
+<span id="get-cpu-info-returns"></span>
 
 ##### Returns
 
@@ -741,7 +737,7 @@ None.
 
 The call blocks for about two seconds, because the two usage readings are sampled one after the other.
 
-{#get-cpu-info-example}
+<span id="get-cpu-info-example"></span>
 
 ##### Example
 
@@ -776,7 +772,7 @@ Tells whether a string is only an architecture label rather than a CPU model. Us
 def is_cpu_architecture_token(value: str, machine: str) -> bool: ...
 ```
 
-{#is-cpu-architecture-token-parameters}
+<span id="is-cpu-architecture-token-parameters"></span>
 
 ##### Parameters
 
@@ -785,7 +781,7 @@ def is_cpu_architecture_token(value: str, machine: str) -> bool: ...
 | `value` | `str` | required | The candidate CPU model string. It is stripped and lowercased before the comparison. |
 | `machine` | `str` | required | The current machine architecture, such as `x86_64` or `arm64`. |
 
-{#is-cpu-architecture-token-returns}
+<span id="is-cpu-architecture-token-returns"></span>
 
 ##### Returns
 
@@ -803,13 +799,13 @@ Returns the CPU model and vendor of the current host. Either value can be unavai
 def detect_cpu_info() -> tuple[str | None, str | None]: ...
 ```
 
-{#detect-cpu-info-parameters}
+<span id="detect-cpu-info-parameters"></span>
 
 ##### Parameters
 
 None.
 
-{#detect-cpu-info-returns}
+<span id="detect-cpu-info-returns"></span>
 
 ##### Returns
 
@@ -824,7 +820,7 @@ The probe depends on the platform:
 
 Probe errors return unavailable values. A detected architecture label is discarded as a model, and an available vendor is kept.
 
-The probes request processor identity, not host names or machine identifiers. `get_system_info()` separately includes a host name, so callers who publish host information still need the anonymization rules in {doc}`/development/result-execution-environment`.
+The probes request processor identity, not host names or machine identifiers. `get_system_info()` separately includes a host name, so callers who publish host information still need the anonymization rules in [Result Execution Environment Contract](../../development/result-execution-environment.md).
 
 ### Usage Examples
 
@@ -990,10 +986,10 @@ Output on a 4-core host with 15.7 GB of memory:
 
 ## See Also
 
-- {doc}`data-validation` - Data validation utilities
-- {doc}`performance-monitoring` - Performance monitoring utilities
-- {doc}`utilities` - Core utilities (dialect translation)
-- {doc}`/development/getting-started` - Development guide
+- [Data Validation Utilities API](data-validation.md) - Data validation utilities
+- [Performance Monitoring Utilities API](performance-monitoring.md) - Performance monitoring utilities
+- [Utility Functions API](utilities.md) - Core utilities (dialect translation)
+- [Getting Started with Development](../../development/getting-started.md) - Development guide
 
 <span id="not-part-of-public-contract"></span>
 

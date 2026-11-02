@@ -1,26 +1,23 @@
+---
+tags: [reference, python-api, sql-platform]
+---
+
 <!-- markdownlint-disable MD024 -->
 
 # Platform API Reference
 
-```{tags} reference, python-api, sql-platform
-```
-
 This section documents the supported database adapters and their shared lifecycle.
 
-```{toctree}
-:maxdepth: 1
-
-platforms/common
-platforms/duckdb
-platforms/datafusion
-platforms/clickhouse
-platforms/databricks
-platforms/bigquery
-platforms/snowflake
-platforms/redshift
-platforms/sqlite
-platforms/polars
-```
+- [Common platform adapter API](platforms/common.md)
+- [DuckDB Platform Adapter](platforms/duckdb.md)
+- [Apache DataFusion Platform Adapter](platforms/datafusion.md)
+- [ClickHouse Platform Adapter](platforms/clickhouse.md)
+- [Databricks Platform Adapter](platforms/databricks.md)
+- [BigQuery Platform Adapter](platforms/bigquery.md)
+- [Snowflake Platform Adapter](platforms/snowflake.md)
+- [Amazon Redshift Platform Adapter](platforms/redshift.md)
+- [SQLite Platform Adapter](platforms/sqlite.md)
+- [Polars Platform Adapter](platforms/polars.md)
 
 ## `benchbox.platforms`
 
@@ -98,4 +95,4 @@ Unsupported platform: not_a_platform
 
 ### Compatibility
 
-Each adapter is also importable from its own module, and both paths give the same object: `benchbox.platforms.duckdb.DuckDBAdapter` is `benchbox.platforms.DuckDBAdapter`. Per-adapter pages: {doc}`platforms/duckdb`, {doc}`platforms/polars` and the others in the list above.
+Each adapter is also importable from its own module, and both paths give the same object: `benchbox.platforms.duckdb.DuckDBAdapter` is `benchbox.platforms.DuckDBAdapter`. Per-adapter pages: [DuckDB Platform Adapter](platforms/duckdb.md), [Polars Platform Adapter](platforms/polars.md) and the others in the list above.

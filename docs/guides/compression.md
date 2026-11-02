@@ -1,7 +1,8 @@
-# Data Compression in BenchBox
+---
+tags: [intermediate, guide, data-generation]
+---
 
-```{tags} intermediate, guide, data-generation
-```
+# Data Compression in BenchBox
 
 BenchBox provides comprehensive data compression support to reduce storage requirements and improve I/O performance during benchmark data generation.
 

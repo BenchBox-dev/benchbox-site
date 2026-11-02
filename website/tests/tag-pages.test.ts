@@ -5,11 +5,12 @@ import { build, bodyOf, cleanup, pageOf } from "./support.ts";
 afterEach(cleanup);
 
 const files = {
-  "index.md": "# Home\n\n```{toctree}\n:maxdepth: 2\n:caption: Browse by Tag\n\n_tags/cat-audience\n_tags/cat-feature\n```\n",
-  "README.md": "# Readme\n\n```{tags} beginner, cli\n```\n",
-  "usage/index.md": "# Usage\n\n```{tags}\nbeginner,\nPython API\n```\n",
-  "Zeta.md": "# Zeta Guide\n\n```{tags} advanced\n```\n",
-  "platforms/duck.md": "# Duck Platform\n\n```{tags} reference, python-api\n```\n\nBody text.\n",
+  "index.md": "# Home\n\n- [By Audience](_tags/cat-audience.md)\n- [By Feature](_tags/cat-feature.md)\n",
+  "nav.yml": "groups:\n  - label: Browse by Tag\n    generated: tag-categories\n",
+  "README.md": "---\ntags: [beginner, cli]\n---\n\n# Readme\n",
+  "usage/index.md": "---\ntags: [beginner, Python API]\n---\n\n# Usage\n",
+  "Zeta.md": "---\ntags: [advanced]\n---\n\n# Zeta Guide\n",
+  "platforms/duck.md": "---\ntags: [reference, python-api]\n---\n\n# Duck Platform\n\nBody text.\n",
   "plain.md": "# Plain\n",
   "blog/2026-01-01-post.md": "---\nblogpost: true\ndate: Jan 1, 2026\ntags: beginner, blogonly\n---\n\n# A post\n\nBody.\n",
 };
@@ -22,8 +23,6 @@ sidebar:
   order: 2
 ---
 
-<span id="sphx-tag-beginner"></span>
-
 <span id="tagged-with-beginner"></span>
 
 **Pages with this tag**
@@ -33,7 +32,7 @@ sidebar:
 `;
 
 describe("tag page generation", () => {
-  it("emits a golden tag page at the sphinx-tags route with matching ids", () => {
+  it("emits a golden tag page at the stable tag route", () => {
     const result = build(files);
     expect(result.errors).toEqual([]);
     expect(pageOf(result, "docs/_tags/beginner.md")).toBe(GOLDEN_BEGINNER);
@@ -86,7 +85,6 @@ describe("tag page generation", () => {
   it("nests category tags under the tags index", () => {
     const result = build(files);
     const body = bodyOf(result, "docs/_tags/tagsindex.md");
-    expect(body).toContain('<span id="tagoverview"></span>');
     expect(body).toContain("- [By Audience](/docs/_tags/cat-audience.html)\n  - [beginner (2)](/docs/_tags/beginner.html)");
     expect(pageOf(result, "docs/_tags/tagsindex.md")).toContain("title: Browse by Tag");
   });
@@ -97,26 +95,30 @@ describe("tag page generation", () => {
   });
 });
 
-describe("toctree resolution of generated tag pages", () => {
-  it("resolves _tags category targets from a toctree without errors", () => {
+describe("links to generated tag pages", () => {
+  it("resolves _tags category links from a page without errors", () => {
     const result = build(files);
     expect(result.errors).toEqual([]);
-    const body = bodyOf(result, "docs/index.md");
-    expect(body).toContain("**Browse by Tag**");
-    expect(body).toContain("- [By Audience](/docs/_tags/cat-audience.html)");
-    expect(body).toContain("  - [beginner (2)](/docs/_tags/beginner.html)");
+    expect(bodyOf(result, "docs/index.md")).toContain("- [By Audience](/docs/_tags/cat-audience.html)");
   });
 
-  it("places generated pages in the sidebar under the index toctree", () => {
+  it("places generated pages in the sidebar under the generated tag group", () => {
     const result = build(files);
     const sidebar = JSON.parse(result.files.get("manifest/sidebar.json") ?? "{}") as { groups: { label: string; items: { link: string; items?: { link: string }[] }[] }[] };
     expect(sidebar.groups[0].label).toBe("Browse by Tag");
-    expect(sidebar.groups[0].items.map((item) => item.link)).toEqual(["/docs/_tags/cat-audience.html", "/docs/_tags/cat-feature.html"]);
+    expect(sidebar.groups[0].items.map((item) => item.link)).toEqual([
+      "/docs/_tags/cat-audience.html",
+      "/docs/_tags/cat-benchmark.html",
+      "/docs/_tags/cat-platform.html",
+      "/docs/_tags/cat-platform-type.html",
+      "/docs/_tags/cat-content-type.html",
+      "/docs/_tags/cat-feature.html",
+    ]);
     expect(sidebar.groups[0].items[0].items?.map((item) => item.link)).toEqual(["/docs/_tags/beginner.html", "/docs/_tags/advanced.html"]);
   });
 
-  it("still reports unknown _tags targets when no such tag page exists", () => {
-    const result = build({ "index.md": "# Home\n\n```{toctree}\n_tags/cat-audience\n```\n" });
+  it("still reports links to a tag page that does not exist", () => {
+    const result = build({ "index.md": "# Home\n\n[tags](_tags/cat-audience.md)\n" });
     expect(result.errors.map((error) => error.message).join("\n")).toContain("_tags/cat-audience");
   });
 

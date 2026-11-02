@@ -1,9 +1,10 @@
+---
+tags: [intermediate, guide, lakesail, sql-platform, dataframe-platform, spark-compatible, local]
+---
+
 <!-- Copyright 2026 Joe Harris / BenchBox Project. Licensed under the MIT License. -->
 
 # LakeSail Sail Platform
-
-```{tags} intermediate, guide, lakesail, sql-platform, dataframe-platform, spark-compatible, local
-```
 
 LakeSail Sail is a Rust-based, drop-in replacement for Apache Spark built on DataFusion. It delivers 4x faster execution with 94% lower hardware costs compared to Apache Spark (TPC-H SF100). BenchBox supports LakeSail in both SQL mode (`lakesail`) and DataFrame mode (`lakesail-df`), connecting via the standard Spark Connect protocol for zero-rewrite migration from PySpark.
 

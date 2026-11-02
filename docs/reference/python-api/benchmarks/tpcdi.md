@@ -1,14 +1,10 @@
 ---
-myst:
-  enable_extensions:
-    - attrs_block
+tags: [reference, python-api, tpc-di]
 ---
+
 <!-- markdownlint-disable MD024 -->
 
 # TPC-DI Benchmark API
-
-```{tags} reference, python-api, tpc-di
-```
 
 Python API reference for the TPC-DI (Data Integration) benchmark.
 
@@ -56,7 +52,7 @@ The DuckDB adapter needs the `duckdb` package. This runs the 38 TPC-DI queries a
 
 Creates a TPC-DI benchmark that generates the 16 warehouse tables, generates ETL source files in four formats, runs the ETL pipeline and serves 38 validation and analytical queries.
 
-`TPCDI` is the public facade over the data-integration implementation. It inherits the common benchmark lifecycle and adapter integration described in {doc}`/reference/python-api/base`. Its own query, schema and ETL methods delegate to the TPC-DI implementation. `run_with_platform` returns a `BenchmarkResults` object. The connection-based `run_benchmark` and `run_full_benchmark` return TPC-DI result dictionaries. These APIs are distinct.
+`TPCDI` is the public facade over the data-integration implementation. It inherits the common benchmark lifecycle and adapter integration described in [Base Benchmark API](../base.md). Its own query, schema and ETL methods delegate to the TPC-DI implementation. `run_with_platform` returns a `BenchmarkResults` object. The connection-based `run_benchmark` and `run_full_benchmark` return TPC-DI result dictionaries. These APIs are distinct.
 
 **Import:** `from benchbox import TPCDI` · **Extras:** `tpcdi`
 
@@ -82,7 +78,7 @@ Unlike most benchmarks, the constructor creates the directories `logs`, `source`
 
 ##### Returns
 
-A `TPCDI` instance. It subclasses `BaseBenchmark`; see {doc}`/reference/python-api/base` for the shared interface.
+A `TPCDI` instance. It subclasses `BaseBenchmark`; see [Base Benchmark API](../base.md) for the shared interface.
 
 ##### Raises
 
@@ -459,7 +455,7 @@ if benchmark.etl_mode:
 
 ### Inherited members
 
-Every other member comes from `BaseBenchmark`. See {doc}`/reference/python-api/base` for what they do. The ids on this page for the inherited members are kept in the table.
+Every other member comes from `BaseBenchmark`. See [Base Benchmark API](../base.md) for what they do. The ids on this page for the inherited members are kept in the table.
 
 | Group | Member | Kind | Notes |
 | --- | --- | --- | --- |
@@ -871,7 +867,7 @@ Holds the TPC-DI settings for scale, output directory, parallelism, chunk size, 
 
 **Import:** `from benchbox.core.tpcdi.config import TPCDIConfig` · **Extras:** `tpcdi`
 
-{#tpcdi-config-parameters}
+<span id="tpcdi-config-parameters"></span>
 
 #### Parameters
 
@@ -888,7 +884,7 @@ Holds the TPC-DI settings for scale, output directory, parallelism, chunk size, 
 | `optimize_memory` | `bool` | `True` | Turns on memory-saving processing. |
 | `log_level` | `str` | `"INFO"` | `DEBUG`, `INFO`, `WARNING`, `ERROR` or `CRITICAL`, in any case. Creating a config calls `logging.basicConfig` with this level; an unknown name uses `INFO` there and stays unchanged on the attribute. |
 
-{#tpcdi-config-returns}
+<span id="tpcdi-config-returns"></span>
 
 #### Returns
 
@@ -907,13 +903,13 @@ A `TPCDIConfig`. Creating one makes no directories.
 | `for_production(scale_factor=1.0)` (class method) | `chunk_size` 15000 and `strict_validation` on, adjusted by `adjust_for_scale_factor()`. |
 | `for_performance_testing(scale_factor=1.0)` (class method) | `max_workers` set to the CPU count (parallel stays off), `chunk_size` 25000, `enable_validation` off, `log_level` `WARNING`. |
 
-{#tpcdi-config-raises}
+<span id="tpcdi-config-raises"></span>
 
 #### Raises
 
 Nothing it raises itself for numeric values, which are corrected. A value of the wrong type, such as a string `scale_factor`, raises `TypeError`.
 
-{#tpcdi-config-example}
+<span id="tpcdi-config-example"></span>
 
 #### Example
 
@@ -951,7 +947,7 @@ The TPC-DI benchmark implementation: it generates the 16 warehouse tables, serve
 
 **Import:** `from benchbox.core.tpcdi.benchmark import TPCDIBenchmark` · **Extras:** `tpcdi`
 
-{#tpcdi-benchmark-parameters}
+<span id="tpcdi-benchmark-parameters"></span>
 
 #### Parameters
 
@@ -964,11 +960,11 @@ The TPC-DI benchmark implementation: it generates the 16 warehouse tables, serve
 | `config` | `TPCDIConfig` or `None` | `None` | A configuration. When given, its `scale_factor`, `output_dir`, `enable_parallel` and `max_workers` are used and the same-named arguments are ignored. |
 | `**kwargs` | keyword arguments | none | `quiet` and `verbose` set the log level; `generation_seed` sets the seed when no `config` is given. |
 
-{#tpcdi-benchmark-returns}
+<span id="tpcdi-benchmark-returns"></span>
 
 #### Returns
 
-A `TPCDIBenchmark`. It subclasses `BaseBenchmark`; see {doc}`/reference/python-api/base`. The constructor creates `logs`, `source`, `staging` and `warehouse` under `output_dir`; data files are written by `generate_data()`. Its attributes include `scale_factor`, `output_dir`, `config`, `tables` (table name to file path after `generate_data`), `schema_manager`, `metrics_calculator` and `data_generator`.
+A `TPCDIBenchmark`. It subclasses `BaseBenchmark`; see [Base Benchmark API](../base.md). The constructor creates `logs`, `source`, `staging` and `warehouse` under `output_dir`; data files are written by `generate_data()`. Its attributes include `scale_factor`, `output_dir`, `config`, `tables` (table name to file path after `generate_data`), `schema_manager`, `metrics_calculator` and `data_generator`.
 
 Methods that differ from the `TPCDI` wrapper:
 
@@ -982,7 +978,7 @@ Methods that differ from the `TPCDI` wrapper:
 
 The ETL, validation and metrics methods have the same names and meanings as on `TPCDI` (see Methods above). `TPCDIBenchmark` also has `run_validation_queries`, `run_analytical_queries`, `run_etl_validation_queries`, `run_queries_by_category`, `run_enhanced_etl_pipeline`, `get_enhanced_etl_status`, `translate_query_text`, `get_all_queries`, `get_query_execution_plan` and `get_platform_skip_queries`, which `TPCDI` does not forward.
 
-{#tpcdi-benchmark-raises}
+<span id="tpcdi-benchmark-raises"></span>
 
 #### Raises
 
@@ -991,7 +987,7 @@ The ETL, validation and metrics methods have the same names and meanings as on `
 - `generate_data`: `ValueError` for an `output_format` other than `"csv"` (`Unsupported output format: parquet`) and for unknown table names (`Invalid table names: {...}`).
 - `get_query`: `ValueError` for an unknown query id (`Invalid query ID: ZZ9. Available: ...`).
 
-{#tpcdi-benchmark-example}
+<span id="tpcdi-benchmark-example"></span>
 
 #### Example
 
@@ -1026,7 +1022,7 @@ Unsupported output format: parquet
 Invalid table names: {'Nope'}
 ```
 
-{#tpcdi-benchmark-compatibility}
+<span id="tpcdi-benchmark-compatibility"></span>
 
 #### Compatibility
 
@@ -1034,14 +1030,14 @@ Invalid table names: {'Nope'}
 
 ## See Also
 
-- {doc}`index` - Benchmark API overview
-- {doc}`tpch` - TPC-H benchmark API
-- {doc}`tpcds` - TPC-DS benchmark API
-- {doc}`../base` - Base benchmark interface
-- {doc}`../results` - Results API
-- {doc}`/benchmarks/tpc-di` - TPC-DI guide
-- {doc}`/guides/tpc/tpc-di-deployment-guide` - Deployment guide
-- {doc}`/guides/tpc/tpc-di-etl-guide` - ETL implementation guide
+- [Benchmark APIs](index.md) - Benchmark API overview
+- [TPC-H Benchmark API](tpch.md) - TPC-H benchmark API
+- [TPC-DS Benchmark API](tpcds.md) - TPC-DS benchmark API
+- [Base Benchmark API](../base.md) - Base benchmark interface
+- [Results API](../results.md) - Results API
+- [TPC-DI Benchmark](../../../benchmarks/tpc-di.md) - TPC-DI guide
+- [TPC-DI Deployment Guide](../../../guides/tpc/tpc-di-deployment-guide.md) - Deployment guide
+- [TPC-DI ETL Implementation Guide](../../../guides/tpc/tpc-di-etl-guide.md) - ETL implementation guide
 
 ### External Resources
 

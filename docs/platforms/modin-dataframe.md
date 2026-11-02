@@ -1,9 +1,10 @@
+---
+tags: [intermediate, guide, modin, dataframe-platform]
+---
+
 <!-- Copyright 2026 Joe Harris / BenchBox Project. Licensed under the MIT License. -->
 
 # Migrating from the Modin DataFrame platform
-
-```{tags} intermediate, guide, modin, dataframe-platform
-```
 
 BenchBox no longer supports the `modin` and `modin-df` platform selectors. No published Modin release supports the pandas 3 dependency required by BenchBox's current DataFrame update.
 

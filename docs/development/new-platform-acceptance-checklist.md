@@ -1,7 +1,8 @@
-# New Platform Acceptance Checklist
+---
+tags: [contributor, guide, platform]
+---
 
-```{tags} contributor, guide, platform
-```
+# New Platform Acceptance Checklist
 
 Use this checklist before opening a platform-support PR. It is deliberately concrete: platform breadth is only useful when the registry, docs, optional dependencies, compatibility rules, and tests move together.
 
@@ -15,7 +16,7 @@ Use this checklist before opening a platform-support PR. It is deliberately conc
 | What dependency group enables it? | Add or reuse an optional extra; do not make base import require a platform SDK. |
 | What is the blast radius? | List adapter files, registry metadata, docs, tests, SQL compatibility, and UAT/live scope. |
 
-(new-platform-checklist-sql)=
+<span id="new-platform-checklist-sql"></span>
 
 ## SQL Platform Checklist
 

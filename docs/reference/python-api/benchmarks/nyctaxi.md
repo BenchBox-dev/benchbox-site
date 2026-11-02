@@ -1,7 +1,8 @@
-# NYCTaxi Benchmark API
+---
+tags: [reference, python-api, nyctaxi]
+---
 
-```{tags} reference, python-api, nyctaxi
-```
+# NYCTaxi Benchmark API
 
 Python API reference for the NYC Taxi benchmark.
 
@@ -31,7 +32,7 @@ The constructor creates no files. Data is written by `generate_data()`.
 
 ### Returns
 
-An `NYCTaxi` instance. It subclasses `BaseBenchmark`; see {doc}`/reference/python-api/base` for the shared interface. It also has two read-only properties: `tables`, the table-to-path mapping (empty until `generate_data()` has run on this instance), and `year`, the `year` argument.
+An `NYCTaxi` instance. It subclasses `BaseBenchmark`; see [Base Benchmark API](../base.md) for the shared interface. It also has two read-only properties: `tables`, the table-to-path mapping (empty until `generate_data()` has run on this instance), and `year`, the `year` argument.
 
 ### Raises
 
@@ -222,4 +223,4 @@ all queries ran
 
 ## Inherited members
 
-`run_with_platform`, `run_benchmark`, `output_dir`, `scale_factor` and every other member come from `BaseBenchmark`. See {doc}`/reference/python-api/base` for what they do.
+`run_with_platform`, `run_benchmark`, `output_dir`, `scale_factor` and every other member come from `BaseBenchmark`. See [Base Benchmark API](../base.md) for what they do.

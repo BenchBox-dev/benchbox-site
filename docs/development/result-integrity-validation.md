@@ -1,9 +1,10 @@
+---
+tags: [contributor, validation, architecture]
+---
+
 <!-- Copyright 2026 Joe Harris / BenchBox Project. Licensed under the MIT License. -->
 
 # Result Integrity Validation
-
-```{tags} contributor, validation, architecture
-```
 
 BenchBox includes a three-tier integrity validator for benchmark result JSON files. The validator checks structural correctness, completeness against benchmark specifications, and statistical believability of reported metrics.
 
@@ -219,7 +220,7 @@ Both functions handle invalid JSON gracefully - returning a FAIL report rather t
 | **MCP tool** | `validate_results(result_file="...", verbose=True)` |
 | **Python API** | `from benchbox.core.results.integrity_validator import validate_file` |
 
-See the [CLI reference](../reference/cli/utilities.md#cli-validate-results) and [MCP reference](../reference/mcp.md) for usage details.
+See the [CLI reference](../reference/cli/utilities.md#result-integrity-validation) and [MCP reference](../reference/mcp.md) for usage details.
 
 ## Special Cases
 

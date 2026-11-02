@@ -63,24 +63,37 @@ versioned core bundle; it reads nothing else from core.
   here and merge, merge the core change, then relink here.
 - Never read core files by any other route. A guard test fails the build on
   any path outside the repository other than `$SITE_INPUTS`.
-- `npm run docs:parity -w website` runs the TypeScript generators on the
-  bundle's `docs-data` and compares the output byte for byte with the
-  bundle's `docs` member while the bundle still carries one (schema 4). The
-  generated scope is `benchmarks/queries/`, `compat/` and
-  `reference/tuning-platform-support.md`. Every changed, missing and extra
-  path in that scope fails the run and is named with its first differing
-  byte and SHA-256 digests; nothing is normalized. A bundle without `docs`
-  (schema 5) reports not applicable unless `--require-applicable` is given.
-  `--report <file>` writes the full difference list with path and SHA-256
-  inventories of both sides. `ci` runs it.
 
 ## Documentation
 
 - `docs/` holds the published pages, authored here, with their original
   MIT license text in `docs/LICENSE`. The build assembles them with the
   pages that `npm run docs:generate -w website` renders from the bundle's
-  `docs-data` (the generated scope above) and with `blog/`. An authored page
+  `docs-data` (the generated scope: `benchmarks/queries/`, `compat/` and
+  `reference/tuning-platform-support.md`) and with `blog/`. An authored page
   in the generated scope or under `docs/blog/` fails the assembly.
+- Pages are plain GitHub-flavoured Markdown. They render the same on GitHub
+  as on the site. The converter still reads some MyST syntax while it is
+  being retired, so do not write new MyST: no directives, `{doc}` or `{ref}`
+  roles, `(label)=` lines or definition lists.
+- The sidebar is the tree in `docs/nav.yml`: groups with a `label` and
+  `items`, where an item is a page path, `{page, label, items}` for a page
+  with a label override or children, or `{label, url}` for an external link.
+  A group with `generated: tag-categories` lists the tag categories. Convert
+  fails with the line in `nav.yml` for an unknown key, an empty group, a page
+  that does not exist or a page listed twice under one parent. A page that is
+  not listed still builds; add it to `docs/nav.yml` to put it in the sidebar.
+- Tags are the `tags` list in front matter, which must be the first thing in
+  the file. The tag pages under `/docs/_tags/` are generated from them.
+- Cross-references are relative `.md` links, for example
+  `[Title](../usage/installation.md#section)`. The converter checks that the
+  page and the fragment exist. Heading ids follow the docutils algorithm, and
+  `<span id="old-anchor"></span>` lines keep published fragments working.
+- Admonitions are GitHub alerts (`> [!NOTE]`, `TIP`, `IMPORTANT`,
+  `WARNING`, `CAUTION`), diagrams are `mermaid` code fences, and tables are
+  pipe tables.
+- The blog index is rendered by the blog template from the published posts;
+  `blog/index.md` holds only the introduction.
 - `docs/README.md` is the landing page. Its `{{package_version}}` token
   becomes the bundle manifest's `package_version`, so the release marker in
   the page always matches the bundle.

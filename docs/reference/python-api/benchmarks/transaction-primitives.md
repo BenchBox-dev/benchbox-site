@@ -1,7 +1,8 @@
-# Transaction Primitives API
+---
+tags: [reference, python-api, custom-benchmark]
+---
 
-```{tags} reference, python-api, custom-benchmark
-```
+# Transaction Primitives API
 
 <!-- markdownlint-disable MD024 -->
 
@@ -35,7 +36,7 @@ The constructor creates no files and does not touch a database.
 
 ### Returns
 
-A `TransactionPrimitives` instance. It subclasses `BaseBenchmark`; see {doc}`/reference/python-api/base` for the shared interface.
+A `TransactionPrimitives` instance. It subclasses `BaseBenchmark`; see [Base Benchmark API](../base.md) for the shared interface.
 
 ### Raises
 
@@ -244,4 +245,4 @@ This prints `23 18`: the number of results, then the number that succeeded.
 
 ## Inherited members
 
-Every other member comes from `BaseBenchmark`: platform runs (`run_with_platform`), validation, logging, `output_dir`, `scale_factor` and the loading configuration. See {doc}`/reference/python-api/base`.
+Every other member comes from `BaseBenchmark`: platform runs (`run_with_platform`), validation, logging, `output_dir`, `scale_factor` and the loading configuration. See [Base Benchmark API](../base.md).

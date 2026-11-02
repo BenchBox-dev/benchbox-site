@@ -1,9 +1,10 @@
+---
+tags: [intermediate, guide, duckdb, embedded-platform]
+---
+
 <!-- Copyright 2026 Joe Harris / BenchBox Project. Licensed under the MIT License. -->
 
 # DuckDB Platform
-
-```{tags} intermediate, guide, duckdb, embedded-platform
-```
 
 DuckDB is an in-process analytical database optimized for OLAP workloads. Install it via the `[duckdb]` extra and it is ready for local development, testing, and small-to-medium scale benchmarks.
 
@@ -86,7 +87,7 @@ benchbox run --platform duckdb --benchmark tpch \
   --platform-option driver_auto_install=true
 ```
 
-See {ref}`driver-version-management` for the full guide, including why `uv run` may
+See [Driver Version Management](../usage/driver-version-management.md) for the full guide, including why `uv run` may
 revert a manually-installed version and how to work around it.
 
 ## Usage Examples

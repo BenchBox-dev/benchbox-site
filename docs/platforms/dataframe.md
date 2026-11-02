@@ -1,9 +1,10 @@
+---
+tags: [beginner, guide, dataframe-platform]
+---
+
 <!-- Copyright 2026 Joe Harris / BenchBox Project. Licensed under the MIT License. -->
 
 # DataFrame Platforms
-
-```{tags} beginner, guide, dataframe-platform
-```
 
 BenchBox supports native DataFrame benchmarking alongside traditional SQL database benchmarking. DataFrame platforms execute benchmark queries using native DataFrame APIs rather than SQL, enabling direct performance comparison between different DataFrame libraries.
 

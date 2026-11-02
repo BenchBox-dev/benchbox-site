@@ -1,9 +1,10 @@
+---
+tags: [guide]
+---
+
 <!-- Copyright 2026 Joe Harris / BenchBox Project. Licensed under the MIT License. -->
 
 # Platform Documentation
-
-```{tags} guide
-```
 
 Documentation for database platforms supported by BenchBox.
 
@@ -202,69 +203,65 @@ benchbox run --platform bigquery --benchmark tpch --scale 1.0
 - [Cloud Storage Guide](../guides/cloud-storage.md) - Cloud storage configuration for staging data
 - [Platform Configuration](../usage/configuration.md) - Detailed configuration options
 
-```{toctree}
-:maxdepth: 1
-
-platform-selection-guide
-quick-reference
-comparison-matrix
-support-status
-deployment-modes
-dataframe
-duckdb
-sqlite
-polars
-pandas-dataframe
-modin-dataframe
-dask-dataframe
-cudf
-pyspark-dataframe
-datafusion-dataframe
-databricks-dataframe
-spark
-lakesail
-velox
-velox_jar_setup
-starrocks
-doris
-singlestore
-questdb
-databend
-cedardb
-gizmosql
-clickhouse-local-mode
-clickhouse-server
-clickhouse-cloud
-clickhouse-migration
-postgresql
-pg_duckdb
-pg_mooncake
-paradedb
-citus
-presto
-trino
-snowflake
-databricks
-bigquery
-redshift
-motherduck
-ducklake
-starburst
-quanton
-athena
-athena-spark
-firebolt
-microsoft-fabric
-fabric-lakehouse
-azure-platforms
-datafusion
-influxdb
-timescaledb
-aws-glue
-gcp-dataproc
-dataproc-serverless
-emr-serverless
-fabric-spark
-synapse-spark
-snowpark-connect
-```
+- [Platform Selection Guide](platform-selection-guide.md)
+- [Multi-Platform Database Support](quick-reference.md)
+- [Platform Comparison Matrix](comparison-matrix.md)
+- [Platform Support Status](support-status.md)
+- [Platform Deployment Modes](deployment-modes.md)
+- [DataFrame Platforms](dataframe.md)
+- [DuckDB Platform](duckdb.md)
+- [SQLite Platform](sqlite.md)
+- [Polars Platform](polars.md)
+- [Pandas DataFrame Platform](pandas-dataframe.md)
+- [Migrating from the Modin DataFrame platform](modin-dataframe.md)
+- [Dask DataFrame Platform](dask-dataframe.md)
+- [cuDF DataFrame Platform](cudf.md)
+- [PySpark Platform (SQL & DataFrame)](pyspark-dataframe.md)
+- [DataFusion DataFrame Platform](datafusion-dataframe.md)
+- [Databricks DataFrame Platform](databricks-dataframe.md)
+- [Apache Spark Platform](spark.md)
+- [LakeSail Sail Platform](lakesail.md)
+- [Apache Gluten + Velox Platform](velox.md)
+- [Velox Jar Setup](velox_jar_setup.md)
+- [StarRocks Platform](starrocks.md)
+- [Apache Doris Platform](doris.md)
+- [SingleStore Platform](singlestore.md)
+- [QuestDB Platform](questdb.md)
+- [Databend Platform](databend.md)
+- [CedarDB Platform](cedardb.md)
+- [GizmoSQL Platform](gizmosql.md)
+- [ClickHouse Local Mode](clickhouse-local-mode.md)
+- [ClickHouse Server Platform](clickhouse-server.md)
+- [ClickHouse Cloud Platform](clickhouse-cloud.md)
+- [ClickHouse Platform Migration Guide](clickhouse-migration.md)
+- [PostgreSQL Platform](postgresql.md)
+- [pg\_duckdb Platform](pg_duckdb.md)
+- [pg\_mooncake Platform](pg_mooncake.md)
+- [ParadeDB Platform](paradedb.md)
+- [Citus Platform](citus.md)
+- [PrestoDB Platform Guide](presto.md)
+- [Trino Platform](trino.md)
+- [Snowflake Platform](snowflake.md)
+- [Databricks Platform](databricks.md)
+- [BigQuery Platform](bigquery.md)
+- [Redshift Platform](redshift.md)
+- [MotherDuck Platform](motherduck.md)
+- [DuckLake Platform](ducklake.md)
+- [Starburst Platform](starburst.md)
+- [Onehouse Quanton Platform](quanton.md)
+- [Amazon Athena Platform](athena.md)
+- [Amazon Athena for Apache Spark Platform](athena-spark.md)
+- [Firebolt Platform](firebolt.md)
+- [Microsoft Fabric](microsoft-fabric.md)
+- [Microsoft Fabric Lakehouse SQL](fabric-lakehouse.md)
+- [Azure Analytics Platforms](azure-platforms.md)
+- [Apache DataFusion Platform Guide](datafusion.md)
+- [InfluxDB](influxdb.md)
+- [TimescaleDB Platform](timescaledb.md)
+- [AWS Glue Platform](aws-glue.md)
+- [Google Cloud Dataproc Platform](gcp-dataproc.md)
+- [Google Cloud Dataproc Serverless Platform](dataproc-serverless.md)
+- [Amazon EMR Serverless Platform](emr-serverless.md)
+- [Microsoft Fabric Spark Platform](fabric-spark.md)
+- [Azure Synapse Analytics Spark Platform](synapse-spark.md)
+- [Snowpark Connect for Spark](snowpark-connect.md)

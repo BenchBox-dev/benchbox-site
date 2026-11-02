@@ -1,7 +1,8 @@
-# FlightData Benchmark API
+---
+tags: [reference, python-api, flightdata]
+---
 
-```{tags} reference, python-api, flightdata
-```
+# FlightData Benchmark API
 
 Python API reference for the FlightData benchmark.
 
@@ -28,7 +29,7 @@ The constructor creates no files. Data is written by `generate_data()`.
 
 ### Returns
 
-A `FlightData` instance. It subclasses `BaseBenchmark`; see {doc}`/reference/python-api/base` for the shared interface. The property `tables` holds the table-to-path mapping; it is empty until `generate_data()` has run on this instance.
+A `FlightData` instance. It subclasses `BaseBenchmark`; see [Base Benchmark API](../base.md) for the shared interface. The property `tables` holds the table-to-path mapping; it is empty until `generate_data()` has run on this instance.
 
 ### Raises
 
@@ -186,4 +187,4 @@ airports 50
 
 ## Inherited members
 
-`run_with_platform`, `run_benchmark`, `output_dir`, `scale_factor` and every other member come from `BaseBenchmark`. See {doc}`/reference/python-api/base` for what they do.
+`run_with_platform`, `run_benchmark`, `output_dir`, `scale_factor` and every other member come from `BaseBenchmark`. See [Base Benchmark API](../base.md) for what they do.

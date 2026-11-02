@@ -1,7 +1,8 @@
-# TPC-Havoc API
+---
+tags: [reference, python-api, tpch]
+---
 
-```{tags} reference, python-api, tpch
-```
+# TPC-Havoc API
 
 <!-- markdownlint-disable MD024 -->
 
@@ -31,7 +32,7 @@ The constructor creates no files. Data is written by `generate_data()`.
 
 ### Returns
 
-A `TPCHavoc` instance. It subclasses `BaseBenchmark`; see {doc}`/reference/python-api/base` for the shared interface.
+A `TPCHavoc` instance. It subclasses `BaseBenchmark`; see [Base Benchmark API](../base.md) for the shared interface.
 
 ### Raises
 
@@ -200,4 +201,4 @@ True
 
 ## Inherited members
 
-Every other member comes from `BaseBenchmark`: platform runs (`run_with_platform`), validation, logging, `output_dir`, `scale_factor` and the loading configuration. See {doc}`/reference/python-api/base`.
+Every other member comes from `BaseBenchmark`: platform runs (`run_with_platform`), validation, logging, `output_dir`, `scale_factor` and the loading configuration. See [Base Benchmark API](../base.md).

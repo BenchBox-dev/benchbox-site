@@ -1,9 +1,10 @@
+---
+tags: [intermediate, guide, paradedb, sql-platform, postgresql-extension]
+---
+
 <!-- Copyright 2026 Joe Harris / BenchBox Project. Licensed under the MIT License. -->
 
 # ParadeDB Platform
-
-```{tags} intermediate, guide, paradedb, sql-platform, postgresql-extension
-```
 
 > **CLI name:** `paradedb` - use `benchbox run --platform paradedb`
 

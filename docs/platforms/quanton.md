@@ -1,9 +1,10 @@
+---
+tags: [intermediate, guide, quanton, cloud-platform, spark]
+---
+
 <!-- Copyright 2026 Joe Harris / BenchBox Project. Licensed under the MIT License. -->
 
 # Onehouse Quanton Platform
-
-```{tags} intermediate, guide, quanton, cloud-platform, spark
-```
 
 Onehouse Quanton is a serverless managed Spark compute runtime that delivers 2-3x better price-performance versus AWS EMR and Databricks, with multi-table-format support for Apache Hudi, Apache Iceberg, and Delta Lake.
 

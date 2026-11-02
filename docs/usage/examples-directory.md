@@ -1,7 +1,8 @@
-# Examples Directory Guide
+---
+tags: [beginner, reference]
+---
 
-```{tags} beginner, reference
-```
+# Examples Directory Guide
 
 The BenchBox repository includes an `examples/` directory with over 50 practical examples, organized to help you get started quickly and learn advanced patterns progressively.
 

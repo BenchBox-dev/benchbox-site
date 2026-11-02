@@ -1,9 +1,10 @@
+---
+tags: [intermediate, guide, spark, dataframe-platform]
+---
+
 <!-- Copyright 2026 Joe Harris / BenchBox Project. Licensed under the MIT License. -->
 
 # Apache Spark Platform
-
-```{tags} intermediate, guide, spark, dataframe-platform
-```
 
 Apache Spark is the most widely deployed distributed computing framework for large-scale data processing. It provides a unified analytics engine supporting batch processing, streaming, and machine learning workloads.
 

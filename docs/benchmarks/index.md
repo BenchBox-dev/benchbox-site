@@ -1,9 +1,10 @@
+---
+tags: [concept]
+---
+
 <!-- Copyright 2026 Joe Harris / BenchBox Project. Licensed under the MIT License. -->
 
 # Benchmarks
-
-```{tags} concept
-```
 
 Use this catalog to choose a workload, understand its data and query shape,
 and estimate the resources a run needs. BenchBox includes standards-based,
@@ -284,7 +285,7 @@ Planned platform and benchmark additions, including DataFrame support expansion 
 *Experimental benchmarks for specialized testing.*
 
 See also [TPC-H Data Vault](datavault.md) under *Data Modeling Variants* above -
-shipped in the experimental toctree but documented alongside the other TPC-H
+shipped with the experimental benchmarks but documented alongside the other TPC-H
 schema variants.
 
 #### [TPC-DS-OBT](tpc-ds-obt.md)
@@ -346,20 +347,16 @@ schema variants.
 - **Transaction Operations**: [Transaction Primitives](transaction-primitives.md)
 - **Analytical Operations**: [ClickBench](clickbench.md)
 
-```{toctree}
-:maxdepth: 2
-
-tpc-standards
-academic-benchmarks
-industry-benchmarks
-real-world-benchmarks
-time-series-benchmarks
-benchbox-primitives
-ai-ml-benchmarks
-benchbox-experimental
-support-status
-queries/index
-```
+- [TPC Standards](tpc-standards.md)
+- [Academic Benchmarks](academic-benchmarks.md)
+- [Industry Benchmarks](industry-benchmarks.md)
+- [Real-World Data Benchmarks](real-world-benchmarks.md)
+- [Time-Series Benchmarks](time-series-benchmarks.md)
+- [BenchBox Primitives](benchbox-primitives.md)
+- [AI & ML Benchmarks](ai-ml-benchmarks.md)
+- [BenchBox Experimental](benchbox-experimental.md)
+- [Benchmark Support Status Criteria](support-status.md)
+- [Query Templates](queries/index.md)
 
 #### **Development and CI/CD**
 

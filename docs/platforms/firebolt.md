@@ -1,9 +1,10 @@
+---
+tags: [intermediate, guide, firebolt, sql-platform]
+---
+
 <!-- Copyright 2026 Joe Harris / BenchBox Project. Licensed under the MIT License. -->
 
 # Firebolt Platform
-
-```{tags} intermediate, guide, firebolt, sql-platform
-```
 
 Firebolt is a high-performance cloud analytics database with a vectorized query engine optimized for sub-second analytics. BenchBox supports both Firebolt Core (local) and Firebolt Cloud deployments.
 

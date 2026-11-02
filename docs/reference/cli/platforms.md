@@ -1,9 +1,10 @@
-(cli-platforms)=
+---
+tags: [reference, cli, sql-platform]
+---
+
+<span id="cli-platforms"></span>
 
 # `platforms` - Platform Management
-
-```{tags} reference, cli, sql-platform
-```
 
 Manage database platform adapters, check availability, and configure platforms for use with BenchBox.
 

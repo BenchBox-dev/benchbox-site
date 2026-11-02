@@ -15,6 +15,14 @@ function fence(code: string, lang: string): string {
   return `${ticks}${lang}\n${code}\n${ticks}`;
 }
 
+const YAML_PLAIN = /^[a-z][a-z0-9_-]*$/;
+const YAML_RESERVED = /^(true|false|null|yes|no|on|off|y|n)$/;
+
+function frontMatter(...tags: string[]): string[] {
+  const items = tags.map((tag) => (YAML_PLAIN.test(tag) && !YAML_RESERVED.test(tag) ? tag : JSON.stringify(tag)));
+  return ["---", `tags: [${items.join(", ")}]`, "---", ""];
+}
+
 function normalize(body: string): string {
   const stripped = body
     .split("\n")
@@ -108,12 +116,10 @@ function recipes(queries: QueriesData, benchmark: BenchmarkRecord, query: QueryR
 
 function queryPage(queries: QueriesData, benchmark: BenchmarkRecord, query: QueryRecord): string {
   const lines = [
+    ...frontMatter("reference", "query-template", benchmark.id),
     LICENSE,
     "",
     `# ${query.heading}`,
-    "",
-    "```{tags} reference, query-template, " + benchmark.id,
-    "```",
     "",
     `> [${benchmark.display_name}](${TO_BENCHMARKS}${benchmark.overview_slug}.md) benchmark · [all ${benchmark.display_name} queries](index.md)`,
     "",
@@ -135,12 +141,10 @@ function queryPage(queries: QueriesData, benchmark: BenchmarkRecord, query: Quer
 
 function benchmarkIndex(queries: QueriesData, benchmark: BenchmarkRecord): string {
   const header = [
+    ...frontMatter("reference", "query-template", benchmark.id),
     LICENSE,
     "",
     `# ${benchmark.display_name} Query Templates`,
-    "",
-    "```{tags} reference, query-template, " + benchmark.id,
-    "```",
     "",
     `> [${benchmark.display_name} overview](${TO_BENCHMARKS}${benchmark.overview_slug}.md)`,
     "",
@@ -148,57 +152,34 @@ function benchmarkIndex(queries: QueriesData, benchmark: BenchmarkRecord): strin
     "",
   ];
   if (benchmark.tpc_derived) header.push(queries.tpc_notice, "");
-  if (benchmark.groups === null) {
-    const body = [
-      ...header,
-      ...catalogTable(benchmark.queries),
-      "",
-      "```{toctree}",
-      ":hidden:",
-      "",
-      ...benchmark.queries.map((query) => query.slug),
-      "```",
-    ];
-    return normalize(body.join("\n"));
-  }
+  if (benchmark.groups === null) return normalize([...header, ...catalogTable(benchmark.queries)].join("\n"));
   const body = [...header, "## Query groups", ""];
   for (const group of benchmark.groups) {
     body.push(`- [${group.name}](group-${group.slug}.md) (${group.query_ids.length})`);
   }
-  body.push("", "```{toctree}", ":hidden:", "", ...benchmark.groups.map((group) => `group-${group.slug}`), "```");
   return normalize(body.join("\n"));
 }
 
 function groupPage(benchmark: BenchmarkRecord, name: string, slug: string, queries: QueryRecord[]): string {
   const body = [
+    ...frontMatter("reference", "query-template", benchmark.id),
     LICENSE,
     "",
     `# ${benchmark.display_name} Query Templates — ${name}`,
     "",
-    "```{tags} reference, query-template, " + benchmark.id,
-    "```",
-    "",
     `> [All ${benchmark.display_name} query groups](index.md)`,
     "",
     ...catalogTable(queries),
-    "",
-    "```{toctree}",
-    ":hidden:",
-    "",
-    ...queries.map((query) => query.slug),
-    "```",
   ];
   return normalize(body.join("\n"));
 }
 
 function topIndex(benchmarks: BenchmarkRecord[]): string {
   const lines = [
+    ...frontMatter("reference", "query-template"),
     LICENSE,
     "",
     "# Query Templates",
-    "",
-    "```{tags} reference, query-template",
-    "```",
     "",
     "Representative SQL and DataFrame renderings for every query in every BenchBox benchmark, one page per query. Each page shows a DataFusion rendering with default parameters and a short recipe for extracting the exact query a specific platform runs at a specific scale.",
     "",
@@ -208,7 +189,6 @@ function topIndex(benchmarks: BenchmarkRecord[]): string {
   for (const benchmark of benchmarks) {
     lines.push(`| [${benchmark.display_name}](${benchmark.id}/index.md) | ${benchmark.query_count} |`);
   }
-  lines.push("", "```{toctree}", ":hidden:", "", ...benchmarks.map((benchmark) => `${benchmark.id}/index`), "```");
   return normalize(lines.join("\n"));
 }
 

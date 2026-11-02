@@ -1,7 +1,8 @@
-# BenchBox Testing Guide
+---
+tags: [contributor, guide, testing]
+---
 
-```{tags} contributor, guide, testing
-```
+# BenchBox Testing Guide
 
 This guide summarizes the testing infrastructure and provides guidance on running
 different test tiers based on your development needs and available dependencies.

@@ -1,7 +1,8 @@
-# InfluxDB
+---
+tags: [intermediate, guide, influxdb, sql-platform]
+---
 
-```{tags} intermediate, guide, influxdb, sql-platform
-```
+# InfluxDB
 
 BenchBox supports InfluxDB 3.x for time series benchmarking workloads via FlightSQL.
 

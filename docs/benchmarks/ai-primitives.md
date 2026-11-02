@@ -1,9 +1,10 @@
+---
+tags: [advanced, concept, ai-primitives, custom-benchmark]
+---
+
 <!-- Copyright 2026 Joe Harris / BenchBox Project. Licensed under the MIT License. -->
 
 # AI/ML Primitives Benchmark
-
-```{tags} advanced, concept, ai-primitives, custom-benchmark
-```
 
 > **CLI name:** `ai_primitives` - use `benchbox run --benchmark ai_primitives`
 >

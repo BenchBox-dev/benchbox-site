@@ -1,7 +1,8 @@
-# Comparing Platforms
+---
+tags: [intermediate, tutorial, sql-platform]
+---
 
-```{tags} intermediate, tutorial, sql-platform
-```
+# Comparing Platforms
 
 Run the same benchmark on multiple databases to compare performance.
 

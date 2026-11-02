@@ -1,7 +1,8 @@
-# TPCDSOBT Benchmark API
+---
+tags: [reference, python-api, tpcds-obt]
+---
 
-```{tags} reference, python-api, tpcds-obt
-```
+# TPCDSOBT Benchmark API
 
 Python API reference for the TPC-DS One Big Table (OBT) benchmark.
 
@@ -30,7 +31,7 @@ The constructor creates no files.
 
 ### Returns
 
-A `TPCDSOBT` instance. It subclasses `BaseBenchmark`; see {doc}`/reference/python-api/base` for the shared interface.
+A `TPCDSOBT` instance. It subclasses `BaseBenchmark`; see [Base Benchmark API](../base.md) for the shared interface.
 
 ### Raises
 
@@ -145,4 +146,4 @@ False
 
 ## Inherited members
 
-`run_with_platform`, `run_benchmark`, `tables`, `output_dir`, `scale_factor` and every other member come from `BaseBenchmark`. See {doc}`/reference/python-api/base` for what they do.
+`run_with_platform`, `run_benchmark`, `tables`, `output_dir`, `scale_factor` and every other member come from `BaseBenchmark`. See [Base Benchmark API](../base.md) for what they do.

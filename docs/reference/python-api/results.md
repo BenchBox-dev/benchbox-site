@@ -1,7 +1,8 @@
-# Results API
+---
+tags: [reference, python-api, validation]
+---
 
-```{tags} reference, python-api, validation
-```
+# Results API
 
 Reference for the object that holds the outcome of a benchmark run, `BenchmarkResults`, and for the patterns that read, save and analyze it.
 
@@ -647,7 +648,7 @@ Exported JSON: benchmark_runs/tpch_sf001_duckdb_20261003_193125_196d1732.json
 TPC-H {'failed': 0, 'passed': 22, 'total': 22}
 ```
 
-The `data` entry is the exported JSON document, not a `BenchmarkResults`. See {doc}`result-analysis` for the exporter and the comparison helpers.
+The `data` entry is the exported JSON document, not a `BenchmarkResults`. See [Result Analysis API](result-analysis.md) for the exporter and the comparison helpers.
 
 ### Saving Results
 
@@ -2419,22 +2420,22 @@ An unavailable-cost warning suppresses every rule and returns no recommendations
 
 ### Conceptual Documentation
 
-- {doc}`/concepts/data-model` - Complete data model reference
-- {doc}`/concepts/architecture` - How results fit into BenchBox
-- {doc}`/concepts/workflow` - Result collection in workflows
+- [Data Model](../../concepts/data-model.md) - Complete data model reference
+- [BenchBox Architecture](../../concepts/architecture.md) - How results fit into BenchBox
+- [Benchmarking Workflows](../../concepts/workflow.md) - Result collection in workflows
 
 ### API Reference
 
-- {doc}`base` - Base benchmark interface
-- {doc}`index` - Python API overview
-- {doc}`/reference/api-reference` - High-level API guide
+- [Base Benchmark API](base.md) - Base benchmark interface
+- [Python API Reference](index.md) - Python API overview
+- [API Reference](../api-reference.md) - High-level API guide
 
 ### Guides
 
-- {doc}`/advanced/performance` - Performance monitoring
-- {doc}`/guides/tpc/tpc-validation-guide` - TPC compliance validation
-- {doc}`/usage/examples` - Result analysis examples
+- [Performance Monitoring](../../advanced/performance.md) - Performance monitoring
+- [TPC Test Result Validation System](../../guides/tpc/tpc-validation-guide.md) - TPC compliance validation
+- [Examples](../../usage/examples.md) - Result analysis examples
 
 ### External Resources
 
-- {doc}`/reference/result-schema-v1` - JSON schema specification
+- [Benchmark Result Schema (v1.1, Legacy)](../result-schema-v1.md) - JSON schema specification

@@ -1,9 +1,10 @@
+---
+tags: [guide]
+---
+
 <!-- Copyright 2026 Joe Harris / BenchBox Project. Licensed under the MIT License. -->
 
 # Guides
-
-```{tags} guide
-```
 
 Practical how-to guides for accomplishing specific tasks with BenchBox.
 
@@ -82,20 +83,16 @@ Integrating BenchBox into your workflow:
 - [Reference Documentation](../reference/index.md) - Complete API and CLI reference
 - [Troubleshooting](../usage/troubleshooting.md) - Common issues and solutions
 
-```{toctree}
-:maxdepth: 1
-
-tpc/index
-table-formats/index
-platform-comparison
-dataframe-comparison
-dataframe-migration
-row-count-validation
-cloud-storage
-compression
-hosted-submission
-mcp-integration
-../features/query-plan-analysis
-../performance/dataframe-benchmarks
-../performance/dataframe-optimization
-```
+- [TPC Benchmark Guides](tpc/index.md)
+- [Table Format Guides](table-formats/index.md)
+- [Platform Comparison Guide](platform-comparison.md)
+- [DataFrame Cross-Platform Comparison](dataframe-comparison.md)
+- [Migrating to DataFrame Benchmarking](dataframe-migration.md)
+- [Row Count Validation](row-count-validation.md)
+- [Cloud Storage Support](cloud-storage.md)
+- [Data Compression in BenchBox](compression.md)
+- [Hosted Result Submission](hosted-submission.md)
+- [MCP Integration Guide](mcp-integration.md)
+- [Query Plan Analysis](../features/query-plan-analysis.md)
+- [DataFrame Performance Benchmarks](../performance/dataframe-benchmarks.md)
+- [DataFrame Performance Optimization Guide](../performance/dataframe-optimization.md)

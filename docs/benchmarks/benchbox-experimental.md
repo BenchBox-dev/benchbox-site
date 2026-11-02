@@ -1,13 +1,8 @@
 ---
-myst:
-  enable_extensions:
-    - deflist
+tags: [advanced, reference]
 ---
 
 # BenchBox Experimental
-
-```{tags} advanced, reference
-```
 
 Emerging benchmarks for specialized testing and novel workloads.
 
@@ -15,17 +10,13 @@ Emerging benchmarks for specialized testing and novel workloads.
 
 Experimental benchmarks in BenchBox share one or more of these characteristics:
 
-**Newly developed**
-: Recently created benchmarks that haven't yet been validated across many platforms or use cases. They may evolve as we learn from real-world usage.
+**Newly developed**: Recently created benchmarks that haven't yet been validated across many platforms or use cases. They may evolve as we learn from real-world usage.
 
-**Limited adoption**
-: Benchmarks that address real needs but haven't achieved widespread industry acceptance. They may become standards or remain niche tools.
+**Limited adoption**: Benchmarks that address real needs but haven't achieved widespread industry acceptance. They may become standards or remain niche tools.
 
-**Specialized focus**
-: Benchmarks targeting emerging workloads (AI/ML, time-series, metadata) that don't fit traditional OLAP categories. The methodology for testing these workloads is still evolving.
+**Specialized focus**: Benchmarks targeting emerging workloads (AI/ML, time-series, metadata) that don't fit traditional OLAP categories. The methodology for testing these workloads is still evolving.
 
-**Research-oriented**
-: Benchmarks designed to explore database behavior under unusual conditions (skewed data, adversarial queries) rather than measure typical performance.
+**Research-oriented**: Benchmarks designed to explore database behavior under unusual conditions (skewed data, adversarial queries) rather than measure typical performance.
 
 ## Why Include Experimental Benchmarks?
 
@@ -42,42 +33,24 @@ Experimental benchmarks let BenchBox stay ahead of these trends. Some will prove
 
 When working with experimental benchmarks, keep these considerations in mind:
 
-**Expect change**
-: Schemas, queries, and methodologies may evolve. Pin to specific BenchBox versions for reproducible results.
+**Expect change**: Schemas, queries, and methodologies may evolve. Pin to specific BenchBox versions for reproducible results.
 
-**Validate relevance**
-: Check whether the benchmark's assumptions match your use case. A skew or
+**Validate relevance**: Check whether the benchmark's assumptions match your use case. A skew or
 optimizer-stress benchmark may not tell you much about production dashboard
 workloads.
 
-**Contribute feedback**
-: Experimental benchmarks improve through usage. Report issues, suggest improvements, and share results to help refine them.
+**Contribute feedback**: Experimental benchmarks improve through usage. Report issues, suggest improvements, and share results to help refine them.
 
-**Interpret cautiously**
-: Results may be less reliable than established benchmarks. Use them for directional guidance, not definitive platform selection.
+**Interpret cautiously**: Results may be less reliable than established benchmarks. Use them for directional guidance, not definitive platform selection.
 
 ## Experimental Benchmarks in BenchBox
 
-```{list-table}
-:header-rows: 1
-:widths: 25 35 40
-
-* - Benchmark
-  - Focus
-  - Status
-* - **TPC-HAVOC**
-  - Optimizer stress testing with 220 TPC-H syntax variants
-  - Research prototype
-* - **TPC-H Skew**
-  - Data skew effects on query performance
-  - Methodology validation
-* - **TPC-DS-OBT**
-  - TPC-DS on a single denormalized "One Big Table" schema
-  - Active development
-* - **Data Vault**
-  - Data Vault 2.0 modeling patterns
-  - Schema finalization
-```
+| Benchmark | Focus | Status |
+| --- | --- | --- |
+| **TPC-HAVOC** | Optimizer stress testing with 220 TPC-H syntax variants | Research prototype |
+| **TPC-H Skew** | Data skew effects on query performance | Methodology validation |
+| **TPC-DS-OBT** | TPC-DS on a single denormalized "One Big Table" schema | Active development |
+| **Data Vault** | Data Vault 2.0 modeling patterns | Schema finalization |
 
 ### Graduation Criteria
 
@@ -90,20 +63,16 @@ Experimental benchmarks may graduate to standard categories when they meet these
 
 ## Included Benchmarks
 
-```{toctree}
-:maxdepth: 1
-
-tpc-havoc
-tpch-skew
-tpc-ds-obt
-tpc-ds-obt-lineage
-datavault
-```
+- [TPC-Havoc Benchmark](tpc-havoc.md)
+- [TPC-H Skew Benchmark](tpch-skew.md)
+- [TPC-DS-OBT Benchmark](tpc-ds-obt.md)
+- [TPC-DS OBT column lineage](tpc-ds-obt-lineage.md)
+- [TPC-H Data Vault Benchmark](datavault.md)
 
 ## See Also
 
-- {doc}`benchbox-primitives` - Stable BenchBox-created benchmarks (Read/Write/Transaction/Metadata/AI)
-- {doc}`real-world-benchmarks` - Public-dataset benchmarks (NYC Taxi, Flight Data)
-- {doc}`time-series-benchmarks` - Time-series workloads (TSBS DevOps)
-- {doc}`ai-ml-benchmarks` - AI/ML workloads (Vector Search)
-- {doc}`academic-benchmarks` - Research benchmarks with established methodology
+- [BenchBox Primitives](benchbox-primitives.md) - Stable BenchBox-created benchmarks (Read/Write/Transaction/Metadata/AI)
+- [Real-World Data Benchmarks](real-world-benchmarks.md) - Public-dataset benchmarks (NYC Taxi, Flight Data)
+- [Time-Series Benchmarks](time-series-benchmarks.md) - Time-series workloads (TSBS DevOps)
+- [AI & ML Benchmarks](ai-ml-benchmarks.md) - AI/ML workloads (Vector Search)
+- [Academic Benchmarks](academic-benchmarks.md) - Research benchmarks with established methodology

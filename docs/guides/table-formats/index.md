@@ -1,7 +1,8 @@
-# Table Format Guides
+---
+tags: [guide, formats]
+---
 
-```{tags} guide, formats
-```
+# Table Format Guides
 
 Understanding table formats helps you run better benchmarks and interpret results correctly. This guide series covers file formats (Parquet, Vortex) and table formats (Delta Lake, Iceberg) from a benchmarking perspective.
 
@@ -106,12 +107,3 @@ Detailed guides for each format:
 - [Format Conversion Reference](../../advanced/format-conversion.md): CLI commands for converting between formats
 - [Compression Guide](../compression.md): Data compression strategies
 - [Cloud Storage](../cloud-storage.md): S3, GCS, and Azure Blob integration
-
-```{toctree}
-:maxdepth: 1
-
-parquet-deep-dive
-delta-lake-guide
-iceberg-guide
-vortex-guide
-```

@@ -1,7 +1,8 @@
-# Understanding Benchmark Results
+---
+tags: [beginner, tutorial, validation]
+---
 
-```{tags} beginner, tutorial, validation
-```
+# Understanding Benchmark Results
 
 Learn how to interpret BenchBox output and what the metrics mean.
 

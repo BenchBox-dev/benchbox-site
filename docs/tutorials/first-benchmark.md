@@ -1,7 +1,8 @@
-# Your First Benchmark
+---
+tags: [beginner, tutorial, tpc-h, duckdb]
+---
 
-```{tags} beginner, tutorial, tpc-h, duckdb
-```
+# Your First Benchmark
 
 Run a complete TPC-H benchmark in under 5 minutes with zero configuration.
 

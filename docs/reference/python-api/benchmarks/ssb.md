@@ -1,7 +1,8 @@
-# SSB (Star Schema Benchmark) API
+---
+tags: [reference, python-api, ssb]
+---
 
-```{tags} reference, python-api, ssb
-```
+# SSB (Star Schema Benchmark) API
 
 Python API reference for the Star Schema Benchmark (SSB).
 
@@ -61,7 +62,7 @@ The constructor creates no files. Data is written by `generate_data()`.
 
 ##### Returns
 
-An `SSB` instance. It subclasses `BaseBenchmark`; see {doc}`/reference/python-api/base` for the shared interface.
+An `SSB` instance. It subclasses `BaseBenchmark`; see [Base Benchmark API](../base.md) for the shared interface.
 
 ##### Raises
 
@@ -217,7 +218,7 @@ This prints `0 5`.
 
 ### Inherited members
 
-Every other member comes from `BaseBenchmark`. See {doc}`/reference/python-api/base` for what they do. The ids on this page for the inherited members are kept in the table.
+Every other member comes from `BaseBenchmark`. See [Base Benchmark API](../base.md) for what they do. The ids on this page for the inherited members are kept in the table.
 
 | Group | Member | Kind | Notes |
 | --- | --- | --- | --- |
@@ -573,13 +574,13 @@ print(df)
 
 ## See Also
 
-- {doc}`index` - Benchmark API overview
-- {doc}`tpch` - TPC-H benchmark API (normalized schema)
-- {doc}`tpcds` - TPC-DS benchmark API
-- {doc}`../base` - Base benchmark interface
-- {doc}`../results` - Results API
-- {doc}`/benchmarks/ssb` - SSB guide
-- {doc}`/benchmarks/tpc-h` - TPC-H guide (SSB is derived from TPC-H)
+- [Benchmark APIs](index.md) - Benchmark API overview
+- [TPC-H Benchmark API](tpch.md) - TPC-H benchmark API (normalized schema)
+- [TPC-DS Benchmark API](tpcds.md) - TPC-DS benchmark API
+- [Base Benchmark API](../base.md) - Base benchmark interface
+- [Results API](../results.md) - Results API
+- [Star Schema Benchmark (SSB)](../../../benchmarks/ssb.md) - SSB guide
+- [TPC-H Benchmark](../../../benchmarks/tpc-h.md) - TPC-H guide (SSB is derived from TPC-H)
 
 ### External Resources
 

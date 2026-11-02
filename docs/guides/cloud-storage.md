@@ -1,7 +1,8 @@
-# Cloud Storage Support
+---
+tags: [intermediate, guide, cloud-storage, cloud-platform]
+---
 
-```{tags} intermediate, guide, cloud-storage, cloud-platform
-```
+# Cloud Storage Support
 
 BenchBox provides minimal cloud storage path support, allowing you to specify cloud storage locations for data generation and storage while maintaining simplicity and leveraging database cloud integration features.
 

@@ -1,9 +1,10 @@
+---
+tags: [reference, python-api, performance]
+---
+
 <!-- markdownlint-disable MD024 -->
 
 # Performance Monitoring Utilities API
-
-```{tags} reference, python-api, performance
-```
 
 Python API reference for BenchBox's performance monitoring utilities.
 
@@ -905,7 +906,7 @@ Performance check passed
 
 ## See Also
 
-- {doc}`result-analysis` - Result analysis and comparison utilities
-- {doc}`/advanced/performance-optimization` - Performance optimization guide
-- {doc}`/advanced/ci-cd-integration` - CI/CD integration guide
-- {doc}`/usage/troubleshooting` - Troubleshooting guide
+- [Result Analysis API](result-analysis.md) - Result analysis and comparison utilities
+- [Advanced Performance Optimization Guide](../../advanced/performance-optimization.md) - Performance optimization guide
+- [CI/CD Integration Guide](../../advanced/ci-cd-integration.md) - CI/CD integration guide
+- [Troubleshooting Guide](../../usage/troubleshooting.md) - Troubleshooting guide

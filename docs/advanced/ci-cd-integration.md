@@ -1,7 +1,8 @@
-# CI/CD Integration Guide
+---
+tags: [advanced, guide, testing]
+---
 
-```{tags} advanced, guide, testing
-```
+# CI/CD Integration Guide
 
 Complete guide for integrating BenchBox into CI/CD pipelines for automated performance testing and regression detection.
 

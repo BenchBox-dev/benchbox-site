@@ -1,9 +1,8 @@
-(driver-version-management)=
+---
+tags: [intermediate, guide, driver, versioning]
+---
 
 # Driver Version Management
-
-```{tags} intermediate, guide, driver, versioning
-```
 
 When running benchmarks, BenchBox uses the Python database driver (e.g. `duckdb`,
 `snowflake-connector-python`) that is installed in the current environment. This guide
@@ -115,5 +114,5 @@ the platform adapter from the driver itself.
 
 ## See Also
 
-- {ref}`cli-configuration` - `driver_version` and `driver_auto_install` option reference
+- [Configuration](../reference/cli/configuration.md) - `driver_version` and `driver_auto_install` option reference
 - [DuckDB Platform Guide](../platforms/duckdb.md) - DuckDB-specific version testing notes

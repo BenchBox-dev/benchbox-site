@@ -1,13 +1,10 @@
 ---
-orphan: true
+tags: [beginner, quickstart]
 ---
 
 <!-- Copyright 2026 Joe Harris / BenchBox Project. Licensed under the MIT License. -->
 
 # Usage Overview
-
-```{tags} beginner, quickstart
-```
 
 BenchBox keeps everyday workflows concise. Use this page as the jumping-off point for the tasks you perform most often.
 

@@ -1,9 +1,10 @@
+---
+tags: [advanced, guide, tpc-h, performance]
+---
+
 <!-- Copyright 2026 Joe Harris / BenchBox Project. Licensed under the MIT License. -->
 
 # Power Run Iterations and Concurrent Query Execution
-
-```{tags} advanced, guide, tpc-h, performance
-```
 
 Comprehensive guide to BenchBox's execution modes for benchmark testing with statistical confidence and throughput analysis.
 

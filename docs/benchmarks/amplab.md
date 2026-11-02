@@ -1,9 +1,10 @@
+---
+tags: [intermediate, concept, amplab, custom-benchmark]
+---
+
 <!-- Copyright 2026 Joe Harris / BenchBox Project. Licensed under the MIT License. -->
 
 # AMPLab Big Data Benchmark
-
-```{tags} intermediate, concept, amplab, custom-benchmark
-```
 
 > **CLI name:** `amplab` - use `benchbox run --benchmark amplab`
 
@@ -67,7 +68,7 @@ Row counts scale linearly with `scale_factor` for all three tables (see
 
 ### Schema Relationships
 
-```{mermaid}
+```mermaid
 erDiagram
     RANKINGS ||--o{ USERVISITS : pageURL_destURL
     DOCUMENTS ||--o{ USERVISITS : url_destURL
@@ -100,11 +101,10 @@ erDiagram
 
 The AMPLab benchmark includes three primary query patterns that test different aspects of big data processing.
 
-```{tip}
-Each query has a [query template](queries/amplab/index.md) with a representative
-SQL and DataFrame rendering, plus how to extract the exact statement for your
-platform and scale.
-```
+> [!TIP]
+> Each query has a [query template](queries/amplab/index.md) with a representative
+> SQL and DataFrame rendering, plus how to extract the exact statement for your
+> platform and scale.
 
 ### Query 1: Scan Query (Data Filtering and Aggregation)
 

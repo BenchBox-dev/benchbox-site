@@ -1,9 +1,10 @@
+---
+tags: [contributor, guide, dataframe-platform]
+---
+
 <!-- Copyright 2026 Joe Harris / BenchBox Project. Licensed under the MIT License. -->
 
 # Adding a New DataFrame Platform
-
-```{tags} contributor, guide, dataframe-platform
-```
 
 This guide explains how to add support for a new DataFrame platform to BenchBox.
 
@@ -215,7 +216,7 @@ Before implementation, maintainers can print the expected file plan with the
 platform scaffold script (`--kind dataframe`).
 
 Declare compute and gateway support with the compute and gateway items of the
-{ref}`SQL platform checklist <new-platform-checklist-sql>`.
+[SQL platform checklist](new-platform-acceptance-checklist.md#sql-platform-checklist).
 
 Declare execution engines when the platform offers more than one way to execute a query, following the same
 manifest `capabilities.execution_engines` block, closed class list, value-naming rule and reserved-word ban as

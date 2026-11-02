@@ -1,9 +1,10 @@
+---
+tags: [reference, python-api, databricks]
+---
+
 <!-- markdownlint-disable MD024 -->
 
 # Databricks Platform Adapter
-
-```{tags} reference, python-api, databricks
-```
 
 The Databricks adapter provides cloud-native Spark SQL execution with Delta Lake optimization for analytical benchmarks.
 
@@ -837,24 +838,24 @@ cursor.execute("""
 
 ### Platform Documentation
 
-- {doc}`/platforms/platform-selection-guide` - Choosing Databricks vs other platforms
-- {doc}`/platforms/quick-reference` - Quick setup for all platforms
-- {doc}`/platforms/comparison-matrix` - Feature comparison
-- {doc}`/guides/cloud-storage` - S3, ADLS, GCS integration
+- [Platform Selection Guide](../../../platforms/platform-selection-guide.md) - Choosing Databricks vs other platforms
+- [Multi-Platform Database Support](../../../platforms/quick-reference.md) - Quick setup for all platforms
+- [Platform Comparison Matrix](../../../platforms/comparison-matrix.md) - Feature comparison
+- [Cloud Storage Support](../../../guides/cloud-storage.md) - S3, ADLS, GCS integration
 
 ### Benchmark Guides
 
-- {doc}`/benchmarks/tpc-h` - TPC-H on Databricks
-- {doc}`/benchmarks/tpc-ds` - TPC-DS on Databricks
-- {doc}`/benchmarks/tpc-di` - TPC-DI on Databricks
+- [TPC-H Benchmark](../../../benchmarks/tpc-h.md) - TPC-H on Databricks
+- [TPC-DS Benchmark](../../../benchmarks/tpc-ds.md) - TPC-DS on Databricks
+- [TPC-DI Benchmark](../../../benchmarks/tpc-di.md) - TPC-DI on Databricks
 
 ### API Reference
 
-- {doc}`duckdb` - DuckDB adapter
-- {doc}`clickhouse` - ClickHouse adapter
-- {doc}`bigquery` - BigQuery adapter for comparison
-- {doc}`../base` - Base benchmark interface
-- {doc}`../index` - Python API overview
+- [DuckDB Platform Adapter](duckdb.md) - DuckDB adapter
+- [ClickHouse Platform Adapter](clickhouse.md) - ClickHouse adapter
+- [BigQuery Platform Adapter](bigquery.md) - BigQuery adapter for comparison
+- [Base Benchmark API](../base.md) - Base benchmark interface
+- [Python API Reference](../index.md) - Python API overview
 
 ### External Resources
 

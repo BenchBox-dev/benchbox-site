@@ -1,7 +1,8 @@
-# AMPLab Big Data Benchmark API
+---
+tags: [reference, python-api, custom-benchmark]
+---
 
-```{tags} reference, python-api, custom-benchmark
-```
+# AMPLab Big Data Benchmark API
 
 Python API reference for the AMPLab Big Data Benchmark.
 
@@ -61,7 +62,7 @@ The constructor creates no files. Data is written by `generate_data()`.
 
 ##### Returns
 
-An `AMPLab` instance. It subclasses `BaseBenchmark`; see {doc}`/reference/python-api/base` for the shared interface.
+An `AMPLab` instance. It subclasses `BaseBenchmark`; see [Base Benchmark API](../base.md) for the shared interface.
 
 ##### Raises
 
@@ -196,7 +197,7 @@ The keys are `['1', '1a', '2', '2a', '3', '3a', '4', '5']`.
 
 ### Inherited members
 
-Every other member comes from `BaseBenchmark`. See {doc}`/reference/python-api/base` for what they do. The ids on this page for the inherited members are kept in the table.
+Every other member comes from `BaseBenchmark`. See [Base Benchmark API](../base.md) for what they do. The ids on this page for the inherited members are kept in the table.
 
 | Group | Member | Kind | Notes |
 | --- | --- | --- | --- |
@@ -372,10 +373,10 @@ for sf in scale_factors:
 
 ## See Also
 
-- {doc}`/benchmarks/amplab` - AMPLab benchmark guide
-- {doc}`clickbench` - ClickBench analytics benchmark
-- {doc}`tpch` - TPC-H benchmark
-- {doc}`/reference/python-api/base` - Base benchmark interface
+- [AMPLab Big Data Benchmark](../../../benchmarks/amplab.md) - AMPLab benchmark guide
+- [ClickBench Benchmark API](clickbench.md) - ClickBench analytics benchmark
+- [TPC-H Benchmark API](tpch.md) - TPC-H benchmark
+- [Base Benchmark API](../base.md) - Base benchmark interface
 
 ### External Resources
 

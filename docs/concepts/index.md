@@ -1,9 +1,10 @@
+---
+tags: [concept]
+---
+
 <!-- Copyright 2026 Joe Harris / BenchBox Project. Licensed under the MIT License. -->
 
 # Concepts
-
-```{tags} concept
-```
 
 Conceptual documentation explaining BenchBox architecture, terminology, and design principles.
 
@@ -47,15 +48,3 @@ Structured output capturing execution metrics, query timings, and optional valid
 - [Getting Started](../usage/getting-started.md) - Start using BenchBox
 - [Design Documents](../design/index.md) - Detailed design specifications
 - [Development Guide](../development/index.md) - Contributing to BenchBox
-
-```{toctree}
-:maxdepth: 1
-:caption: Concept Guides
-:hidden:
-
-architecture
-workflow
-data-model
-glossary
-benchmarking-tools-compared
-```

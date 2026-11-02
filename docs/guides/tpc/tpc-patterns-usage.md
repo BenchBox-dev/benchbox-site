@@ -1,9 +1,10 @@
+---
+tags: [intermediate, guide, tpc-h, tpc-ds, data-generation]
+---
+
 <!-- Copyright 2026 Joe Harris / BenchBox Project. Licensed under the MIT License. -->
 
 # TPC Patterns Usage Guide
-
-```{tags} intermediate, guide, tpc-h, tpc-ds, data-generation
-```
 
 `benchbox.core.tpc_patterns` used to ship a generic concurrent-stream execution
 framework (`StreamExecutor`, `QueryPermutator`, `ParameterManager`,

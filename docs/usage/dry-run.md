@@ -1,9 +1,10 @@
+---
+tags: [intermediate, guide, cli]
+---
+
 <!-- Copyright 2026 Joe Harris / BenchBox Project. Licensed under the MIT License. -->
 
 # Dry Run Mode
-
-```{tags} intermediate, guide, cli
-```
 
 The BenchBox dry run feature provides a powerful preview capability that allows you to validate configurations, extract queries, estimate resources, and troubleshoot issues without executing actual benchmarks.
 

@@ -1,9 +1,10 @@
+---
+tags: [contributor, guide, tpcds, dataframe-platform]
+---
+
 <!-- Copyright 2026 Joe Harris / BenchBox Project. Licensed under the MIT License. -->
 
 # TPC-DS DataFrame parity
-
-```{tags} contributor, guide, tpcds, dataframe-platform
-```
 
 TPC-DS parity means that SQL and DataFrame implementations read the same generated tables, use the same substitution values, and return equivalent results. Registering 99 query implementations establishes execution support; it does not establish parity for every query, scale, draw, or DataFrame engine.
 

@@ -1,9 +1,10 @@
+---
+tags: [intermediate, guide, emr-serverless, cloud-platform]
+---
+
 <!-- Copyright 2026 Joe Harris / BenchBox Project. Licensed under the MIT License. -->
 
 # Amazon EMR Serverless Platform
-
-```{tags} intermediate, guide, emr-serverless, cloud-platform
-```
 
 Amazon EMR Serverless is AWS's serverless deployment option for running Apache Spark without managing clusters. BenchBox integrates with EMR Serverless to execute benchmarks with automatic scaling and sub-second startup times.
 

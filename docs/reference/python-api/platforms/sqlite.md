@@ -1,9 +1,10 @@
+---
+tags: [reference, python-api, sqlite]
+---
+
 <!-- markdownlint-disable MD024 -->
 
 # SQLite Platform Adapter
-
-```{tags} reference, python-api, sqlite
-```
 
 The SQLite adapter provides lightweight testing and development capabilities with embedded database functionality.
 
@@ -26,9 +27,8 @@ Common use cases:
 - Proof-of-concept work
 - Educational and learning purposes
 
-```{note}
-SQLite is not designed for production-scale OLAP workloads. Use ClickHouse, DuckDB, or cloud platforms for large-scale benchmarking.
-```
+> [!NOTE]
+> SQLite is not designed for production-scale OLAP workloads. Use ClickHouse, DuckDB, or cloud platforms for large-scale benchmarking.
 
 ## Quick Start
 
@@ -434,9 +434,8 @@ Recommended scale factors for SQLite:
 - **Local benchmarking**: SF = 0.1 to 1.0 (~100MB to 1GB)
 - **Maximum practical**: SF = 10 (~10GB, slow queries)
 
-```{warning}
-SQLite is not designed for large-scale OLAP workloads. Scale factors above 1.0 will result in slow query performance.
-```
+> [!WARNING]
+> SQLite is not designed for large-scale OLAP workloads. Scale factors above 1.0 will result in slow query performance.
 
 ## Best Practices
 
@@ -593,22 +592,22 @@ adapter = DuckDBAdapter()
 
 ### Platform Documentation
 
-- {doc}`/platforms/platform-selection-guide` - Choosing SQLite vs other platforms
-- {doc}`/platforms/quick-reference` - Quick setup for all platforms
-- {doc}`/platforms/comparison-matrix` - Feature comparison
+- [Platform Selection Guide](../../../platforms/platform-selection-guide.md) - Choosing SQLite vs other platforms
+- [Multi-Platform Database Support](../../../platforms/quick-reference.md) - Quick setup for all platforms
+- [Platform Comparison Matrix](../../../platforms/comparison-matrix.md) - Feature comparison
 
 ### API Reference
 
-- {doc}`duckdb` - DuckDB adapter (recommended for OLAP testing)
-- {doc}`clickhouse` - ClickHouse adapter
-- {doc}`../base` - Base benchmark interface
-- {doc}`../index` - Python API overview
+- [DuckDB Platform Adapter](duckdb.md) - DuckDB adapter (recommended for OLAP testing)
+- [ClickHouse Platform Adapter](clickhouse.md) - ClickHouse adapter
+- [Base Benchmark API](../base.md) - Base benchmark interface
+- [Python API Reference](../index.md) - Python API overview
 
 ### Benchmarks
 
-- {doc}`/benchmarks/tpc-h` - TPC-H benchmark
-- {doc}`/usage/getting-started` - Getting started guide
-- {doc}`/usage/troubleshooting` - General troubleshooting
+- [TPC-H Benchmark](../../../benchmarks/tpc-h.md) - TPC-H benchmark
+- [Getting Started in 5 Minutes](../../../usage/getting-started.md) - Getting started guide
+- [Troubleshooting Guide](../../../usage/troubleshooting.md) - General troubleshooting
 
 ### External Resources
 

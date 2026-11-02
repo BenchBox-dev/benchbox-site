@@ -1,9 +1,10 @@
+---
+tags: [reference, python-api, polars]
+---
+
 <!-- markdownlint-disable MD024 -->
 
 # Polars Platform Adapter
-
-```{tags} reference, python-api, polars
-```
 
 The Polars adapter loads BenchBox benchmark data into Polars lazy frames. It does not run SQL: query execution on Polars goes through the DataFrame adapter.
 
@@ -41,7 +42,7 @@ All parameters are keyword arguments (the signature is `(**config)`).
 | `n_rows` | `int` or `None` | `None` | Row limit applied when delimited text files are scanned. `None` reads all rows. |
 | `rechunk` | `bool` | `True` | Passed to the Polars scan functions. |
 
-The adapter also accepts the keys every BenchBox adapter takes, such as `force_recreate`, `show_query_plans` and `tuning_enabled`; see Constructor Parameters on {doc}`duckdb`. Keys it does not recognise are accepted and ignored.
+The adapter also accepts the keys every BenchBox adapter takes, such as `force_recreate`, `show_query_plans` and `tuning_enabled`; see Constructor Parameters on [DuckDB Platform Adapter](duckdb.md). Keys it does not recognise are accepted and ignored.
 
 #### Returns
 

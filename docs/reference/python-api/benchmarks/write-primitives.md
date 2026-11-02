@@ -1,7 +1,8 @@
-# Write Primitives Benchmark API
+---
+tags: [reference, python-api, custom-benchmark]
+---
 
-```{tags} reference, python-api, custom-benchmark
-```
+# Write Primitives Benchmark API
 
 Python API reference for the Write Primitives Benchmark.
 
@@ -70,7 +71,7 @@ The constructor creates no files and does not touch a database.
 
 ##### Returns
 
-A `WritePrimitives` instance. It subclasses `BaseBenchmark`; see {doc}`/reference/python-api/base` for the shared interface.
+A `WritePrimitives` instance. It subclasses `BaseBenchmark`; see [Base Benchmark API](../base.md) for the shared interface.
 
 ##### Raises
 
@@ -382,7 +383,7 @@ Result object returned by `execute_operation` and `run_benchmark`. It is a datac
 
 ### Inherited members
 
-Every other member comes from `BaseBenchmark`. See {doc}`/reference/python-api/base` for what they do. The ids on this page for the inherited members are kept in the table.
+Every other member comes from `BaseBenchmark`. See [Base Benchmark API](../base.md) for what they do. The ids on this page for the inherited members are kept in the table.
 
 | Group | Member | Kind | Notes |
 | --- | --- | --- | --- |
@@ -802,11 +803,11 @@ class DataFrameWriteCapabilities:
 
 ## See Also
 
-- {doc}`/benchmarks/write-primitives` - Write Primitives benchmark guide
-- {doc}`read-primitives` - Read Primitives benchmark
-- {doc}`tpch` - TPC-H benchmark (data source)
-- {doc}`/reference/python-api/base` - Base benchmark interface
-- {doc}`/platforms/dataframe` - DataFrame platforms overview
+- [Write Primitives Benchmark](../../../benchmarks/write-primitives.md) - Write Primitives benchmark guide
+- [Read Primitives Benchmark API](read-primitives.md) - Read Primitives benchmark
+- [TPC-H Benchmark API](tpch.md) - TPC-H benchmark (data source)
+- [Base Benchmark API](../base.md) - Base benchmark interface
+- [DataFrame Platforms](../../../platforms/dataframe.md) - DataFrame platforms overview
 
 ### Future Expansion
 

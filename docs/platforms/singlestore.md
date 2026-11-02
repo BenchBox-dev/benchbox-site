@@ -1,9 +1,10 @@
+---
+tags: [intermediate, guide, singlestore, sql-platform, distributed, olap, htap, cloud]
+---
+
 <!-- Copyright 2026 Joe Harris / BenchBox Project. Licensed under the MIT License. -->
 
 # SingleStore Platform
-
-```{tags} intermediate, guide, singlestore, sql-platform, distributed, olap, htap, cloud
-```
 
 SingleStore (formerly MemSQL) is a distributed SQL database designed for real-time analytics and transactions. It offers a unified architecture combining row-store for fast writes and columnstore for analytical queries, with MySQL wire protocol compatibility. BenchBox connects via the MySQL protocol using the official `singlestoredb` Python SDK and uses `LOAD DATA LOCAL INFILE` for high-throughput data ingestion. BenchBox translates queries with the SQLGlot `singlestore` dialect, which writes `:>` casts and `NULLS FIRST` / `NULLS LAST` natively.
 

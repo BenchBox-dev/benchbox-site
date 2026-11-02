@@ -1,9 +1,10 @@
+---
+tags: [contributor, testing]
+---
+
 <!-- Copyright 2026 Joe Harris / BenchBox Project. Licensed under the MIT License. -->
 
 # Testing Documentation
-
-```{tags} contributor, testing
-```
 
 Documentation for testing BenchBox functionality, including live integration tests.
 
@@ -97,13 +98,3 @@ See [Live Integration Tests](live-integration-tests.md) for detailed setup instr
 - [Testing Guide](../development/testing.md) - Test organization and strategies
 - [Pytest xdist Safety](../development/pytest-xdist-safety.md) - xdist root cause, cap behavior, and validation checklist
 - [CI/CD Integration](../advanced/ci-cd-integration.md) - Automated testing workflows
-
-```{toctree}
-:maxdepth: 1
-:caption: Testing Guides
-:hidden:
-
-e2e-testing
-docker-integration-tests
-live-integration-tests
-```

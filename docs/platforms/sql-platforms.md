@@ -1,55 +1,40 @@
-# SQL Platforms
+---
+tags: [reference, sql-platform]
+---
 
-```{tags} reference, sql-platform
-```
+# SQL Platforms
 
 Database platforms with SQL interfaces, grouped by deployment shape.
 
 ## Single-Node Analytics Engines
 
-```{toctree}
-:maxdepth: 1
-
-duckdb
-clickhouse-local-mode
-clickhouse-server
-datafusion
-cedardb
-gizmosql
-```
+- [DuckDB Platform](duckdb.md)
+- [ClickHouse Local Mode](clickhouse-local-mode.md)
+- [ClickHouse Server Platform](clickhouse-server.md)
+- [Apache DataFusion Platform Guide](datafusion.md)
+- [CedarDB Platform](cedardb.md)
+- [GizmoSQL Platform](gizmosql.md)
 
 ## Row-Based & Postgres-Compatible
 
-```{toctree}
-:maxdepth: 1
-
-postgresql
-sqlite
-pg_duckdb
-pg_mooncake
-```
+- [PostgreSQL Platform](postgresql.md)
+- [SQLite Platform](sqlite.md)
+- [pg\_duckdb Platform](pg_duckdb.md)
+- [pg\_mooncake Platform](pg_mooncake.md)
 
 ## Distributed Query Engines
 
-```{toctree}
-:maxdepth: 1
-
-trino
-presto
-spark
-doris
-starrocks
-lakesail
-velox
-singlestore
-```
+- [Trino Platform](trino.md)
+- [PrestoDB Platform Guide](presto.md)
+- [Apache Spark Platform](spark.md)
+- [Apache Doris Platform](doris.md)
+- [StarRocks Platform](starrocks.md)
+- [LakeSail Sail Platform](lakesail.md)
+- [Apache Gluten + Velox Platform](velox.md)
+- [SingleStore Platform](singlestore.md)
 
 ## Time-Series Databases
 
-```{toctree}
-:maxdepth: 1
-
-timescaledb
-influxdb
-questdb
-```
+- [TimescaleDB Platform](timescaledb.md)
+- [InfluxDB](influxdb.md)
+- [QuestDB Platform](questdb.md)

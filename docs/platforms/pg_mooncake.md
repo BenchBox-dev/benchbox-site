@@ -1,9 +1,10 @@
+---
+tags: [intermediate, guide, pg-mooncake, sql-platform, postgresql-extension, columnstore]
+---
+
 <!-- Copyright 2026 Joe Harris / BenchBox Project. Licensed under the MIT License. -->
 
 # pg_mooncake Platform
-
-```{tags} intermediate, guide, pg-mooncake, sql-platform, postgresql-extension, columnstore
-```
 
 > **CLI name:** `pg-mooncake` - use `benchbox run --platform pg-mooncake`
 

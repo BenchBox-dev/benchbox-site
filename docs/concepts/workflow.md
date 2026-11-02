@@ -1,9 +1,10 @@
+---
+tags: [concept, intermediate]
+---
+
 <!-- Copyright 2026 Joe Harris / BenchBox Project. Licensed under the MIT License. -->
 
 # Benchmarking Workflows
-
-```{tags} concept, intermediate
-```
 
 Common patterns and workflows for running benchmarks with BenchBox.
 

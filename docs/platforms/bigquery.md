@@ -1,9 +1,10 @@
+---
+tags: [intermediate, guide, bigquery, cloud-platform]
+---
+
 <!-- Copyright 2026 Joe Harris / BenchBox Project. Licensed under the MIT License. -->
 
 # BigQuery Platform
-
-```{tags} intermediate, guide, bigquery, cloud-platform
-```
 
 Google BigQuery is a serverless, highly scalable data warehouse with built-in machine learning and real-time analytics. BenchBox provides full support for BigQuery benchmarking with optimized data loading via Cloud Storage.
 
@@ -102,7 +103,7 @@ benchbox run --platform bigquery --benchmark tpch \
 
 The driver package for BigQuery is `google-cloud-bigquery`.
 
-See {ref}`driver-version-management` for the full guide, including why `uv run` may
+See [Driver Version Management](../usage/driver-version-management.md) for the full guide, including why `uv run` may
 revert a manually-installed version and how to work around it.
 
 ## Authentication Methods

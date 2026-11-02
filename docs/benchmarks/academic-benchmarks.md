@@ -1,13 +1,8 @@
 ---
-myst:
-  enable_extensions:
-    - deflist
+tags: [reference]
 ---
 
 # Academic Benchmarks
-
-```{tags} reference
-```
 
 Research benchmarks from academia that have shaped database technology.
 
@@ -26,39 +21,23 @@ Academic benchmarks emerge from this research tradition. Unlike industry benchma
 
 Academic benchmarks often become industry standards years after their initial publication. They matter for several reasons:
 
-**Theoretical foundation**
-: Academic benchmarks are designed with deep understanding of database internals. They target specific subsystems (join algorithms, cardinality estimation, memory management) rather than just measuring end-to-end throughput.
+**Theoretical foundation**: Academic benchmarks are designed with deep understanding of database internals. They target specific subsystems (join algorithms, cardinality estimation, memory management) rather than just measuring end-to-end throughput.
 
-**Challenging workloads**
-: Researchers deliberately design queries that expose optimizer weaknesses, test algorithmic complexity boundaries, and stress edge cases. These "hard" queries reveal performance cliffs that production workloads might never trigger.
+**Challenging workloads**: Researchers deliberately design queries that expose optimizer weaknesses, test algorithmic complexity boundaries, and stress edge cases. These "hard" queries reveal performance cliffs that production workloads might never trigger.
 
-**Open methodology**
-: Academic benchmarks are published with full specifications, data generators, and analysis. This transparency enables deep investigation of why systems perform as they do.
+**Open methodology**: Academic benchmarks are published with full specifications, data generators, and analysis. This transparency enables deep investigation of why systems perform as they do.
 
-**Predictive value**
-: Performance on academic benchmarks often predicts behavior on future production workloads. Systems that handle join order optimization well on JOB will likely handle complex analytical queries well in practice.
+**Predictive value**: Performance on academic benchmarks often predicts behavior on future production workloads. Systems that handle join order optimization well on JOB will likely handle complex analytical queries well in practice.
 
 ## Academic Benchmarks in BenchBox
 
 BenchBox includes three influential academic benchmarks:
 
-```{list-table}
-:header-rows: 1
-:widths: 20 35 45
-
-* - Benchmark
-  - Origin
-  - Focus
-* - **Star Schema Benchmark (SSB)**
-  - O'Neil et al., UMass Boston
-  - Star schema OLAP queries, dimensional modeling performance
-* - **AMPLab Big Data Benchmark**
-  - UC Berkeley AMPLab
-  - Big data analytics, comparing SQL engines at scale
-* - **Join Order Benchmark (JOB)**
-  - Leis et al., TU Munich
-  - Query optimizer join ordering and cardinality estimation on canonical IMDb 2013 data
-```
+| Benchmark | Origin | Focus |
+| --- | --- | --- |
+| **Star Schema Benchmark (SSB)** | O'Neil et al., UMass Boston | Star schema OLAP queries, dimensional modeling performance |
+| **AMPLab Big Data Benchmark** | UC Berkeley AMPLab | Big data analytics, comparing SQL engines at scale |
+| **Join Order Benchmark (JOB)** | Leis et al., TU Munich | Query optimizer join ordering and cardinality estimation on canonical IMDb 2013 data |
 
 ### From Research to Practice
 
@@ -70,16 +49,12 @@ Many techniques first validated on academic benchmarks are now standard in produ
 
 ## Included Benchmarks
 
-```{toctree}
-:maxdepth: 1
-
-ssb
-amplab
-join-order
-```
+- [Star Schema Benchmark (SSB)](ssb.md)
+- [AMPLab Big Data Benchmark](amplab.md)
+- [Join Order Benchmark](join-order.md)
 
 ## See Also
 
 - [VLDB Conference](https://www.vldb.org/) - Premier database research venue
 - [SIGMOD Conference](https://sigmod.org/) - ACM database systems conference
-- {doc}`tpc-standards` - Industry-standard benchmarks derived from academic research
+- [TPC Standards](tpc-standards.md) - Industry-standard benchmarks derived from academic research

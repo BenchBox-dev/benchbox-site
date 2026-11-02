@@ -1,9 +1,10 @@
+---
+tags: [guide, architecture]
+---
+
 <!-- Copyright 2026 Joe Harris / BenchBox Project. Licensed under the MIT License. -->
 
 # Platform Deployment Modes
-
-```{tags} guide, architecture
-```
 
 BenchBox supports multiple deployment modes for database platforms, enabling you to run the same benchmark against local, self-hosted, and cloud-managed instances of the same database engine. This guide explains the deployment mode architecture, configuration, and usage patterns.
 
@@ -130,11 +131,10 @@ benchbox run --platform snowflake:local --benchmark tpch --scale 1.0
 benchbox run --platform databricks:local --benchmark tpch --scale 1.0
 ```
 
-```{note}
-The `:local` suffix on a platform without deployment modes names the
-platform's implicit (and only) deployment — it does not mean local
-execution. A `snowflake:local` run still executes against Snowflake Cloud.
-```
+> [!NOTE]
+> The `:local` suffix on a platform without deployment modes names the
+> platform's implicit (and only) deployment — it does not mean local
+> execution. A `snowflake:local` run still executes against Snowflake Cloud.
 
 ### Configuration Inheritance
 
@@ -153,9 +153,8 @@ This means MotherDuck automatically uses DuckDB's query translator and Starburst
 
 ClickHouse has three first-class platform names, plus a legacy `clickhouse` selector for backwards compatibility.
 
-```{note}
-The bare `clickhouse` selector has been removed (it now raises an error). The colon syntax (`clickhouse:local`, `clickhouse:server`) is deprecated but still works. Use the first-class names below. See [Migration Guide](clickhouse-migration.md).
-```
+> [!NOTE]
+> The bare `clickhouse` selector has been removed (it now raises an error). The colon syntax (`clickhouse:local`, `clickhouse:server`) is deprecated but still works. Use the first-class names below. See [Migration Guide](clickhouse-migration.md).
 
 ### clickhouse-local (chDB)
 
@@ -535,9 +534,8 @@ See [LakeSail Platform Guide](lakesail.md) for the full option reference.
 
 Apache Gluten offloads Spark SQL physical operators to [Velox](https://velox-lib.io/), a vectorized C++ query engine. The Velox adapter supports two deployment modes: `local` (in-process SparkSession with the Gluten jar loaded) and `remote` (connect to a pre-started Spark Connect server that already has Gluten wired in).
 
-```{important}
-**Linux-only runtime.** The Gluten Velox bundle jar is Linux-only - there are no prebuilt jars for macOS or Windows, and native builds on those hosts are not supported. The checked-in Docker workflow currently targets `linux/amd64` because Apache Gluten 1.6.0 does not publish an official Spark 3.5 arm64 jar. On Apple Silicon, that Docker path is suitable for smoke testing under emulation, but not for timing-valid benchmarks.
-```
+> [!IMPORTANT]
+> **Linux-only runtime.** The Gluten Velox bundle jar is Linux-only - there are no prebuilt jars for macOS or Windows, and native builds on those hosts are not supported. The checked-in Docker workflow currently targets `linux/amd64` because Apache Gluten 1.6.0 does not publish an official Spark 3.5 arm64 jar. On Apple Silicon, that Docker path is suitable for smoke testing under emulation, but not for timing-valid benchmarks.
 
 ### Local Mode (Default)
 

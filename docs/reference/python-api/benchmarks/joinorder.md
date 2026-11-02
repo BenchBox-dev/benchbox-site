@@ -1,7 +1,8 @@
-# Join Order Benchmark API
+---
+tags: [reference, python-api, custom-benchmark]
+---
 
-```{tags} reference, python-api, custom-benchmark
-```
+# Join Order Benchmark API
 
 Python API reference for BenchBox's public Join Order Benchmark implementation.
 
@@ -71,7 +72,7 @@ The constructor does not download anything. Data is fetched by `generate_data()`
 
 #### Returns
 
-A `JoinOrder` instance. It subclasses `BaseBenchmark`; see {doc}`/reference/python-api/base` for the shared interface.
+A `JoinOrder` instance. It subclasses `BaseBenchmark`; see [Base Benchmark API](../base.md) for the shared interface.
 
 #### Raises
 
@@ -208,7 +209,7 @@ assert "33c" in queries
 
 ### Inherited members
 
-Every other member comes from `BaseBenchmark`. See {doc}`/reference/python-api/base` for what they do. The ids on this page for the inherited members are kept in the table.
+Every other member comes from `BaseBenchmark`. See [Base Benchmark API](../base.md) for what they do. The ids on this page for the inherited members are kept in the table.
 
 | Group | Member | Kind | Notes |
 | --- | --- | --- | --- |
@@ -281,7 +282,7 @@ Dataset provenance and redistribution notes are in `benchbox/core/joinorder/DATA
 
 ## References
 
-- Benchmark guide: {doc}`/benchmarks/join-order`
+- Benchmark guide: [Join Order Benchmark](../../../benchmarks/join-order.md)
 - JOB paper: <http://www.vldb.org/pvldb/vol9/p204-leis.pdf>
 - Query corpus: <https://github.com/gregrahn/join-order-benchmark>
 - Dataset DOI: <https://doi.org/10.7910/DVN/2QYZBT>

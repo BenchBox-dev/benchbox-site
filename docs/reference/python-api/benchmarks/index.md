@@ -1,7 +1,8 @@
-# Benchmark APIs
+---
+tags: [reference, python-api]
+---
 
-```{tags} reference, python-api
-```
+# Benchmark APIs
 
 Complete reference for using benchmark classes programmatically in Python.
 
@@ -15,40 +16,22 @@ BenchBox provides Python APIs for all supported benchmarks, allowing you to:
 - Run benchmarks on any supported platform
 - Customize execution parameters
 
-All benchmark classes extend {doc}`../base` and share a common interface.
-Shared generation and query methods are documented in {doc}`mixins`;
-TPC-H query variants are documented in {doc}`tpchavoc`.
+All benchmark classes extend [Base Benchmark API](../base.md) and share a common interface.
+Shared generation and query methods are documented in [Shared Benchmark Facade Mixins](mixins.md);
+TPC-H query variants are documented in [TPC-Havoc API](tpchavoc.md).
 
 ## Available Benchmarks
 
 ### Standard Benchmarks
 
-```{list-table}
-:header-rows: 1
-:widths: 25 50 25
-
-* - Benchmark
-  - Description
-  - Query Count
-* - {doc}`tpch`
-  - TPC-H analytical queries
-  - 22 queries
-* - {doc}`tpcds`
-  - TPC-DS decision support queries
-  - 99 queries
-* - TPC-DI
-  - Data integration benchmark
-  - ETL pipelines
-* - SSB
-  - Star Schema Benchmark
-  - 13 queries
-* - ClickBench
-  - Real-world analytics
-  - 43 queries
-* - {doc}`coffeeshop`
-  - Coffee-shop transaction analytics
-  - 11 queries
-```
+| Benchmark | Description | Query Count |
+| --- | --- | --- |
+| [TPC-H Benchmark API](tpch.md) | TPC-H analytical queries | 22 queries |
+| [TPC-DS Benchmark API](tpcds.md) | TPC-DS decision support queries | 99 queries |
+| TPC-DI | Data integration benchmark | ETL pipelines |
+| SSB | Star Schema Benchmark | 13 queries |
+| ClickBench | Real-world analytics | 43 queries |
+| [CoffeeShop Benchmark API](coffeeshop.md) | Coffee-shop transaction analytics | 11 queries |
 
 ## Quick Start
 
@@ -327,29 +310,29 @@ platform connection error.
 
 ### Conceptual Documentation
 
-- {doc}`/concepts/architecture` - System architecture overview
-- {doc}`/concepts/workflow` - Common benchmarking workflows
-- {doc}`/concepts/data-model` - Result data structures
+- [BenchBox Architecture](../../../concepts/architecture.md) - System architecture overview
+- [Benchmarking Workflows](../../../concepts/workflow.md) - Common benchmarking workflows
+- [Data Model](../../../concepts/data-model.md) - Result data structures
 
 ### API References
 
-- {doc}`../base` - Base benchmark interface
-- {doc}`../results` - Results API
-- {doc}`../index` - Python API overview
+- [Base Benchmark API](../base.md) - Base benchmark interface
+- [Results API](../results.md) - Results API
+- [Python API Reference](../index.md) - Python API overview
 
 ### Platform Adapters
 
-- {doc}`../platforms/duckdb` - DuckDB adapter
-- {doc}`../platforms/clickhouse` - ClickHouse adapter
-- {doc}`../platforms/databricks` - Databricks adapter
-- {doc}`../platforms/bigquery` - BigQuery adapter
+- [DuckDB Platform Adapter](../platforms/duckdb.md) - DuckDB adapter
+- [ClickHouse Platform Adapter](../platforms/clickhouse.md) - ClickHouse adapter
+- [Databricks Platform Adapter](../platforms/databricks.md) - Databricks adapter
+- [BigQuery Platform Adapter](../platforms/bigquery.md) - BigQuery adapter
 
 ### Benchmark Guides
 
-- {doc}`/benchmarks/tpc-h` - TPC-H guide
-- {doc}`/benchmarks/tpc-ds` - TPC-DS guide
-- {doc}`/benchmarks/clickbench` - ClickBench guide
-- {doc}`/benchmarks/index` - Benchmark catalog
+- [TPC-H Benchmark](../../../benchmarks/tpc-h.md) - TPC-H guide
+- [TPC-DS Benchmark](../../../benchmarks/tpc-ds.md) - TPC-DS guide
+- [ClickBench (ClickHouse Analytics Benchmark)](../../../benchmarks/clickbench.md) - ClickBench guide
+- [Benchmarks](../../../benchmarks/index.md) - Benchmark catalog
 
 ### External Resources
 

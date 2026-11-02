@@ -1,9 +1,10 @@
+---
+tags: [intermediate, guide, postgresql, sql-platform]
+---
+
 <!-- Copyright 2026 Joe Harris / BenchBox Project. Licensed under the MIT License. -->
 
 # PostgreSQL Platform
-
-```{tags} intermediate, guide, postgresql, sql-platform
-```
 
 PostgreSQL is a powerful open-source relational database that serves as an excellent baseline for benchmark comparisons. BenchBox supports PostgreSQL 12+ with optional TimescaleDB extensions for time-series workloads.
 
@@ -75,7 +76,7 @@ benchbox run --platform postgresql --benchmark tpch \
 
 The driver package for PostgreSQL is `psycopg[binary]`.
 
-See {ref}`driver-version-management` for the full guide, including why `uv run` may
+See [Driver Version Management](../usage/driver-version-management.md) for the full guide, including why `uv run` may
 revert a manually-installed version and how to work around it.
 
 ## Usage Examples

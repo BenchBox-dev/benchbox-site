@@ -33,81 +33,25 @@ Industry benchmarks address these gaps by reflecting actual production workloads
 
 ## Why Industry Benchmarks Matter
 
-<dl>
+**Practical relevance**: Industry benchmarks model real use cases. ClickBench uses actual web analytics data. H2O.ai benchmarks reflect machine learning workflows. This practical grounding makes results more actionable for similar workloads.
 
-<dt><strong>Practical relevance</strong></dt>
+**Modern workload patterns**: These benchmarks capture patterns that academic and TPC benchmarks miss: wide tables, high cardinality dimensions, time-series aggregations, and interactive query latencies.
 
-<dd>
+**Ecosystem validation**: Companies create benchmarks not just for marketing, but to validate their design decisions. When ClickHouse publishes ClickBench results, they're demonstrating that their columnar architecture handles the workloads it was designed for.
 
-Industry benchmarks model real use cases. ClickBench uses actual web analytics data. H2O.ai benchmarks reflect machine learning workflows. This practical grounding makes results more actionable for similar workloads.
-
-</dd>
-
-<dt><strong>Modern workload patterns</strong></dt>
-
-<dd>
-
-These benchmarks capture patterns that academic and TPC benchmarks miss: wide tables, high cardinality dimensions, time-series aggregations, and interactive query latencies.
-
-</dd>
-
-<dt><strong>Ecosystem validation</strong></dt>
-
-<dd>
-
-Companies create benchmarks not just for marketing, but to validate their design decisions. When ClickHouse publishes ClickBench results, they're demonstrating that their columnar architecture handles the workloads it was designed for.
-
-</dd>
-
-<dt><strong>Competitive pressure</strong></dt>
-
-<dd>
-
-Once published, these benchmarks become competitive arenas. Other vendors optimize for them, driving innovation. ClickBench results now span dozens of databases, providing valuable cross-platform comparisons.
-
-</dd>
-
-</dl>
+**Competitive pressure**: Once published, these benchmarks become competitive arenas. Other vendors optimize for them, driving innovation. ClickBench results now span dozens of databases, providing valuable cross-platform comparisons.
 
 ## Interpreting Vendor Benchmarks
 
 When evaluating vendor benchmark results, keep these factors in mind:
 
-<dl>
+**Home field advantage**: The benchmark creator typically performs best. This isn't always manipulation - they designed their system for these exact workloads. But it means results may not generalize to your use case.
 
-<dt><strong>Home field advantage</strong></dt>
+**Configuration matters**: Vendors optimize configurations for their benchmarks. Default settings may perform very differently. BenchBox runs with consistent, documented configurations to enable fair comparison.
 
-<dd>
+**Data characteristics**: The specific data distributions, cardinalities, and access patterns in a benchmark may or may not match your data. A database that excels on ClickBench's web analytics data might struggle with your IoT sensor data.
 
-The benchmark creator typically performs best. This isn't always manipulation - they designed their system for these exact workloads. But it means results may not generalize to your use case.
-
-</dd>
-
-<dt><strong>Configuration matters</strong></dt>
-
-<dd>
-
-Vendors optimize configurations for their benchmarks. Default settings may perform very differently. BenchBox runs with consistent, documented configurations to enable fair comparison.
-
-</dd>
-
-<dt><strong>Data characteristics</strong></dt>
-
-<dd>
-
-The specific data distributions, cardinalities, and access patterns in a benchmark may or may not match your data. A database that excels on ClickBench's web analytics data might struggle with your IoT sensor data.
-
-</dd>
-
-<dt><strong>What's not measured</strong></dt>
-
-<dd>
-
-Every benchmark has blind spots. ClickBench doesn't test joins. H2O.ai benchmarks don't test SQL. Consider what matters for your use case that the benchmark doesn't cover.
-
-</dd>
-
-</dl>
+**What's not measured**: Every benchmark has blind spots. ClickBench doesn't test joins. H2O.ai benchmarks don't test SQL. Consider what matters for your use case that the benchmark doesn't cover.
 
 ## Industry Benchmarks in BenchBox
 
@@ -130,12 +74,12 @@ Industry benchmarks work best alongside TPC benchmarks, not as replacements:
 
 ## Included Benchmarks
 
-- [clickbench](/docs/benchmarks/clickbench.html)
-- [h2odb](/docs/benchmarks/h2odb.html)
-- [coffeeshop](/docs/benchmarks/coffeeshop.html)
+- [ClickBench (ClickHouse Analytics Benchmark)](/docs/benchmarks/clickbench.html)
+- [H2O DB Benchmark](/docs/benchmarks/h2odb.html)
+- [CoffeeShop Example Dataset](/docs/benchmarks/coffeeshop.html)
 
 ## See Also
 
-- [tpc-standards](/docs/benchmarks/tpc-standards.html) - Industry-standard benchmarks from TPC
-- [academic-benchmarks](/docs/benchmarks/academic-benchmarks.html) - Research benchmarks from academia
+- [TPC Standards](/docs/benchmarks/tpc-standards.html) - Industry-standard benchmarks from TPC
+- [Academic Benchmarks](/docs/benchmarks/academic-benchmarks.html) - Research benchmarks from academia
 - [ClickBench Official Results](https://benchmark.clickhouse.com/) - Cross-database ClickBench comparison

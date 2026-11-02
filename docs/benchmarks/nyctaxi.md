@@ -1,9 +1,10 @@
+---
+tags: [intermediate, concept, nyctaxi, custom-benchmark]
+---
+
 <!-- Copyright 2026 Joe Harris / BenchBox Project. Licensed under the MIT License. -->
 
 # NYC Taxi OLAP Example Dataset
-
-```{tags} intermediate, concept, nyctaxi, custom-benchmark
-```
 
 > **CLI name:** `nyctaxi` - use `benchbox run --benchmark nyctaxi`
 >

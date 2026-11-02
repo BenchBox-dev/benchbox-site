@@ -1,9 +1,10 @@
+---
+tags: [intermediate, guide, presto, sql-platform]
+---
+
 <!-- Copyright 2026 Joe Harris / BenchBox Project. Licensed under the MIT License. -->
 
 # PrestoDB Platform Guide
-
-```{tags} intermediate, guide, presto, sql-platform
-```
 
 PrestoDB is Meta's distributed SQL query engine (the original Presto project). BenchBox provides a dedicated PrestoDB adapter that intentionally diverges from the Trino adapter to respect protocol, driver, and dialect differences between the two forks.
 

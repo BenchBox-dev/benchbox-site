@@ -1,9 +1,10 @@
+---
+tags: [reference]
+---
+
 <!-- Copyright 2026 Joe Harris / BenchBox Project. Licensed under the MIT License. -->
 
 # Reference Documentation
-
-```{tags} reference
-```
 
 Complete reference documentation for BenchBox APIs, CLI, and data formats.
 
@@ -41,18 +42,14 @@ Complete reference documentation for BenchBox APIs, CLI, and data formats.
 - [How-To Guides](../guides/index.md) - Task-oriented guides
 - [Platform Documentation](../platforms/index.md) - Platform-specific reference
 
-```{toctree}
-:maxdepth: 2
-
-cli/index
-cli
-api-reference
-public-contracts
-mcp
-result-formats
-tuning-platform-support
-result-schema-v1
-backward-compatibility
-python-api/index
-python-api/platforms
-```
+- [BenchBox CLI Reference](cli/index.md)
+- [CLI Command Reference](cli.md)
+- [API Reference](api-reference.md)
+- [Public Contracts and Support Taxonomy](public-contracts.md)
+- [MCP Server Reference](mcp.md)
+- [Result Export Formats](result-formats.md)
+- [Tuning Platform Support](tuning-platform-support.md)
+- [Benchmark Result Schema (v1.1, Legacy)](result-schema-v1.md)
+- [Backward Compatibility Registry](backward-compatibility.md)
+- [Python API Reference](python-api/index.md)
+- [Platform API Reference](python-api/platforms.md)

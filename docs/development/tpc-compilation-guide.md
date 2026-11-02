@@ -1,7 +1,8 @@
-# TPC Binary Auto-Compilation Guide
+---
+tags: [contributor, guide, tpc-h, tpc-ds]
+---
 
-```{tags} contributor, guide, tpc-h, tpc-ds
-```
+# TPC Binary Auto-Compilation Guide
 
 This document describes how BenchBox compiles the TPC-H and TPC-DS tools from source.
 

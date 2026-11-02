@@ -1,7 +1,8 @@
-# ADR: DuckLake Maturity, Publishability, and Compaction Bias
+---
+tags: [platform, governance, results]
+---
 
-```{tags} platform, governance, results
-```
+# ADR: DuckLake Maturity, Publishability, and Compaction Bias
 
 ## Status
 

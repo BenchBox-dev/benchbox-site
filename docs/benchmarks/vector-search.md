@@ -1,9 +1,10 @@
+---
+tags: [advanced, concept, vector-search, custom-benchmark]
+---
+
 <!-- Copyright 2026 Joe Harris / BenchBox Project. Licensed under the MIT License. -->
 
 # Vector Search Benchmark
-
-```{tags} advanced, concept, vector-search, custom-benchmark
-```
 
 > **CLI name:** `vector_search` - use `benchbox run --benchmark vector_search`
 >

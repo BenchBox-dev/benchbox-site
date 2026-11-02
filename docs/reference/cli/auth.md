@@ -1,9 +1,10 @@
-(cli-auth)=
+---
+tags: [reference, cli, results]
+---
+
+<span id="cli-auth"></span>
 
 # `auth` - Hosted Submission Credentials
-
-```{tags} reference, cli, results
-```
 
 Manage the token used by `benchbox submit --service`.
 
@@ -66,4 +67,4 @@ environment variable instead of hiding a replacement keyring token behind it.
 ## Related
 
 - [submit](submit.md) - Upload or package benchmark results
-- [results](results.md#cli-results) - Show hosted submission history
+- [results](results.md#results-show-benchmark-results) - Show hosted submission history

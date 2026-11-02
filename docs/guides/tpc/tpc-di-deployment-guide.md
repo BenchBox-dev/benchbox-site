@@ -1,9 +1,10 @@
+---
+tags: [advanced, guide, tpc-di, cloud-platform]
+---
+
 <!-- Copyright 2026 Joe Harris / BenchBox Project. Licensed under the MIT License. -->
 
 # TPC-DI Deployment Guide
-
-```{tags} advanced, guide, tpc-di, cloud-platform
-```
 
 ## Overview
 

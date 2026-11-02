@@ -1,9 +1,10 @@
+---
+tags: [guide, velox, gluten, docker, local-dev]
+---
+
 <!-- Copyright 2026 Joe Harris / BenchBox Project. Licensed under the MIT License. -->
 
 # Velox Docker Dev Workflow
-
-```{tags} guide, velox, gluten, docker, local-dev
-```
 
 The Apache Gluten Velox bundle jar is **Linux-only** - there are no prebuilt jars for macOS or Windows, and native builds on those hosts are not supported upstream. The `docker/velox/` image is therefore the primary local development path on macOS and Windows, and the recommended reproducible path on Linux.
 

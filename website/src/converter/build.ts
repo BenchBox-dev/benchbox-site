@@ -82,7 +82,7 @@ export function buildSite(options: BuildOptions): BuildResult {
   );
   const seed = new DocsIndex(sources.map((source) => placeholderInfo(source)));
   const firstPass = convertAll(sources, seed, run, "collect");
-  const tagged = firstPass.map((document) => document.info).filter((info) => info.collection === "docs").map((info) => ({ path: info.path, tags: info.tags }));
+  const tagged = firstPass.map((document) => document.info).filter((info) => info.collection === "docs").map((info) => ({ path: info.path, title: info.titleNodes, tags: info.tags }));
   const generated = generateTagSources(tagged);
   const generatedSeed = new DocsIndex([...seed.paths().map((path) => seed.get(path) as DocInfo), ...generated.map((source) => placeholderInfo(source))]);
   const collected = firstPass.map((document, position) =>

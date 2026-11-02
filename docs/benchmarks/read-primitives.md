@@ -1,9 +1,10 @@
+---
+tags: [intermediate, concept, read-primitives, custom-benchmark, performance]
+---
+
 <!-- Copyright 2026 Joe Harris / BenchBox Project. Licensed under the MIT License. -->
 
 # Read Primitives Benchmark
-
-```{tags} intermediate, concept, read-primitives, custom-benchmark, performance
-```
 
 > **CLI name:** `read_primitives` - use `benchbox run --benchmark read_primitives`
 >

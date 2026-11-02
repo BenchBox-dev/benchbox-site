@@ -1,7 +1,8 @@
-# Dependency Compatibility
+---
+tags: [contributor, reference]
+---
 
-```{tags} contributor, reference
-```
+# Dependency Compatibility
 
 `pyproject.toml` owns declared Python and dependency ranges. `uv.lock` records
 the resolved environment. Do not maintain a static copy of either here.

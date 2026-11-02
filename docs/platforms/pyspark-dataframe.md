@@ -1,9 +1,10 @@
+---
+tags: [intermediate, guide, pyspark, dataframe-platform]
+---
+
 <!-- Copyright 2026 Joe Harris / BenchBox Project. Licensed under the MIT License. -->
 
 # PySpark Platform (SQL & DataFrame)
-
-```{tags} intermediate, guide, pyspark, dataframe-platform
-```
 
 PySpark is the Python API for Apache Spark, providing distributed analytics through both SQL and DataFrame interfaces. BenchBox supports PySpark in two execution modes:
 

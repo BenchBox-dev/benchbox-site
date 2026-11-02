@@ -1,7 +1,8 @@
-# H2O.ai Database Benchmark API
+---
+tags: [reference, python-api, h2odb]
+---
 
-```{tags} reference, python-api, h2odb
-```
+# H2O.ai Database Benchmark API
 
 Python API reference for the H2O.ai Database Benchmark.
 
@@ -62,7 +63,7 @@ The constructor creates no files. Data is written by `generate_data()`.
 
 ##### Returns
 
-An `H2ODB` instance. It subclasses `BaseBenchmark`; see {doc}`/reference/python-api/base` for the shared interface.
+An `H2ODB` instance. It subclasses `BaseBenchmark`; see [Base Benchmark API](../base.md) for the shared interface.
 
 ##### Raises
 
@@ -193,7 +194,7 @@ The ten queries read the `trips` table and take no parameters:
 
 ### Inherited members
 
-Every other member comes from `BaseBenchmark`. See {doc}`/reference/python-api/base` for what they do. The ids on this page for the inherited members are kept in the table.
+Every other member comes from `BaseBenchmark`. See [Base Benchmark API](../base.md) for what they do. The ids on this page for the inherited members are kept in the table.
 
 | Group | Member | Kind | Notes |
 | --- | --- | --- | --- |
@@ -454,10 +455,10 @@ The script generates data for a machine-learning preprocessing simulation and lo
 
 ## See Also
 
-- {doc}`/benchmarks/h2odb` - H2O.ai benchmark guide
-- {doc}`clickbench` - ClickBench analytics benchmark
-- {doc}`amplab` - AMPLab big data benchmark
-- {doc}`/reference/python-api/base` - Base benchmark interface
+- [H2O DB Benchmark](../../../benchmarks/h2odb.md) - H2O.ai benchmark guide
+- [ClickBench Benchmark API](clickbench.md) - ClickBench analytics benchmark
+- [AMPLab Big Data Benchmark API](amplab.md) - AMPLab big data benchmark
+- [Base Benchmark API](../base.md) - Base benchmark interface
 
 ### External Resources
 

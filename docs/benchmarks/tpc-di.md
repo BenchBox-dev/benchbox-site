@@ -1,9 +1,10 @@
+---
+tags: [intermediate, concept, tpc-di]
+---
+
 <!-- Copyright 2026 Joe Harris / BenchBox Project. Licensed under the MIT License. -->
 
 # TPC-DI Benchmark
-
-```{tags} intermediate, concept, tpc-di
-```
 
 > **CLI name:** `tpcdi` - use `benchbox run --benchmark tpcdi`
 
@@ -69,7 +70,7 @@ The TPC-DI schema models a financial services data warehouse with dimension tabl
 
 ### Schema Relationships
 
-```{mermaid}
+```mermaid
 erDiagram
     DimDate ||--o{ FactTrade : trade_date
     DimTime ||--o{ FactTrade : trade_time
@@ -142,11 +143,10 @@ queries (in `benchbox/core/tpcdi/queries.py`) plus 30 extended queries
 spread across `query_validation.py` (12), `query_analytics.py` (10), and
 `query_etl.py` (8).
 
-```{tip}
-Each query has a [query template](queries/tpcdi/index.md) with a representative
-SQL rendering, plus how to extract the exact statement for your platform and
-scale.
-```
+> [!TIP]
+> Each query has a [query template](queries/tpcdi/index.md) with a representative
+> SQL rendering, plus how to extract the exact statement for your platform and
+> scale.
 
 ### Base Validation Queries (V1-V3)
 

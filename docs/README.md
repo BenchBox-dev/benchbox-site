@@ -1,9 +1,10 @@
+---
+tags: [beginner]
+---
+
 <!-- Copyright 2026 Joe Harris / BenchBox Project. Licensed under the MIT License. -->
 
 # BenchBox Documentation
-
-```{tags} beginner
-```
 
 BenchBox helps you run industry benchmarks across analytical databases. The documentation is organized to get you productive quickly and keep deeper references tidy.
 

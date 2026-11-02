@@ -1,9 +1,10 @@
+---
+tags: [intermediate, guide, gizmosql, sql-platform]
+---
+
 <!-- Copyright 2026 Joe Harris / BenchBox Project. Licensed under the MIT License. -->
 
 # GizmoSQL Platform
-
-```{tags} intermediate, guide, gizmosql, sql-platform
-```
 
 > **CLI name:** `gizmosql` - use `benchbox run --platform gizmosql`
 >

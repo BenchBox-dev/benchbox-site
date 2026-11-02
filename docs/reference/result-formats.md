@@ -1,9 +1,10 @@
+---
+tags: [reference, validation]
+---
+
 <!-- Copyright 2026 Joe Harris / BenchBox Project. Licensed under the MIT License. -->
 
 # Result Export Formats
-
-```{tags} reference, validation
-```
 
 BenchBox exports benchmark results in multiple formats for analysis, visualization, and integration with external tools.
 
