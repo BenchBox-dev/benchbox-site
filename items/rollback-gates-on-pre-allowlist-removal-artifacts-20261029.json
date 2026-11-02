@@ -3,7 +3,7 @@
     "A documented conclusion, shown by running the rollback gate path (locally with `npm run deploy -- gates` against a downloaded retained artifact, or by reading the workflow if gates are skipped), on whether a rollback to a pre-allowlist-removal receipt passes",
     "If it fails, the rollback path no longer re-runs content gates that depend on current inventory files, with a test in deploy/test/rollback.test.ts"
   ],
-  "context": "Moved from the BenchBox core tracker, where it was filed on 2026-10-29, when this repository gained its own tracker.",
+  "context": "Moved from the BenchBox core tracker, where it was filed on 2026-10-29, when this repository gained its own tracker.\n\n2026-11-02: Done in PR #107 (merge c3449512f7). Conclusion from running `npm run deploy -- gates` locally against retained artifact of run 40698105528 (site 9a96d30, before the allowance was emptied; local hand-built rollback resolution): rollback mode passes (privacy, explorer_compat pass; links and snapshot_digest skipped, exit 0); deploy mode on the same artifact fails links with 35 new broken links. deploy/gates/index.ts already skipped those gates on rollback, but deploy/cli.ts still read inventory/known-broken-links.json in rollback mode; now it does not. deploy/test/rollback.test.ts: a broken-fragment artifact fails deploy but passes rollback; a leaked secret still fails rollback. deploy/README.md gained 'Gates on a rollback'. test:deploy green; ci green before merge.",
   "description": "Found 2026-10-28 while reviewing the rollback rehearsal item. Rollback restores a stored artifact but the run re-evaluates the current deploy gates. Site PR 80 emptied inventory/known-broken-links.json to []. A receipt built before that change (every retained receipt older than the PR 80 merge) may contain the 14 broken fragment targets the allowance used to cover, so the links gate could reject the rollback exactly when an owner needs it. Not verified: the reviewer inferred this from deploy/cli.ts and deploy/gates/links.ts but did not run it.\n\nVerify whether the gates run in rollback mode against the restored artifact (read .github/workflows/deploy.yml rollback steps, deploy/cli.ts, deploy/gates/links.ts). If they do and an older artifact fails, decide: skip the links gate for rollback (a rollback restores bytes that already passed their own gates), or record the gate's inputs in the receipt.",
   "links": [
     "BenchBox-dev/benchbox-site: .github/workflows/deploy.yml",
@@ -18,6 +18,14 @@
       "op": "create",
       "op_id": "e00e065ada1c4521a8692c7452b5d5e8",
       "session_id": "cc767de99c19400aa238236633ca9140"
+    },
+    {
+      "actor": "mcp:omp-coding-agent:joe@joe-mac-mini.local:a6d1a76a8fe5c477ca12e1f3",
+      "at": "2026-11-02T02:06:06Z",
+      "client": "omp-coding-agent",
+      "op": "update",
+      "op_id": "9772073574d449baae1b53db42dc3a22",
+      "session_id": "2708a39948944f4299911f72f62ba6c5"
     }
   ]
 }
