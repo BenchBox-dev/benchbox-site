@@ -3,7 +3,7 @@
     "A site converter test links to a core directory that has no direct files and passes; a test links to a missing directory and fails",
     "The site inventory/core-linked-paths.json kind field and core's check agree on every current entry"
   ],
-  "context": "Moved from the BenchBox core tracker, where it was filed on 2026-10-29, when this repository gained its own tracker.",
+  "context": "Moved from the BenchBox core tracker, where it was filed on 2026-10-29, when this repository gained its own tracker.\n\n2026-11-02: Done in PR #110 (merge bb6f3f5bf0). The converter already resolved ancestor directories through repo-files.json (bundle lists 556 directories, every ancestor present, 31 with only subdirectories). Real gap fixed: when the listing exists it is now the only source of truth; the statSync filesystem fallback applies only without a listing. Tests in website/tests/repo-links.test.ts: examples/ (no direct files) resolves to tree/<sha>/examples; examples/missing/ fails. All 36 inventory/core-linked-paths.json entries agree with the bundle's directory/file classification (rule derived from the item text; core's checker not run); regenerating the inventory gave no diff. Build passed the link gate; ci green.",
   "description": "Found 2026-10-28 during the dead-link precheck. Core's repo_file_entries() (scripts/site_inputs.py) now lists every ancestor directory of each tracked file in repo-files.json; the earlier rule listed only the immediate parent. The site converter's 'tree' link kind (website/src/converter/handlers/links.ts:39-51, website/src/lib/repo-files.ts:12-21) reads that file, and the review of the site converter found it also treats only immediate parents. A site docs link to a core directory that holds only subdirectories was rejected before and is accepted by the new core list. Confirm the converter's tree resolution matches the new directory set, that no link to a directory such as examples/ or a parent of nested folders resolves differently between the site build and core's core-linked-paths check (make site-linked-paths-check), and add a test with a directory that contains only subdirectories.",
   "links": [
     "BenchBox-dev/benchbox-site: website/src/converter/handlers/links.ts",
@@ -19,6 +19,14 @@
       "op": "create",
       "op_id": "a3c9e47d1b434e3fadfc8ab69698ba2c",
       "session_id": "cc767de99c19400aa238236633ca9140"
+    },
+    {
+      "actor": "mcp:omp-coding-agent:joe@joe-mac-mini.local:a6d1a76a8fe5c477ca12e1f3",
+      "at": "2026-11-02T02:12:31Z",
+      "client": "omp-coding-agent",
+      "op": "update",
+      "op_id": "d58be4f56a1045b6832c759c1b06082e",
+      "session_id": "2708a39948944f4299911f72f62ba6c5"
     }
   ]
 }
