@@ -1,5 +1,5 @@
 {
-  "context": "Small factual addition. Re-measure SF1 rather than reuse the audit's ~13.3 ms,\nthen extend the existing table and soften the \"~1.7x\" sentence to acknowledge the\nnon-constant per-decade rate. Draft is unpublished, so this is low urgency.\n\n\nMoved from the BenchBox core tracker on 2026-10-30, when this repository gained its own tracker.\n\nThe draft now lives in this repository at drafts/platform-deep-dives/drafts/apply-changes-into-vs-standard-sql.md; the _blog/ and _project/DONE/ paths above predate the move. Rules carried over from the core item: no em or en dashes in blog content; re-measure SF1 rather than reuse the audit's ~13.3 ms; leave the SF0.01 and SF0.1 rows and their sources unchanged unless re-measured; keep the change-batch-bound framing accurate and do not overstate flatness.",
+  "context": "Small factual addition. Re-measure SF1 rather than reuse the audit's ~13.3 ms,\nthen extend the existing table and soften the \"~1.7x\" sentence to acknowledge the\nnon-constant per-decade rate. Draft is unpublished, so this is low urgency.\n\n\nMoved from the BenchBox core tracker on 2026-10-30, when this repository gained its own tracker.\n\nThe draft now lives in this repository at drafts/platform-deep-dives/drafts/apply-changes-into-vs-standard-sql.md; the _blog/ and _project/DONE/ paths above predate the move. Rules carried over from the core item: no em or en dashes in blog content; re-measure SF1 rather than reuse the audit's ~13.3 ms; leave the SF0.01 and SF0.1 rows and their sources unchanged unless re-measured; keep the change-batch-bound framing accurate and do not overstate flatness.\n\n2026-11-02: Done in PR #115 (merge 8dc69b11ec). Owner decision: re-measure all three points. Re-measured SF0.01, SF0.1 and SF1 in one process on core 6f5692490e, DuckDB 1.5.5, CPython 3.12.15, Apple M4 10-core 16 GB, in-memory; 30/15/15 iterations; started at 90% CPU idle (iostat) after two passing checks. Basic median 2.160 / 3.304 / 10.774 ms (per-decade about 1.5x then 3.3x; 100x data about 5x); text now says the curve bends upward and the workload becomes scan-bound at SF1. Methodology snippet and [^log] record commit, versions, hardware, iterations and idle state. Also corrected: DuckDB 1.5.5 accepts MERGE INTO, so the portability paragraph and [^skip] now say core's skip is a catalog decision; core's skip-reason text still cites 1.3.2 (not changed). Owner may want to review the weaker portability narrative.",
   "description": "Follow-up deferred from scd2-docs-and-count-hygiene-followup (audit finding N12)\nand re-deferred from scd2-basic-idempotency-and-cleanup-scoping w4, which updated\nthe blog line counts (18 -> 20) but did not add the third scale point.\n\nThe SCD2 blog draft\n(_blog/platform-deep-dives/drafts/apply-changes-into-vs-standard-sql.md) presents\nthe \"change-batch-bound, not dimension-bound\" scale claim on only two points\n(SF0.01 and SF0.1, ~1.7x). Adding an SF1 row makes the growth curve honest: the\naudit re-derivation measured SF1.0 basic median ~13.3 ms against a 150,000-row\ndimension, i.e. 100x data costs ~6.4x, and the per-decade rate is NOT constant\n(~1.74x then ~3.66x). The two-point presentation reads flatter than the curve.\n\nScope: blog draft only (the research note already records the SF1 figure in its\nscale-independence section). Re-measure SF1 before publishing rather than\ntrusting the stale audit number, since the idempotency guard changed basic's SQL.\n",
   "sessions": [
     {
@@ -9,6 +9,14 @@
       "op": "create",
       "op_id": "094ada8f00da469db6e480cc9e016299",
       "session_id": "82c0d7d9603c4b7cb3497f18a64ea231"
+    },
+    {
+      "actor": "mcp:omp-coding-agent:joe@joe-mac-mini.local:19c40f82a7ecdc483ce560ab",
+      "at": "2026-11-02T06:20:16Z",
+      "client": "omp-coding-agent",
+      "op": "update",
+      "op_id": "1c9abd719bff4400a12b5b65dff9028b",
+      "session_id": "1f519ab45af44bed99b4ed89fff299f8"
     }
   ]
 }
