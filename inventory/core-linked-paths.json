@@ -4,7 +4,7 @@
       "path": "_benchbox_pytest_xdist_safety.py",
       "kind": "file",
       "sources": [
-        "docs/development/pytest-xdist-safety.md:61"
+        "docs/development/pytest-xdist-safety.md:62"
       ]
     },
     {
@@ -61,197 +61,197 @@
       "path": "examples/INDEX.md",
       "kind": "file",
       "sources": [
-        "docs/guides/compression.md:392",
-        "docs/usage/examples-directory.md:264",
-        "docs/usage/examples/index.md:66"
+        "docs/guides/compression.md:393",
+        "docs/usage/examples-directory.md:265",
+        "docs/usage/examples/index.md:67"
       ]
     },
     {
       "path": "examples/PATTERNS.md",
       "kind": "file",
       "sources": [
-        "docs/usage/examples-directory.md:18",
-        "docs/usage/examples-directory.md:265",
-        "docs/usage/examples/index.md:67"
+        "docs/usage/examples-directory.md:19",
+        "docs/usage/examples-directory.md:266",
+        "docs/usage/examples/index.md:68"
       ]
     },
     {
       "path": "examples/config",
       "kind": "directory",
       "sources": [
-        "docs/usage/examples-directory.md:17"
+        "docs/usage/examples-directory.md:18"
       ]
     },
     {
       "path": "examples/features",
       "kind": "directory",
       "sources": [
-        "docs/usage/examples-directory.md:14",
-        "docs/usage/examples.md:1001"
+        "docs/usage/examples-directory.md:15",
+        "docs/usage/examples.md:1002"
       ]
     },
     {
       "path": "examples/features/README.md",
       "kind": "file",
       "sources": [
-        "docs/usage/examples-directory.md:124",
-        "docs/usage/examples.md:22",
-        "docs/usage/examples/index.md:22"
+        "docs/usage/examples-directory.md:125",
+        "docs/usage/examples.md:23",
+        "docs/usage/examples/index.md:23"
       ]
     },
     {
       "path": "examples/features/multi_platform.py",
       "kind": "file",
       "sources": [
-        "docs/usage/examples.md:1522"
+        "docs/usage/examples.md:1523"
       ]
     },
     {
       "path": "examples/features/result_analysis.py",
       "kind": "file",
       "sources": [
-        "docs/usage/examples.md:1143"
+        "docs/usage/examples.md:1144"
       ]
     },
     {
       "path": "examples/features/test_types.py",
       "kind": "file",
       "sources": [
-        "docs/guides/tpc/maintenance-phase-guide.md:538"
+        "docs/guides/tpc/maintenance-phase-guide.md:539"
       ]
     },
     {
       "path": "examples/getting_started",
       "kind": "directory",
       "sources": [
-        "docs/usage/examples-directory.md:12",
         "docs/usage/examples-directory.md:13",
-        "docs/usage/examples.md:1001"
+        "docs/usage/examples-directory.md:14",
+        "docs/usage/examples.md:1002"
       ]
     },
     {
       "path": "examples/getting_started/README.md",
       "kind": "file",
       "sources": [
-        "docs/usage/examples-directory.md:123",
-        "docs/usage/examples.md:21",
-        "docs/usage/examples/index.md:14"
+        "docs/usage/examples-directory.md:124",
+        "docs/usage/examples.md:22",
+        "docs/usage/examples/index.md:15"
       ]
     },
     {
       "path": "examples/getting_started/cloud",
       "kind": "directory",
       "sources": [
-        "docs/usage/examples.md:904"
+        "docs/usage/examples.md:905"
       ]
     },
     {
       "path": "examples/getting_started/local/duckdb_nyctaxi.py",
       "kind": "file",
       "sources": [
-        "docs/usage/examples.md:840"
+        "docs/usage/examples.md:841"
       ]
     },
     {
       "path": "examples/getting_started/local/duckdb_tpch_power.py",
       "kind": "file",
       "sources": [
-        "docs/usage/examples.md:836"
+        "docs/usage/examples.md:837"
       ]
     },
     {
       "path": "examples/getting_started/local/duckdb_tsbs_devops.py",
       "kind": "file",
       "sources": [
-        "docs/usage/examples.md:841"
+        "docs/usage/examples.md:842"
       ]
     },
     {
       "path": "examples/notebooks",
       "kind": "directory",
       "sources": [
-        "docs/usage/examples-directory.md:16"
+        "docs/usage/examples-directory.md:17"
       ]
     },
     {
       "path": "examples/notebooks/README.md",
       "kind": "file",
       "sources": [
-        "docs/usage/examples-directory.md:126",
-        "docs/usage/examples.md:24",
-        "docs/usage/examples/index.md:38"
+        "docs/usage/examples-directory.md:127",
+        "docs/usage/examples.md:25",
+        "docs/usage/examples/index.md:39"
       ]
     },
     {
       "path": "examples/programmatic/README.md",
       "kind": "file",
       "sources": [
-        "docs/usage/examples-directory.md:128",
-        "docs/usage/examples.md:26",
-        "docs/usage/examples/index.md:54"
+        "docs/usage/examples-directory.md:129",
+        "docs/usage/examples.md:27",
+        "docs/usage/examples/index.md:55"
       ]
     },
     {
       "path": "examples/tunings",
       "kind": "directory",
       "sources": [
-        "docs/usage/examples.md:904"
+        "docs/usage/examples.md:905"
       ]
     },
     {
       "path": "examples/tunings/README.md",
       "kind": "file",
       "sources": [
-        "docs/usage/examples-directory.md:127",
-        "docs/usage/examples.md:25",
-        "docs/usage/examples/index.md:46",
-        "docs/usage/examples/index.md:98"
+        "docs/usage/examples-directory.md:128",
+        "docs/usage/examples.md:26",
+        "docs/usage/examples/index.md:47",
+        "docs/usage/examples/index.md:99"
       ]
     },
     {
       "path": "examples/unified_runner.py",
       "kind": "file",
       "sources": [
-        "docs/usage/examples-directory.md:266"
+        "docs/usage/examples-directory.md:267"
       ]
     },
     {
       "path": "examples/use_cases",
       "kind": "directory",
       "sources": [
-        "docs/usage/examples-directory.md:15"
+        "docs/usage/examples-directory.md:16"
       ]
     },
     {
       "path": "examples/use_cases/README.md",
       "kind": "file",
       "sources": [
-        "docs/usage/examples-directory.md:125",
-        "docs/usage/examples.md:23",
-        "docs/usage/examples/index.md:30"
+        "docs/usage/examples-directory.md:126",
+        "docs/usage/examples.md:24",
+        "docs/usage/examples/index.md:31"
       ]
     },
     {
       "path": "examples/use_cases/ci_regression_test.py",
       "kind": "file",
       "sources": [
-        "docs/usage/examples.md:1326",
-        "docs/usage/examples.md:1711"
+        "docs/usage/examples.md:1327",
+        "docs/usage/examples.md:1712"
       ]
     },
     {
       "path": "examples/use_cases/platform_evaluation.py",
       "kind": "file",
       "sources": [
-        "docs/usage/examples.md:1522"
+        "docs/usage/examples.md:1523"
       ]
     },
     {
       "path": "pytest.ini",
       "kind": "file",
       "sources": [
-        "docs/development/pytest-xdist-safety.md:62",
-        "docs/development/pytest-xdist-safety.md:141"
+        "docs/development/pytest-xdist-safety.md:63",
+        "docs/development/pytest-xdist-safety.md:142"
       ]
     },
     {
@@ -265,16 +265,16 @@
       "path": "tests/conftest.py",
       "kind": "file",
       "sources": [
-        "docs/development/pytest-xdist-safety.md:81",
-        "docs/development/pytest-xdist-safety.md:94",
-        "docs/development/pytest-xdist-safety.md:144"
+        "docs/development/pytest-xdist-safety.md:82",
+        "docs/development/pytest-xdist-safety.md:95",
+        "docs/development/pytest-xdist-safety.md:145"
       ]
     },
     {
       "path": "tests/unit/test_xdist_safety.py",
       "kind": "file",
       "sources": [
-        "docs/development/pytest-xdist-safety.md:118"
+        "docs/development/pytest-xdist-safety.md:119"
       ]
     }
   ]

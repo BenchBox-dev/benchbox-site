@@ -1,9 +1,10 @@
+---
+tags: [intermediate, guide, citus, sql-platform, postgresql-extension, distributed]
+---
+
 <!-- Copyright 2026 Joe Harris / BenchBox Project. Licensed under the MIT License. -->
 
 # Citus Platform
-
-```{tags} intermediate, guide, citus, sql-platform, postgresql-extension, distributed
-```
 
 > **CLI name:** `citus` - use `benchbox run --platform citus`
 

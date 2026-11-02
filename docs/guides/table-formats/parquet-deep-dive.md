@@ -1,7 +1,8 @@
-# Parquet Deep Dive <!-- content-ok: cliche -->
+---
+tags: [guide, formats, parquet]
+---
 
-```{tags} guide, formats, parquet
-```
+# Parquet Deep Dive <!-- content-ok: cliche -->
 
 Apache Parquet is the de facto standard for analytical data storage. Understanding row groups, column chunks, and compression options helps you run better benchmarks.
 

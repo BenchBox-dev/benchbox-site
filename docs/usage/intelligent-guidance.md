@@ -1,9 +1,10 @@
+---
+tags: [intermediate, guide, cli]
+---
+
 <!-- Copyright 2026 Joe Harris / BenchBox Project. Licensed under the MIT License. -->
 
 # Intelligent Guidance and Enhanced CLI
-
-```{tags} intermediate, guide, cli
-```
 
 BenchBox's CLI provides intelligent guidance throughout the benchmarking process, making it easier to get appropriate results regardless of your system specifications or benchmarking experience.
 

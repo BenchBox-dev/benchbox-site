@@ -1,7 +1,8 @@
-# BenchBox Visualization Architecture
+---
+tags: [intermediate, concept, visualization]
+---
 
-```{tags} intermediate, concept, visualization
-```
+# BenchBox Visualization Architecture
 
 ## Goals and Constraints
 
@@ -121,15 +122,3 @@ The commands, in order, display charts directly in the terminal, drop colors (fo
 - [Customization](customization.md) - Styling, theming, and advanced options
 - [Templates](templates.md) - Reusable chart templates
 - [CLI Reference](cli-reference.md) - Command-line interface for visualization
-
-```{toctree}
-:maxdepth: 1
-:caption: Visualization
-:hidden:
-
-chart-generation-guide
-chart-types
-customization
-templates
-cli-reference
-```

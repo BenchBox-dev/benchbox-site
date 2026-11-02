@@ -1,13 +1,10 @@
-# Customization & Extensions
+---
+tags: [advanced, guide, configuration]
+---
 
-```{tags} advanced, guide, configuration
-```
+# Customization & Extensions
 
 Guides for customizing BenchBox and creating custom benchmarks.
 
-```{toctree}
-:maxdepth: 1
-
-custom-benchmarks
-optimizer-tests
-```
+- [Custom Benchmarks](custom-benchmarks.md)
+- [Optimizer Sniff Test Queries](optimizer-tests.md)

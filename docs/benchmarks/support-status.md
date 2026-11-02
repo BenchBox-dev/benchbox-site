@@ -1,9 +1,10 @@
+---
+tags: [reference, contributor]
+---
+
 <!-- Copyright 2026 Joe Harris / BenchBox Project. Licensed under the MIT License. -->
 
 # Benchmark Support Status Criteria
-
-```{tags} reference, contributor
-```
 
 Every benchmark in `benchbox.core.benchmark_registry` carries exactly one
 `support_status` from the public support taxonomy: `stable`, `beta`,

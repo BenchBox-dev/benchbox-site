@@ -27,7 +27,6 @@ const REQUIRED = {
   "results/index.html": "results",
   "404.html": "benchbox.results.redirect",
   "results/data/results.duckdb": "db",
-  "docs/objects.inv": "inv",
 };
 
 test("the probe manifest covers every route class and samples more files", () => {

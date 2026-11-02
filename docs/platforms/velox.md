@@ -1,9 +1,10 @@
+---
+tags: [intermediate, guide, velox, gluten, sql-platform, spark-compatible, accelerated, local]
+---
+
 <!-- Copyright 2026 Joe Harris / BenchBox Project. Licensed under the MIT License. -->
 
 # Apache Gluten + Velox Platform
-
-```{tags} intermediate, guide, velox, gluten, sql-platform, spark-compatible, accelerated, local
-```
 
 Apache Gluten is a plugin to Apache Spark that offloads physical operators to [Velox](https://velox-lib.io/) - a vectorized, SIMD-optimized C++ query engine with unified off-heap memory. Spark retains its distributed scheduler, fault tolerance, and SQL/DataFrame APIs; Gluten intercepts the post-Catalyst physical plan and runs it natively in Velox. Reference performance (Gluten community, March 2024): **~3.3x faster** overall on TPC-H vs. Apache Spark, with individual queries up to **~23x** faster.
 

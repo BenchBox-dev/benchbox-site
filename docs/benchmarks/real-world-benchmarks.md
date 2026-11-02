@@ -1,7 +1,8 @@
-# Real-World Data Benchmarks
+---
+tags: [reference]
+---
 
-```{tags} reference
-```
+# Real-World Data Benchmarks
 
 Benchmarks built on public real-world datasets rather than synthetic TPC or vendor data.
 
@@ -21,20 +22,10 @@ These characteristics drive optimizer behavior in ways TPC workloads do not - ca
 
 ## Real-World Benchmarks in BenchBox
 
-```{list-table}
-:header-rows: 1
-:widths: 20 30 50
-
-* - Benchmark
-  - Data Source
-  - Focus
-* - **NYC Taxi**
-  - NYC TLC trip records
-  - Geospatial + temporal OLAP, taxi zones dimension, 25 queries
-* - **Flight Data**
-  - US BTS On-Time Performance
-  - Aviation analytics - delays, routes, carriers, seasonality, 20 queries
-```
+| Benchmark | Data Source | Focus |
+| --- | --- | --- |
+| **NYC Taxi** | NYC TLC trip records | Geospatial + temporal OLAP, taxi zones dimension, 25 queries |
+| **Flight Data** | US BTS On-Time Performance | Aviation analytics - delays, routes, carriers, seasonality, 20 queries |
 
 ## When to Use
 
@@ -43,15 +34,11 @@ These characteristics drive optimizer behavior in ways TPC workloads do not - ca
 
 ## Included Benchmarks
 
-```{toctree}
-:maxdepth: 1
-
-nyctaxi
-flightdata
-```
+- [NYC Taxi OLAP Example Dataset](nyctaxi.md)
+- [Flight Data Benchmark](flightdata.md)
 
 ## See Also
 
-- {doc}`time-series-benchmarks` - Time-series workloads (TSBS DevOps)
-- {doc}`industry-benchmarks` - Vendor / practitioner benchmarks (ClickBench, H2O, CoffeeShop)
-- {doc}`tpc-standards` - Synthetic standard benchmarks
+- [Time-Series Benchmarks](time-series-benchmarks.md) - Time-series workloads (TSBS DevOps)
+- [Industry Benchmarks](industry-benchmarks.md) - Vendor / practitioner benchmarks (ClickBench, H2O, CoffeeShop)
+- [TPC Standards](tpc-standards.md) - Synthetic standard benchmarks

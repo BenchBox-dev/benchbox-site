@@ -1,9 +1,10 @@
+---
+tags: [reference, query-template, flat]
+---
+
 <!-- Copyright 2026 Joe Harris / BenchBox Project. Licensed under the MIT License. -->
 
 # Flat Demo 3a
-
-```{tags} reference, query-template, flat
-```
 
 > [Flat Demo](../../flat-demo.md) benchmark · [all Flat Demo queries](index.md)
 

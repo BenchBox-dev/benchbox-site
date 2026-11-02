@@ -1,9 +1,10 @@
+---
+tags: [advanced, concept, datavault, custom-benchmark]
+---
+
 <!-- Copyright 2026 Joe Harris / BenchBox Project. Licensed under the MIT License. -->
 
 # TPC-H Data Vault Benchmark
-
-```{tags} advanced, concept, datavault, custom-benchmark
-```
 
 > **CLI name:** `datavault` - use `benchbox run --benchmark datavault`
 
@@ -71,7 +72,7 @@ Data Vault 2.0 is an enterprise data warehouse modeling methodology that separat
 
 ### Schema Relationships
 
-```{mermaid}
+```mermaid
 erDiagram
     hub_region ||--o{ link_nation_region : "hk_region"
     hub_nation ||--o{ link_nation_region : "hk_nation"
@@ -109,11 +110,10 @@ Tables must be loaded respecting referential integrity:
 
 All 22 TPC-H queries are adapted for the Data Vault schema using Hub→Satellite→Link join patterns. Each query filters for current records using `load_end_dts IS NULL`.
 
-```{tip}
-Each query has a [query template](queries/datavault/index.md) with a
-representative SQL and DataFrame rendering, plus how to extract the exact
-statement for your platform and scale.
-```
+> [!TIP]
+> Each query has a [query template](queries/datavault/index.md) with a
+> representative SQL and DataFrame rendering, plus how to extract the exact
+> statement for your platform and scale.
 
 ### Query Complexity
 

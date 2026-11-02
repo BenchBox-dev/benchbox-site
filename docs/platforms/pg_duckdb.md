@@ -1,9 +1,10 @@
+---
+tags: [intermediate, guide, pg-duckdb, sql-platform, postgresql-extension]
+---
+
 <!-- Copyright 2026 Joe Harris / BenchBox Project. Licensed under the MIT License. -->
 
 # pg_duckdb Platform
-
-```{tags} intermediate, guide, pg-duckdb, sql-platform, postgresql-extension
-```
 
 > **CLI name:** `pg-duckdb` - use `benchbox run --platform pg-duckdb`
 

@@ -1,9 +1,10 @@
-(cli-usage-patterns)=
+---
+tags: [reference, cli]
+---
+
+<span id="cli-usage-patterns"></span>
 
 # Common Workflows
-
-```{tags} reference, cli
-```
 
 This page covers common usage patterns and troubleshooting for BenchBox CLI.
 
@@ -100,7 +101,7 @@ This runs the benchmark and fails on a regression of more than 10%.
 
 ---
 
-(cli-troubleshooting)=
+<span id="cli-troubleshooting"></span>
 
 # Troubleshooting
 

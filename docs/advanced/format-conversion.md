@@ -1,7 +1,8 @@
-# Open Table Formats Guide
+---
+tags: [advanced, guide]
+---
 
-```{tags} advanced, guide
-```
+# Open Table Formats Guide
 
 Convert benchmark data to modern columnar formats for improved query performance, storage efficiency, and platform compatibility.
 

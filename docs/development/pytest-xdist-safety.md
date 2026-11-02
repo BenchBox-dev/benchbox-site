@@ -1,9 +1,10 @@
+---
+tags: [contributor, guide, testing]
+---
+
 <!-- Copyright 2026 Joe Harris / BenchBox Project. Licensed under the MIT License. -->
 
 # Pytest xdist Safety
-
-```{tags} contributor, guide, testing
-```
 
 BenchBox defaults to pytest-xdist for local runs, but some parts of the test
 suite also create native thread pools, parse large module trees, or spawn

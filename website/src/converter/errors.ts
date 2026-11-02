@@ -19,15 +19,6 @@ export class UnknownConstructError extends ConverterError {
   }
 }
 
-export class NotYetImplementedError extends UnknownConstructError {
-  readonly owner: string;
-
-  constructor(file: string, line: number, construct: string, owner: string) {
-    super(file, line, construct, `${construct} is not yet implemented (handler slot: ${owner})`);
-    this.owner = owner;
-  }
-}
-
 export class UnresolvedReferenceError extends ConverterError {
   readonly reference: string;
 

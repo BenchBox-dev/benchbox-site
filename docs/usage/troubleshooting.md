@@ -1,9 +1,10 @@
+---
+tags: [intermediate, guide]
+---
+
 <!-- Copyright 2026 Joe Harris / BenchBox Project. Licensed under the MIT License. -->
 
 # Troubleshooting Guide
-
-```{tags} intermediate, guide
-```
 
 This guide helps diagnose and resolve common issues when running BenchBox benchmarks.
 
@@ -22,8 +23,6 @@ This guide helps diagnose and resolve common issues when running BenchBox benchm
 | "ImportError" | Missing package | [Dependencies](#missing-platform-dependencies) |
 | "file not found" | Data loading | [Data Loading](#data-loading-issues) |
 | "command not found: benchbox" | PATH issue | [Installation Issues](#installation-issues) |
-
-(installation-issues)=
 
 ## Installation Issues
 

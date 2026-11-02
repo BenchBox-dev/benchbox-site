@@ -1,9 +1,10 @@
+---
+tags: [intermediate, concept, tpc-ds]
+---
+
 <!-- Copyright 2026 Joe Harris / BenchBox Project. Licensed under the MIT License. -->
 
 # TPC-DS Benchmark
-
-```{tags} intermediate, concept, tpc-ds
-```
 
 > **CLI name:** `tpcds` - use `benchbox run --benchmark tpcds`
 
@@ -65,7 +66,7 @@ The TPC-DS schema models a systematic retail data warehouse with three main area
 
 ### Schema Relationships
 
-```{mermaid}
+```mermaid
 erDiagram
     DATE_DIM ||--o{ STORE_SALES : sold_on
     DATE_DIM ||--o{ CATALOG_SALES : sold_on
@@ -91,11 +92,10 @@ erDiagram
 
 The 99 TPC-DS queries are organized into different complexity categories and test various aspects of analytical query processing.
 
-```{tip}
-Each query has a [query template](queries/tpcds/index.md) with a representative
-SQL and DataFrame rendering, plus how to extract the exact statement for your
-platform and scale.
-```
+> [!TIP]
+> Each query has a [query template](queries/tpcds/index.md) with a representative
+> SQL and DataFrame rendering, plus how to extract the exact statement for your
+> platform and scale.
 
 ### Query Categories by Complexity
 

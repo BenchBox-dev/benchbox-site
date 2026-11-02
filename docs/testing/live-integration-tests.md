@@ -1,13 +1,13 @@
-# Live Integration Tests
+---
+tags: [contributor, guide, testing]
+---
 
-```{tags} contributor, guide, testing
-```
+# Live Integration Tests
 
 This document describes BenchBox's live integration test suite that executes real benchmarks against cloud database platforms using actual credentials.
 
-```{tip}
-For platforms that run locally in Docker (ClickHouse, Trino, Presto, PostgreSQL, StarRocks, Doris, Databend, InfluxDB), see [Docker Integration Tests](docker-integration-tests.md) instead (no cloud credentials needed).
-```
+> [!TIP]
+> For platforms that run locally in Docker (ClickHouse, Trino, Presto, PostgreSQL, StarRocks, Doris, Databend, InfluxDB), see [Docker Integration Tests](docker-integration-tests.md) instead (no cloud credentials needed).
 
 ## Overview
 

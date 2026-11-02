@@ -1,7 +1,8 @@
-# Benchmarking PostgreSQL Extensions
+---
+tags: [guide, postgresql, extensions, pg-duckdb, pg-mooncake, timescaledb]
+---
 
-```{tags} guide, postgresql, extensions, pg-duckdb, pg-mooncake, timescaledb
-```
+# Benchmarking PostgreSQL Extensions
 
 BenchBox supports benchmarking PostgreSQL analytical extensions as first-class platforms. Each extension accelerates different workloads by adding specialized execution engines or storage formats to PostgreSQL.
 

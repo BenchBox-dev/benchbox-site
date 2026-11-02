@@ -1,7 +1,8 @@
-# Base Benchmark API
+---
+tags: [reference, python-api, contributor]
+---
 
-```{tags} reference, python-api, contributor
-```
+# Base Benchmark API
 
 The `benchbox.base` module provides the foundational abstract class that all benchmarks inherit from.
 
@@ -338,7 +339,7 @@ print(results.successful_queries, results.total_queries)
 2 2
 ```
 
-Adapters for cloud warehouses such as Databricks are constructed with keyword configuration (`DatabricksAdapter(**config)`) and need live credentials; see {doc}`/platforms/platform-selection-guide`.
+Adapters for cloud warehouses such as Databricks are constructed with keyword configuration (`DatabricksAdapter(**config)`) and need live credentials; see [Platform Selection Guide](../../platforms/platform-selection-guide.md).
 
 ### SQL Translation
 
@@ -359,9 +360,8 @@ Translates a query to another SQL dialect with sqlglot.
 
 Any dialect that sqlglot knows is accepted. These all translated TPC-H query 6 on 0.4.1: postgres, mysql, sqlite, duckdb, snowflake, bigquery, redshift, clickhouse, databricks, trino, athena and spark. The dialect name is case-insensitive (`"SNOWFLAKE"` works).
 
-```{note}
-**Dialect Translation vs Platform Adapters**: BenchBox can translate queries to many SQL dialects, but this doesn't mean platform adapters exist for all those databases. BenchBox supports 30+ platforms including DuckDB, SQLite, PostgreSQL, Databricks, BigQuery, Redshift, Snowflake, Trino, Athena, and more. See {doc}`/platforms/index` for the full list or {doc}`/development/roadmap` for planned platforms (MySQL, etc.).
-```
+> [!NOTE]
+> **Dialect Translation vs Platform Adapters**: BenchBox can translate queries to many SQL dialects, but this doesn't mean platform adapters exist for all those databases. BenchBox supports 30+ platforms including DuckDB, SQLite, PostgreSQL, Databricks, BigQuery, Redshift, Snowflake, Trino, Athena, and more. See [Platform Documentation](../../platforms/index.md) for the full list or [Development Roadmap](../../development/roadmap.md) for planned platforms (MySQL, etc.).
 
 ```python
 from benchbox import TPCH
@@ -455,7 +455,7 @@ Returns the lower-case name of the benchmark whose data this one reuses, or `Non
 
 ## See Also
 
-- {doc}`/usage/getting-started` - Getting started guide with complete examples
-- {doc}`/platforms/platform-selection-guide` - Platform adapter documentation
-- {doc}`/benchmarks/index` - Available benchmark implementations
-- {doc}`/reference/api-reference` - High-level API overview
+- [Getting Started in 5 Minutes](../../usage/getting-started.md) - Getting started guide with complete examples
+- [Platform Selection Guide](../../platforms/platform-selection-guide.md) - Platform adapter documentation
+- [Benchmarks](../../benchmarks/index.md) - Available benchmark implementations
+- [API Reference](../api-reference.md) - High-level API overview

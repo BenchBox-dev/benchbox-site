@@ -1,9 +1,10 @@
+---
+tags: [intermediate, guide, doris, sql-platform, self-hosted, olap]
+---
+
 <!-- Copyright 2026 Joe Harris / BenchBox Project. Licensed under the MIT License. -->
 
 # Apache Doris Platform
-
-```{tags} intermediate, guide, doris, sql-platform, self-hosted, olap
-```
 
 Apache Doris is a high-performance real-time analytical database based on MPP (Massively Parallel Processing) architecture. Originally developed at Baidu as Palo, it graduated as an Apache Top-Level Project in 2022. BenchBox connects via the MySQL protocol using PyMySQL (port 9030) and supports Stream Load via the FE HTTP API (port 8030) for high-throughput data ingestion. SQLGlot provides official `doris` dialect support for SQL translation.
 

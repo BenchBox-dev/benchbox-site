@@ -1,7 +1,8 @@
-# Platform Comparison Matrix
+---
+tags: [intermediate, reference]
+---
 
-```{tags} intermediate, reference
-```
+# Platform Comparison Matrix
 
 This matrix compares BenchBox platform families and links exact platform counts back to runtime registry metadata.
 
@@ -26,9 +27,8 @@ Platform registry: **53** metadata entries; **49** SQL-capable; **18** DataFrame
 | relational | 1 | General relational database support |
 | timeseries | 3 | Time-series engines with SQL/query support |
 
-```{note}
-**CLI Naming Convention**: DataFrame platforms use the `-df` suffix (e.g., `polars-df`, `pandas-df`) to distinguish them from SQL mode platforms. Some platforms like DataFusion support both modes - see [Hybrid Platforms](#hybrid-platforms-sql-dataframe) for details.
-```
+> [!NOTE]
+> **CLI Naming Convention**: DataFrame platforms use the `-df` suffix (e.g., `polars-df`, `pandas-df`) to distinguish them from SQL mode platforms. Some platforms like DataFusion support both modes - see [Hybrid Platforms](#hybrid-platforms-sql--dataframe) for details.
 
 ---
 
@@ -97,9 +97,8 @@ BenchBox supports multiple deployment modes for platforms, enabling the same ben
 | **self-hosted** | Yes         | Yes     | No            | ClickHouse Server, Trino, TimescaleDB, SingleStore |
 | **managed**     | Yes         | Yes     | Sometimes     | MotherDuck, ClickHouse Cloud, Starburst Galaxy |
 
-```{note}
-For detailed deployment mode configuration, see [Deployment Modes Guide](deployment-modes.md).
-```
+> [!NOTE]
+> For detailed deployment mode configuration, see [Deployment Modes Guide](deployment-modes.md).
 
 ---
 
@@ -119,9 +118,8 @@ Zero-infrastructure platforms that run in-process. Ideal for development, testin
 | **ACID Support**   | Limited           | None               | Full               | None               | Limited                  |
 | **SQL Support**    | Full              | Full               | Full               | **DataFrame only** | Full                     |
 
-```{note}
-**ClickHouse Platforms**: ClickHouse is available as three first-class platforms: `clickhouse-local` (chDB, zero-config), `clickhouse-server` (self-hosted), and `clickhouse-cloud` (managed). The legacy bare `clickhouse` selector has been removed and now raises an error naming these replacements. See [Migration Guide](clickhouse-migration.md).
-```
+> [!NOTE]
+> **ClickHouse Platforms**: ClickHouse is available as three first-class platforms: `clickhouse-local` (chDB, zero-config), `clickhouse-server` (self-hosted), and `clickhouse-cloud` (managed). The legacy bare `clickhouse` selector has been removed and now raises an error naming these replacements. See [Migration Guide](clickhouse-migration.md).
 
 ### Relative Performance Characteristics
 
@@ -176,9 +174,8 @@ SQLite is built into Python and needs no installation.
 
 Managed cloud platforms with enterprise features, auto-scaling, and petabyte-scale capacity.
 
-```{note}
-TimescaleDB also supports a managed cloud deployment mode via TigerData (`timescaledb:cloud`). It is shown separately below because it is a managed PostgreSQL time-series service rather than an MPP warehouse.
-```
+> [!NOTE]
+> TimescaleDB also supports a managed cloud deployment mode via TigerData (`timescaledb:cloud`). It is shown separately below because it is a managed PostgreSQL time-series service rather than an MPP warehouse.
 
 ### Architecture Comparison
 
@@ -491,9 +488,8 @@ In order, these commands install the dependencies for AWS Spark services (Glue, 
 
 Native DataFrame API libraries for programmatic data manipulation.
 
-```{important}
-**Naming Convention**: All DataFrame platforms use the `-df` suffix in CLI names to distinguish them from SQL-mode platforms. For example, use `polars-df` for Polars DataFrame API or `datafusion-df` for DataFusion DataFrame API.
-```
+> [!IMPORTANT]
+> **Naming Convention**: All DataFrame platforms use the `-df` suffix in CLI names to distinguish them from SQL-mode platforms. For example, use `polars-df` for Polars DataFrame API or `datafusion-df` for DataFusion DataFrame API.
 
 ### Expression Family (Lazy Evaluation)
 
@@ -570,6 +566,8 @@ The commands install, in order:
 
 ---
 
+<span id="hybrid-platforms-sql--dataframe"></span>
+
 ## Hybrid Platforms (SQL + DataFrame)
 
 These platforms support both SQL and native DataFrame execution modes. Use the appropriate CLI name based on your preferred execution paradigm.
@@ -582,9 +580,8 @@ These platforms support both SQL and native DataFrame execution modes. Use the a
 | **Snowpark Connect** | N/A          | `snowpark-connect` | DataFrame    | PySpark-compatible API on Snowflake |
 | **LakeSail**         | `lakesail`   | `lakesail-df`      | SQL          | Rust/DataFusion engine, Spark Connect |
 
-```{note}
-**Polars** is DataFrame-only (`polars-df`). SQL mode was removed due to fundamental limitations in Polars' SQL implementation (no implicit joins, limited subquery support) that make it incompatible with TPC benchmarks. For SQL benchmarks, use `duckdb` or another SQL-native platform.
-```
+> [!NOTE]
+> **Polars** is DataFrame-only (`polars-df`). SQL mode was removed due to fundamental limitations in Polars' SQL implementation (no implicit joins, limited subquery support) that make it incompatible with TPC benchmarks. For SQL benchmarks, use `duckdb` or another SQL-native platform.
 
 **Usage Example:**
 

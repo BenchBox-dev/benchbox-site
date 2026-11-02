@@ -1,7 +1,8 @@
-# CoffeeShop Benchmark API
+---
+tags: [reference, python-api, coffeeshop]
+---
 
-```{tags} reference, python-api, coffeeshop
-```
+# CoffeeShop Benchmark API
 
 Python API reference for the CoffeeShop benchmark.
 
@@ -25,7 +26,7 @@ The constructor creates no files. Data is written by `generate_data()`.
 
 ### Returns
 
-A `CoffeeShop` instance. It subclasses `BaseBenchmark`; see {doc}`/reference/python-api/base` for the shared interface.
+A `CoffeeShop` instance. It subclasses `BaseBenchmark`; see [Base Benchmark API](../base.md) for the shared interface.
 
 ### Raises
 
@@ -197,4 +198,4 @@ order_lines 132600
 
 ## Inherited members
 
-`run_with_platform`, `run_benchmark`, `tables`, `output_dir`, `scale_factor` and every other member come from `BaseBenchmark`. See {doc}`/reference/python-api/base` for what they do.
+`run_with_platform`, `run_benchmark`, `tables`, `output_dir`, `scale_factor` and every other member come from `BaseBenchmark`. See [Base Benchmark API](../base.md) for what they do.

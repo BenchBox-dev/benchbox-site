@@ -1,9 +1,10 @@
+---
+tags: [intermediate, guide, datafusion-df, dataframe-platform]
+---
+
 <!-- Copyright 2026 Joe Harris / BenchBox Project. Licensed under the MIT License. -->
 
 # DataFusion DataFrame Platform
-
-```{tags} intermediate, guide, datafusion-df, dataframe-platform
-```
 
 DataFusion is an Apache Arrow-native query engine with a Rust backend and Python bindings. BenchBox supports benchmarking DataFusion using its native DataFrame API through the `datafusion-df` platform.
 

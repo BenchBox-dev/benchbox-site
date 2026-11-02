@@ -1,7 +1,8 @@
-# Benchmark Result Schema (v1.1, Legacy)
+---
+tags: [reference, validation]
+---
 
-```{tags} reference, validation
-```
+# Benchmark Result Schema (v1.1, Legacy)
 
 This page documents the legacy v1.1 result shape. Current benchmark exports use schema v2 (see [Result Formats](result-formats.md)); v1.x bundles are only read through the normalizer's best-effort compatibility path. Keep this page for interpreting old files, not for new readers.
 

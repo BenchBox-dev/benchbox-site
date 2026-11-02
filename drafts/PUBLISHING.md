@@ -65,7 +65,7 @@ Published posts only:
 
 ```
 blog/
-  index.md                # Blog index (postlist + toctree)
+  index.md                # Blog index (introduction; the post list is built from the posts)
   images/                 # Published images
   2026-01-22-welcome.md   # Published post (YYYY-MM-DD-{slug}.md)
 ```
@@ -148,8 +148,7 @@ Check in particular:
   style checks and similar) has not added LLM writing tells.
 
 `npm run lint:blog` checks structure only: post file names and dates,
-required front matter, `blog/index.md` toctree coverage, queue and
-draft agreement, links in the queue and series plans, and hold and
+required front matter, queue and draft agreement, links in the queue and series plans, and hold and
 facts-verified marks. It does not judge content. Editorial quality is
 a human check against `STYLE_GUIDE.md` and `VOICE_REFERENCE.md`,
 backed by the build and repository checks in step 5. Evidence behind
@@ -201,23 +200,11 @@ For charts, `npm run charts -- <name>` renders a chart from
 unchanged charts alone. See `drafts/ASSETS.md` for how draft assets
 are kept in step with their published copies.
 
-### 4. Register the post in the blog index
+### 4. Check the blog index
 
-Edit `blog/index.md`. Add the post filename (without extension) to
-the `toctree`, in date order:
-
-````md
-```{toctree}
-:maxdepth: 1
-:hidden:
-
-2026-01-22-welcome
-YYYY-MM-DD-{slug}
-```
-````
-
-The `postlist` directive at the top of the index picks up the new
-post for the recent posts listing automatically.
+`blog/index.md` needs no edit. The blog template lists every published
+post on `/blog/` from the posts' own front matter, newest first, so a post
+appears once its `date` has arrived.
 
 ### 5. Validate locally
 
@@ -232,7 +219,7 @@ npm run preview -w website
 
 `npm run build` builds the Explorer and the website. The website
 build runs the converter over `blog/`, so unresolved links, bad
-frontmatter and unknown `toctree` targets fail here. Open the preview
+frontmatter and unknown link targets fail here. Open the preview
 and read the candidate post in place: the branch carrying a candidate
 in `blog/` is the previewable state. If the bundle cannot be fetched,
 the pull request's CI run uploads a `site-preview` artifact after the
@@ -277,7 +264,7 @@ open a pull request against `main`:
 
 ```bash
 git add blog/YYYY-MM-DD-{slug}.md blog/images/{image}.png \
-  blog/index.md drafts/PUBLICATION_SCHEDULE.md
+  drafts/PUBLICATION_SCHEDULE.md
 git commit -m "docs(blog): publish {title}"
 ```
 
@@ -337,7 +324,6 @@ run succeeds.
 - [ ] `blog/` copy uses `./images/` links; referenced images copied to `blog/images/`
 - [ ] Changed charts re-rendered with `npm run charts -- <name> --publish`; unchanged charts left alone
 - [ ] Companion links use exact date-prefixed filenames in `blog/`
-- [ ] Post added to `blog/index.md` toctree
 - [ ] Upcoming-queue row removed and links to the moved draft repaired in the same pull request
 - [ ] Candidate rendered and inspected using a fresh local build or the identified CI `site-preview` artifact
 - [ ] Pull request `ci` checks pass against `main`

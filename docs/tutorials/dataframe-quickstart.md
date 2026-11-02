@@ -1,7 +1,8 @@
-# DataFrame Benchmarking Quickstart
+---
+tags: [beginner, tutorial, dataframe-platform, polars]
+---
 
-```{tags} beginner, tutorial, dataframe-platform, polars
-```
+# DataFrame Benchmarking Quickstart
 
 Run TPC-H using DataFrame APIs (Polars, Pandas) instead of SQL.
 

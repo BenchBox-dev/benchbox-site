@@ -1,9 +1,10 @@
+---
+tags: [beginner, guide, python-api]
+---
+
 <!-- Copyright 2026 Joe Harris / BenchBox Project. Licensed under the MIT License. -->
 
 # Examples
-
-```{tags} beginner, guide, python-api
-```
 
 Practical code examples for common BenchBox usage patterns, database integrations, and performance testing scenarios.
 

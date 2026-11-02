@@ -1,7 +1,8 @@
-# Microsoft Fabric Lakehouse SQL
+---
+tags: [intermediate, guide, fabric-lakehouse, cloud-platform]
+---
 
-```{tags} intermediate, guide, fabric-lakehouse, cloud-platform
-```
+# Microsoft Fabric Lakehouse SQL
 
 BenchBox supports Microsoft Fabric Lakehouse SQL for **read-only query benchmarking**.
 

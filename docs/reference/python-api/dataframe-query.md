@@ -1,7 +1,8 @@
-# DataFrame Query Registries
+---
+tags: [reference, python-api, dataframe]
+---
 
-```{tags} reference, python-api, dataframe
-```
+# DataFrame Query Registries
 
 DataFrame benchmark modules store callable implementations and query metadata in shared registries. Registration metadata is runtime data: descriptions, category codes, SQL equivalents, expected counts and platform exclusions remain part of the query surface rather than source documentation.
 

@@ -1,7 +1,8 @@
-# ClickBench Benchmark API
+---
+tags: [reference, python-api, clickbench]
+---
 
-```{tags} reference, python-api, clickbench
-```
+# ClickBench Benchmark API
 
 Python API reference for the ClickBench (ClickHouse Analytics Benchmark).
 
@@ -63,7 +64,7 @@ The constructor creates no files. Data is written by `generate_data()`.
 
 ##### Returns
 
-A `ClickBench` instance. It subclasses `BaseBenchmark`; see {doc}`/reference/python-api/base` for the shared interface.
+A `ClickBench` instance. It subclasses `BaseBenchmark`; see [Base Benchmark API](../base.md) for the shared interface.
 
 ##### Raises
 
@@ -223,7 +224,7 @@ q10_sf = benchmark.translate_query("Q10", "snowflake")
 
 ### Inherited members
 
-Every other member comes from `BaseBenchmark`. See {doc}`/reference/python-api/base` for what they do. The ids on this page for the inherited members are kept in the table.
+Every other member comes from `BaseBenchmark`. See [Base Benchmark API](../base.md) for what they do. The ids on this page for the inherited members are kept in the table.
 
 | Group | Member | Kind | Notes |
 | --- | --- | --- | --- |
@@ -615,14 +616,14 @@ for query_id in string_queries:
 
 ## See Also
 
-- {doc}`index` - Benchmark API overview
-- {doc}`tpch` - TPC-H benchmark API
-- {doc}`tpcds` - TPC-DS benchmark API
-- {doc}`ssb` - Star Schema Benchmark API
-- {doc}`../base` - Base benchmark interface
-- {doc}`../results` - Results API
-- {doc}`/benchmarks/clickbench` - ClickBench guide
-- {doc}`/benchmarks/index` - Benchmark catalog
+- [Benchmark APIs](index.md) - Benchmark API overview
+- [TPC-H Benchmark API](tpch.md) - TPC-H benchmark API
+- [TPC-DS Benchmark API](tpcds.md) - TPC-DS benchmark API
+- [SSB (Star Schema Benchmark) API](ssb.md) - Star Schema Benchmark API
+- [Base Benchmark API](../base.md) - Base benchmark interface
+- [Results API](../results.md) - Results API
+- [ClickBench (ClickHouse Analytics Benchmark)](../../../benchmarks/clickbench.md) - ClickBench guide
+- [Benchmarks](../../../benchmarks/index.md) - Benchmark catalog
 
 ### External Resources
 

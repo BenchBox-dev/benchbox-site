@@ -1,9 +1,10 @@
+---
+tags: [contributor, guide, sql-platform]
+---
+
 <!-- Copyright 2026 Joe Harris / BenchBox Project. Licensed under the MIT License. -->
 
 # Adding New Platform Adapters
-
-```{tags} contributor, guide, sql-platform
-```
 
 This guide provides step-by-step instructions for implementing new platform adapters in BenchBox. Platform adapters enable BenchBox to run benchmarks on different database systems.
 
@@ -758,7 +759,7 @@ Before implementation, maintainers can print the expected file plan with the
 platform scaffold script (`--kind sql`).
 
 Declare compute and gateway support with the compute and gateway items of the
-{ref}`SQL platform checklist <new-platform-checklist-sql>`.
+[SQL platform checklist](new-platform-acceptance-checklist.md#sql-platform-checklist).
 
 Regenerate the inventory and run the drift gate after editing the manifest:
 

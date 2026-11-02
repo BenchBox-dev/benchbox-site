@@ -1,9 +1,10 @@
+---
+tags: [intermediate, guide, datafusion, sql-platform]
+---
+
 <!-- Copyright 2026 Joe Harris / BenchBox Project. Licensed under the MIT License. -->
 
 # Apache DataFusion Platform Guide
-
-```{tags} intermediate, guide, datafusion, sql-platform
-```
 
 Apache DataFusion is a fast, embeddable query engine for building high-quality data-centric systems in Rust, Python, and other languages. BenchBox's DataFusion adapter enables in-memory OLAP benchmarking with support for both CSV and Parquet formats.
 
@@ -122,7 +123,7 @@ benchbox run --platform datafusion --benchmark tpch \
 
 The driver package for DataFusion is `datafusion`.
 
-See {ref}`driver-version-management` for the full guide, including why `uv run` may
+See [Driver Version Management](../usage/driver-version-management.md) for the full guide, including why `uv run` may
 revert a manually-installed version and how to work around it.
 
 ### Performance Tuning

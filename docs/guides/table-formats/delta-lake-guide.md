@@ -1,7 +1,8 @@
-# Delta Lake Guide
+---
+tags: [guide, formats, delta-lake, databricks]
+---
 
-```{tags} guide, formats, delta-lake, databricks
-```
+# Delta Lake Guide
 
 Delta Lake adds transaction logs and ACID semantics on top of Parquet. This guide covers how transaction overhead affects benchmarks, when to use OPTIMIZE and Z-ORDER, and Databricks-specific considerations.
 

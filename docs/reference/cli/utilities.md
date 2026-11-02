@@ -1,11 +1,12 @@
-# Utility Commands
+---
+tags: [reference, cli]
+---
 
-```{tags} reference, cli
-```
+# Utility Commands
 
 This page covers smaller utility commands for dependency checking, system profiling, benchmark discovery, and configuration validation.
 
-(cli-check-deps)=
+<span id="cli-check-deps"></span>
 
 ## `check-deps` - Check Dependencies
 
@@ -31,7 +32,7 @@ benchbox check-deps --verbose
 
 The commands, in order, give an overview of all platform dependencies, check one platform, show the detailed installation matrix, and give verbose output with recommendations.
 
-(cli-profile)=
+<span id="cli-profile"></span>
 
 ## `profile` - System Profiling
 
@@ -57,7 +58,7 @@ Provides recommendations for:
 - Concurrency settings
 - Platform selection
 
-(cli-benchmarks)=
+<span id="cli-benchmarks"></span>
 
 ## `benchmarks` - Manage Benchmark Suites
 
@@ -80,7 +81,7 @@ Shows information about:
 - SSB, AMPLab (academic benchmarks)
 - ReadPrimitives, WritePrimitives, TPC-Havoc (testing benchmarks)
 
-(cli-validate)=
+<span id="cli-validate"></span>
 
 ## `validate` - Validate Configuration
 
@@ -100,7 +101,7 @@ benchbox validate --config ./custom-config.yaml
 
 The first command validates the default configuration and the second validates a specific configuration file.
 
-(cli-validate-results)=
+<span id="cli-validate-results"></span>
 
 ## Result Integrity Validation
 

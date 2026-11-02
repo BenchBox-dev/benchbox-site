@@ -1,9 +1,10 @@
+---
+tags: [beginner, cli, reference]
+---
+
 <!-- Copyright 2026 Joe Harris / BenchBox Project. Licensed under the MIT License. -->
 
 # BenchBox CLI quick reference
-
-```{tags} beginner, cli, reference
-```
 
 BenchBox ships with a full-featured CLI implemented with Click. This guide focuses on the commands and flags you will touch most often.
 

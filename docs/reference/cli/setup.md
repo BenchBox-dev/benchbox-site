@@ -1,9 +1,10 @@
-(cli-setup)=
+---
+tags: [reference, cli, cloud, credentials]
+---
+
+<span id="cli-setup"></span>
 
 # `setup` - Cloud Credentials
-
-```{tags} reference, cli, cloud, credentials
-```
 
 Interactive setup and management for cloud platform credentials.
 

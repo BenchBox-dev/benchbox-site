@@ -1,0 +1,299 @@
+groups:
+  - label: Getting Started
+    items:
+      - README.md
+      - usage/installation.md
+      - usage/getting-started.md
+      - usage/cli-quick-start.md
+      - guides/mcp-integration.md
+      - page: tutorials/index.md
+        items:
+          - tutorials/first-benchmark.md
+          - tutorials/understanding-results.md
+          - tutorials/comparing-platforms.md
+          - tutorials/dataframe-quickstart.md
+  - label: User Guide
+    items:
+      - usage/configuration.md
+      - usage/data-generation.md
+      - usage/dry-run.md
+      - usage/examples-directory.md
+      - tutorials/understanding-results.md
+      - usage/troubleshooting.md
+      - usage/faq.md
+      - page: concepts/index.md
+        items:
+          - concepts/architecture.md
+          - concepts/workflow.md
+          - concepts/data-model.md
+          - concepts/glossary.md
+          - concepts/benchmarking-tools-compared.md
+  - label: Benchmarks
+    items:
+      - page: benchmarks/tpc-standards.md
+        items:
+          - benchmarks/tpc-h.md
+          - benchmarks/tpc-ds.md
+          - benchmarks/tpc-di.md
+          - benchmarks/tpc-trademarks.md
+      - page: benchmarks/academic-benchmarks.md
+        items:
+          - benchmarks/ssb.md
+          - benchmarks/amplab.md
+          - benchmarks/join-order.md
+      - page: benchmarks/industry-benchmarks.md
+        items:
+          - benchmarks/clickbench.md
+          - benchmarks/h2odb.md
+          - benchmarks/coffeeshop.md
+      - page: benchmarks/real-world-benchmarks.md
+        items:
+          - benchmarks/nyctaxi.md
+          - benchmarks/flightdata.md
+      - page: benchmarks/time-series-benchmarks.md
+        items:
+          - benchmarks/tsbs-devops.md
+      - page: benchmarks/benchbox-primitives.md
+        items:
+          - benchmarks/read-primitives.md
+          - benchmarks/write-primitives.md
+          - benchmarks/transaction-primitives.md
+          - benchmarks/metadata-primitives.md
+          - benchmarks/ai-primitives.md
+      - page: benchmarks/ai-ml-benchmarks.md
+        items:
+          - benchmarks/vector-search.md
+      - page: benchmarks/benchbox-experimental.md
+        items:
+          - benchmarks/tpc-havoc.md
+          - benchmarks/tpch-skew.md
+          - benchmarks/tpc-ds-obt.md
+          - benchmarks/tpc-ds-obt-lineage.md
+          - benchmarks/datavault.md
+  - label: Platforms
+    items:
+      - platforms/platform-selection-guide.md
+      - platforms/quick-reference.md
+      - platforms/comparison-matrix.md
+      - page: platforms/sql-platforms.md
+        items:
+          - platforms/duckdb.md
+          - platforms/clickhouse-local-mode.md
+          - platforms/clickhouse-server.md
+          - platforms/datafusion.md
+          - platforms/cedardb.md
+          - platforms/gizmosql.md
+          - platforms/postgresql.md
+          - platforms/sqlite.md
+          - platforms/pg_duckdb.md
+          - platforms/pg_mooncake.md
+          - platforms/trino.md
+          - platforms/presto.md
+          - platforms/spark.md
+          - platforms/doris.md
+          - platforms/starrocks.md
+          - platforms/lakesail.md
+          - platforms/velox.md
+          - platforms/singlestore.md
+          - platforms/timescaledb.md
+          - platforms/influxdb.md
+          - platforms/questdb.md
+      - page: platforms/dataframe-platforms.md
+        items:
+          - platforms/dataframe.md
+          - platforms/polars.md
+          - platforms/pandas-dataframe.md
+          - platforms/pyspark-dataframe.md
+          - platforms/datafusion-dataframe.md
+          - platforms/modin-dataframe.md
+          - platforms/dask-dataframe.md
+          - platforms/cudf.md
+          - platforms/databricks-dataframe.md
+      - page: platforms/cloud-platforms.md
+        items:
+          - platforms/snowflake.md
+          - platforms/databricks.md
+          - platforms/bigquery.md
+          - platforms/clickhouse-cloud.md
+          - platforms/redshift.md
+          - platforms/athena.md
+          - platforms/azure-platforms.md
+          - platforms/microsoft-fabric.md
+          - platforms/fabric-lakehouse.md
+          - platforms/firebolt.md
+          - platforms/databend.md
+          - platforms/motherduck.md
+          - platforms/starburst.md
+          - platforms/quanton.md
+          - platforms/aws-glue.md
+          - platforms/emr-serverless.md
+          - platforms/athena-spark.md
+          - platforms/gcp-dataproc.md
+          - platforms/dataproc-serverless.md
+          - platforms/fabric-spark.md
+          - platforms/synapse-spark.md
+          - platforms/snowpark-connect.md
+  - label: Guides
+    items:
+      - page: guides/tpc/index.md
+        items:
+          - guides/tpc/tpc-h-official-guide.md
+          - guides/tpc/tpc-ds-official-guide.md
+          - guides/tpc/tpc-di-deployment-guide.md
+          - guides/tpc/tpc-di-etl-guide.md
+          - guides/tpc/maintenance-phase-guide.md
+          - guides/tpc/tpc-patterns-usage.md
+          - guides/tpc/tpc-validation-guide.md
+      - page: guides/table-formats/index.md
+        items:
+          - guides/table-formats/parquet-deep-dive.md
+          - guides/table-formats/delta-lake-guide.md
+          - guides/table-formats/iceberg-guide.md
+          - guides/table-formats/vortex-guide.md
+      - guides/platform-comparison.md
+      - guides/cloud-storage.md
+      - guides/compression.md
+      - page: advanced/index.md
+        items:
+          - advanced/power-run-concurrent-queries.md
+          - advanced/optimizer-tests.md
+          - advanced/performance.md
+          - advanced/performance-optimization.md
+          - page: advanced/performance-tuning.md
+            items:
+              - advanced/performance.md
+              - advanced/performance-optimization.md
+              - advanced/power-run-concurrent-queries.md
+          - advanced/format-conversion.md
+          - advanced/custom-benchmarks.md
+          - advanced/ci-cd-integration.md
+          - page: advanced/customization.md
+            items:
+              - advanced/custom-benchmarks.md
+              - advanced/optimizer-tests.md
+      - page: visualization/overview.md
+        items:
+          - visualization/chart-generation-guide.md
+          - visualization/chart-types.md
+          - visualization/customization.md
+          - visualization/templates.md
+          - visualization/cli-reference.md
+  - label: Contributing
+    items:
+      - contributing-results.md
+  - label: Reference
+    items:
+      - page: reference/cli/index.md
+        items:
+          - reference/cli/run.md
+          - reference/cli/convert.md
+          - reference/cli/shell.md
+          - reference/cli/platforms.md
+          - reference/cli/utilities.md
+          - reference/cli/tuning.md
+          - reference/cli/results.md
+          - reference/cli/submit.md
+          - reference/cli/auth.md
+          - reference/cli/visualize.md
+          - reference/cli/report.md
+          - reference/cli/metrics.md
+          - reference/cli/aggregate.md
+          - reference/cli/datagen.md
+          - reference/cli/setup.md
+          - reference/cli/query-plans.md
+          - reference/cli/download-answers.md
+          - reference/cli/configuration.md
+          - reference/cli/workflows.md
+      - page: reference/python-api/index.md
+        items:
+          - reference/python-api/base.md
+          - reference/python-api/core.md
+          - page: reference/python-api/benchmarks.md
+            items:
+              - reference/python-api/benchmarks/index.md
+              - reference/python-api/benchmarks/mixins.md
+              - reference/python-api/benchmarks/tpch.md
+              - reference/python-api/benchmarks/tpcds.md
+              - reference/python-api/benchmarks/tpchavoc.md
+              - reference/python-api/benchmarks/tpcdi.md
+              - reference/python-api/benchmarks/ssb.md
+              - reference/python-api/benchmarks/clickbench.md
+              - reference/python-api/benchmarks/coffeeshop.md
+              - reference/python-api/benchmarks/joinorder.md
+              - reference/python-api/benchmarks/amplab.md
+              - reference/python-api/benchmarks/h2odb.md
+              - reference/python-api/benchmarks/read-primitives.md
+              - reference/python-api/benchmarks/write-primitives.md
+              - reference/python-api/benchmarks/transaction-primitives.md
+              - reference/python-api/benchmarks/tpch-skew.md
+              - reference/python-api/benchmarks/tsbs-devops.md
+              - reference/python-api/benchmarks/vector-search.md
+              - reference/python-api/benchmarks/datavault.md
+              - reference/python-api/benchmarks/flightdata.md
+              - reference/python-api/benchmarks/metadata-primitives.md
+              - reference/python-api/benchmarks/nyctaxi.md
+              - reference/python-api/benchmarks/tpcds-obt.md
+          - reference/python-api/dataframe-query.md
+          - reference/python-api/dataframe-runtime.md
+          - reference/python-api/results.md
+          - reference/python-api/result-analysis.md
+          - reference/python-api/dataframe.md
+          - reference/python-api/platforms/common.md
+          - reference/python-api/platforms/duckdb.md
+          - reference/python-api/platforms/datafusion.md
+          - reference/python-api/platforms/sqlite.md
+          - reference/python-api/platforms/clickhouse.md
+          - reference/python-api/platforms/databricks.md
+          - reference/python-api/platforms/bigquery.md
+          - reference/python-api/platforms/snowflake.md
+          - reference/python-api/platforms/redshift.md
+          - reference/python-api/platforms/polars.md
+          - reference/python-api/cloud-storage.md
+          - reference/python-api/data-validation.md
+          - page: reference/python-api/utilities-index.md
+            items:
+              - reference/python-api/utilities.md
+              - reference/python-api/tuning.md
+              - reference/python-api/cloud-storage.md
+              - reference/python-api/result-analysis.md
+              - reference/python-api/data-validation.md
+              - reference/python-api/performance-monitoring.md
+              - reference/python-api/additional-utilities.md
+          - reference/python-api/additional-utilities.md
+          - reference/python-api/performance-monitoring.md
+          - reference/python-api/tuning.md
+      - reference/mcp.md
+      - reference/result-formats.md
+      - reference/result-schema-v1.md
+      - api.md
+  - label: Development
+    items:
+      - page: development/getting-started.md
+        items:
+          - development/development.md
+          - development/testing.md
+          - testing/live-integration-tests.md
+      - page: development/architecture-design.md
+        items:
+          - page: design/index.md
+            items:
+              - design/architecture.md
+              - design/structure.md
+          - design/architecture.md
+          - design/structure.md
+          - development/import-patterns.md
+      - page: development/platform-development.md
+        items:
+          - development/adding-new-platforms.md
+          - development/adding-dataframe-platform.md
+          - development/tpcds-dataframe-parity.md
+          - development/runtime-modules.md
+          - development/db-api-2.md
+      - design/architecture.md
+      - page: testing/index.md
+        items:
+          - testing/e2e-testing.md
+          - testing/docker-integration-tests.md
+          - testing/live-integration-tests.md
+  - label: Browse by Tag
+    generated: tag-categories

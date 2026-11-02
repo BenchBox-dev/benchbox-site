@@ -1,9 +1,10 @@
+---
+tags: [intermediate, guide, synapse-spark, cloud-platform]
+---
+
 <!-- Copyright 2026 Joe Harris / BenchBox Project. Licensed under the MIT License. -->
 
 # Azure Synapse Analytics Spark Platform
-
-```{tags} intermediate, guide, synapse-spark, cloud-platform
-```
 
 Azure Synapse Analytics is Microsoft's enterprise analytics platform providing integrated Spark, SQL, and Data Explorer capabilities. BenchBox integrates with Synapse Spark pools via the Livy API for benchmark execution with ADLS Gen2 storage.
 

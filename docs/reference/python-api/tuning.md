@@ -1,14 +1,10 @@
 ---
-myst:
-  enable_extensions:
-    - attrs_block
+tags: [reference, python-api, tuning]
 ---
+
 <!-- markdownlint-disable MD024 -->
 
 # Tuning Configuration API
-
-```{tags} reference, python-api, tuning
-```
 
 Complete Python API reference for database tuning and optimization configuration.
 
@@ -369,7 +365,7 @@ An enumeration of the 14 tuning types BenchBox can request, with checks for plat
 
 **Import:** `from benchbox.core.tuning.interface import TuningType` · **Extras:** none
 
-{#tuning-type-members}
+<span id="tuning-type-members"></span>
 
 #### Members
 
@@ -381,7 +377,7 @@ An enumeration of the 14 tuning types BenchBox can request, with checks for plat
 
 `str(TuningType.SORTING)` is `'sorting'`.
 
-{#tuning-type-parameters}
+<span id="tuning-type-parameters"></span>
 
 #### Parameters
 
@@ -393,19 +389,19 @@ An enumeration of the 14 tuning types BenchBox can request, with checks for plat
 | `is_compatible_with_platform(platform: str)` | `bool`: whether the platform supports this tuning type. The platform is a canonical platform key such as `"duckdb"`; case is ignored. A platform that is not known to BenchBox gets `False` for every type. |
 | `is_known_platform(platform: str)` (class method) | `bool`: whether the platform has an entry in the compatibility data. `"duckdb"` is known; `"starrocks"` and `"clickhouse-local"` are not. |
 
-{#tuning-type-returns}
+<span id="tuning-type-returns"></span>
 
 #### Returns
 
 A `TuningType` member.
 
-{#tuning-type-raises}
+<span id="tuning-type-raises"></span>
 
 #### Raises
 
 `ValueError` from `from_string` (`Invalid tuning type: nope`) and from `TuningType("nope")`.
 
-{#tuning-type-example}
+<span id="tuning-type-example"></span>
 
 #### Example
 
@@ -438,7 +434,7 @@ One column that takes part in a table tuning, with its SQL type, its position an
 
 **Import:** `from benchbox.core.tuning.interface import TuningColumn` · **Extras:** none
 
-{#tuning-column-parameters}
+<span id="tuning-column-parameters"></span>
 
 #### Parameters
 
@@ -451,7 +447,7 @@ One column that takes part in a table tuning, with its SQL type, its position an
 | `nulls_position` | `"FIRST"`, `"LAST"` or `"DEFAULT"` | `"DEFAULT"` | Where NULLs sort. `"DEFAULT"` leaves it to the platform. |
 | `compression` | `str` or `None` | `None` | Platform-specific compression or encoding name. |
 
-{#tuning-column-returns}
+<span id="tuning-column-returns"></span>
 
 #### Returns
 
@@ -460,13 +456,13 @@ A `TuningColumn`.
 - `to_dict()` returns a `dict` with `name`, `type` and `order`, plus `sort_order`, `nulls_position` and `compression` only when they differ from their defaults.
 - `from_dict(data)` (class method) builds a column from such a dict; the three optional keys may be absent.
 
-{#tuning-column-raises}
+<span id="tuning-column-raises"></span>
 
 #### Raises
 
 `ValueError` for an empty or badly formed `name`, an `order` that is not a positive integer, a `sort_order` or `nulls_position` outside the listed values, and, from `from_dict`, a dict missing `name`, `type` or `order` (`Missing required fields: {...}`).
 
-{#tuning-column-example}
+<span id="tuning-column-example"></span>
 
 #### Example
 
@@ -503,7 +499,7 @@ The tuning of one table: the columns used for partitioning, clustering, distribu
 
 **Import:** `from benchbox.core.tuning.interface import TableTuning` · **Extras:** none
 
-{#table-tuning-parameters}
+<span id="table-tuning-parameters"></span>
 
 #### Parameters
 
@@ -515,7 +511,7 @@ The tuning of one table: the columns used for partitioning, clustering, distribu
 | `distribution` | `list[TuningColumn]` or `None` | `None` | Distribution columns. |
 | `sorting` | `list[TuningColumn]` or `None` | `None` | Sort columns. |
 
-{#table-tuning-returns}
+<span id="table-tuning-returns"></span>
 
 #### Returns
 
@@ -530,13 +526,13 @@ A `TableTuning`. Creating one checks the name and that every list item is a `Tun
 | `to_dict()` | `dict` with `table_name` and one key per list that is not `None`. |
 | `from_dict(data)` (class method) | A `TableTuning` built from such a dict. |
 
-{#table-tuning-raises}
+<span id="table-tuning-raises"></span>
 
 #### Raises
 
 `ValueError` for an empty or badly formed `table_name`, for a list item that is not a `TuningColumn` (`sorting column at index 0 must be a TuningColumn instance`), and, from `from_dict`, for a dict without `table_name`.
 
-{#table-tuning-example}
+<span id="table-tuning-example"></span>
 
 #### Example
 
@@ -580,7 +576,7 @@ One object that holds the constraint settings, platform-specific optimizations a
 
 **Import:** `from benchbox.core.tuning.interface import UnifiedTuningConfiguration` · **Extras:** none
 
-{#unified-tuning-parameters}
+<span id="unified-tuning-parameters"></span>
 
 #### Parameters
 
@@ -595,7 +591,7 @@ All parameters are optional and default to a new object of their type.
 | `platform_optimizations` | `PlatformOptimizationConfiguration` | all off | Z-ordering, liquid clustering, auto-optimize, auto-compact, bloom filters and materialized views, each with an `..._enabled` flag. |
 | `table_tunings` | `dict[str, TableTuning]` | `{}` | Per-table tunings, keyed by table name. |
 
-{#unified-tuning-returns}
+<span id="unified-tuning-returns"></span>
 
 #### Returns
 
@@ -614,13 +610,13 @@ A `UnifiedTuningConfiguration`. A new one has the four constraint types enabled 
 | `get_configuration_hash()` | `str`: a 64-character SHA-256 hex digest of the `to_dict()` content. Equal configurations give equal hashes. |
 | `from_dict(data)` (class method) | A configuration built from such a dict; missing keys keep their defaults. An unknown key, at the top level (only `_metadata` is allowed besides the six settings), in a constraint section, in `platform_optimizations`, in a table tuning or in a column entry, raises `ValueError` that names the key, suggests the nearest valid key and lists the valid keys. |
 
-{#unified-tuning-raises}
+<span id="unified-tuning-raises"></span>
 
 #### Raises
 
 Nothing it raises itself, apart from what building `TableTuning` objects in `from_dict` raises. Validation problems are returned, not raised.
 
-{#unified-tuning-example}
+<span id="unified-tuning-example"></span>
 
 #### Example
 
@@ -978,12 +974,12 @@ for platform in platforms:
 
 ## See Also
 
-- {doc}`base` - Base benchmark interface
-- {doc}`platforms/databricks` - Databricks platform adapter (Z-ordering)
-- {doc}`platforms/snowflake` - Snowflake platform adapter (clustering)
-- {doc}`platforms/redshift` - Redshift platform adapter (distribution, sort keys)
-- {doc}`/usage/configuration` - Configuration guide
-- {doc}`/advanced/performance` - Performance optimization guide
+- [Base Benchmark API](base.md) - Base benchmark interface
+- [Databricks Platform Adapter](platforms/databricks.md) - Databricks platform adapter (Z-ordering)
+- [Snowflake Platform Adapter](platforms/snowflake.md) - Snowflake platform adapter (clustering)
+- [Amazon Redshift Platform Adapter](platforms/redshift.md) - Redshift platform adapter (distribution, sort keys)
+- [Configuration Handbook](../../usage/configuration.md) - Configuration guide
+- [Performance Monitoring](../../advanced/performance.md) - Performance optimization guide
 
 ### External Resources
 

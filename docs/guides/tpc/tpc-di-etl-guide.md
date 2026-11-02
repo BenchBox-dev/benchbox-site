@@ -1,9 +1,10 @@
+---
+tags: [advanced, guide, tpc-di]
+---
+
 <!-- Copyright 2026 Joe Harris / BenchBox Project. Licensed under the MIT License. -->
 
 # TPC-DI ETL Implementation Guide
-
-```{tags} advanced, guide, tpc-di
-```
 
 ## Overview
 

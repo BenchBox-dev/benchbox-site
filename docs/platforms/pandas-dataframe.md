@@ -1,9 +1,10 @@
+---
+tags: [intermediate, guide, pandas, dataframe-platform]
+---
+
 <!-- Copyright 2026 Joe Harris / BenchBox Project. Licensed under the MIT License. -->
 
 # Pandas DataFrame Platform
-
-```{tags} intermediate, guide, pandas, dataframe-platform
-```
 
 Pandas is the most widely-used Python data analysis library, with over 50 million monthly downloads. BenchBox supports benchmarking Pandas using its native DataFrame API through the `pandas-df` platform.
 

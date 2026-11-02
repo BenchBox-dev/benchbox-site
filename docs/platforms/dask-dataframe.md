@@ -1,9 +1,10 @@
+---
+tags: [intermediate, guide, dask, dataframe-platform]
+---
+
 <!-- Copyright 2026 Joe Harris / BenchBox Project. Licensed under the MIT License. -->
 
 # Dask DataFrame Platform
-
-```{tags} intermediate, guide, dask, dataframe-platform
-```
 
 Dask is a flexible parallel computing library that enables distributed DataFrame operations. BenchBox supports benchmarking Dask using its Pandas-compatible API through the `dask-df` platform.
 

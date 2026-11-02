@@ -1,7 +1,9 @@
+import { existsSync } from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { assertBuilt, assertOwnedOutput, buildSite, clearOutput, loadKnownBrokenLinks, UnownedOutputError, writeOutput } from "./build.ts";
 import { ConversionFailedError, constructOf } from "./errors.ts";
+import { NAV_FILE } from "./nav.ts";
 import { assembleDocsSource, repoPath } from "../lib/site-inputs.ts";
 
 const websiteRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..", "..");
@@ -12,6 +14,11 @@ function option(name: string, fallback: string): string {
 }
 
 const docsRoot = process.argv.includes("--docs") ? path.resolve(option("--docs", "")) : assembleDocsSource(path.join(websiteRoot, ".core-source"));
+if (!existsSync(path.join(docsRoot, NAV_FILE))) {
+  process.stderr.write(`${NAV_FILE} is missing from ${docsRoot}; the sidebar is built from it\n`);
+  process.exit(1);
+}
+
 const outRoot = path.resolve(option("--out", path.join(websiteRoot, ".generated")));
 const showAll = process.argv.includes("--all");
 

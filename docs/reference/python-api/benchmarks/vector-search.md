@@ -1,7 +1,8 @@
-# Vector Search API
+---
+tags: [reference, python-api, custom-benchmark]
+---
 
-```{tags} reference, python-api, custom-benchmark
-```
+# Vector Search API
 
 <!-- markdownlint-disable MD024 -->
 
@@ -41,7 +42,7 @@ The constructor creates no files. Data is written by `generate_data()`.
 
 ### Returns
 
-A `VectorSearch` instance. It subclasses `BaseBenchmark`; see {doc}`/reference/python-api/base` for the shared interface. The dimension count is used by the generator and by `get_create_tables_sql()`; the instance has no `dimensions` attribute.
+A `VectorSearch` instance. It subclasses `BaseBenchmark`; see [Base Benchmark API](../base.md) for the shared interface. The dimension count is used by the generator and by `get_create_tables_sql()`; the instance has no `dimensions` attribute.
 
 ### Raises
 
@@ -170,4 +171,4 @@ Raises `ValueError` otherwise, for example `Q1 similarity results are not descen
 
 ## Inherited members
 
-Every other member comes from `BaseBenchmark`: platform runs (`run_with_platform`), logging, `output_dir`, `scale_factor` and the loading configuration. See {doc}`/reference/python-api/base`.
+Every other member comes from `BaseBenchmark`: platform runs (`run_with_platform`), logging, `output_dir`, `scale_factor` and the loading configuration. See [Base Benchmark API](../base.md).

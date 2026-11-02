@@ -3,7 +3,7 @@ import assert from "node:assert/strict";
 import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from "node:fs";
 import os from "node:os";
 import path from "node:path";
-import { checkPublication, isoFromPostDate, linkFindings, planFindings, postFindings, toctreeEntries } from "./check-blog-publication.mjs";
+import { checkPublication, isoFromPostDate, linkFindings, planFindings, postFindings } from "./check-blog-publication.mjs";
 
 const NOW = Date.parse("2026-10-20");
 
@@ -13,8 +13,8 @@ function post(overrides = {}) {
   return `---\n${lines.join("\n")}\n---\n\n# Title\n`;
 }
 
-function index(...stems) {
-  return `# Blog\n\n\`\`\`{toctree}\n:maxdepth: 1\n:hidden:\n\n${stems.join("\n")}\n\`\`\`\n`;
+function index() {
+  return "# Blog\n";
 }
 
 test("post dates accept full and abbreviated month names and reject anything else", () => {
@@ -26,7 +26,7 @@ test("post dates accept full and abbreviated month names and reject anything els
 
 test("a post whose date disagrees with its file name is refused", () => {
   const posts = [{ name: "2026-10-08-late.md", source: post() }];
-  assert.deepEqual(postFindings(posts, index("2026-10-08-late")), ["blog/2026-10-08-late.md: date October 7, 2026 does not match the file name date"]);
+  assert.deepEqual(postFindings(posts), ["blog/2026-10-08-late.md: date October 7, 2026 does not match the file name date"]);
 });
 
 test("required front matter fields and the file name shape are enforced", () => {
@@ -37,22 +37,12 @@ test("required front matter fields and the file name shape are enforced", () => 
     { name: "2026-10-07-not-a-post.md", source: post({ blogpost: "false" }) },
     { name: "notes.md", source: post() },
   ];
-  const findings = postFindings(posts, index("2026-10-07-ok", "2026-10-07-no-author", "2026-10-07-no-tags", "2026-10-07-not-a-post"));
+  const findings = postFindings(posts);
   assert.deepEqual(findings, [
     "blog/2026-10-07-no-author.md: front matter needs author",
     "blog/2026-10-07-no-tags.md: front matter needs tags",
     "blog/2026-10-07-not-a-post.md: front matter needs blogpost: true",
     "blog/notes.md: file name must be YYYY-MM-DD-slug.md",
-  ]);
-});
-
-test("toctree entries and posts must match in both directions", () => {
-  const posts = [{ name: "2026-10-07-a.md", source: post() }, { name: "2026-10-07-b.md", source: post() }];
-  assert.deepEqual(toctreeEntries(index("x", "y")), ["x", "y"]);
-  assert.deepEqual(postFindings(posts, index("2026-10-07-a", "2026-10-07-ghost", "2026-10-07-a")), [
-    "blog/index.md: toctree lists 2026-10-07-ghost but blog/2026-10-07-ghost.md does not exist",
-    "blog/index.md: toctree lists 2026-10-07-a twice",
-    "blog/index.md: toctree is missing 2026-10-07-b",
   ]);
 });
 
@@ -146,7 +136,7 @@ test("time-sensitive rows need a verification mark and warn when stale or never 
 
 test("a consistent tree passes", () => {
   const root = fixture({
-    "blog/index.md": index("2026-10-07-a"),
+    "blog/index.md": index(),
     "blog/2026-10-07-a.md": post(),
     "drafts/PUBLICATION_SCHEDULE.md": schedule(row("queued", "-")),
     "drafts/s/drafts/queued.md": "# Q\n",

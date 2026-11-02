@@ -1,9 +1,10 @@
+---
+tags: [intermediate, concept, write-primitives, custom-benchmark, performance]
+---
+
 <!-- Copyright 2026 Joe Harris / BenchBox Project. Licensed under the MIT License. -->
 
 # Write Primitives Benchmark
-
-```{tags} intermediate, concept, write-primitives, custom-benchmark, performance
-```
 
 > **CLI name:** `write_primitives` - use `benchbox run --benchmark write_primitives`
 >

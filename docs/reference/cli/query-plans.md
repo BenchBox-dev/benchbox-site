@@ -1,9 +1,10 @@
-(cli-query-plans)=
+---
+tags: [reference, cli, query-plans]
+---
+
+<span id="cli-query-plans"></span>
 
 # `show-plan` / `plan-history` - Query Plans
-
-```{tags} reference, cli, query-plans
-```
 
 Inspect and track query execution plans from benchmark runs.
 

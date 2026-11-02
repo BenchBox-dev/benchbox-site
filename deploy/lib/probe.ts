@@ -5,7 +5,7 @@ import { filesUnder } from "../gates/files.ts";
 import type { ProbeMismatch } from "./receipt.ts";
 
 export const ROUTE_ROOTS = ["index.html", "docs/index.html", "docs/dev/index.html", "blog/index.html", "results/index.html", "404.html"];
-export const REQUIRED_PATHS = [...ROUTE_ROOTS, "results/data/results.duckdb", "docs/objects.inv"];
+export const REQUIRED_PATHS = [...ROUTE_ROOTS, "results/data/results.duckdb"];
 const SAMPLED = /\.(html|css|js|svg|json|xml)$/;
 export const DEEP_LINK = "/results/__site_deploy_probe__/deep/link";
 const LEGACY_DOWNLOAD_PAGE = /^docs\/_downloads\/[0-9a-f]{32}\/([^/]+)\/index\.html$/;

@@ -1,20 +1,18 @@
-# CLI Command Reference
+---
+tags: [reference, cli]
+---
 
-```{tags} reference, cli
-```
+# CLI Command Reference
 
 Complete reference for BenchBox command-line interface.
 
-```{toctree}
-:maxdepth: 1
-
-cli/index
-cli/run
-cli/shell
-cli/platforms
-cli/tuning
-cli/results
-cli/configuration
-cli/utilities
-cli/workflows
-```
+- [BenchBox CLI Reference](cli/index.md)
+- [`run` - Run Benchmarks](cli/run.md)
+- [`shell` - Interactive SQL Shell](cli/shell.md)
+- [`platforms` - Platform Management](cli/platforms.md)
+- [Tuning Commands](cli/tuning.md)
+- [Results Commands](cli/results.md)
+- [Configuration](cli/configuration.md)
+- [Utility Commands](cli/utilities.md)
+- [Common Workflows](cli/workflows.md)
+- [Troubleshooting](cli/workflows.md#troubleshooting)

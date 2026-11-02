@@ -1,7 +1,8 @@
-# Apache Iceberg Guide
+---
+tags: [guide, formats, iceberg, multi-engine]
+---
 
-```{tags} guide, formats, iceberg, multi-engine
-```
+# Apache Iceberg Guide
 
 Iceberg provides table format features with true multi-engine support. This guide covers how to benchmark with Iceberg across different query engines, catalog configuration, and multi-engine workflows.
 

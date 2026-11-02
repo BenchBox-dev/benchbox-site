@@ -1,9 +1,10 @@
+---
+tags: [intermediate, guide, cedardb, sql-platform]
+---
+
 <!-- Copyright 2026 Joe Harris / BenchBox Project. Licensed under the MIT License. -->
 
 # CedarDB Platform
-
-```{tags} intermediate, guide, cedardb, sql-platform
-```
 
 > **CLI name:** `cedardb` - use `benchbox run --platform cedardb`
 

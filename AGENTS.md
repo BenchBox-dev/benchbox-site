@@ -63,24 +63,42 @@ versioned core bundle; it reads nothing else from core.
   here and merge, merge the core change, then relink here.
 - Never read core files by any other route. A guard test fails the build on
   any path outside the repository other than `$SITE_INPUTS`.
-- `npm run docs:parity -w website` runs the TypeScript generators on the
-  bundle's `docs-data` and compares the output byte for byte with the
-  bundle's `docs` member while the bundle still carries one (schema 4). The
-  generated scope is `benchmarks/queries/`, `compat/` and
-  `reference/tuning-platform-support.md`. Every changed, missing and extra
-  path in that scope fails the run and is named with its first differing
-  byte and SHA-256 digests; nothing is normalized. A bundle without `docs`
-  (schema 5) reports not applicable unless `--require-applicable` is given.
-  `--report <file>` writes the full difference list with path and SHA-256
-  inventories of both sides. `ci` runs it.
 
 ## Documentation
 
 - `docs/` holds the published pages, authored here, with their original
   MIT license text in `docs/LICENSE`. The build assembles them with the
   pages that `npm run docs:generate -w website` renders from the bundle's
-  `docs-data` (the generated scope above) and with `blog/`. An authored page
+  `docs-data` (the generated scope: `benchmarks/queries/`, `compat/` and
+  `reference/tuning-platform-support.md`) and with `blog/`. An authored page
   in the generated scope or under `docs/blog/` fails the assembly.
+- Pages are plain GitHub-flavoured Markdown. They render the same on GitHub
+  as on the site. The converter does not read MyST, and a guard
+  (`website/src/converter/myst-guard.ts`) fails the build with the file and
+  line on the constructs that would otherwise render as stray text: a
+  directive fence (```` ```{name} ````), a role before an inline code span
+  a `(label)=` line and a `myst` front matter key. Write the plain form instead: GitHub alerts, `.md`
+  links, `<span id>` anchors and bold lead-ins in place of definition lists.
+- The site publishes no `objects.inv` Sphinx inventory. Nothing consumed it,
+  and the deploy probe no longer requires it.
+- The sidebar is the tree in `docs/nav.yml`: groups with a `label` and
+  `items`, where an item is a page path, `{page, label, items}` for a page
+  with a label override or children, or `{label, url}` for an external link.
+  A group with `generated: tag-categories` lists the tag categories. Convert
+  fails with the line in `nav.yml` for an unknown key, an empty group, a page
+  that does not exist or a page listed twice under one parent. A page that is
+  not listed still builds; add it to `docs/nav.yml` to put it in the sidebar.
+- Tags are the `tags` list in front matter, which must be the first thing in
+  the file. The tag pages under `/docs/_tags/` are generated from them.
+- Cross-references are relative `.md` links, for example
+  `[Title](../usage/installation.md#section)`. The converter checks that the
+  page and the fragment exist. Heading ids follow the docutils algorithm, and
+  `<span id="old-anchor"></span>` lines keep published fragments working.
+- Admonitions are GitHub alerts (`> [!NOTE]`, `TIP`, `IMPORTANT`,
+  `WARNING`, `CAUTION`), diagrams are `mermaid` code fences, and tables are
+  pipe tables.
+- The blog index is rendered by the blog template from the published posts;
+  `blog/index.md` holds only the introduction.
 - `docs/README.md` is the landing page. Its `{{package_version}}` token
   becomes the bundle manifest's `package_version`, so the release marker in
   the page always matches the bundle.
@@ -171,8 +189,9 @@ versioned core bundle; it reads nothing else from core.
   artifact and reports the differences. It is advisory: it is not part of
   `ci` and never fails on a difference.
 - The Nightly workflow's `links` job checks external links in `blog/`, `docs/`
-  and the site pages with `.lychee.toml`, which carries the scoped ignore
-  policy for flaky and login-gated hosts. It then checks the published
+  and the site pages, including their `#fragment` anchors, with `.lychee.toml`,
+  which carries the scoped ignore policy for flaky and login-gated hosts and
+  the fragment allowlist for anchors that JavaScript builds. It then checks the published
   documentation: every `/docs/` page in the `SITE_ORIGIN` sitemap, with
   fragments, for links to that origin (the scoped policy's own-origin exclusion
   yields to the check's include pattern). `scripts/check-published-links.mjs` accepts the
@@ -226,10 +245,11 @@ Adaptations to keep:
   `.todo-db/config.json` binds the `todo-db` MCP server that `.mcp.json`
   starts to that branch. The server runs on the developer's machine as
   `todo-db-mcp` and is not part of the site build.
-- Use todo-db 0.11.0 or later; older servers ignore `expect_store`. Before
-  the first tracker write in a session, confirm the bound store by passing
-  `BenchBox-dev/benchbox-site` as `expect_store`. A server bound to core's
-  tracker refuses it.
+- Use todo-db 0.12.0 or later. Older servers ignore `expect_store`, and
+  before 0.12.0 `drop` takes no `reason`, which the tracker skill now passes.
+  Before the first tracker write in a session, confirm the bound store by
+  passing `BenchBox-dev/benchbox-site` as `expect_store`. A server bound to
+  core's tracker refuses it.
 - Work that needs changes in both repositories is tracked in core, with
   links to the site paths it touches.
 - Change tracker state only through the server, never by editing the branch.

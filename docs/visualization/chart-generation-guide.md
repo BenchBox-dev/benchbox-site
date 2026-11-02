@@ -1,7 +1,8 @@
-# Chart Generation Guide
+---
+tags: [intermediate, guide, visualization]
+---
 
-```{tags} intermediate, guide, visualization
-```
+# Chart Generation Guide
 
 This guide walks you through generating charts from BenchBox benchmark results. Whether you're inspecting results in a terminal, creating CI summaries, or comparing platforms, this guide covers the end-to-end workflow.
 

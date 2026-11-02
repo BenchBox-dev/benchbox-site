@@ -1,7 +1,8 @@
-# Python API Reference
+---
+tags: [reference, python-api]
+---
 
-```{tags} reference, python-api
-```
+# Python API Reference
 
 Complete reference for BenchBox's Python API, covering benchmarks, platform adapters, results, and utilities.
 
@@ -35,55 +36,39 @@ print(f"Average time: {results.average_query_time:.3f}s")
 
 ### Core APIs
 
-```{toctree}
-:maxdepth: 1
-
-base
-core
-benchmarks
-dataframe-query
-dataframe-runtime
-results
-result-analysis
-dataframe
-```
+- [Base Benchmark API](base.md)
+- [Configuration, Registry and Lifecycle API](core.md)
+- [Benchmark API Reference](benchmarks.md)
+- [DataFrame Query Registries](dataframe-query.md)
+- [DataFrame Contexts and Tuning](dataframe-runtime.md)
+- [Results API](results.md)
+- [Result Analysis API](result-analysis.md)
+- [DataFrame query registries](dataframe.md)
 
 ### Platform Adapters
 
-```{toctree}
-:maxdepth: 1
-
-platforms/common
-platforms/duckdb
-platforms/datafusion
-platforms/sqlite
-platforms/clickhouse
-platforms/databricks
-platforms/bigquery
-platforms/snowflake
-platforms/redshift
-platforms/polars
-```
+- [Common platform adapter API](platforms/common.md)
+- [DuckDB Platform Adapter](platforms/duckdb.md)
+- [Apache DataFusion Platform Adapter](platforms/datafusion.md)
+- [SQLite Platform Adapter](platforms/sqlite.md)
+- [ClickHouse Platform Adapter](platforms/clickhouse.md)
+- [Databricks Platform Adapter](platforms/databricks.md)
+- [BigQuery Platform Adapter](platforms/bigquery.md)
+- [Snowflake Platform Adapter](platforms/snowflake.md)
+- [Amazon Redshift Platform Adapter](platforms/redshift.md)
+- [Polars Platform Adapter](platforms/polars.md)
 
 ### Utilities
 
-```{toctree}
-:maxdepth: 1
-
-cloud-storage
-data-validation
-utilities-index
-additional-utilities
-```
+- [Cloud Storage Integration API](cloud-storage.md)
+- [Data Validation Utilities API](data-validation.md)
+- [Utilities & Helpers](utilities-index.md)
+- [Additional Utilities API](additional-utilities.md)
 
 ### Performance & Monitoring
 
-```{toctree}
-:maxdepth: 1
-
-performance-monitoring
-tuning
-```
+- [Performance Monitoring Utilities API](performance-monitoring.md)
+- [Tuning Configuration API](tuning.md)
 
 ## Common Patterns
 
@@ -256,8 +241,8 @@ The first adapter is a DuckDB configuration. `database_path` accepts `":memory:"
 
 ## See Also
 
-- {doc}`/reference/api-reference` - High-level API overview
-- {doc}`/concepts/architecture` - System architecture and design
-- {doc}`/concepts/workflow` - Common workflow patterns
-- {doc}`/usage/examples` - Code examples and snippets
-- {doc}`/usage/troubleshooting` - Common issues and solutions
+- [API Reference](../api-reference.md) - High-level API overview
+- [BenchBox Architecture](../../concepts/architecture.md) - System architecture and design
+- [Benchmarking Workflows](../../concepts/workflow.md) - Common workflow patterns
+- [Examples](../../usage/examples.md) - Code examples and snippets
+- [Troubleshooting Guide](../../usage/troubleshooting.md) - Common issues and solutions

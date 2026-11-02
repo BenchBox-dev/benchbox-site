@@ -1,9 +1,10 @@
+---
+tags: [intermediate, guide, snowflake, cloud-platform]
+---
+
 <!-- Copyright 2026 Joe Harris / BenchBox Project. Licensed under the MIT License. -->
 
 # Snowflake Platform
-
-```{tags} intermediate, guide, snowflake, cloud-platform
-```
 
 Snowflake is a cloud-native data warehouse with automatic scaling, multi-cluster compute, and separation of storage and compute. BenchBox provides comprehensive support for Snowflake benchmarking across all cloud providers (AWS, Azure, GCP).
 
@@ -101,7 +102,7 @@ benchbox run --platform snowflake --benchmark tpch \
 
 The driver package for Snowflake is `snowflake-connector-python`.
 
-See {ref}`driver-version-management` for the full guide, including why `uv run` may
+See [Driver Version Management](../usage/driver-version-management.md) for the full guide, including why `uv run` may
 revert a manually-installed version and how to work around it.
 
 ### Gateway Endpoint

@@ -1,9 +1,10 @@
+---
+tags: [intermediate, guide, sqlite, embedded-platform]
+---
+
 <!-- Copyright 2026 Joe Harris / BenchBox Project. Licensed under the MIT License. -->
 
 # SQLite Platform
-
-```{tags} intermediate, guide, sqlite, embedded-platform
-```
 
 SQLite is the most widely deployed database engine in the world. While optimized for OLTP workloads, BenchBox supports SQLite for comparison benchmarks and scenarios where simplicity is paramount.
 

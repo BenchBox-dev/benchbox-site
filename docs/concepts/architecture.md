@@ -1,9 +1,10 @@
+---
+tags: [concept, intermediate, python-api]
+---
+
 <!-- Copyright 2026 Joe Harris / BenchBox Project. Licensed under the MIT License. -->
 
 # BenchBox Architecture
-
-```{tags} concept, intermediate, python-api
-```
 
 High-level overview of BenchBox's design, components, and extension points.
 

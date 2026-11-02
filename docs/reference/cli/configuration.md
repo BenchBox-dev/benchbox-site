@@ -1,9 +1,10 @@
-(cli-configuration)=
+---
+tags: [reference, cli, configuration]
+---
+
+<span id="cli-configuration"></span>
 
 # Configuration
-
-```{tags} reference, cli, configuration
-```
 
 BenchBox supports configuration through multiple sources with the following precedence:
 
@@ -77,7 +78,7 @@ platforms:
     schema: "PUBLIC"
 ```
 
-(cli-env-vars)=
+<span id="cli-env-vars"></span>
 
 ## Environment Variables
 
@@ -155,7 +156,7 @@ These variables control lower-level behaviors, useful for CI, offline environmen
 - `CLICKHOUSE_USER`: Username
 - `CLICKHOUSE_PASSWORD`: Password
 
-(cli-platform-options)=
+<span id="cli-platform-options"></span>
 
 ## Platform-Specific Options
 
@@ -170,12 +171,11 @@ These keys are available for every platform:
 | `driver_version` | Pin the Python driver package to a specific version (e.g. `1.2.0`). Useful for reproducing results or testing a specific connector release. |
 | `driver_auto_install` | When `true`, automatically installs the requested `driver_version` via uv if the package is not already present. |
 
-```{note}
-`uv run benchbox run` syncs the environment to `uv.lock` before Python starts, which
-can silently revert a version you installed manually. Use `driver_version` +
-`driver_auto_install=true` or `uv run --with "pkg==X"` to reliably test a specific
-version. See {ref}`driver-version-management` for the full guide.
-```
+> [!NOTE]
+> `uv run benchbox run` syncs the environment to `uv.lock` before Python starts, which
+> can silently revert a version you installed manually. Use `driver_version` +
+> `driver_auto_install=true` or `uv run --with "pkg==X"` to reliably test a specific
+> version. See [Driver Version Management](../../usage/driver-version-management.md) for the full guide.
 
 Example: pin DuckDB driver and auto-install it:
 
@@ -277,7 +277,7 @@ benchbox platforms status clickhouse
 benchbox platforms status databricks
 ```
 
-(cli-config-sections)=
+<span id="cli-config-sections"></span>
 
 ## Configuration Sections Reference
 

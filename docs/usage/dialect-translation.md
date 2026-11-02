@@ -1,7 +1,8 @@
-# SQL Dialect Translation Guide
+---
+tags: [intermediate, guide, sql-platform]
+---
 
-```{tags} intermediate, guide, sql-platform
-```
+# SQL Dialect Translation Guide
 
 ## Overview
 

@@ -2,7 +2,8 @@
 import type { CollectionEntry } from "astro:content";
 import { render } from "astro:content";
 import Blog from "../../layouts/Blog.astro";
-import { AUTHORS, authorPath, formatBlogDate, neighbours, postPath, seriesOf, seriesTitle, tagPath, toPost } from "../../lib/blog.ts";
+import PostList from "./PostList.astro";
+import { AUTHORS, authorPath, formatBlogDate, neighbours, newestFirst, postPath, seriesOf, seriesTitle, tagPath, toPost } from "../../lib/blog.ts";
 import { loadBlog } from "../../lib/blog-posts.ts";
 
 interface Props {
@@ -14,7 +15,8 @@ const { Content, headings } = await render(post);
 const lede = /^\s*>\s*([^\n[\]*_`]+?)\s*\n(?!>)/.exec(post.body ?? "")?.[1];
 const isIndex = post.id === "blog/index";
 const entry = isIndex || post.data.blogpost !== true ? undefined : toPost(post);
-const posts = entry ? (await loadBlog()).published : [];
+const nativeIndex = isIndex && post.data.nativeIndex === true;
+const posts = entry || nativeIndex ? (await loadBlog()).published : [];
 const { previous, next } = entry ? neighbours(posts, entry) : {};
 const siblings = entry ? seriesOf(posts, entry) : [];
 const link = (target: typeof previous) => (target ? { label: target.title, href: postPath(target) } : undefined);
@@ -39,4 +41,25 @@ const link = (target: typeof previous) => (target ? { label: target.title, href:
   isIndex={isIndex}
 >
   <Content />
+  {
+    nativeIndex && (
+      <>
+        <h2 id="recent-posts">Recent Posts</h2>
+        <PostList posts={newestFirst(posts)} excerpts />
+        <h2 id="archives">Archives</h2>
+        <p>Browse by:</p>
+        <ul>
+          <li>
+            <a href="archive.html">Archive</a> - Posts organized by year
+          </li>
+          <li>
+            <a href="tag.html">Tags</a> - Posts organized by topic
+          </li>
+          <li>
+            <a href="author.html">Authors</a> - Posts organized by author
+          </li>
+        </ul>
+      </>
+    )
+  }
 </Blog>

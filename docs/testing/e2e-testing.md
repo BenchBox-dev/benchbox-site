@@ -1,9 +1,10 @@
+---
+tags: [contributor, guide, testing, e2e]
+---
+
 <!-- Copyright 2026 Joe Harris / BenchBox Project. Licensed under the MIT License. -->
 
 # End-to-End (E2E) Testing Guide
-
-```{tags} contributor, guide, testing, e2e
-```
 
 This guide covers BenchBox's end-to-end test suite, which validates complete benchmark workflows through the CLI interface.
 

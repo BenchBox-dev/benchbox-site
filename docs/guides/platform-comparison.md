@@ -1,9 +1,10 @@
+---
+tags: [intermediate, guide, sql-platform]
+---
+
 <!-- Copyright 2026 Joe Harris / BenchBox Project. Licensed under the MIT License. -->
 
 # Platform Comparison Guide
-
-```{tags} intermediate, guide, sql-platform
-```
 
 This guide covers how to compare benchmark performance across platforms using the unified `benchbox compare` command. Compare SQL platforms, DataFrame platforms, or both.
 

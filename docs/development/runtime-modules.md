@@ -1,7 +1,8 @@
-# Runtime Module Architecture Overview
+---
+tags: [contributor, reference]
+---
 
-```{tags} contributor, reference
-```
+# Runtime Module Architecture Overview
 
 This guide summarizes the organization of the runtime-focused modules after the modularization refactor. It highlights the primary entry points, extension boundaries, and the locations of shared utilities.
 

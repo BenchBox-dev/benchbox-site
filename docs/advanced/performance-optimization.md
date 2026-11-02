@@ -1,7 +1,8 @@
-# Advanced Performance Optimization Guide
+---
+tags: [advanced, guide, performance]
+---
 
-```{tags} advanced, guide, performance
-```
+# Advanced Performance Optimization Guide
 
 Comprehensive guide to optimizing BenchBox benchmarks for maximum performance across different platforms and configurations.
 

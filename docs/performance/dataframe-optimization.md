@@ -1,7 +1,8 @@
-# DataFrame Performance Optimization Guide
+---
+tags: [advanced, guide, dataframe-platform, performance]
+---
 
-```{tags} advanced, guide, dataframe-platform, performance
-```
+# DataFrame Performance Optimization Guide
 
 This guide covers performance optimization techniques for BenchBox DataFrame adapters.
 

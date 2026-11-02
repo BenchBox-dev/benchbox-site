@@ -1,9 +1,10 @@
+---
+tags: [intermediate, guide, fabric-spark, cloud-platform]
+---
+
 <!-- Copyright 2026 Joe Harris / BenchBox Project. Licensed under the MIT License. -->
 
 # Microsoft Fabric Spark Platform
-
-```{tags} intermediate, guide, fabric-spark, cloud-platform
-```
 
 Microsoft Fabric is Microsoft's unified analytics platform providing SaaS Spark, Data Factory, Power BI, and more. BenchBox integrates with Fabric's Spark pools via the Livy API for benchmark execution with OneLake storage.
 

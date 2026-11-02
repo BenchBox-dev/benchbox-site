@@ -1,15 +1,15 @@
+---
+tags: [intermediate, guide, ducklake, sql-platform, beta]
+---
+
 <!-- Copyright 2026 Joe Harris / BenchBox Project. Licensed under the MIT License. -->
 
 # DuckLake Platform
 
-```{tags} intermediate, guide, ducklake, sql-platform, beta
-```
-
 DuckLake is an open lakehouse table format shipped as a DuckDB extension: table **data** is stored as Parquet files, while table **metadata** (the catalog) lives in a SQL database. BenchBox runs DuckLake through the same DuckDB engine used by the `duckdb` platform, inheriting DuckDB's SQL dialect and benchmark compatibility unchanged.
 
-```{warning}
-The DuckLake platform is **beta**. BenchBox has tested four catalog/storage deployment modes with TPC-H; other backend-by-storage combinations have not been tested separately. Runs with a PostgreSQL catalog or S3 storage are publishable and are not demoted in rankings, but their results record the catalog backend and storage location, because those are part of the configuration under test and a remote-backed number partly measures object-store latency. See [Catalog Backends](#catalog-backends) below. The [DuckLake maturity decision](../development/adr/adr-ducklake-maturity-and-publishability.md) is optional background.
-```
+> [!WARNING]
+> The DuckLake platform is **beta**. BenchBox has tested four catalog/storage deployment modes with TPC-H; other backend-by-storage combinations have not been tested separately. Runs with a PostgreSQL catalog or S3 storage are publishable and are not demoted in rankings, but their results record the catalog backend and storage location, because those are part of the configuration under test and a remote-backed number partly measures object-store latency. See [Catalog Backends](#catalog-backends) below. The [DuckLake maturity decision](../development/adr/adr-ducklake-maturity-and-publishability.md) is optional background.
 
 ## Features
 
@@ -149,15 +149,14 @@ What `--force` clears depends on where the catalog and the data live:
 | Local `data_path` directory | Yes - cleared recursively |
 | Cloud `data_path` (`s3://...`) | **No** - see below |
 
-```{warning}
-`--force` never deletes objects from a cloud `DATA_PATH`. Recursively deleting an
-object-store prefix is destructive in a way that clearing a local run directory is
-not, and the configured prefix may hold data this run did not write. The rebuilt
-catalog references only newly-written files, so **results stay correct** - but the
-Parquet from earlier runs is left unreferenced and keeps accruing storage cost. The
-adapter logs a warning naming the prefix; clear it yourself, e.g.
-`aws s3 rm --recursive s3://bucket/prefix/`.
-```
+> [!WARNING]
+> `--force` never deletes objects from a cloud `DATA_PATH`. Recursively deleting an
+> object-store prefix is destructive in a way that clearing a local run directory is
+> not, and the configured prefix may hold data this run did not write. The rebuilt
+> catalog references only newly-written files, so **results stay correct** - but the
+> Parquet from earlier runs is left unreferenced and keeps accruing storage cost. The
+> adapter logs a warning naming the prefix; clear it yourself, e.g.
+> `aws s3 rm --recursive s3://bucket/prefix/`.
 
 ## Python API
 

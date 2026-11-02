@@ -1,9 +1,10 @@
+---
+tags: [advanced, guide, tpc-h, tpc-ds]
+---
+
 <!-- Copyright 2026 Joe Harris / BenchBox Project. Licensed under the MIT License. -->
 
 # TPC Maintenance Phase: Complete Guide
-
-```{tags} advanced, guide, tpc-h, tpc-ds
-```
 
 > Standalone Maintenance tests permanently modify the database. TPC-H Power and Throughput also write
 > when `tpch_refresh_functions=true`. Reload the original data before reusing update sets; otherwise,

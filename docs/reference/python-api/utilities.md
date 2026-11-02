@@ -1,20 +1,16 @@
 ---
-myst:
-  enable_extensions:
-    - attrs_block
+tags: [reference, python-api]
 ---
+
 <!-- markdownlint-disable MD024 -->
 
 # Utility Functions API
-
-```{tags} reference, python-api
-```
 
 Complete Python API reference for BenchBox utility functions.
 
 ## Overview
 
-BenchBox provides utility functions for common tasks like SQL dialect translation. These utilities simplify cross-database benchmarking and platform-specific optimizations. This page covers dialect resolution and query translation; the other utility modules are listed in {doc}`utilities-index`.
+BenchBox provides utility functions for common tasks like SQL dialect translation. These utilities simplify cross-database benchmarking and platform-specific optimizations. This page covers dialect resolution and query translation; the other utility modules are listed in [Utilities & Helpers](utilities-index.md).
 
 **Available Utilities**:
 
@@ -22,19 +18,18 @@ BenchBox provides utility functions for common tasks like SQL dialect translatio
 
 ## Dialect Translation
 
-```{important}
-**Dialect Translation vs Platform Adapters**
-
-BenchBox can translate queries to many SQL dialects via SQLGlot (PostgreSQL, MySQL, SQL Server, Oracle, etc.),
-but **dialect translation does not mean platform adapters exist** for connecting to those databases.
-
-**Currently supported platforms**: DuckDB, SQLite, PostgreSQL, TimescaleDB, ClickHouse, Databricks SQL, BigQuery, Redshift, Snowflake, Trino, Presto, Amazon Athena, Firebolt, Azure Synapse Analytics, Microsoft Fabric, and many more (see {doc}`/platforms/index`)
-
-**Planned platforms**: MySQL, SQL Server, and others (see {doc}`/development/roadmap`)
-
-The examples below demonstrate dialect translation capabilities - you can use translated queries with your own
-database connections, but BenchBox's built-in platform adapters are limited to the supported platforms listed above.
-```
+> [!IMPORTANT]
+> **Dialect Translation vs Platform Adapters**
+>
+> BenchBox can translate queries to many SQL dialects via SQLGlot (PostgreSQL, MySQL, SQL Server, Oracle, etc.),
+> but **dialect translation does not mean platform adapters exist** for connecting to those databases.
+>
+> **Currently supported platforms**: DuckDB, SQLite, PostgreSQL, TimescaleDB, ClickHouse, Databricks SQL, BigQuery, Redshift, Snowflake, Trino, Presto, Amazon Athena, Firebolt, Azure Synapse Analytics, Microsoft Fabric, and many more (see [Platform Documentation](../../platforms/index.md))
+>
+> **Planned platforms**: MySQL, SQL Server, and others (see [Development Roadmap](../../development/roadmap.md))
+>
+> The examples below demonstrate dialect translation capabilities - you can use translated queries with your own
+> database connections, but BenchBox's built-in platform adapters are limited to the supported platforms listed above.
 
 ### SQL Dialect Resolution
 
@@ -293,7 +288,7 @@ Reads and changes the power-run and concurrent-query execution settings that are
 
 **Import:** `from benchbox.utils import ExecutionConfigHelper` · **Extras:** none
 
-{#execution-config-helper-parameters}
+<span id="execution-config-helper-parameters"></span>
 
 #### Parameters
 
@@ -301,7 +296,7 @@ Reads and changes the power-run and concurrent-query execution settings that are
 | --- | --- | --- | --- |
 | `config_manager` | object with `get(key, default)` and `set(key, value)` or `None` | `None` | The provider that holds the settings. `None` uses the process-wide provider, or a new in-memory provider with the defaults below when none has been registered. Each helper created that way has its own settings. |
 
-{#execution-config-helper-returns}
+<span id="execution-config-helper-returns"></span>
 
 #### Returns
 
@@ -330,14 +325,14 @@ Performance profiles:
 | `thorough` | 5 | 2 | 120 | on | 4 |
 | `stress` | 10 | 3 | 180 | on | 8 |
 
-{#execution-config-helper-raises}
+<span id="execution-config-helper-raises"></span>
 
 #### Raises
 
 - `create_performance_profile` and `apply_performance_profile`: `ValueError` for an unknown profile (`Unknown performance profile: fast. Available: ['quick', 'standard', 'thorough', 'stress']`).
 - `save_config` and `validate_execution_config`: `AttributeError` when the provider has no `save_config` or `validate_config` method, which is the case for the default in-memory provider.
 
-{#execution-config-helper-example}
+<span id="execution-config-helper-example"></span>
 
 #### Example
 
@@ -378,7 +373,7 @@ Unknown performance profile: fast. Available: ['quick', 'standard', 'thorough', 
 'SimpleConfigProvider' object has no attribute 'save_config'
 ```
 
-{#execution-config-helper-compatibility}
+<span id="execution-config-helper-compatibility"></span>
 
 #### Compatibility
 
@@ -1273,7 +1268,7 @@ The methods below return these values.
 
 These helpers construct names and paths. Except for `ensure_directory`, they do not create directories and do not validate remote storage access. Names are compatibility labels, not unique dataset identities.
 
-Scale-label formatting and its precision and identity limits are described in {doc}`additional-utilities`.
+Scale-label formatting and its precision and identity limits are described in [Additional Utilities API](additional-utilities.md).
 
 ### `benchbox.utils.output_path.normalize_output_root`
 
@@ -2339,11 +2334,11 @@ Nothing it raises itself. YAML import, conversion and file system errors propaga
 
 ## See Also
 
-- {doc}`base` - Base benchmark interface
-- {doc}`platforms` - Platform adapter documentation
-- {doc}`benchmarks/index` - Benchmark API overview
-- {doc}`/usage/configuration` - Configuration guide
-- {doc}`/usage/troubleshooting` - Troubleshooting guide
+- [Base Benchmark API](base.md) - Base benchmark interface
+- [Platform API Reference](platforms.md) - Platform adapter documentation
+- [Benchmark APIs](benchmarks/index.md) - Benchmark API overview
+- [Configuration Handbook](../../usage/configuration.md) - Configuration guide
+- [Troubleshooting Guide](../../usage/troubleshooting.md) - Troubleshooting guide
 
 ### External Resources
 

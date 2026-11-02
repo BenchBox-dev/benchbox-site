@@ -1,9 +1,10 @@
+---
+tags: [intermediate, guide, timescaledb, sql-platform]
+---
+
 <!-- Copyright 2026 Joe Harris / BenchBox Project. Licensed under the MIT License. -->
 
 # TimescaleDB Platform
-
-```{tags} intermediate, guide, timescaledb, sql-platform
-```
 
 TimescaleDB is a PostgreSQL extension for time-series workloads with hypertables, native compression, and continuous aggregates. BenchBox supports both self-hosted TimescaleDB and managed TigerData cloud deployments via the same adapter.
 

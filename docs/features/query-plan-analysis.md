@@ -1,7 +1,8 @@
-# Query Plan Analysis
+---
+tags: [advanced, guide, performance]
+---
 
-```{tags} advanced, guide, performance
-```
+# Query Plan Analysis
 
 BenchBox supports capturing, analyzing, and comparing query execution plans across different database platforms. This feature enables:
 

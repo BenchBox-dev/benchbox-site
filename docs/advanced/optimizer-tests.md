@@ -1,7 +1,8 @@
-# Optimizer Sniff Test Queries
+---
+tags: [advanced, guide, performance]
+---
 
-```{tags} advanced, guide, performance
-```
+# Optimizer Sniff Test Queries
 
 <!-- Copyright 2026 Joe Harris / BenchBox Project. Licensed under the MIT License. -->
 

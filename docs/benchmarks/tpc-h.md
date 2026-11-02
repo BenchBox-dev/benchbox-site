@@ -1,9 +1,10 @@
+---
+tags: [intermediate, concept, tpc-h]
+---
+
 <!-- Copyright 2026 Joe Harris / BenchBox Project. Licensed under the MIT License. -->
 
 # TPC-H Benchmark
-
-```{tags} intermediate, concept, tpc-h
-```
 
 > **CLI name:** `tpch` - use `benchbox run --benchmark tpch`
 
@@ -42,7 +43,7 @@ TPC-H uses 8 tables modeling a wholesale supplier business:
 
 ### Schema Relationships
 
-```{mermaid}
+```mermaid
 erDiagram
     REGION ||--o{ NATION : contains
     NATION ||--o{ CUSTOMER : located_in

@@ -35,87 +35,25 @@ This approach enables systematic performance investigation that pinpoints bottle
 
 BenchBox Primitives follow several design principles:
 
-<dl>
+**Isolation**: Each primitive tests one operation or a small family of related operations. A filter primitive tests filtering, not filtering-then-joining. This isolation makes performance differences attributable to specific capabilities.
 
-<dt><strong>Isolation</strong></dt>
+**Realistic data**: Primitives use TPC-derived data with realistic distributions, cardinalities, and correlations. Testing a filter on uniformly distributed random data tells you little about production performance.
 
-<dd>
+**Coverage**: The primitives cover the fundamental operations that compose all analytical queries: scans, filters, projections, aggregations, joins, sorts, and more. Understanding primitive performance predicts complex query performance.
 
-Each primitive tests one operation or a small family of related operations. A filter primitive tests filtering, not filtering-then-joining. This isolation makes performance differences attributable to specific capabilities.
-
-</dd>
-
-<dt><strong>Realistic data</strong></dt>
-
-<dd>
-
-Primitives use TPC-derived data with realistic distributions, cardinalities, and correlations. Testing a filter on uniformly distributed random data tells you little about production performance.
-
-</dd>
-
-<dt><strong>Coverage</strong></dt>
-
-<dd>
-
-The primitives cover the fundamental operations that compose all analytical queries: scans, filters, projections, aggregations, joins, sorts, and more. Understanding primitive performance predicts complex query performance.
-
-</dd>
-
-<dt><strong>Platform agnostic</strong></dt>
-
-<dd>
-
-Primitives work across SQL and DataFrame platforms, enabling comparison between Pandas and PostgreSQL, or Polars and DuckDB. The same logical operation is tested regardless of API.
-
-</dd>
-
-</dl>
+**Platform agnostic**: Primitives work across SQL and DataFrame platforms, enabling comparison between Pandas and PostgreSQL, or Polars and DuckDB. The same logical operation is tested regardless of API.
 
 ## Use Cases for Primitives
 
-<dl>
+**Performance debugging**: When a TPC-H query runs slower than expected, run the corresponding primitives to identify which operation is the bottleneck. Is Q9's slowdown from the join strategy or the aggregation?
 
-<dt><strong>Performance debugging</strong></dt>
+**Platform evaluation**: Before choosing a database, test the operations your workload uses most. If your queries are join-heavy, the join primitives predict real performance better than aggregate TPC scores.
 
-<dd>
+**Optimization validation**: After tuning a database, run primitives to verify the optimization worked. Did the new index actually speed up the filter operation? Primitives provide focused measurement.
 
-When a TPC-H query runs slower than expected, run the corresponding primitives to identify which operation is the bottleneck. Is Q9's slowdown from the join strategy or the aggregation?
+**Regression detection**: Track primitive performance across database versions to catch regressions early. A 20% slowdown in aggregation primitives predicts problems before they appear in complex queries.
 
-</dd>
-
-<dt><strong>Platform evaluation</strong></dt>
-
-<dd>
-
-Before choosing a database, test the operations your workload uses most. If your queries are join-heavy, the join primitives predict real performance better than aggregate TPC scores.
-
-</dd>
-
-<dt><strong>Optimization validation</strong></dt>
-
-<dd>
-
-After tuning a database, run primitives to verify the optimization worked. Did the new index actually speed up the filter operation? Primitives provide focused measurement.
-
-</dd>
-
-<dt><strong>Regression detection</strong></dt>
-
-<dd>
-
-Track primitive performance across database versions to catch regressions early. A 20% slowdown in aggregation primitives predicts problems before they appear in complex queries.
-
-</dd>
-
-<dt><strong>DataFrame vs SQL comparison</strong></dt>
-
-<dd>
-
-Primitives enable apples-to-apples comparison between DataFrame libraries (Polars, Pandas) and SQL databases (DuckDB, PostgreSQL) on the same logical operations.
-
-</dd>
-
-</dl>
+**DataFrame vs SQL comparison**: Primitives enable apples-to-apples comparison between DataFrame libraries (Polars, Pandas) and SQL databases (DuckDB, PostgreSQL) on the same logical operations.
 
 ## Primitive Categories
 
@@ -135,14 +73,14 @@ Read and Write Primitives include full DataFrame implementations supporting both
 
 ## Included Benchmarks
 
-- [read-primitives](/docs/benchmarks/read-primitives.html)
-- [write-primitives](/docs/benchmarks/write-primitives.html)
-- [transaction-primitives](/docs/benchmarks/transaction-primitives.html)
-- [metadata-primitives](/docs/benchmarks/metadata-primitives.html)
-- [ai-primitives](/docs/benchmarks/ai-primitives.html)
+- [Read Primitives Benchmark](/docs/benchmarks/read-primitives.html)
+- [Write Primitives Benchmark](/docs/benchmarks/write-primitives.html)
+- [Transaction Primitives Benchmark](/docs/benchmarks/transaction-primitives.html)
+- [Metadata Primitives Benchmark](/docs/benchmarks/metadata-primitives.html)
+- [AI/ML Primitives Benchmark](/docs/benchmarks/ai-primitives.html)
 
 ## See Also
 
-- [understanding-results](/docs/tutorials/understanding-results.html) - Interpreting benchmark output
-- [platform-comparison](/docs/guides/platform-comparison.html) - Comparing platforms systematically
-- [tpc-standards](/docs/benchmarks/tpc-standards.html) - End-to-end query benchmarks
+- [Understanding Benchmark Results](/docs/tutorials/understanding-results.html) - Interpreting benchmark output
+- [Platform Comparison Guide](/docs/guides/platform-comparison.html) - Comparing platforms systematically
+- [TPC Standards](/docs/benchmarks/tpc-standards.html) - End-to-end query benchmarks

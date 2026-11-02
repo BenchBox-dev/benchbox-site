@@ -1,9 +1,10 @@
+---
+tags: [intermediate, guide, polars, dataframe-platform]
+---
+
 <!-- Copyright 2026 Joe Harris / BenchBox Project. Licensed under the MIT License. -->
 
 # Polars Platform
-
-```{tags} intermediate, guide, polars, dataframe-platform
-```
 
 Polars is a high-performance DataFrame library implemented in Rust with Python bindings. It provides both lazy and eager execution modes, with automatic query optimization and parallelization.
 
@@ -97,7 +98,7 @@ benchbox run --platform polars-df --benchmark tpch \
   --platform-option driver_auto_install=true
 ```
 
-See {ref}`driver-version-management` for the full guide, including why `uv run` may
+See [Driver Version Management](../usage/driver-version-management.md) for the full guide, including why `uv run` may
 revert a manually-installed version and how to work around it.
 
 ## Usage Examples

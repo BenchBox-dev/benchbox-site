@@ -1,9 +1,10 @@
+---
+tags: [reference, python-api, duckdb]
+---
+
 <!-- markdownlint-disable MD024 -->
 
 # DuckDB Platform Adapter
-
-```{tags} reference, python-api, duckdb
-```
 
 The DuckDB adapter provides fast, embedded analytical database execution for benchmarks.
 
@@ -537,21 +538,21 @@ adapter = DuckDBAdapter(database_path=":memory:")
 
 ### Platform Documentation
 
-- {doc}`/platforms/platform-selection-guide` - Choosing DuckDB vs other platforms
-- {doc}`/platforms/quick-reference` - Quick setup for all platforms
-- {doc}`/platforms/comparison-matrix` - Feature comparison
+- [Platform Selection Guide](../../../platforms/platform-selection-guide.md) - Choosing DuckDB vs other platforms
+- [Multi-Platform Database Support](../../../platforms/quick-reference.md) - Quick setup for all platforms
+- [Platform Comparison Matrix](../../../platforms/comparison-matrix.md) - Feature comparison
 
 ### Benchmark Guides
 
-- {doc}`/benchmarks/tpc-h` - TPC-H on DuckDB
-- {doc}`/benchmarks/tpc-ds` - TPC-DS on DuckDB
-- {doc}`/benchmarks/clickbench` - ClickBench on DuckDB
+- [TPC-H Benchmark](../../../benchmarks/tpc-h.md) - TPC-H on DuckDB
+- [TPC-DS Benchmark](../../../benchmarks/tpc-ds.md) - TPC-DS on DuckDB
+- [ClickBench (ClickHouse Analytics Benchmark)](../../../benchmarks/clickbench.md) - ClickBench on DuckDB
 
 ### API Reference
 
-- {doc}`../base` - Base benchmark interface
-- {doc}`/reference/python-api/index` - Python API overview
-- {doc}`/reference/api-reference` - High-level API guide
+- [Base Benchmark API](../base.md) - Base benchmark interface
+- [Python API Reference](../index.md) - Python API overview
+- [API Reference](../../api-reference.md) - High-level API guide
 
 ### External Resources
 

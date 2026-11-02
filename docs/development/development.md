@@ -1,9 +1,10 @@
+---
+tags: [contributor, guide]
+---
+
 <!-- Copyright 2026 Joe Harris / BenchBox Project. Licensed under the MIT License. -->
 
 # Development Guide
-
-```{tags} contributor, guide
-```
 
 This guide provides information for developers who want to contribute to BenchBox or understand its internal architecture.
 

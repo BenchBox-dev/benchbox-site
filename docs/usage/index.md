@@ -1,9 +1,10 @@
+---
+tags: [beginner]
+---
+
 <!-- Copyright 2026 Joe Harris / BenchBox Project. Licensed under the MIT License. -->
 
 # User Guide
-
-```{tags} beginner
-```
 
 Your daily reference for using BenchBox. This section covers configuration, running benchmarks, and understanding results.
 
@@ -64,24 +65,20 @@ Core concepts for understanding BenchBox:
 - [CLI Reference](../reference/cli/index.md) - Complete command documentation
 - [Guides](../guides/index.md) - Task-oriented how-to guides
 
-```{toctree}
-:maxdepth: 1
-
-installation
-getting-started
-cli-quick-start
-configuration
-examples
-examples-directory
-examples/index
-dry-run
-data-generation
-dialect-translation
-cloud-sorted-ingestion
-tpc-tuning-profiles
-databricks-liquid-clustering
-intelligent-guidance
-faq
-troubleshooting
-README
-```
+- [Installation and environment setup](installation.md)
+- [Getting Started in 5 Minutes](getting-started.md)
+- [BenchBox CLI quick reference](cli-quick-start.md)
+- [Configuration Handbook](configuration.md)
+- [Examples](examples.md)
+- [Examples Directory Guide](examples-directory.md)
+- [BenchBox Examples](examples/index.md)
+- [Dry Run Mode](dry-run.md)
+- [Data Generation](data-generation.md)
+- [SQL Dialect Translation Guide](dialect-translation.md)
+- [Cloud Sorted Ingestion](cloud-sorted-ingestion.md)
+- [TPC Logical Tuning Profiles](tpc-tuning-profiles.md)
+- [Databricks Liquid Clustering](databricks-liquid-clustering.md)
+- [Intelligent Guidance and Enhanced CLI](intelligent-guidance.md)
+- [Frequently Asked Questions (FAQ)](faq.md)
+- [Troubleshooting Guide](troubleshooting.md)
+- [Usage Overview](README.md)

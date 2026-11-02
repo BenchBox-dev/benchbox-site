@@ -1,9 +1,10 @@
+---
+tags: [reference, python-api, sql-platform]
+---
+
 <!-- markdownlint-disable MD024 -->
 
 # Apache DataFusion Platform Adapter
-
-```{tags} reference, python-api, sql-platform
-```
 
 The DataFusion adapter provides in-memory analytical query execution using Apache DataFusion's fast query engine.
 
@@ -747,21 +748,21 @@ Validate the platform capabilities first. BenchBox translates queries for the `d
 
 ### Platform Documentation
 
-- {doc}`/platforms/datafusion` - Comprehensive DataFusion platform guide
-- {doc}`/platforms/platform-selection-guide` - Platform selection guide
-- {doc}`/platforms/comparison-matrix` - Platform comparison
-- {doc}`duckdb` - Similar in-process analytics platform
+- [Apache DataFusion Platform Guide](../../../platforms/datafusion.md) - Comprehensive DataFusion platform guide
+- [Platform Selection Guide](../../../platforms/platform-selection-guide.md) - Platform selection guide
+- [Platform Comparison Matrix](../../../platforms/comparison-matrix.md) - Platform comparison
+- [DuckDB Platform Adapter](duckdb.md) - Similar in-process analytics platform
 
 ### Benchmark Guides
 
-- {doc}`/benchmarks/tpc-h` - TPC-H benchmark
-- {doc}`/benchmarks/tpc-ds` - TPC-DS benchmark
-- {doc}`/benchmarks/index` - All benchmarks
+- [TPC-H Benchmark](../../../benchmarks/tpc-h.md) - TPC-H benchmark
+- [TPC-DS Benchmark](../../../benchmarks/tpc-ds.md) - TPC-DS benchmark
+- [Benchmarks](../../../benchmarks/index.md) - All benchmarks
 
 ### API Reference
 
-- {doc}`../base` - Base platform adapter interface
-- {doc}`/reference/python-api/index` - Python API overview
+- [Base Benchmark API](../base.md) - Base platform adapter interface
+- [Python API Reference](../index.md) - Python API overview
 
 ### External Resources
 

@@ -1,9 +1,10 @@
+---
+tags: [beginner, concept, coffeeshop, custom-benchmark]
+---
+
 <!-- Copyright 2026 Joe Harris / BenchBox Project. Licensed under the MIT License. -->
 
 # CoffeeShop Example Dataset
-
-```{tags} beginner, concept, coffeeshop, custom-benchmark
-```
 
 > **CLI name:** `coffeeshop` - use `benchbox run --benchmark coffeeshop`
 >

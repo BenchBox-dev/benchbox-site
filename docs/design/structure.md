@@ -1,9 +1,10 @@
+---
+tags: [contributor, concept]
+---
+
 <!-- Copyright 2026 Joe Harris / BenchBox Project. Licensed under the MIT License. -->
 
 # BenchBox Repository Structure
-
-```{tags} contributor, concept
-```
 
 ## Top-Level Layout
 

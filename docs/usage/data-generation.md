@@ -1,9 +1,10 @@
+---
+tags: [intermediate, guide, data-generation]
+---
+
 <!-- Copyright 2026 Joe Harris / BenchBox Project. Licensed under the MIT License. -->
 
 # Data Generation
-
-```{tags} intermediate, guide, data-generation
-```
 
 BenchBox provides systematic data generation capabilities for all supported benchmarks. This guide covers both basic data generation concepts and the advanced smart data generation features that optimize performance and developer productivity.
 

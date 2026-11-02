@@ -1,9 +1,10 @@
-(cli-report)=
+---
+tags: [reference, cli, analysis]
+---
+
+<span id="cli-report"></span>
 
 # `report` - Historical Analysis
-
-```{tags} reference, cli, analysis
-```
 
 Analyze benchmark results over time, generate platform rankings, and detect performance regressions. Results are stored in a local SQLite database at `~/.benchbox/results.db`.
 

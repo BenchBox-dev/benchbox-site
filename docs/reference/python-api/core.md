@@ -1,9 +1,10 @@
+---
+tags: [reference, python-api]
+---
+
 <!-- markdownlint-disable MD024 -->
 
 # Configuration, Registry and Lifecycle API
-
-```{tags} reference, python-api
-```
 
 Contract reference for the configuration models, the platform registry, the benchmark lifecycle runner, the system profiler and the TPC result validator in `benchbox.core`. None of these symbols needs an optional extra. Examples that run a benchmark use the `duckdb` extra for the adapter.
 
@@ -200,7 +201,7 @@ Platform 'not_a_platform' not registered
 
 ### Compatibility
 
-The registered names include platforms whose packages are not installed, so `get_available_platforms()` is longer than the set of platforms that can run. Use `get_platform_availability()` for that. `benchbox.platforms.get_platform_adapter` resolves aliases and then uses this registry; see {doc}`platforms`.
+The registered names include platforms whose packages are not installed, so `get_available_platforms()` is longer than the set of platforms that can run. Use `get_platform_availability()` for that. `benchbox.platforms.get_platform_adapter` resolves aliases and then uses this registry; see [Platform API Reference](platforms.md).
 
 ## `benchbox.core.runner.LifecyclePhases`
 

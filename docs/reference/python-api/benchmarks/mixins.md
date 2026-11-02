@@ -1,7 +1,8 @@
-# Shared Benchmark Facade Mixins
+---
+tags: [reference, python-api, benchmarks]
+---
 
-```{tags} reference, python-api, benchmarks
-```
+# Shared Benchmark Facade Mixins
 
 These maintained contracts document the public methods that benchmark facades inherit. Concrete benchmark pages describe only their own behavior and link here instead of repeating the same inherited member list.
 

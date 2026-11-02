@@ -1,9 +1,10 @@
+---
+tags: [reference, python-api, dataframe]
+---
+
 # DataFrame Contexts and Tuning
 
-```{tags} reference, python-api, dataframe
-```
-
-Query implementations share table access and expression helpers through a context. Pandas-family queries use string column access and Series operations. Expression queries use platform expression objects. See {doc}`dataframe-query` for query metadata, execution and registry contracts, and {doc}`/platforms/dataframe` for family architecture. These interfaces do not imply that every native DataFrame implements every protocol operation, or that benchmark results are equivalent.
+Query implementations share table access and expression helpers through a context. Pandas-family queries use string column access and Series operations. Expression queries use platform expression objects. See [DataFrame Query Registries](dataframe-query.md) for query metadata, execution and registry contracts, and [DataFrame Platforms](../../platforms/dataframe.md) for family architecture. These interfaces do not imply that every native DataFrame implements every protocol operation, or that benchmark results are equivalent.
 
 ## Contexts
 

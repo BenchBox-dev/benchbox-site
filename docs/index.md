@@ -2,109 +2,82 @@
 
 BenchBox is a comprehensive database benchmarking toolkit supporting TPC-H, TPC-DS, TPC-DI, and other industry-standard benchmarks across SQL and DataFrame platforms.
 
-```{toctree}
-:maxdepth: 1
-:caption: Getting Started
+**Getting Started**
 
-README.md
-usage/installation.md
-usage/getting-started.md
-usage/cli-quick-start.md
-guides/mcp-integration.md
-tutorials/index
-```
+- [BenchBox Documentation](README.md)
+- [Installation and environment setup](usage/installation.md)
+- [Getting Started in 5 Minutes](usage/getting-started.md)
+- [BenchBox CLI quick reference](usage/cli-quick-start.md)
+- [MCP Integration Guide](guides/mcp-integration.md)
+- [Tutorials](tutorials/index.md)
 
-```{toctree}
-:maxdepth: 2
-:caption: User Guide
+**User Guide**
 
-usage/configuration.md
-usage/data-generation.md
-usage/dry-run.md
-usage/examples-directory.md
-tutorials/understanding-results
-usage/troubleshooting.md
-usage/faq.md
-concepts/index.md
-```
+- [Configuration Handbook](usage/configuration.md)
+- [Data Generation](usage/data-generation.md)
+- [Dry Run Mode](usage/dry-run.md)
+- [Examples Directory Guide](usage/examples-directory.md)
+- [Understanding Benchmark Results](tutorials/understanding-results.md)
+- [Troubleshooting Guide](usage/troubleshooting.md)
+- [Frequently Asked Questions (FAQ)](usage/faq.md)
+- [Concepts](concepts/index.md)
 
-```{toctree}
-:maxdepth: 2
-:caption: Benchmarks
+**Benchmarks**
 
-benchmarks/tpc-standards
-benchmarks/academic-benchmarks
-benchmarks/industry-benchmarks
-benchmarks/real-world-benchmarks
-benchmarks/time-series-benchmarks
-benchmarks/benchbox-primitives
-benchmarks/ai-ml-benchmarks
-benchmarks/benchbox-experimental
-```
+- [TPC Standards](benchmarks/tpc-standards.md)
+- [Academic Benchmarks](benchmarks/academic-benchmarks.md)
+- [Industry Benchmarks](benchmarks/industry-benchmarks.md)
+- [Real-World Data Benchmarks](benchmarks/real-world-benchmarks.md)
+- [Time-Series Benchmarks](benchmarks/time-series-benchmarks.md)
+- [BenchBox Primitives](benchmarks/benchbox-primitives.md)
+- [AI & ML Benchmarks](benchmarks/ai-ml-benchmarks.md)
+- [BenchBox Experimental](benchmarks/benchbox-experimental.md)
 
-```{toctree}
-:maxdepth: 2
-:caption: Platforms
+**Platforms**
 
-platforms/platform-selection-guide.md
-platforms/quick-reference.md
-platforms/comparison-matrix.md
-platforms/sql-platforms
-platforms/dataframe-platforms
-platforms/cloud-platforms
-```
+- [Platform Selection Guide](platforms/platform-selection-guide.md)
+- [Multi-Platform Database Support](platforms/quick-reference.md)
+- [Platform Comparison Matrix](platforms/comparison-matrix.md)
+- [SQL Platforms](platforms/sql-platforms.md)
+- [DataFrame Platforms](platforms/dataframe-platforms.md)
+- [Cloud Platforms](platforms/cloud-platforms.md)
 
-```{toctree}
-:maxdepth: 2
-:caption: Guides
+**Guides**
 
-guides/tpc/index
-guides/table-formats/index
-guides/platform-comparison.md
-guides/cloud-storage.md
-guides/compression.md
-advanced/index.md
-visualization/overview.md
-```
+- [TPC Benchmark Guides](guides/tpc/index.md)
+- [Table Format Guides](guides/table-formats/index.md)
+- [Platform Comparison Guide](guides/platform-comparison.md)
+- [Cloud Storage Support](guides/cloud-storage.md)
+- [Data Compression in BenchBox](guides/compression.md)
+- [Advanced Topics](advanced/index.md)
+- [BenchBox Visualization Architecture](visualization/overview.md)
 
-```{toctree}
-:maxdepth: 1
-:caption: Contributing
+**Contributing**
 
-contributing-results.md
-```
+- [Contributing Benchmark Results](contributing-results.md)
 
-```{toctree}
-:maxdepth: 2
-:caption: Reference
+**Reference**
 
-reference/cli/index
-reference/python-api/index
-reference/mcp.md
-reference/result-formats.md
-reference/result-schema-v1.md
-api
-```
+- [BenchBox CLI Reference](reference/cli/index.md)
+- [Python API Reference](reference/python-api/index.md)
+- [MCP Server Reference](reference/mcp.md)
+- [Result Export Formats](reference/result-formats.md)
+- [Benchmark Result Schema (v1.1, Legacy)](reference/result-schema-v1.md)
+- [API Reference](api.md)
 
-```{toctree}
-:maxdepth: 2
-:caption: Development
+**Development**
 
-development/getting-started
-development/architecture-design
-development/platform-development
-design/architecture.md
-testing/index.md
-```
+- [Getting Started with Development](development/getting-started.md)
+- [Architecture & Design](development/architecture-design.md)
+- [Platform Development](development/platform-development.md)
+- [BenchBox Architecture](design/architecture.md)
+- [Testing Documentation](testing/index.md)
 
-```{toctree}
-:maxdepth: 2
-:caption: Browse by Tag
+**Browse by Tag**
 
-_tags/cat-audience
-_tags/cat-benchmark
-_tags/cat-platform
-_tags/cat-platform-type
-_tags/cat-content-type
-_tags/cat-feature
-```
+- [By Audience](_tags/cat-audience.md)
+- [By Benchmark](_tags/cat-benchmark.md)
+- [By Platform](_tags/cat-platform.md)
+- [By Platform Type](_tags/cat-platform-type.md)
+- [By Content Type](_tags/cat-content-type.md)
+- [By Feature](_tags/cat-feature.md)

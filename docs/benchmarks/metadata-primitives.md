@@ -1,9 +1,10 @@
+---
+tags: [intermediate, concept, metadata-primitives, custom-benchmark]
+---
+
 <!-- Copyright 2026 Joe Harris / BenchBox Project. Licensed under the MIT License. -->
 
 # Metadata Primitives Benchmark
-
-```{tags} intermediate, concept, metadata-primitives, custom-benchmark
-```
 
 > **CLI name:** `metadata_primitives` - use `benchbox run --benchmark metadata_primitives`
 >

@@ -1,9 +1,10 @@
+---
+tags: [concept, comparison, olap, oltp]
+---
+
 <!-- Copyright 2026 Joe Harris / BenchBox Project. Licensed under the MIT License. -->
 
 # Database Benchmarking Tools Compared
-
-```{tags} concept, comparison, olap, oltp
-```
 
 A practical comparison of open-source database benchmarking tools, their
 trade-offs, and the workloads each one targets.
@@ -78,9 +79,8 @@ The biggest decision is workload type, not tool features.
 **OLTP tools**: HammerDB, BenchBase
 **OLAP tools**: BenchBox, LakeBench (partial HammerDB via TPROC-H)
 
-```{warning}
-Running TPC-H on a tool optimized for TPC-C (or vice versa) produces misleading results. The tool's architecture assumes certain workload patterns.
-```
+> [!WARNING]
+> Running TPC-H on a tool optimized for TPC-C (or vice versa) produces misleading results. The tool's architecture assumes certain workload patterns.
 
 ## Head-to-Head Comparison
 
@@ -144,11 +144,10 @@ Running TPC-H on a tool optimized for TPC-C (or vice versa) produces misleading 
 
 **Avoid when**: Running OLTP transactional benchmarks.
 
-```{note}
-BenchBox can run native DataFrame workloads as well as SQL workloads. Check the
-current adapter metadata before assuming that a particular benchmark supports
-both paths.
-```
+> [!NOTE]
+> BenchBox can run native DataFrame workloads as well as SQL workloads. Check the
+> current adapter metadata before assuming that a particular benchmark supports
+> both paths.
 
 ## Combining Tools
 

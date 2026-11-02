@@ -1,7 +1,8 @@
-# Migrating to DataFrame Benchmarking
+---
+tags: [intermediate, guide, dataframe-platform]
+---
 
-```{tags} intermediate, guide, dataframe-platform
-```
+# Migrating to DataFrame Benchmarking
 
 This guide explains how to adopt DataFrame-based benchmarking alongside or instead of SQL-based execution.
 

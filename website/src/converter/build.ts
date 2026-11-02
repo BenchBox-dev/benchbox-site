@@ -1,15 +1,15 @@
-import { lstatSync, mkdirSync, readFileSync, readdirSync, rmSync, writeFileSync } from "node:fs";
+import { existsSync, lstatSync, mkdirSync, readFileSync, readdirSync, rmSync, writeFileSync } from "node:fs";
 import path from "node:path";
 import { convertDocument, type ConvertedDocument } from "./document.ts";
 import { DocsIndex, placeholderInfo } from "./docs-index.ts";
 import { ConverterError, ConversionFailedError } from "./errors.ts";
 import { createDefaultRegistry } from "./handlers/index.ts";
-import type { InventoryEntry } from "../lib/legacy-assets.ts";
 import type { DocInfo } from "./model.ts";
 import type { HandlerRegistry } from "./registry.ts";
 import { findMdxProblem, serializeDocument } from "./serialize.ts";
-import { generateTagSources } from "./tag-pages.ts";
-import { buildSidebar } from "./sidebar.ts";
+import { NAV_FILE, parseNav } from "./nav.ts";
+import { generateTagSources, tagCounts, type TaggedDocument } from "./tag-pages.ts";
+import { buildSidebar, type SidebarManifest } from "./sidebar.ts";
 import { listDocSources } from "./sources.ts";
 
 export type BuildOptions = { docsRoot: string; registry?: HandlerRegistry; knownBrokenLinks?: ReadonlySet<string> };
@@ -17,28 +17,6 @@ export type BuildOptions = { docsRoot: string; registry?: HandlerRegistry; known
 export type BuildSummary = { pages: number; md: number; mdx: number; mdxPages: string[] };
 
 export type BuildResult = { files: Map<string, string>; errors: ConverterError[]; summary: BuildSummary; infos: DocInfo[] };
-
-export function inventoryEntries(infos: readonly DocInfo[]): InventoryEntry[] {
-  const entries: InventoryEntry[] = [];
-  for (const info of infos) {
-    const uri = info.collection === "docs" ? info.route.replace(/^\/docs\//, "") : `..${info.route}`;
-    entries.push({ name: info.path.replace(/\.(md|rst)$/, ""), role: "doc", uri, title: info.title });
-    const seen = new Set<string>();
-    const post = /^blog\/(\d{4}-\d{2}-\d{2}-.+)\.(md|rst)$/.exec(info.path);
-    if (post) {
-      seen.add(post[1]);
-      entries.push({ name: post[1], role: "label", uri, title: info.title });
-    }
-    for (const label of [...info.labels.values(), ...info.headingLabels]) {
-      if (seen.has(label.label)) continue;
-      seen.add(label.label);
-      entries.push({ name: label.label, role: "label", uri: `${uri}#${label.id}`, title: label.title === undefined ? info.title : label.title.map((node) => node.value).join("") });
-    }
-  }
-  entries.push({ name: "genindex", role: "label", uri: "genindex.html", title: "Index" });
-  entries.push({ name: "search", role: "label", uri: "search.html", title: "Search Page" });
-  return entries.sort((a, b) => (a.role + a.name < b.role + b.name ? -1 : a.role + a.name > b.role + b.name ? 1 : 0));
-}
 
 function json(value: unknown): string {
   return `${JSON.stringify(value, null, 2)}\n`;
@@ -57,38 +35,38 @@ export function loadKnownBrokenLinks(file: string): Set<string> {
   return new Set(entries.map(([source, target]) => `${source} ${target}`));
 }
 
-function hasUnknownToctreeTarget(document: ConvertedDocument, index: DocsIndex): boolean {
-  return document.info.toctrees.some((block) => block.entries.some((entry) => entry.kind === "doc" && index.get(entry.path) === undefined));
+function sidebarFor(docsRoot: string, index: DocsIndex, tagged: readonly TaggedDocument[], errors: ConverterError[]): SidebarManifest {
+  const navPath = path.join(docsRoot, NAV_FILE);
+  if (!existsSync(navPath)) return { groups: [], order: {} };
+  try {
+    return buildSidebar(index, parseNav(readFileSync(navPath, "utf-8")), tagCounts(tagged));
+  } catch (error) {
+    if (!(error instanceof ConverterError)) throw error;
+    errors.push(error);
+    return { groups: [], order: {} };
+  }
 }
 
 export function buildSite(options: BuildOptions): BuildResult {
   const run: Run = { registry: options.registry ?? createDefaultRegistry(), docsRoot: options.docsRoot, knownBroken: options.knownBrokenLinks ?? new Set() };
   const sources: SourceText[] = listDocSources(options.docsRoot).map((source) => ({ relative: source.relative, raw: readFileSync(source.absolute, "utf-8") }));
   const errors: ConverterError[] = listDocSources(options.docsRoot, ".rst").map(
-    (source) => new ConverterError(source.relative, 1, "reStructuredText pages are not built by this site; convert the page to MyST Markdown"),
+    (source) => new ConverterError(source.relative, 1, "reStructuredText pages are not built by this site; convert the page to Markdown"),
   );
   const seed = new DocsIndex(sources.map((source) => placeholderInfo(source)));
   const firstPass = convertAll(sources, seed, run, "collect");
-  const generated = generateTagSources(firstPass.map((document) => document.info).filter((info) => info.collection === "docs").map((info) => ({ path: info.path, tags: info.tags })));
+  const tagged = firstPass.map((document) => document.info).filter((info) => info.collection === "docs").map((info) => ({ path: info.path, title: info.titleNodes, tags: info.tags }));
+  const generated = generateTagSources(tagged);
   const generatedSeed = new DocsIndex([...seed.paths().map((path) => seed.get(path) as DocInfo), ...generated.map((source) => placeholderInfo(source))]);
-  const collected = firstPass.map((document, position) =>
-    hasUnknownToctreeTarget(document, seed) ? convertAll([sources[position]], generatedSeed, run, "collect")[0] : document,
-  );
-  collected.push(...convertAll(generated, generatedSeed, run, "collect"));
+  const collected = [...firstPass, ...convertAll(generated, generatedSeed, run, "collect")];
   const emitted = [...sources, ...generated];
-  let index: DocsIndex;
-  try {
-    index = new DocsIndex(collected.map((document) => document.info));
-  } catch (error) {
-    if (error instanceof ConverterError) return { files: new Map(), errors: [error], summary: { pages: 0, md: 0, mdx: 0, mdxPages: [] }, infos: [] };
-    throw error;
-  }
+  const index = new DocsIndex(collected.map((document) => document.info));
   const documents = convertAll(emitted, index, run, "emit");
   for (const document of documents) errors.push(...document.errors);
   const summary: BuildSummary = { pages: documents.length, md: 0, mdx: 0, mdxPages: [] };
   const infos = documents.map((document) => document.info);
+  const sidebar = sidebarFor(options.docsRoot, index, tagged, errors);
   if (errors.length > 0) return { files: new Map(), errors, summary, infos };
-  const sidebar = buildSidebar(index);
   const files = new Map<string, string>();
   const tags = new Map<string, { path: string; route: string; title: string }[]>();
   for (const document of documents) {
@@ -114,7 +92,6 @@ export function buildSite(options: BuildOptions): BuildResult {
   files.set("manifest/sidebar.json", json(sidebar));
   files.set("manifest/tags.json", json(Object.fromEntries([...tags.entries()].sort((a, b) => (a[0] < b[0] ? -1 : 1)))));
   files.set("manifest/summary.json", json(summary));
-  files.set("manifest/inventory-entries.json", json(inventoryEntries(infos)));
   files.set(
     "manifest/legacy-files.json",
     json({

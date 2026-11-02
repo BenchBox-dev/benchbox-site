@@ -1,7 +1,8 @@
-# TPC-H Benchmark API
+---
+tags: [reference, python-api, tpc-h]
+---
 
-```{tags} reference, python-api, tpc-h
-```
+# TPC-H Benchmark API
 
 Python API reference for the TPC-H benchmark.
 
@@ -73,7 +74,7 @@ The constructor creates no files. Data is written by `generate_data()`.
 
 ##### Returns
 
-A `TPCH` instance. It subclasses `BaseBenchmark`; see {doc}`/reference/python-api/base` for the shared interface. The instance has a `compliance_class` attribute, a `TpchComplianceClass` value:
+A `TPCH` instance. It subclasses `BaseBenchmark`; see [Base Benchmark API](../base.md) for the shared interface. The instance has a `compliance_class` attribute, a `TpchComplianceClass` value:
 
 | Value | When |
 | --- | --- |
@@ -313,7 +314,7 @@ for table_name, file_path in benchmark.tables.items():
 
 ### Inherited members
 
-Every other member comes from `BaseBenchmark`. See {doc}`/reference/python-api/base` for what they do. The ids on this page for the inherited members are kept in the table.
+Every other member comes from `BaseBenchmark`. See [Base Benchmark API](../base.md) for what they do. The ids on this page for the inherited members are kept in the table.
 
 | Group | Member | Kind | Notes |
 | --- | --- | --- | --- |
@@ -475,9 +476,9 @@ print(power_results.queries_successful, f"{power_results.power_at_size:.1f}")
 
 ## See Also
 
-- {doc}`index` - Benchmark API overview
-- {doc}`tpcds` - TPC-DS benchmark API
-- {doc}`../base` - Base benchmark interface
-- {doc}`../results` - Results API
-- {doc}`/benchmarks/tpc-h` - TPC-H guide
-- {doc}`/guides/tpc/tpc-h-official-guide` - Official benchmark guide
+- [Benchmark APIs](index.md) - Benchmark API overview
+- [TPC-DS Benchmark API](tpcds.md) - TPC-DS benchmark API
+- [Base Benchmark API](../base.md) - Base benchmark interface
+- [Results API](../results.md) - Results API
+- [TPC-H Benchmark](../../../benchmarks/tpc-h.md) - TPC-H guide
+- [TPC-H Official Benchmark Guide](../../../guides/tpc/tpc-h-official-guide.md) - Official benchmark guide

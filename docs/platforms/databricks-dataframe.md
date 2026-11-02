@@ -1,9 +1,10 @@
+---
+tags: [intermediate, guide, databricks-df, dataframe-platform, cloud-platform]
+---
+
 <!-- Copyright 2026 Joe Harris / BenchBox Project. Licensed under the MIT License. -->
 
 # Databricks DataFrame Platform
-
-```{tags} intermediate, guide, databricks-df, dataframe-platform, cloud-platform
-```
 
 > **CLI name:** `databricks-df` - use `benchbox run --platform databricks-df`
 

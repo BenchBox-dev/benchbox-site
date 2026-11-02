@@ -1,7 +1,8 @@
-# Platform Support Status
+---
+tags: [intermediate, reference]
+---
 
-```{tags} intermediate, reference
-```
+# Platform Support Status
 
 BenchBox platform metadata carries a `support_status` value from the public support taxonomy: `stable`, `beta`, `experimental`, `repo_only`, `deprecated`, or `document_only`.
 

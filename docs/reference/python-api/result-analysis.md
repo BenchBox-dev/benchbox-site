@@ -1,9 +1,10 @@
+---
+tags: [reference, python-api, validation]
+---
+
 <!-- markdownlint-disable MD024 -->
 
 # Result Analysis API
-
-```{tags} reference, python-api, validation
-```
 
 Complete Python API reference for BenchBox result analysis, export, and comparison utilities.
 
@@ -704,9 +705,8 @@ print(manager.remove_pii(text))
 Contact [REDACTED] or call [REDACTED]
 ```
 
-```{note}
-**Migrating from the pre-consolidation API.** `anonymize_system_profile()`, `sanitize_path()`, `anonymize_query_metadata()`, and `validate_anonymization()` were removed. Call `anonymize_result_payload` on the whole payload instead - it applies all of those transforms in one pass. To confirm a payload is publishable, use `benchbox.core.results.anonymization.find_public_path_leaks`, which returns the offending field paths and replaces the old `validate_anonymization` check.
-```
+> [!NOTE]
+> **Migrating from the pre-consolidation API.** `anonymize_system_profile()`, `sanitize_path()`, `anonymize_query_metadata()`, and `validate_anonymization()` were removed. Call `anonymize_result_payload` on the whole payload instead - it applies all of those transforms in one pass. To confirm a payload is publishable, use `benchbox.core.results.anonymization.find_public_path_leaks`, which returns the offending field paths and replaces the old `validate_anonymization` check.
 
 ### Anonymization Config
 
@@ -1165,11 +1165,11 @@ for path in find_public_path_leaks(anonymized):
 
 ## See Also
 
-- {doc}`results` - Result models and data structures
-- {doc}`/usage/examples` - Usage examples
-- {doc}`/usage/troubleshooting` - Troubleshooting guide
-- {doc}`utilities` - Other utility functions
-- {doc}`/testing/index` - Testing and validation
+- [Results API](results.md) - Result models and data structures
+- [Examples](../../usage/examples.md) - Usage examples
+- [Troubleshooting Guide](../../usage/troubleshooting.md) - Troubleshooting guide
+- [Utility Functions API](utilities.md) - Other utility functions
+- [Testing Documentation](../../testing/index.md) - Testing and validation
 
 ### External Resources
 

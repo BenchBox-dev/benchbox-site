@@ -1,9 +1,10 @@
+---
+tags: [intermediate, guide, validation, tpc-h, tpc-ds]
+---
+
 <!-- Copyright 2026 Joe Harris / BenchBox Project. Licensed under the MIT License. -->
 
 # TPC Test Result Validation System
-
-```{tags} intermediate, guide, validation, tpc-h, tpc-ds
-```
 
 A systematic validation system for TPC benchmark test results that ensures compliance with official TPC specification requirements.
 

@@ -1,9 +1,10 @@
-(cli-aggregate)=
+---
+tags: [reference, cli, analysis]
+---
+
+<span id="cli-aggregate"></span>
 
 # `aggregate` - Aggregate Results
-
-```{tags} reference, cli, analysis
-```
 
 Aggregate multiple benchmark result files into a CSV file for performance trend tracking and downstream analysis.
 

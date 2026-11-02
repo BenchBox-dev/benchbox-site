@@ -1,9 +1,10 @@
+---
+tags: [advanced, concept, tpch-skew, tpc-h, custom-benchmark]
+---
+
 <!-- Copyright 2026 Joe Harris / BenchBox Project. Licensed under the MIT License. -->
 
 # TPC-H Skew Benchmark
-
-```{tags} advanced, concept, tpch-skew, tpc-h, custom-benchmark
-```
 
 > **CLI name:** `tpch_skew` - use `benchbox run --benchmark tpch_skew`
 >

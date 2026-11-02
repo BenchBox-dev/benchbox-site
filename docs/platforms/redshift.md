@@ -1,9 +1,10 @@
+---
+tags: [intermediate, guide, redshift, cloud-platform]
+---
+
 <!-- Copyright 2026 Joe Harris / BenchBox Project. Licensed under the MIT License. -->
 
 # Redshift Platform
-
-```{tags} intermediate, guide, redshift, cloud-platform
-```
 
 Amazon Redshift is a fully managed petabyte-scale data warehouse service in AWS. BenchBox provides comprehensive support for Redshift benchmarking with S3-based data loading via COPY command.
 
@@ -98,7 +99,7 @@ benchbox run --platform redshift --benchmark tpch \
 
 The driver package for Redshift is `redshift-connector`.
 
-See {ref}`driver-version-management` for the full guide, including why `uv run` may
+See [Driver Version Management](../usage/driver-version-management.md) for the full guide, including why `uv run` may
 revert a manually-installed version and how to work around it.
 
 ## Authentication Methods

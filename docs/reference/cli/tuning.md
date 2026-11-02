@@ -1,11 +1,14 @@
-# Tuning Commands
+---
+tags: [reference, cli, tuning]
+---
 
-```{tags} reference, cli, tuning
-```
+<!-- markdownlint-disable MD028 -->
+
+# Tuning Commands
 
 Commands for creating and managing tuning configurations for SQL and DataFrame platforms.
 
-(cli-tuning-resolution)=
+<span id="cli-tuning-resolution"></span>
 
 ## How `--tuning` is resolved
 
@@ -69,34 +72,32 @@ Resolution happens in this order (see `benchbox/cli/tuning_resolver.py:resolve_t
 4. **Invalid value**: if it's not a keyword and the path doesn't exist,
    `benchbox run` raises an error (with a hint to run `benchbox tuning list`).
 
-```{note}
-Steps 2.2, 2.3 and 2.5 are **cwd-relative**. `--tuning tuned` only auto-discovers
-the templates bundled in `examples/tunings/` (or a cwd-relative
-`<platform>/` directory) when `benchbox` is run from a checkout of this
-repository (or another directory with its own equivalent template tree). If
-BenchBox is installed as a package and run from elsewhere, auto-discovery
-falls through to step 2.4 - the packaged-resource tier - which resolves for
-the platform/benchmark pairs it covers; otherwise it falls through further to
-the basic-config fallback unless `BENCHBOX_TUNING_PATH` is set to a directory
-with the same `<platform>/<benchmark>_tuned.yaml` layout. A resolution from
-the packaged tier is recorded with a distinct provenance source
-(`TuningSource.PACKAGED_RESOURCE`), never conflated with a cwd/env
-auto-discovered template.
-```
+> [!NOTE]
+> Steps 2.2, 2.3 and 2.5 are **cwd-relative**. `--tuning tuned` only auto-discovers
+> the templates bundled in `examples/tunings/` (or a cwd-relative
+> `<platform>/` directory) when `benchbox` is run from a checkout of this
+> repository (or another directory with its own equivalent template tree). If
+> BenchBox is installed as a package and run from elsewhere, auto-discovery
+> falls through to step 2.4 - the packaged-resource tier - which resolves for
+> the platform/benchmark pairs it covers; otherwise it falls through further to
+> the basic-config fallback unless `BENCHBOX_TUNING_PATH` is set to a directory
+> with the same `<platform>/<benchmark>_tuned.yaml` layout. A resolution from
+> the packaged tier is recorded with a distinct provenance source
+> (`TuningSource.PACKAGED_RESOURCE`), never conflated with a cwd/env
+> auto-discovered template.
 
-```{warning}
-`--tuning auto` prints a "smart defaults" message, but real system-profile
-smart defaults (`benchbox/cli/tuning_runtime.py:resolve_dataframe_tuning_config`)
-are implemented for **DataFrame platforms only** today. On SQL platforms,
-`--tuning auto` proceeds with a basic, untuned configuration and
-`benchbox run` prints an explicit warning saying so.
-```
+> [!WARNING]
+> `--tuning auto` prints a "smart defaults" message, but real system-profile
+> smart defaults (`benchbox/cli/tuning_runtime.py:resolve_dataframe_tuning_config`)
+> are implemented for **DataFrame platforms only** today. On SQL platforms,
+> `--tuning auto` proceeds with a basic, untuned configuration and
+> `benchbox run` prints an explicit warning saying so.
 
 `BENCHBOX_TUNING_CONFIG` and `BENCHBOX_TUNING_PATH` are the only tuning-related
 environment variables that affect resolution; see
-[Configuration - Environment Variables](configuration.md#cli-env-vars).
+[Configuration - Environment Variables](configuration.md#environment-variables).
 
-(cli-tuning-init)=
+<span id="cli-tuning-init"></span>
 
 ## `tuning init` - Create Tuning Configuration
 
@@ -123,7 +124,7 @@ benchbox tuning init --platform snowflake \
 
 The first command creates a sample tuning configuration for Databricks and writes `databricks_tuning.yaml`. The second creates one for Snowflake at a custom output path.
 
-(cli-tuning-dataframe)=
+<span id="cli-tuning-dataframe"></span>
 
 ## DataFrame Tuning via `tuning` Commands
 
@@ -212,7 +213,7 @@ DataFrame tuning supports these configuration sections:
 
 For complete configuration reference, see [DataFrame Platforms - Tuning](../../platforms/dataframe.md#dataframe-tuning).
 
-(cli-tuning-list)=
+<span id="cli-tuning-list"></span>
 
 ## `tuning list` - List Available Templates
 
@@ -237,7 +238,7 @@ benchbox tuning list --benchmark tpcds
 - `--platform TEXT`: Filter to a specific platform (e.g. `duckdb`, `snowflake`)
 - `--benchmark TEXT`: Filter to a specific benchmark (e.g. `tpch`, `tpcds`)
 
-(cli-tuning-show)=
+<span id="cli-tuning-show"></span>
 
 ## `tuning show` - Show Resolved Tuning Configuration
 
@@ -258,7 +259,7 @@ benchbox tuning show notuning
 - `--platform TEXT`: Target platform, used for template discovery
 - `--benchmark TEXT`: Target benchmark, used for template discovery
 
-(cli-tuning-platforms)=
+<span id="cli-tuning-platforms"></span>
 
 ## `tuning platforms` - List Platform Tuning Capabilities
 

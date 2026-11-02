@@ -1,7 +1,8 @@
-# Chart Types
+---
+tags: [intermediate, reference, visualization]
+---
 
-```{tags} intermediate, reference, visualization
-```
+# Chart Types
 
 BenchBox provides chart types optimized for benchmarking narratives, rendered as ASCII art directly in the terminal. Each chart is designed for a specific analytical purpose and can be generated via `benchbox visualize` or programmatically through the Python API. No external dependencies are required.
 

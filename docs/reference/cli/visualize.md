@@ -1,9 +1,10 @@
-(cli-visualize)=
+---
+tags: [reference, cli, visualization]
+---
+
+<span id="cli-visualize"></span>
 
 # `visualize` - Generate Charts
-
-```{tags} reference, cli, visualization
-```
 
 Generate ASCII charts from benchmark result files directly in the terminal.
 
@@ -38,7 +39,7 @@ benchbox visualize result_a.json result_b.json --chart-type speedup
 
 benchbox visualize result.json --chart-type performance_bar
 
-benchbox visualize result.json --template overview
+benchbox visualize result.json --template executive_summary
 
 benchbox visualize result.json --no-color --no-unicode > charts.txt
 
