@@ -3,7 +3,7 @@
     "A tuning page generated from a docs-data fixture with no aliases has no dangling sentence; the no-aliases golden is updated",
     "npm test -w website passes"
   ],
-  "context": "Moved from the BenchBox core tracker, where it was filed on 2026-10-29, when this repository gained its own tracker.",
+  "context": "Moved from the BenchBox core tracker, where it was filed on 2026-10-29, when this repository gained its own tracker.\n\n2026-11-02: Done in PR #105 (merge 6435170d6a). tuning-matrix.ts omits the aliases sentence when the alias map is empty; no-aliases golden regenerated (diff removes only that sentence and a blank line). The real bundle has one global map with 7 entries, so it is never empty today. npm test -w website passed; ci green before merge.",
   "description": "Found 2026-10-28 while adding generator goldens. With an empty alias list, website/src/lib/docs-generators/tuning-matrix.ts renders the sentence \"Aliases resolve to another platform's entry: .\" with nothing after the colon. The checked-in golden (website/tests/docs-generators-golden/no-aliases/) now pins that wording. Omit the sentence when the list is empty (or render an explicit none), then regenerate the golden with UPDATE_GOLDEN=1 and review the diff. Check whether the real bundle ever has an empty alias list; if never, the fix is still cheap and prevents a malformed published page.",
   "links": [
     "BenchBox-dev/benchbox-site: website/src/lib/docs-generators/tuning-matrix.ts",
@@ -17,6 +17,14 @@
       "op": "create",
       "op_id": "86ebb30014bb47a38cb3573170fdc477",
       "session_id": "cc767de99c19400aa238236633ca9140"
+    },
+    {
+      "actor": "mcp:omp-coding-agent:joe@joe-mac-mini.local:a6d1a76a8fe5c477ca12e1f3",
+      "at": "2026-11-02T02:01:18Z",
+      "client": "omp-coding-agent",
+      "op": "update",
+      "op_id": "32c6f6d48ecb4005b62f98ab7febf84d",
+      "session_id": "2708a39948944f4299911f72f62ba6c5"
     }
   ]
 }
