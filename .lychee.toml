@@ -48,4 +48,13 @@ exclude = [
   # Geekbench blog pages reject automated CI requests with HTTP 403.
   '^https://www\.geekbench\.com/blog/2023/06/geekbench-61/',
   '^https://www\.geekbench\.com/blog/2026/07/geekbench-7/',
+  # Fragment allowlist. The nightly external step checks fragments; these
+  # patterns match only links that carry the named fragment, so the page itself
+  # is still checked when linked without it. Each fragment is built or loaded
+  # by JavaScript after the page renders, so it is absent from the fetched HTML.
+  # GitHub comment and review anchors are inserted client side by the
+  # timeline loader.
+  '^https://github\.com/[^/]+/[^/]+/(issues|pull)/[0-9]+[^#]*#(issuecomment|discussion_r|pullrequestreview|event)-',
+  # GitHub changed-files anchors are hashes of the file path, rendered client side.
+  '^https://github\.com/[^/]+/[^/]+/pull/[0-9]+/(files|commits/[0-9a-f]+)#diff-',
 ]
