@@ -41,15 +41,10 @@
       "title": "Add the SF1 basic row to the SCD2 blog scale table for balance"
     },
     "canonical-snapshot-digest-looseness-20261029": {
-      "claim": {
-        "expires_at": "2026-11-03T03:40:16Z",
-        "generation": "0774949f147b4d08ac359a740da92936",
-        "renewals": 0,
-        "worker": "mcp:omp-coding-agent:joe@joe-mac-mini.local:19c40f82a7ecdc483ce560ab"
-      },
+      "claim": null,
       "needs": [],
       "priority": "low",
-      "status": "active",
+      "status": "done",
       "title": "Tighten or document what the deploy's canonical snapshot digest ignores"
     },
     "deploy-artifact-egress-503-20261101": {
