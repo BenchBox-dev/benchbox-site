@@ -21,8 +21,7 @@ function tuningHeader(aliases: string): string {
     "  introspector and applies at least one tuning type. Other platforms report",
     "  at most `applied_unverified`.",
     "",
-    `Aliases resolve to another platform's entry: ${aliases}.`,
-    "",
+    ...(aliases === "" ? [] : [`Aliases resolve to another platform's entry: ${aliases}.`, ""]),
     "| Platform | Shipped templates | Applied at execution | Not applied | Spark session map | Catalog introspector | Can reach `applied_verified` |",
     "| --- | --- | --- | --- | --- | --- | --- |",
   ];

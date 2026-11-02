@@ -17,8 +17,6 @@ data when the site is built, so do not edit it by hand.
   introspector and applies at least one tuning type. Other platforms report
   at most `applied_unverified`.
 
-Aliases resolve to another platform's entry: .
-
 | Platform | Shipped templates | Applied at execution | Not applied | Spark session map | Catalog introspector | Can reach `applied_verified` |
 | --- | --- | --- | --- | --- | --- | --- |
 | `alpha` | tpch | clustering, sorting (with sorted ingestion) | partitioning, foreign_keys | applied | yes | yes |
