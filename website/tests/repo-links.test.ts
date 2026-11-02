@@ -50,3 +50,25 @@ describe("links to repository files", () => {
     expect(bodyOf(kept, "docs/guide/a.md")).toContain("(https://github.com/BenchBox-dev/BenchBox/blob/develop/docs/data/x.csv#L2)");
   });
 });
+
+describe("links to core directories listed in repo-files.json", () => {
+  const sha = "0123456789abcdef0123456789abcdef01234567";
+  const listing = JSON.stringify({
+    core_sha: sha,
+    files: [
+      { path: "examples", kind: "tree" },
+      { path: "examples/unified", kind: "tree" },
+      { path: "examples/unified/run.py", kind: "file" },
+    ],
+  });
+
+  it("resolves a directory that holds only subdirectories", () => {
+    const docsRoot = repository({ "repo-files.json": listing, "docs/a.md": "# A\n\n[Examples](../examples/)\n" });
+    expect(bodyOf(docsRoot, "docs/a.md")).toContain(`(https://github.com/BenchBox-dev/BenchBox/tree/${sha}/examples)`);
+  });
+
+  it("fails on a directory the listing does not contain", () => {
+    const docsRoot = repository({ "repo-files.json": listing, "docs/a.md": "# A\n\n[Gone](../examples/missing/)\n" });
+    expect(buildSite({ docsRoot }).errors.map((error) => error.message)).toEqual(["a.md:3: link:../examples/missing/ does not match a file in the repository"]);
+  });
+});
