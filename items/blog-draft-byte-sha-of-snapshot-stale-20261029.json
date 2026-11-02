@@ -3,7 +3,7 @@
     "The draft no longer cites a byte hash of results.duckdb as an identity check; any digest quoted is snapshot_canonical_sha256 from a named deploy receipt and matches it",
     "npm run lint:blog passes"
   ],
-  "context": "Moved from the BenchBox core tracker, where it was filed on 2026-10-29, when this repository gained its own tracker.",
+  "context": "Moved from the BenchBox core tracker, where it was filed on 2026-10-29, when this repository gained its own tracker.\n\n2026-11-02: Done in PR #101 (merge 2cfaa85cf1). Footnote [^snapshot] keeps the URL and 'read August 28, 2026' and no longer cites a byte SHA-256 (owner chose removal: no Aug 28 receipt carries a canonical digest). The only other byte reference is a file size at line 121, not an identity check. npm run lint:blog: 0 findings; ci green before merge.",
   "description": "Found 2026-10-28. The site blog draft drafts/building-benchbox/drafts/17-*.md (about line 204) cites a byte SHA-256 of the deployed Explorer snapshot. DuckDB file bytes differ on every rebuild of core's snapshot even when the corpus is unchanged (checksums and unused block tails), and the deploy gate compares canonical content digests, not bytes. The cited hash is stale after any core bundle and the sentence misdescribes how identity is checked. Before publication, rewrite the sentence to cite snapshot_canonical_sha256 from a named receipt or describe the content-digest approach, and verify the figure against the receipt.",
   "links": [
     "BenchBox-dev/benchbox-site: drafts/building-benchbox/drafts/"
@@ -16,6 +16,14 @@
       "op": "create",
       "op_id": "90b9093284af4a608a3967e9a4488961",
       "session_id": "cc767de99c19400aa238236633ca9140"
+    },
+    {
+      "actor": "mcp:omp-coding-agent:joe@joe-mac-mini.local:a6d1a76a8fe5c477ca12e1f3",
+      "at": "2026-11-02T02:01:10Z",
+      "client": "omp-coding-agent",
+      "op": "update",
+      "op_id": "0f291a8f2e1b4bd5b9644e9534595636",
+      "session_id": "2708a39948944f4299911f72f62ba6c5"
     }
   ]
 }
