@@ -5,7 +5,7 @@
     "A test covers the stale-baseline case.",
     "No visual tolerance is loosened, and no capture is excluded."
   ],
-  "context": "The diagnostics artifact `public-site-visual-diagnostics-38612765430` (artifact IDs 11921847821 and 11920436721) holds the current captures and the Playwright error context. It expires about 3 days after 2026-10-14, so download it first.\n\nRelevant code:\n- `.github/workflows/ci.yml`: the `visual-inputs` outputs `render_changed`, `base_sha` and `baseline_candidates` (around line 1451), and the job `public-site-visual-regression` (around line 1646);\n- `results-explorer/scripts/download-public-site-visual-baseline.mjs`;\n- `results-explorer/e2e/captures/public-site-pages.spec.ts`.\n\nNote that `check_explorer_compat.py` is listed as a site input in `scripts/site_inputs.py:303`, which is why render_changed was true before the rebase.\n\nMoved from the BenchBox core tracker on 2026-10-30, when this repository gained its own tracker.\n\nThe core job, workflow lines and results-explorer/ scripts named here were removed when the site moved out of core; this repository's advisory Visual comparison workflow (.github/workflows/visual.yml) replaced them. Check whether its baseline selection can produce the same false mismatch, and drop the item if it cannot.",
+  "context": "The diagnostics artifact `public-site-visual-diagnostics-38612765430` (artifact IDs 11921847821 and 11920436721) holds the current captures and the Playwright error context. It expires about 3 days after 2026-10-14, so download it first.\n\nRelevant code:\n- `.github/workflows/ci.yml`: the `visual-inputs` outputs `render_changed`, `base_sha` and `baseline_candidates` (around line 1451), and the job `public-site-visual-regression` (around line 1646);\n- `results-explorer/scripts/download-public-site-visual-baseline.mjs`;\n- `results-explorer/e2e/captures/public-site-pages.spec.ts`.\n\nNote that `check_explorer_compat.py` is listed as a site input in `scripts/site_inputs.py:303`, which is why render_changed was true before the rebase.\n\nMoved from the BenchBox core tracker on 2026-10-30, when this repository gained its own tracker.\n\nThe core job, workflow lines and results-explorer/ scripts named here were removed when the site moved out of core; this repository's advisory Visual comparison workflow (.github/workflows/visual.yml) replaced them. Check whether its baseline selection can produce the same false mismatch, and drop the item if it cannot.\n\n2026-11-02: Dropped as not applicable to this repository. The core job, base_sha/baseline_candidates selection and results-explorer scripts it describes no longer exist. This repository's .github/workflows/visual.yml takes the baseline from the deployed artifact (`npm run deploy -- deployed`, then `gh run download` of site-artifact-<run>) and builds the PR from the same deployed bundle (SITE_INPUTS_CORE_SHA and SITE_INPUTS_DIGEST from the receipt), so baseline and candidate always share results data; the stale-ancestor cause cannot occur. The workflow is advisory and never fails on a difference. Owner authorized dropping stale items on evidence.",
   "description": "PR #2960 changed only `scripts/publication/check_explorer_compat.py` and its unit test. The \"Public-site visual regression\" job still failed twice (run 38612765430, attempts 1 and 2, job 116045844509). It reported \"visual baseline mismatch\" for all 12 /results/, /results/benchmarks/ and /results/platforms/ captures at 390, 768, 1280 and 1600 px. The landing, getting-started and release-overview pages matched.\n\nAfter the branch was rebased onto develop 6296e0a2d, the job was skipped (render_changed=false) and the PR merged as 478e946de. The rebase removed the symptom, but the cause was never confirmed. The likely cause is that the baseline came from an older site-equivalent ancestor, whose results data differed from the PR's merge ref, rather than from the exact base.",
   "links": [
     "https://github.com/BenchBox-dev/benchbox/pull/2960",
@@ -19,6 +19,14 @@
       "op": "create",
       "op_id": "a44aef9da1fa4fed88e909af956d40c5",
       "session_id": "82c0d7d9603c4b7cb3497f18a64ea231"
+    },
+    {
+      "actor": "mcp:omp-coding-agent:joe@joe-mac-mini.local:a6d1a76a8fe5c477ca12e1f3",
+      "at": "2026-11-02T01:46:44Z",
+      "client": "omp-coding-agent",
+      "op": "update",
+      "op_id": "2b6fcc4d44db43e6b498eb3905f43264",
+      "session_id": "2708a39948944f4299911f72f62ba6c5"
     }
   ]
 }
