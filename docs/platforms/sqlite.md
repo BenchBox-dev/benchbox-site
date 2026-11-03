@@ -127,6 +127,14 @@ SQLite has characteristics that affect OLAP benchmarks:
 3. **Limited parallelism** - Sequential query execution
 4. **Memory constraints** - In-memory limited by process memory
 
+### Skipped Operations
+
+BenchBox reports operations that SQLite cannot express as skipped, with the reason, instead of failing the run:
+
+- **Transaction Primitives** - `READ COMMITTED` and `REPEATABLE READ` isolation operations, because SQLite transactions are always `SERIALIZABLE`.
+- **Read Primitives** - full-text `MATCH ... AGAINST` queries and approximate-aggregate queries such as `APPROX_COUNT_DISTINCT`.
+- **TPC-Havoc** - variant `5_v8`, which SQLite cannot decorrelate and which exceeds 300 seconds at scale factor 0.1.
+
 ### Recommended Scale Factors
 
 | Scale Factor | Expected Performance |

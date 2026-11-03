@@ -160,6 +160,7 @@ dbfs
 dbgen
 dbrx
 dbset
+decorrelate
 decorrelation
 dedup
 defaultdict

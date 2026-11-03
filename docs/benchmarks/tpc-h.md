@@ -146,8 +146,10 @@ After a run using Power set F and throughput sets F+1..F+S, pass
 restart at set 1. For a power-only run, the next set is F+1.
 
 Refresh support is declared per adapter. It is enabled for DuckDB, SQLite,
-PostgreSQL and the adapters built on it, Snowflake, and SingleStore. Redshift
-and other adapters do not declare it yet. Power or throughput with refresh
+PostgreSQL, Snowflake, and SingleStore. The PostgreSQL derivatives (CedarDB,
+Citus, ParadeDB, pg_duckdb, pg_mooncake and TimescaleDB), Redshift, and other
+adapters do not declare it. Snowflake runs routed through the Greybeam gateway
+do not support it either. Power or throughput with refresh
 enabled fails clearly on DataFrame engines and undeclared adapters. The
 standalone maintenance phase on an undeclared adapter completes with one
 skipped `maintenance_not_supported` row and runs no refresh SQL.

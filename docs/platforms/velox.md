@@ -249,6 +249,10 @@ recorded as failed and listed in the run's effective session configuration.
 Velox has no curated tuning templates, so `--tuning tuned` uses the generic
 fallback configuration.
 
+### Limitations
+
+- **No Metadata Primitives** - Velox exposes no `INFORMATION_SCHEMA` catalog, so BenchBox declines the Metadata Primitives benchmark before it runs.
+
 ## Comparison: Velox vs. Spark vs. LakeSail
 
 | Dimension | Apache Gluten + Velox | Apache Spark | LakeSail Sail |
