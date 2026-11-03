@@ -206,6 +206,16 @@ The adapter automatically applies session-level optimizations when running bench
 | Sorting | Yes | Sort keys via data model key ordering |
 | Distribution | Yes | `DISTRIBUTED BY HASH` clause at table creation |
 
+### Skipped Operations
+
+StarRocks lacks several SQL features that the Write Primitives and Transaction Primitives benchmarks exercise. BenchBox reports these operations as skipped, with the reason, instead of failing the run:
+
+- **Write Primitives** - bulk loads from a client-side file (StarRocks loads files through Stream Load or Broker Load), `RETURNING` clauses, and `MERGE`.
+- **Transaction Primitives** - `SAVEPOINT`, temporary tables, and operations that need `UPDATE`, `DELETE` or `TRUNCATE` inside an explicit transaction, a second statement against the same table, or reading a table written earlier in the transaction.
+
+> [!NOTE]
+> H2O-DB Q9 runs with `percentile_approx`, so its result is approximate and not directly comparable with platforms that compute the exact percentile.
+
 ### Table Model
 
 StarRocks uses the **Duplicate Key** model by default, which is optimal for OLAP workloads. The adapter automatically:

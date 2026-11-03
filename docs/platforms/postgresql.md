@@ -201,6 +201,7 @@ This captures EXPLAIN ANALYZE output including:
 - **No native columnar storage** - Row-oriented by default (consider Citus for columnar)
 - **Single-node** - No built-in distributed query execution
 - **Memory constraints** - Large datasets may require careful configuration
+- **No TPC-H refresh functions on derivatives** - The PostgreSQL adapter runs TPC-H refresh functions and the maintenance phase. CedarDB, Citus, ParadeDB, pg_duckdb, pg_mooncake and TimescaleDB do not declare refresh support, so the maintenance phase is skipped on them.
 
 ## Troubleshooting
 

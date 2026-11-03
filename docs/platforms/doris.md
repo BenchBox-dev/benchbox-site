@@ -284,6 +284,13 @@ The adapter automatically applies session-level optimizations when running bench
 | Primary Keys | Yes | Unique/Primary Key table models |
 | Foreign Keys | No | No FK enforcement in Doris |
 
+### Skipped Operations
+
+Doris lacks several SQL features that the Write Primitives and Transaction Primitives benchmarks exercise. BenchBox reports these operations as skipped, with the reason, instead of failing the run:
+
+- **Write Primitives** - bulk loads from a client-side file (Doris loads files through Stream Load or Broker Load), `RETURNING` clauses, and `MERGE` with `WHEN NOT MATCHED BY SOURCE`.
+- **Transaction Primitives** - `SAVEPOINT`, temporary tables, `TRUNCATE` inside a transaction, writes to more than one table in one transaction, and mixing `INSERT ... VALUES` with `UPDATE`, `DELETE` or `INSERT ... SELECT` on the same table.
+
 ### Distribution Keys
 
 Choosing effective distribution keys is critical for Doris query performance:

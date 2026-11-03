@@ -263,6 +263,16 @@ QuestDB has a minimal constraint model:
 - **No traditional primary keys** - Uniqueness is not enforced at the database level
 - **No ALTER TABLE ADD CONSTRAINT** - Constraints must be defined at table creation time
 
+### Skipped Operations
+
+QuestDB lacks several SQL features that the Write Primitives and Transaction Primitives benchmarks exercise. BenchBox reports these operations as skipped, with the reason, instead of failing the run:
+
+- **Write Primitives** - `DELETE`, `MERGE`, file bulk loads, `INSERT ... ON CONFLICT`, `RETURNING` clauses on `INSERT` and `UPDATE`, subqueries in `UPDATE ... SET`, SCD2 merges, and `CREATE INDEX`, `DROP INDEX` and `PRIMARY KEY` DDL.
+- **Transaction Primitives** - operations that need `DELETE`, `SAVEPOINT`, temporary tables, `TRUNCATE` inside a transaction, subqueries in `UPDATE ... SET`, or reading a transaction's own uncommitted inserts.
+
+> [!NOTE]
+> QuestDB cannot parse `PERCENTILE_CONT ... WITHIN GROUP`, so H2O-DB Q9 runs with `approx_percentile` at precision 5. Its result is approximate and not directly comparable with platforms that compute the exact percentile.
+
 ## Troubleshooting
 
 ### Connection Refused

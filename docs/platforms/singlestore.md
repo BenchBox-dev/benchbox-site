@@ -112,6 +112,20 @@ BenchBox uses `LOAD DATA LOCAL INFILE` for bulk data loading, which achieves >10
 
 The `singlestoredb` connection is created with `local_infile=True` to enable local file ingestion.
 
+SingleStore `LOAD DATA` reads only gzip and lz4 compressed files. The Write Primitives bulk-load operations for bzip2 and zstd files are skipped with a reason.
+
+## Skipped Operations
+
+BenchBox reports Transaction Primitives operations that SingleStore cannot run as skipped, with the reason:
+
+- `SAVEPOINT` operations, because SingleStore has no savepoint statements.
+- `REPEATABLE READ` and `SERIALIZABLE` isolation operations, because SingleStore provides only `READ COMMITTED`.
+- `TRUNCATE` inside a transaction.
+
+## Deployment
+
+SingleStore has no `cloud` deployment mode. Use `--platform singlestore` for both Helios and self-managed clusters, and select the target with the host option.
+
 ## Benchmarks
 
 | Benchmark | Status | Notes |

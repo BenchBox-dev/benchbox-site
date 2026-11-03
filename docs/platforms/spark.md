@@ -288,6 +288,7 @@ This prints the query plan.
 - **Infrastructure overhead** - Requires cluster for large datasets
 - **Startup time** - JVM warm-up affects small benchmarks
 - **Memory management** - Complex tuning for optimal performance
+- **No Metadata Primitives** - Spark exposes no `INFORMATION_SCHEMA` catalog, so BenchBox declines the Metadata Primitives benchmark before it runs.
 
 ## Troubleshooting
 
