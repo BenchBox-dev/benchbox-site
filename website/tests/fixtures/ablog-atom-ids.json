@@ -11,6 +11,14 @@
   ],
   "entries": [
     {
+      "id": "https://benchbox.dev/blog/blog/2026-11-06-v0-5-0-release-overview.html",
+      "links": [
+        {
+          "href": "https://benchbox.dev/blog/2026-11-06-v0-5-0-release-overview.html"
+        }
+      ]
+    },
+    {
       "id": "https://benchbox.dev/blog/blog/2026-10-07-site-redesign.html",
       "links": [
         {
@@ -79,14 +87,6 @@
       "links": [
         {
           "href": "https://benchbox.dev/blog/2026-04-01-v0-2-0-release-summary.html"
-        }
-      ]
-    },
-    {
-      "id": "https://benchbox.dev/blog/blog/2026-03-10-extracting-textcharts.html",
-      "links": [
-        {
-          "href": "https://benchbox.dev/blog/2026-03-10-extracting-textcharts.html"
         }
       ]
     }
