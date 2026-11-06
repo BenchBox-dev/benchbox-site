@@ -28,3 +28,15 @@ export function mermaidNode(diagram: string): RootContent {
     children: [],
   } as unknown as RootContent;
 }
+
+export function islandNode(name: "CitedResult" | "CurrentResults", prop: string, value: unknown): RootContent {
+  return {
+    type: "mdxJsxFlowElement",
+    name,
+    attributes: [
+      { type: "mdxJsxAttribute", name: prop, value: { type: "mdxJsxAttributeValueExpression", value: JSON.stringify(value) } },
+      { type: "mdxJsxAttribute", name: "client:visible", value: null },
+    ],
+    children: [],
+  } as unknown as RootContent;
+}

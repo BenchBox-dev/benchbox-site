@@ -883,7 +883,7 @@ export async function getTranslatorIdentity(resultId: string): Promise<Translato
   };
 }
 
-function detailResultFromWideRow(
+export function detailResultFromWideRow(
   wide: ResultDetailMetricsRow,
   executionRows: readonly QueryExecutionRow[],
   timingRows: readonly QueryDisplayTimingRow[],

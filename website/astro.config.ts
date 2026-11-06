@@ -14,7 +14,8 @@ import { legacyRedirects, loadLegacyDownloads, publishLegacyImages, publishLegac
 import { docutilsQuotes, SMARTYPANTS } from "./src/lib/smartypants.ts";
 import { treeDigest } from "./src/lib/tree-digest.ts";
 import { headingIds } from "./src/plugins/heading-ids.ts";
-import { siteHost, siteOrigin } from "./src/lib/site-inputs.ts";
+import { explorerSnapshotSha, siteHost, siteOrigin } from "./src/lib/site-inputs.ts";
+import { explorerAliases, explorerDatabasePlugin } from "./src/lib/explorer-alias.ts";
 
 const repoRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 
@@ -83,7 +84,19 @@ const publishStatic = (): AstroIntegration => ({
 
 export default defineConfig({
   site: siteOrigin(),
-  vite: { define: { "import.meta.env.SITE_ORIGIN": JSON.stringify(siteOrigin()) } },
+  vite: {
+    plugins: [explorerDatabasePlugin],
+    define: {
+      "import.meta.env.SITE_ORIGIN": JSON.stringify(siteOrigin()),
+      "import.meta.env.RESULTS_SNAPSHOT_SHA256": JSON.stringify(explorerSnapshotSha()),
+    },
+    resolve: {
+      alias: [
+        { find: /^@\/lib\/duckdbBundles$/, replacement: path.join(repoRoot, "website", "src", "lib", "results-embed", "duckdbBundles.ts") },
+        ...explorerAliases,
+      ],
+    },
+  },
   trailingSlash: "ignore",
   build: { format: "file" },
   markdown: { processor: unified({ remarkPlugins: [headingIds, docutilsQuotes], smartypants: SMARTYPANTS }) },

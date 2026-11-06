@@ -279,6 +279,7 @@ groups:
             items:
               - design/architecture.md
               - design/structure.md
+              - design/results-embeds.md
           - design/architecture.md
           - design/structure.md
           - development/import-patterns.md

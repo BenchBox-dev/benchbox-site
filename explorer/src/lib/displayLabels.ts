@@ -160,6 +160,10 @@ export function formatVisibility(raw: string | null | undefined): string {
   return VISIBILITY_LABELS[raw] ?? formatEnumLabel(raw);
 }
 
+export function isPublishedVisibility(raw: string | null | undefined): boolean {
+  return raw?.startsWith("public-") ?? false;
+}
+
 export function formatCostStatus(raw: string | null | undefined): string {
   if (raw === null || raw === undefined || raw === "") return "unknown";
   return COST_STATUS_LABELS[raw] ?? formatEnumLabel(raw);

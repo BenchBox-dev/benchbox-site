@@ -8,6 +8,7 @@ import { imageSyntax } from "./images.ts";
 import { linkSyntax } from "./links.ts";
 import { mermaidFenceSyntax } from "./mermaid-fence.ts";
 import { rawHtmlInlineSyntax, rawHtmlSyntax } from "./raw-html.ts";
+import { resultEmbedFenceSyntax } from "./result-embed-fence.ts";
 
 export function createDefaultRegistry(): HandlerRegistry {
   return new HandlerRegistry()
@@ -17,6 +18,7 @@ export function createDefaultRegistry(): HandlerRegistry {
     .register(colonFenceSyntax)
     .register(alertSyntax)
     .register(mermaidFenceSyntax)
+    .register(resultEmbedFenceSyntax)
     .register(htmlCommentSyntax)
     .register(headingSyntax)
     .register(linkSyntax)

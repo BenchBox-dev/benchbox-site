@@ -1,0 +1,132 @@
+.result-embed {
+  margin: 1.5rem 0;
+  padding: 1rem 1.25rem;
+  border: 1px solid var(--border-primary);
+  border-radius: var(--radius-md);
+  background: var(--bg-secondary);
+  color: var(--text-secondary);
+}
+
+.result-embed__caption {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem 0.75rem;
+  margin-bottom: 0.75rem;
+  color: var(--text-muted);
+  font-size: 0.875rem;
+}
+
+.result-embed__badge {
+  padding: 0.125rem 0.625rem;
+  border-radius: 999px;
+  background: var(--pill-bg);
+  color: var(--pill-fg);
+  font-family: var(--font-head);
+  font-size: 0.75rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.result-embed__badge--live {
+  background: var(--accent-primary);
+  color: var(--on-accent);
+}
+
+.result-embed p {
+  margin: 0.25rem 0;
+}
+
+.result-embed__title {
+  color: var(--text-primary);
+  font-weight: 600;
+}
+
+.result-embed__value {
+  color: var(--text-primary);
+  font-family: var(--font-head);
+  font-size: 1.5rem;
+  font-stretch: var(--head-stretch);
+}
+
+.result-embed__metric-label,
+.result-embed__meta,
+.result-embed__note {
+  color: var(--text-muted);
+  font-size: 0.875rem;
+}
+
+.result-embed__note {
+  display: block;
+}
+
+.result-embed__withdrawn {
+  padding: 0.5rem 0.75rem;
+  border-left: 4px solid var(--warning-color);
+  background: var(--bg-tertiary);
+  color: var(--text-primary);
+}
+
+.result-embed__snapshot {
+  margin-top: 0.75rem;
+  font-size: 0.875rem;
+}
+
+.result-embed__snapshot summary {
+  cursor: pointer;
+}
+
+.result-embed__sha {
+  display: block;
+  margin-top: 0.25rem;
+  overflow-wrap: anywhere;
+}
+
+.result-embed__status {
+  margin-top: 0.5rem;
+  font-size: 0.875rem;
+}
+
+.result-embed__status[data-status="changed"] {
+  color: var(--text-primary);
+  font-weight: 600;
+}
+
+.result-embed__scroll {
+  overflow-x: auto;
+}
+
+.result-embed table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.result-embed th,
+.result-embed td {
+  padding: 0.5rem 0.75rem;
+  border-bottom: 1px solid var(--border-primary);
+  text-align: left;
+  vertical-align: top;
+}
+
+.result-embed thead th,
+.result-embed td:not([colspan]) {
+  white-space: nowrap;
+}
+
+.result-embed thead th {
+  background: var(--table-header-bg);
+  color: var(--text-primary);
+}
+
+.result-embed .sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
