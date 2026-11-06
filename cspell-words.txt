@@ -270,6 +270,7 @@ greybeam
 greyscale
 groupby
 groupinstall
+grpcio
 gubichev
 hammerdbcli
 hasattr

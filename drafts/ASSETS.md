@@ -6,7 +6,7 @@ posts and their images live in `blog/`.
 
 | Path | Decision | Reason |
 |---|---|---|
-| `building-benchbox/images/*.png` (57 files) | keep | The building-benchbox drafts and outlines link to them. Each is a byte-identical copy of the published image in `blog/images/`, which the published posts use; `scripts/render-blog-charts.mjs --publish` keeps the two in step for rendered charts. |
+| `building-benchbox/images/*.png` (58 files) | keep | The building-benchbox drafts and outlines link to them. Each is a byte-identical copy of the published image in `blog/images/`, which the published posts use; `scripts/render-blog-charts.mjs --publish` keeps the two in step for rendered charts. |
 | `building-benchbox/images/comparison_template.png` | keep | Byte-identical to `blog/images/comparison_template.png`. No draft links to it, but the published copy is a public URL, so the pair stays together until the published one is retired. |
 | `building-benchbox/research/tpch-benchbox-measurements-2026-03-02.json` | keep | Measurement data behind the DuckDB TPC-H extension comparison post; `tpch-extension-vs-benchbox-implementation.md` cites it. |
 | `building-benchbox/research/tpch-extension-vs-benchbox-measurements-2026-03-02.json` | keep | Measurement data behind the same post; the validation note cites it. |
