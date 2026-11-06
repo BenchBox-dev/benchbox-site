@@ -24,3 +24,4 @@
 - [ADR: Rank Subscale TPC-H and TPC-DS Results as Unofficial](adr-subscale-tpc-ranking-policy.md)
 - [ADR: The SQLGlot Fork Owns Transpilation](adr-sqlglot-fork-owns-transpilation.md)
 - [ADR: Author the documentation in plain Markdown and retire the MyST dialect](../../design/adr-plain-markdown-documentation.md)
+- [ADR: Publish searchable result summary pages on their own static paths](../../design/adr-results-summary-pages.md)

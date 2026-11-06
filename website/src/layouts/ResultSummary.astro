@@ -1,0 +1,72 @@
+---
+import Breadcrumbs from "../components/Breadcrumbs.astro";
+import type { Crumb } from "../lib/breadcrumbs.ts";
+import { loadResultsSummary } from "../lib/results-summary.ts";
+import Shell from "./Shell.astro";
+
+interface Props {
+  title: string;
+  description: string;
+  crumbs: Crumb[];
+  explorerHref: string;
+  explorerLabel: string;
+  searchable?: boolean;
+}
+
+const { title, description, crumbs, explorerHref, explorerLabel, searchable = true } = Astro.props;
+const { snapshot } = await loadResultsSummary();
+const short = (value: string) => value.slice(0, 12);
+---
+
+<Shell title={`${title} - BenchBox Results`} description={description} searchable={searchable}>
+  <Breadcrumbs slot="context" crumbs={crumbs} />
+  <article class="prose result-summary">
+    <h1>{title}</h1>
+    <p class="result-summary__explorer">
+      <a href={explorerHref}>{explorerLabel}</a>
+    </p>
+    <slot />
+    <aside class="result-summary__snapshot" aria-label="Results snapshot" data-pagefind-ignore>
+      <h2>Results snapshot</h2>
+      <dl>
+        <dt>Published results</dt>
+        <dd>{snapshot.resultCount.toLocaleString("en-US")}</dd>
+        <dt>BenchBox version</dt>
+        <dd>{snapshot.packageVersion}</dd>
+        <dt>Core commit</dt>
+        <dd><code>{short(snapshot.coreSha)}</code></dd>
+        <dt>Corpus commit</dt>
+        <dd><code>{short(snapshot.corpusSha)}</code></dd>
+        <dt>Snapshot SHA-256</dt>
+        <dd><code>{short(snapshot.snapshotSha256)}</code></dd>
+        <dt>Read model</dt>
+        <dd>{snapshot.readModelVersion}</dd>
+        {snapshot.producedAt && <><dt>Produced</dt><dd><time datetime={snapshot.producedAt}>{snapshot.producedAt.slice(0, 10)}</time></dd></>}
+      </dl>
+      <p>
+        These figures are generated from the same results snapshot the <a href="/results/">Results Explorer</a> loads. Results withdrawn upstream are absent after the next site build.
+      </p>
+    </aside>
+  </article>
+</Shell>
+
+<style is:global>
+  .result-summary {
+    max-width: 64rem;
+  }
+  .result-summary__table {
+    overflow-x: auto;
+  }
+  .result-summary__table table {
+    min-width: 38rem;
+  }
+  .result-summary__snapshot dl {
+    display: grid;
+    grid-template-columns: max-content 1fr;
+    gap: 0.25rem 1rem;
+    margin: 0 0 1rem;
+  }
+  .result-summary__snapshot dd {
+    margin: 0;
+  }
+</style>

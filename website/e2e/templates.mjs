@@ -27,6 +27,11 @@ export const PAGE_TEMPLATES = {
   "docs/search.astro": () => ({ name: "redirect page search", route: "/docs/search.html", stripRefresh: true }),
   "index.astro": () => ({ name: "landing", route: "/" }),
   "prompts/inde[x].astro": () => ({ name: "prompts", route: "/prompts/" }),
+  "result-summaries/benchmarks.astro": () => ({ name: "benchmark summaries", route: "/result-summaries/benchmarks.html" }),
+  "result-summaries/benchmarks/[id].astro": (siteDir) => ({ name: "benchmark summary", route: firstFile(siteDir, "result-summaries/benchmarks", /\.html$/) }),
+  "result-summaries/inde[x].astro": () => ({ name: "result summaries", route: "/result-summaries/" }),
+  "result-summaries/platforms.astro": () => ({ name: "platform summaries", route: "/result-summaries/platforms.html" }),
+  "result-summaries/platforms/[id].astro": (siteDir) => ({ name: "platform summary", route: firstFile(siteDir, "result-summaries/platforms", /\.html$/) }),
 };
 
 export const CONTENT_TEMPLATES = [

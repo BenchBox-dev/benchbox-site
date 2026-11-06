@@ -9,7 +9,7 @@ import type {
 } from "@/types";
 
 export type EligibilityRow = DetailResult | PlatformRow | MetaCohortPlatform;
-export type PrimaryMetricRow = DetailResult | PlatformRow;
+export type PrimaryMetricRow = Pick<PlatformRow, "power_score" | "throughput_at_size" | "display_geomean_ms">;
 export type PrimaryMetric = "power_score" | "throughput_at_size" | "display_geomean_ms";
 export type ChartDatasetEligibilityClass =
   | "display_safe"

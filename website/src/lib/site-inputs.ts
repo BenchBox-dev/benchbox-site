@@ -23,6 +23,7 @@ export type BundleManifest = {
   corpus_sha: string;
   parent_core_sha: string;
   certified_by: string;
+  produced_at?: string;
 };
 
 export function siteInputsRoot(env: NodeJS.ProcessEnv = process.env): string {
