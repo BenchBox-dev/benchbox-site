@@ -213,6 +213,13 @@ Adaptations to keep:
 - Explorer code takes the origin from `SITE_ORIGIN` in
   `explorer/src/components/siteOrigin.ts` and never hard-codes the
   production origin. `npm run lint:guard` fails on a hard-coded one.
+- Result summary pages under `/result-summaries/` are generated at site build
+  time from the bundle's `explorer/results.duckdb`, through the Explorer's own
+  queries and formatters (`website/src/lib/results-summary.ts`). Keep them out
+  of `/results/`, which belongs to the Explorer's client routes. A withdrawn
+  result disappears from the pages and the search index on the next build
+  because it is gone from the snapshot. See
+  `docs/design/adr-results-summary-pages.md`.
 - The site serves no copies of core files. Documentation links to files
   outside `docs/` point at GitHub, pinned to the bundle's `core_sha`. The
   Sphinx-era URLs `/docs/_downloads/<md5>/<name>`, and the `TPC_EULA.txt`

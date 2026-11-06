@@ -1,0 +1,54 @@
+---
+import ResultSummary from "../../../layouts/ResultSummary.astro";
+import { loadResultsSummary, SUMMARY_ROOT } from "../../../lib/results-summary.ts";
+
+export async function getStaticPaths() {
+  const { benchmarks } = await loadResultsSummary();
+  return benchmarks.map((page) => ({ params: { id: page.id }, props: { page } }));
+}
+
+const { page } = Astro.props;
+const description = `${page.label} on BenchBox: ${page.resultCount} published ${page.resultCount === 1 ? "run" : "runs"} across ${page.platforms.length} ${page.platforms.length === 1 ? "platform" : "platforms"}.`;
+---
+
+<ResultSummary
+  title={page.label}
+  description={description}
+  crumbs={[{ label: "Results", href: "/results/" }, { label: "Benchmark summaries", href: `${SUMMARY_ROOT}/benchmarks.html` }, { label: page.label }]}
+  explorerHref={page.explorerHref}
+  explorerLabel={`Open ${page.label} in the Results Explorer`}
+>
+  <p>{description} Latest run {page.latestRun.slice(0, 10)}.</p>
+
+  <h2>Platforms</h2>
+  <ul>
+    {page.platforms.map((platform) => <li><a href={platform.summaryHref}>{platform.label}</a>, {platform.runCount} {platform.runCount === 1 ? "run" : "runs"}</li>)}
+  </ul>
+
+  {page.cohorts.map((cohort) => (
+    <>
+      <h2>{cohort.scale}, {cohort.phase}</h2>
+      <div class="result-summary__table">
+        <table>
+          <caption>Ranked by {cohort.metricLabel.toLowerCase()}</caption>
+          <thead>
+            <tr><th scope="col">Rank</th><th scope="col">Platform</th><th scope="col">Version</th><th scope="col">Run date</th><th scope="col">{cohort.metricLabel}</th><th scope="col">Geomean</th><th scope="col">Ranking</th></tr>
+          </thead>
+          <tbody>
+            {cohort.ranking.map((line) => (
+              <tr>
+                <td>{line.rank ?? "—"}</td>
+                <th scope="row"><a href={line.receiptHref}>{line.platformLabel}</a></th>
+                <td>{line.version ?? "—"}</td>
+                <td>{line.runDate.slice(0, 10)}</td>
+                <td>{line.score}</td>
+                <td>{line.geomean}</td>
+                <td>{line.exclusion ?? "Ranked"}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </>
+  ))}
+</ResultSummary>

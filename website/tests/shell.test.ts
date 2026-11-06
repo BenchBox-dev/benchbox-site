@@ -5,6 +5,7 @@ import { describe, expect, it } from "vitest";
 import { blogTrail, docsTrail, pathAncestors, type TrailEntry } from "../src/lib/breadcrumbs.ts";
 import { editUrlFor } from "../src/lib/edit-url.ts";
 import { shellCta, shellLinks, sitePath, surfaceFor } from "../src/lib/header-links.ts";
+import { SEARCH_SECTIONS } from "../scripts/pagefind-index.mjs";
 
 const here = path.dirname(fileURLToPath(import.meta.url));
 
@@ -150,10 +151,10 @@ describe("shell sources", () => {
     }
   });
 
-  it("limits the search index to docs and blog and keeps shell chrome out of it", () => {
+  it("limits the search index to docs, blog and result summaries and keeps shell chrome out of it", () => {
     const search = read("src/components/SearchBox.astro");
     expect(search).not.toContain("data-search-section");
-    expect(read("scripts/pagefind-index.mjs")).toContain('["docs", "blog"]');
+    expect(SEARCH_SECTIONS.map((section) => section.dir)).toEqual(["docs", "blog", "result-summaries/platforms", "result-summaries/benchmarks"]);
     expect(read("src/components/SiteFooter.astro")).toContain("data-pagefind-ignore");
   });
 
