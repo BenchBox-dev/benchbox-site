@@ -180,22 +180,28 @@ for (const [size, width] of Object.entries(widths).filter(([size]) => size !== "
   await context.close();
 }
 
-for (const [name, query, expectedFirst, size] of [
+for (const [name, query, expectedFirst, size, section] of [
   ["docs term", "installation environment setup", "/docs/usage/installation.html", "desktop"],
   ["blog title", "BenchBox v0.3.0: JoinOrder fix, approximate analytics, and agent prompt composer", "/blog/2026-05-18-v0-3-0-release-overview.html", "desktop"],
   ["docs term mobile", "installation environment setup", "/docs/usage/installation.html", "mobile"],
   ["shell chrome", "open source under the MIT License", undefined, "desktop"],
+  ["results platform", "DuckDB", "/result-summaries/platforms/duckdb.html", "desktop", "Results"],
+  ["results benchmark", "TPC-H", "/result-summaries/benchmarks/tpch.html", "desktop", "Results"],
 ]) {
   const { page, context } = await open(widths[size], pages.landing);
   await page.getByRole("button", { name: "Search" }).click();
   await page.locator(".pagefind-ui__search-input").fill(query);
   await page.waitForSelector(".pagefind-ui__result, .pagefind-ui__message", { timeout: 15000 }).catch(() => null);
   await page.waitForTimeout(800);
+  if (section) {
+    await page.locator(".pagefind-ui__filter-value", { hasText: section }).first().locator("label").click();
+    await page.waitForTimeout(800);
+  }
   const hrefs = await page.locator(".pagefind-ui__result-link").evaluateAll((links) => links.map((a) => new URL(a.href).pathname));
   const message = (await page.locator(".pagefind-ui__message").first().innerText().catch(() => "")).trim();
   const count = Number((message.match(/^([\d,]+)\s+result/) ?? [])[1]?.replace(/,/g, "") ?? hrefs.length);
   report.search[name] = { query, hrefs: hrefs.slice(0, 5), message, count };
-  if (expectedFirst && hrefs[0] !== expectedFirst) fail(`search ${name} returned ${hrefs.slice(0, 5)}`);
+  if (expectedFirst && (section ? !hrefs.includes(expectedFirst) : hrefs[0] !== expectedFirst)) fail(`search ${name} returned ${hrefs.slice(0, 5)}`);
   if (hrefs.some((href) => href.startsWith("/results/"))) fail(`search ${name} returned a /results/ page`);
   if (name === "shell chrome" && count > 100) fail(`footer text is indexed: "${query}" matched ${count} results`);
   if (size === "desktop") await page.screenshot({ path: path.join(outDir, `search-${name.replace(/\W+/g, "_")}.png`) });

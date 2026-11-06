@@ -1,0 +1,50 @@
+---
+import ResultSummary from "../../../layouts/ResultSummary.astro";
+import { loadResultsSummary, SUMMARY_ROOT } from "../../../lib/results-summary.ts";
+
+export async function getStaticPaths() {
+  const { platforms } = await loadResultsSummary();
+  return platforms.map((page) => ({ params: { id: page.id }, props: { page } }));
+}
+
+const { page } = Astro.props;
+const description = `${page.label} on BenchBox: ${page.resultCount} published ${page.resultCount === 1 ? "run" : "runs"} across ${page.benchmarks.length} ${page.benchmarks.length === 1 ? "benchmark" : "benchmarks"}.`;
+---
+
+<ResultSummary
+  title={page.label}
+  description={description}
+  crumbs={[{ label: "Results", href: "/results/" }, { label: "Platform summaries", href: `${SUMMARY_ROOT}/platforms.html` }, { label: page.label }]}
+  explorerHref={page.explorerHref}
+  explorerLabel={`Open ${page.label} in the Results Explorer`}
+>
+  <p>{description} Latest run {page.latestRun.slice(0, 10)}.</p>
+
+  <h2>Benchmarks</h2>
+  <ul>
+    {page.benchmarks.map((benchmark) => <li><a href={benchmark.summaryHref}>{benchmark.label}</a>, {benchmark.runCount} {benchmark.runCount === 1 ? "run" : "runs"}</li>)}
+  </ul>
+
+  <h2>Published runs</h2>
+  <div class="result-summary__table">
+    <table>
+      <thead>
+        <tr><th scope="col">Benchmark</th><th scope="col">Scale</th><th scope="col">Phase</th><th scope="col">Version</th><th scope="col">Run date</th><th scope="col">Score</th><th scope="col">Geomean</th><th scope="col">Ranking</th></tr>
+      </thead>
+      <tbody>
+        {page.runs.map((run) => (
+          <tr>
+            <th scope="row"><a href={run.receiptHref}>{run.benchmarkLabel}</a></th>
+            <td>{run.scale}</td>
+            <td>{run.phase}</td>
+            <td>{run.version ?? "—"}</td>
+            <td>{run.runDate.slice(0, 10)}</td>
+            <td title={run.metricLabel}>{run.score}</td>
+            <td>{run.geomean}</td>
+            <td>{run.rankingStatus}</td>
+          </tr>
+        ))}
+      </tbody>
+    </table>
+  </div>
+</ResultSummary>

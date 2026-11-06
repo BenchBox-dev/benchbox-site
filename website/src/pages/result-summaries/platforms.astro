@@ -1,0 +1,20 @@
+---
+import ResultSummary from "../../layouts/ResultSummary.astro";
+import { loadResultsSummary, SUMMARY_ROOT } from "../../lib/results-summary.ts";
+
+const { platforms } = await loadResultsSummary();
+---
+
+<ResultSummary
+  title="Platform summaries"
+  description="Every platform with published BenchBox results, with its runs by benchmark and scale factor."
+  crumbs={[{ label: "Results", href: "/results/" }, { label: "Summaries", href: `${SUMMARY_ROOT}/` }, { label: "Platforms" }]}
+  explorerHref="/results/platforms/"
+  explorerLabel="Open the platform index in the Results Explorer"
+  searchable={false}
+>
+  <p>{platforms.length} platforms have published results.</p>
+  <ul>
+    {platforms.map((platform) => <li><a href={platform.summaryHref}>{platform.label}</a>, {platform.resultCount} {platform.resultCount === 1 ? "run" : "runs"}, latest {platform.latestRun.slice(0, 10)}</li>)}
+  </ul>
+</ResultSummary>

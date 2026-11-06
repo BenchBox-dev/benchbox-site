@@ -1,0 +1,25 @@
+---
+import ResultSummary from "../../layouts/ResultSummary.astro";
+import { loadResultsSummary, SUMMARY_ROOT } from "../../lib/results-summary.ts";
+
+export function getStaticPaths() {
+  return [{ params: { x: "x" } }];
+}
+
+const { platforms, benchmarks } = await loadResultsSummary();
+---
+
+<ResultSummary
+  title="Result summaries"
+  description="Static, searchable summaries of the published BenchBox results by platform and by benchmark."
+  crumbs={[{ label: "Results", href: "/results/" }, { label: "Summaries" }]}
+  explorerHref="/results/"
+  explorerLabel="Open the Results Explorer"
+  searchable={false}
+>
+  <p>Summaries of the published results, for reading and search. Each page links into the Results Explorer for charts, comparisons and the full run receipts.</p>
+  <ul>
+    <li><a href={`${SUMMARY_ROOT}/platforms.html`}>Platforms</a>, {platforms.length} with published results</li>
+    <li><a href={`${SUMMARY_ROOT}/benchmarks.html`}>Benchmarks</a>, {benchmarks.length} with published results</li>
+  </ul>
+</ResultSummary>

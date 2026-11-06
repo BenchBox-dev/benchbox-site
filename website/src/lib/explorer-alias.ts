@@ -1,14 +1,16 @@
 import path from "node:path";
-import type { Plugin } from "vite";
-import { REPO_ROOT } from "./site-inputs.ts";
+import { fileURLToPath } from "node:url";
 
-export const explorerAliases: { find: RegExp; replacement: string }[] = [{ find: /^@\/(?!db$)/, replacement: `${path.join(REPO_ROOT, "explorer", "src")}/` }];
+const websiteRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..", "..");
+const explorerSource = path.join(websiteRoot, "..", "explorer", "src");
 
-export const explorerDatabasePlugin: Plugin = {
-  name: "explorer-database",
-  enforce: "pre",
-  resolveId(source, _importer, options) {
-    if (source !== "@/db") return null;
-    return path.join(REPO_ROOT, options.ssr ? "website/src/lib/results-db.ts" : "explorer/src/db.ts");
+export const explorerAliases = [{ find: /^@\/(?!db$)/, replacement: `${explorerSource}/` }];
+
+export const explorerDatabasePlugin = {
+  name: "benchbox-explorer-database",
+  enforce: "pre" as const,
+  resolveId(source: string, _importer: string | undefined, options: { ssr?: boolean }): string | undefined {
+    if (source !== "@/db") return undefined;
+    return options.ssr ? path.join(websiteRoot, "src", "lib", "results-db.ts") : path.join(explorerSource, "db.ts");
   },
 };

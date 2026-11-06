@@ -1,0 +1,20 @@
+---
+import ResultSummary from "../../layouts/ResultSummary.astro";
+import { loadResultsSummary, SUMMARY_ROOT } from "../../lib/results-summary.ts";
+
+const { benchmarks } = await loadResultsSummary();
+---
+
+<ResultSummary
+  title="Benchmark summaries"
+  description="Every benchmark with published BenchBox results, with its rankings by scale factor and phase."
+  crumbs={[{ label: "Results", href: "/results/" }, { label: "Summaries", href: `${SUMMARY_ROOT}/` }, { label: "Benchmarks" }]}
+  explorerHref="/results/benchmarks/"
+  explorerLabel="Open the benchmark index in the Results Explorer"
+  searchable={false}
+>
+  <p>{benchmarks.length} benchmarks have published results.</p>
+  <ul>
+    {benchmarks.map((benchmark) => <li><a href={benchmark.summaryHref}>{benchmark.label}</a>, {benchmark.resultCount} {benchmark.resultCount === 1 ? "run" : "runs"}, latest {benchmark.latestRun.slice(0, 10)}</li>)}
+  </ul>
+</ResultSummary>

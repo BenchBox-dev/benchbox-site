@@ -1,28 +1,19 @@
-// @vitest-environment node
-import { afterAll, beforeAll, describe, expect, it, vi } from "vitest";
+import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import { formatPrimaryMetric, primaryMetricLabel } from "@/lib/displayEligibility";
 import { canonicalPhase } from "@/lib/displayLabels";
 import { getBenchmarkRanking, getDetailResult, getPrimaryMetricForBenchmark, getResultDetailMetrics } from "@/lib/duckdbQueries";
 import { loadEmbedResult, loadEmbedResults, presentEmbedResult } from "@/lib/resultEmbed";
-import { openSnapshot, type SnapshotDb } from "@/testing/snapshotDb";
-import { siteInputsPath } from "@/test/siteInputs";
-
-const snapshot = vi.hoisted(() => ({ current: null as SnapshotDb | null }));
-
-vi.mock("@/db", () => ({
-  queryRows: (sql: string, params: unknown[] = []) => snapshot.current!.queryRows(sql, params),
-}));
+import { closeResultsSnapshot, openResultsSnapshot, queryRows } from "../src/lib/results-db.ts";
+import { siteInputsPath } from "../src/lib/site-inputs.ts";
 
 let resultIds: string[] = [];
 
 beforeAll(async () => {
-  snapshot.current = await openSnapshot(siteInputsPath("explorer", "results.duckdb"));
-  resultIds = (await snapshot.current.queryRows<{ result_id: string }>("SELECT result_id FROM bench.results ORDER BY result_id")).map((row) => row.result_id);
+  await openResultsSnapshot(siteInputsPath("explorer", "results.duckdb"));
+  resultIds = (await queryRows<{ result_id: string }>("SELECT result_id FROM bench.results ORDER BY result_id")).map((row) => row.result_id);
 });
 
-afterAll(() => {
-  snapshot.current?.close();
-});
+afterAll(() => closeResultsSnapshot());
 
 describe("embed metric values match the Explorer for the same snapshot", () => {
   it("shows the primary metric exactly as the result detail page formats it, for every published result", async () => {
@@ -42,7 +33,7 @@ describe("embed metric values match the Explorer for the same snapshot", () => {
   }, 120_000);
 
   it("shows the same metric text as the benchmark ranking table for ranked rows", async () => {
-    const cohorts = await snapshot.current!.queryRows<{ benchmark: string; scale_factor: number; phase: string }>(
+    const cohorts = await queryRows<{ benchmark: string; scale_factor: number; phase: string }>(
       "SELECT benchmark, scale_factor, phase FROM bench.benchmark_rankings GROUP BY ALL ORDER BY count(*) DESC LIMIT 1",
     );
     const cohort = cohorts[0]!;
