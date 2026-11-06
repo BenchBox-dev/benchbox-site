@@ -4,6 +4,7 @@ import type { Code, FootnoteDefinition, Html, Paragraph, PhrasingContent, Root, 
 import { collectionOf, contentIdFor, DocsIndex, routeFor } from "./docs-index.ts";
 import { ConverterError, UnknownConstructError, UnresolvedReferenceError } from "./errors.ts";
 import { smartenTitle, titleText, type TitleNode } from "../lib/smartypants.ts";
+import { EMBED_FENCE } from "../lib/results-embed.ts";
 import { IdAllocator } from "./ids.ts";
 import type { Collection, DocInfo, PageData, ResolvedDoc, SourcePosition } from "./model.ts";
 import { rejectDirectiveFence, rejectLabelLines, rejectRoleBeforeCode } from "./myst-guard.ts";
@@ -239,6 +240,7 @@ class DocumentConverter implements ConvertContext {
   private code(node: Code, at: SourcePosition): RootContent[] {
     rejectDirectiveFence(node.lang, at);
     if (node.lang === "mermaid") return this.registry.syntaxHandler("mermaid-fence", at).handle(node, at, this);
+    if (node.lang === EMBED_FENCE) return this.registry.syntaxHandler("result-embed-fence", at).handle(node, at, this);
     return [node];
   }
 

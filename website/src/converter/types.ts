@@ -4,7 +4,7 @@ import type { Code, Definition, Heading, Html, Image, ImageReference, Link, Para
 import type { DocsIndex } from "./docs-index.ts";
 import type { Collection, ResolvedDoc, SourcePosition } from "./model.ts";
 
-export type ComponentName = "Callout" | "Mermaid" | "Embed";
+export type ComponentName = "Callout" | "Mermaid" | "CitedResult" | "CurrentResults";
 
 export interface ConvertContext {
   readonly file: string;
@@ -43,6 +43,7 @@ export type SyntaxNodes = {
   "colon-fence": Paragraph;
   alert: AlertBlock;
   "mermaid-fence": Code;
+  "result-embed-fence": Code;
 };
 
 export type SyntaxName = keyof SyntaxNodes;

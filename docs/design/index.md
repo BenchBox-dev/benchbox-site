@@ -18,6 +18,10 @@ System components and design patterns.
 
 Code organization and directories.
 
+### [Results embeds](results-embeds.md)
+
+Showing Results Explorer results in documentation and blog pages.
+
 ## Design Principles
 
 **Self-contained** - No external dependencies.

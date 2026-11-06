@@ -4,7 +4,7 @@ import type { RoutableProps } from "preact-router";
 import type { DetailResult, QueryDisplayTiming, QueryTiming, SortState } from "@/types";
 import type { ChartContext } from "@/lib/chartRegistry";
 import { getDetailResult, getPrimaryMetricForBenchmark, resolveShortId } from "@/lib/duckdbQueries";
-import { humanizeBenchmark, errMsg, fmtGeomean, fmtScoreCompact, fmtScoreExact } from "@/utils";
+import { humanizeBenchmark, errMsg, fmtScoreExact } from "@/utils";
 import { LoadingSpinner } from "@/components/LoadingSpinner";
 import { ErrorMessage } from "@/components/ErrorMessage";
 import { Breadcrumb } from "@/components/Breadcrumb";
@@ -31,6 +31,7 @@ import {
   parseOverrideRules,
 } from "@/lib/displayLabels";
 import {
+  formatPrimaryMetric,
   primaryMetricHigherIsBetter,
   primaryMetricLabel,
   primaryMetricValue,
@@ -549,11 +550,6 @@ function ResultMetricCard({
       <div class="mt-1 text-xs text-[var(--bb-data-fg-muted)]">{helper}</div>
     </div>
   );
-}
-
-function formatPrimaryMetric(detail: DetailResult, primaryMetric: PrimaryMetric) {
-  if (primaryMetric === "display_geomean_ms") return fmtGeomean(detail.display_geomean_ms);
-  return fmtScoreCompact(primaryMetricValue(detail, primaryMetric));
 }
 
 function isPassingValidationStatus(status: string | null | undefined): boolean {

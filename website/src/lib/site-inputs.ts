@@ -24,6 +24,7 @@ export type BundleManifest = {
   parent_core_sha: string;
   certified_by: string;
   produced_at?: string;
+  members: Record<string, string>;
 };
 
 export function siteInputsRoot(env: NodeJS.ProcessEnv = process.env): string {
@@ -44,6 +45,12 @@ export function requireSiteInputs(): string {
 
 export function bundleManifest(): BundleManifest {
   return JSON.parse(readFileSync(path.join(requireSiteInputs(), "manifest.json"), "utf-8")) as BundleManifest;
+}
+
+export function explorerSnapshotSha(manifest: BundleManifest = bundleManifest()): string {
+  const sha = manifest.members["explorer/results.duckdb"];
+  if (!sha) throw new Error("The core bundle manifest does not list explorer/results.duckdb.");
+  return sha;
 }
 
 export function repoPath(...parts: string[]): string {

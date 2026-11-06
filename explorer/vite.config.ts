@@ -34,6 +34,7 @@ export default defineConfig({
         manualChunks: {
           duckdb: ["@duckdb/duckdb-wasm"],
         },
+        assetFileNames: (asset) => (/^duckdb-.+\.(wasm|js)$/.test(asset.names[0] ?? "") ? "assets/[name][extname]" : "assets/[name]-[hash][extname]"),
       },
     },
   },

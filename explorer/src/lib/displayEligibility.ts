@@ -1,4 +1,5 @@
 import { canonicalPhase } from "@/lib/displayLabels";
+import { fmtGeomean, fmtScoreCompact } from "@/utils";
 import type {
   BenchmarkSummary,
   DetailResult,
@@ -248,6 +249,11 @@ export function primaryMetricValue(row: PrimaryMetricRow, metric: PrimaryMetric)
 export function validPrimaryMetricValue(row: PrimaryMetricRow, metric: PrimaryMetric): number | null {
   const value = primaryMetricValue(row, metric);
   return isValidTimingValue(value) ? value : null;
+}
+
+export function formatPrimaryMetric(row: PrimaryMetricRow, metric: PrimaryMetric): string {
+  if (metric === "display_geomean_ms") return fmtGeomean(row.display_geomean_ms);
+  return fmtScoreCompact(primaryMetricValue(row, metric));
 }
 
 export function formatTimingExclusion(

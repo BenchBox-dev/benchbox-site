@@ -97,6 +97,11 @@ versioned core bundle; it reads nothing else from core.
 - Admonitions are GitHub alerts (`> [!NOTE]`, `TIP`, `IMPORTANT`,
   `WARNING`, `CAUTION`), diagrams are `mermaid` code fences, and tables are
   pipe tables.
+- Results Explorer results are embedded with a `benchbox-result` code fence
+  (`kind: cited` or `kind: current`); the converter turns it into an island
+  that loads the Explorer only when it scrolls into view. Print a cited block
+  with `npm run results:cite -w website -- <result id>`. The syntax is in
+  `docs/design/results-embeds.md`.
 - The blog index is rendered by the blog template from the published posts;
   `blog/index.md` holds only the introduction.
 - `docs/README.md` is the landing page. Its `{{package_version}}` token
