@@ -842,7 +842,7 @@ Tool failures return a structured error object:
 | `suggestion` | How to resolve the issue; present only when one applies |
 | `retry_hint` | `true` when retrying may succeed; omitted otherwise |
 
-A benchmark that cannot load because a Python package is missing returns `DEPENDENCY_MISSING`. `details` names the benchmark, the missing module and the benchbox extras that provide it, and `suggestion` carries the install command:
+A benchmark that cannot load because a Python package is missing returns `DEPENDENCY_MISSING`. `details` names the benchmark, the missing module and the `benchbox` extras that provide it, and `suggestion` carries the install command:
 
 ```json
 {
@@ -855,7 +855,7 @@ A benchmark that cannot load because a Python package is missing returns `DEPEND
 }
 ```
 
-When no benchbox extra provides the module, `extras` is empty and the suggestion asks you to install the module itself and links the installation guide. The install command in a source checkout is `uv sync --extra <extra>`. Any other failure to load a benchmark is reported as `INTERNAL_ERROR`.
+When no `benchbox` extra provides the module, `extras` is empty and the suggestion asks you to install the module itself and links the installation guide. The install command in a source checkout is `uv sync --extra <extra>`. Any other failure to load a benchmark is reported as `INTERNAL_ERROR`.
 
 Error codes fall into these families:
 

@@ -20,7 +20,7 @@ BenchBox v0.5.0 was released on **November 5, 2026**.
 
 v0.5.0 bundles `benchbox-sqlglot` 30.29.0.1, built on SQLGlot 30.29.0, inside the wheel. All SQL transpilation is now consolidated into our own SQLGlot version.
 
-Platform names are now more consistent across `benchbox` surfaces: `--platform firebolt:cloud` works in the CLI, MCP and Python. A new `--execution-engine` option chooses how Polars, Dask and pg-duckdb execute a query.
+Platform names are now more consistent across BenchBox surfaces: `--platform firebolt:cloud` works in the CLI, MCP and Python. A new `--execution-engine` option chooses how Polars, Dask and pg-duckdb execute a query.
 
 Tuning options are now validated and enforced. Previously a tuning file that configured an impossible setting was silently skipped. Such configs now fail loudly so that users can correct them.
 
@@ -73,7 +73,7 @@ Throughput bookkeeping changed with it. Streams are numbered 1 to S and TPC-H po
 
 ## Tuning no longer fails silently
 
-`benchbox` tuning files can specify partitioning, clustering or an index that the target platform does not support. Earlier releases skipped the setting and still recorded the run as tuned. v0.5.0 fails the run, names the tuning type and gives the reason. Unknown keys in a tuning YAML fail too. Check saved files before upgrading:
+BenchBox tuning files can specify partitioning, clustering or an index that the target platform does not support. Earlier releases skipped the setting and still recorded the run as tuned. v0.5.0 fails the run, names the tuning type and gives the reason. Unknown keys in a tuning YAML fail too. Check saved files before upgrading:
 
 ```bash
 uv run -- benchbox tuning validate my_tuning.yaml --platform duckdb
