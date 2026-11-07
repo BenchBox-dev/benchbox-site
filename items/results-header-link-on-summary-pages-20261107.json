@@ -1,0 +1,23 @@
+{
+  "acceptance": [
+    "On /result-summaries/, its index pages and a platform and a benchmark summary page, the header's Results link carries the current-page state (aria-current and styling) and no other link does",
+    "/results/ pages and docs, blog and landing pages keep their current highlighting",
+    "A unit test for surfaceFor covers /result-summaries/ paths and a near-miss path such as /result-summariesx"
+  ],
+  "context": "Noticed 2026-11-06 while delivering PR #118; left out of that PR's scope.",
+  "description": "The site header marks the current surface with surfaceFor() in explorer/src/components/shellModel.ts (line 109). It matches /docs, /blog and /results by path prefix, so the summary pages added under /result-summaries/ (PR #118) get no current surface and the Results link is not highlighted there, although those pages are part of the results surface.",
+  "links": [
+    "explorer/src/components/shellModel.ts",
+    "docs/design/adr-results-summary-pages.md"
+  ],
+  "sessions": [
+    {
+      "actor": "mcp:leader:joe@joe-mac-mini.local:727aec1f5cab611da92d7aba",
+      "at": "2026-11-07T22:08:04Z",
+      "client": "leader",
+      "op": "create",
+      "op_id": "a533e598ddfc4b31bdc56018c8b08795",
+      "session_id": "f3965d839c074422a61a31c2537cd6d8"
+    }
+  ]
+}

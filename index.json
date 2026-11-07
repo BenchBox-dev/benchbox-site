@@ -128,6 +128,13 @@
       "status": "dropped",
       "title": "Public-site visual regression reported every /results/ page changed for a PR that cannot affect rendering"
     },
+    "results-header-link-on-summary-pages-20261107": {
+      "claim": null,
+      "needs": [],
+      "priority": "low",
+      "status": "open",
+      "title": "Highlight the Results header link on /result-summaries/ pages"
+    },
     "rollback-gates-on-pre-allowlist-removal-artifacts-20261029": {
       "claim": null,
       "needs": [],
