@@ -1,0 +1,23 @@
+{
+  "acceptance": [
+    "Every tag used in docs/ and blog/ is either in a category, listed on an index section for uncategorised tags, or removed or merged into an existing tag in front matter, decided per tag",
+    "A converter test fails when a page uses a tag that no browse path reaches",
+    "The built tag index links every tag page that exists"
+  ],
+  "context": "Noticed during the MyST retirement (PRs #112 to #114); recounted 2026-11-07: 145 tags, 65 uncategorised.",
+  "description": "Docs and blog front matter use 145 distinct tags; 65 of them (for example accelerated, ai-ml, analysis, benchmarks, beta, cedardb, citus, cloud-native, columnstore, comparison, credentials) are in no TAG_CATEGORIES entry in website/src/converter/tag-categories.ts. The tag index (_tags/tagsindex.md) and the category pages list only categorised tags, so those tags have pages but no browse path from the index or the sidebar's tag categories.",
+  "links": [
+    "website/src/converter/tag-categories.ts",
+    "website/src/converter/tag-pages.ts"
+  ],
+  "sessions": [
+    {
+      "actor": "mcp:leader:joe@joe-mac-mini.local:727aec1f5cab611da92d7aba",
+      "at": "2026-11-07T22:08:08Z",
+      "client": "leader",
+      "op": "create",
+      "op_id": "22b51b782a7744d393c4485232e0df71",
+      "session_id": "f3965d839c074422a61a31c2537cd6d8"
+    }
+  ]
+}
