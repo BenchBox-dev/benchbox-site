@@ -18,12 +18,17 @@
       "title": "Add result embeds for docs and blog that cite their snapshot and obey Explorer withdrawal rules"
     },
     "astro-site-61-results-discovery-pages": {
-      "claim": null,
+      "claim": {
+        "expires_at": "2026-11-08T14:53:43Z",
+        "generation": "883135ccf2fa45bb9bba668acf645586",
+        "renewals": 0,
+        "worker": "mcp:leader:joe@joe-mac-mini.local:727aec1f5cab611da92d7aba"
+      },
       "needs": [
         "site-browser-acceptance-ci-20261017"
       ],
       "priority": "low",
-      "status": "open",
+      "status": "active",
       "title": "Generate static, searchable result summary pages for platforms and benchmarks"
     },
     "blog-draft-byte-sha-of-snapshot-stale-20261029": {
