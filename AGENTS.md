@@ -254,14 +254,12 @@ Adaptations to keep:
 ## Tracker
 
 - Work for this repository is tracked on its own `todo-state` branch.
-  `.todo-db/config.json` binds the `todo-db` MCP server that `.mcp.json`
+  `.tractable/config.json` binds the `tractable` MCP server that `.mcp.json`
   starts to that branch. The server runs on the developer's machine as
-  `todo-db-mcp` and is not part of the site build.
-- Use todo-db 0.12.0 or later. Older servers ignore `expect_store`, and
-  before 0.12.0 `drop` takes no `reason`, which the tracker skill now passes.
-  Before the first tracker write in a session, confirm the bound store by
-  passing `BenchBox-dev/benchbox-site` as `expect_store`. A server bound to
-  core's tracker refuses it.
+  `tractable-mcp` and is not part of the site build.
+- Use tractable 1.0.0 or later. Before the first tracker write in a session,
+  confirm the bound store by passing `BenchBox-dev/benchbox-site` as
+  `expect_store`. A server bound to core's tracker refuses it.
 - Work that needs changes in both repositories is tracked in core, with
   links to the site paths it touches.
 - Change tracker state only through the server, never by editing the branch.
