@@ -1,6 +1,11 @@
 import { fireEvent, render, screen, within } from "@testing-library/preact";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { CapturedPlanViewer } from "@/components/CapturedPlanViewer";
+import duckdbMultiStream from "@/lib/__tests__/fixtures/plans/duckdb-multi-stream.plans.json";
+import fingerprintVaried from "@/lib/__tests__/fixtures/plans/duckdb-fingerprint-varied.plans.json";
+import pandasErrorsOnly from "@/lib/__tests__/fixtures/plans/pandas-errors-only.plans.json";
+import polarsText from "@/lib/__tests__/fixtures/plans/polars-text.plans.json";
+import sqliteMultiTable from "@/lib/__tests__/fixtures/plans/sqlite-multi-table.plans.json";
 import { MAX_PLAN_SIDECAR_BYTES } from "@/lib/queryPlans";
 
 const MULTI_QUERY_SIDECAR = {
@@ -232,8 +237,8 @@ describe("CapturedPlanViewer", () => {
 
     const selector = await screen.findByRole("combobox");
     expect(within(selector).getAllByRole("option").map((option) => option.textContent)).toEqual([
-      "Q18#1",
-      "Q18#2",
+      "Q18 · stream 1",
+      "Q18 · stream 2",
     ]);
   });
 
@@ -301,5 +306,123 @@ describe("CapturedPlanViewer", () => {
     fireEvent.click(screen.getByRole("button", { name: "Hide query plans" }));
     expect(screen.getByRole("button", { name: "View query plans" }).getAttribute("aria-expanded")).toBe("false");
     expect(screen.queryByRole("region", { name: "Captured query plans" })).toBeNull();
+  });
+});
+
+async function openPlans(queryId?: string) {
+  render(<CapturedPlanViewer plansUrl="/results/r1.plans.json" queryId={queryId} />);
+  fireEvent.click(screen.getByRole("button", { name: "View query plans" }));
+}
+
+describe("CapturedPlanViewer with plans companions written by core", () => {
+  it("lists every stream and test type plan of a query from a multi-stream run", async () => {
+    stubSidecar(duckdbMultiStream);
+    await openPlans("1");
+
+    const selector = await screen.findByRole("combobox");
+    expect(within(selector).getAllByRole("option").map((option) => option.textContent)).toEqual([
+      "Q1 · stream 0 · power",
+      "Q1 · stream 1 · throughput",
+      "Q1 · stream 2 · throughput",
+    ]);
+    expect(screen.getByRole("region", { name: "Query plan for Q1 · stream 0 · power" })).toBeTruthy();
+    expect(screen.getByText("Captured from: measurement iteration 3")).toBeTruthy();
+
+    fireEvent.change(selector, { target: { value: "Q1#2:throughput" } });
+    expect(await screen.findByRole("region", { name: "Query plan for Q1 · stream 2 · throughput" })).toBeTruthy();
+    expect(screen.queryByRole("region", { name: "Query plan for Q1 · stream 0 · power" })).toBeNull();
+    expect(screen.queryByRole("alert")).toBeNull();
+    expect(screen.queryByRole("region", { name: "Plan stability" })).toBeNull();
+  });
+
+  it("states that the run has no plan for a query that the multi-stream run did not capture", async () => {
+    stubSidecar(duckdbMultiStream);
+    await openPlans("6");
+
+    expect(await screen.findByText("No captured plan for query 6 in this run.")).toBeTruthy();
+    expect(screen.queryByRole("combobox")).toBeNull();
+  });
+
+  it("shows the plan text of a Polars run as text with a readable label", async () => {
+    stubSidecar(polarsText);
+    await openPlans("3");
+
+    const region = await screen.findByRole("region", { name: "Query plan for Q3 · stream 0" });
+    expect(screen.queryByRole("combobox")).toBeNull();
+    expect(region.querySelector("pre")?.textContent).toMatch(/^SORT BY \[slice/);
+    expect(region.textContent).not.toContain("plan_data");
+    expect(screen.getByText("Platform: polars")).toBeTruthy();
+    expect(screen.queryByText(/Plan fingerprint/)).toBeNull();
+  });
+
+  it("shows a capture-failure state instead of an empty viewer for an errors-only run", async () => {
+    stubSidecar(pandasErrorsOnly);
+    await openPlans();
+
+    const alert = await screen.findByRole("alert");
+    expect(alert).toHaveTextContent("Plan capture failed for this run. No plans were captured.");
+    expect(alert).toHaveTextContent("3 query plans were not captured.");
+    const items = within(screen.getByRole("list", { name: "Plan capture errors" })).getAllByRole("listitem");
+    expect(items.map((item) => item.textContent)).toEqual([
+      "Q1 · stream 0: Pandas is an eager DataFrame engine with no query plan to capture (iterations 1, 2, 3)",
+      "Q3 · stream 0: Pandas is an eager DataFrame engine with no query plan to capture (iterations 1, 2, 3)",
+      "Q6 · stream 0: Pandas is an eager DataFrame engine with no query plan to capture (iterations 1, 2, 3)",
+    ]);
+    expect(screen.queryByRole("combobox")).toBeNull();
+    expect(screen.queryByText("Published query plans are unavailable.", { exact: false })).toBeNull();
+  });
+
+  it("shows the capture errors of the compared query for an errors-only run", async () => {
+    stubSidecar(pandasErrorsOnly);
+    await openPlans("Q3");
+
+    expect(await screen.findByText("No captured plan for query Q3 in this run.")).toBeTruthy();
+    const items = within(screen.getByRole("list", { name: "Plan capture errors" })).getAllByRole("listitem");
+    expect(items).toHaveLength(1);
+    expect(items[0]?.textContent).toContain("Q3 · stream 0");
+  });
+
+  it("shows the branching SQLite plan and its raw plan output", async () => {
+    stubSidecar(sqliteMultiTable);
+    await openPlans("Q3");
+
+    const region = await screen.findByRole("region", { name: "Query plan for Q3 · stream 0 · power" });
+    const operators = Array.from(region.querySelectorAll("[data-testid='captured-plan-node'] > div")).map(
+      (node) => node.textContent,
+    );
+    expect(operators).toEqual(["Other", "Scan", "Scan", "Scan", "Aggregate", "Sort"]);
+    expect(within(region).getByText("Table: orders", { exact: false })).toBeTruthy();
+    expect(region.querySelector("details pre")?.textContent).toContain("SEARCH orders USING INDEX");
+  });
+
+  it("warns that a plan changed between executions and lists the fingerprints seen", async () => {
+    stubSidecar(fingerprintVaried);
+    await openPlans("1");
+
+    const warning = await screen.findByRole("region", { name: "Plan stability" });
+    expect(warning).toHaveTextContent("The plan changed between executions: 2 different plans were captured");
+    expect(warning).toHaveTextContent("The plan shown is the last one captured.");
+    const items = within(within(warning).getByRole("list")).getAllByRole("listitem");
+    expect(items.map((item) => item.textContent)).toEqual([
+      "a1f0c3d2".repeat(8) + " (measurement iteration 1)",
+      "9b7e5d41".repeat(8) + " (measurement iteration 2)",
+    ]);
+  });
+
+  it("keeps showing the unavailable state for a sidecar with neither plans nor failures", async () => {
+    stubSidecar({ version: "1.0", queries: {}, capture_failures: 0, errors: null });
+    await openPlans();
+
+    expect(await screen.findByRole("alert")).toHaveTextContent("Published query plans are unavailable.");
+  });
+
+  it("renders capture error text as text and never as markup", async () => {
+    stubSidecar({ errors: [{ query_id: "Q1", error: "<img src=x onerror=alert(1)>" }] });
+    const { container } = render(<CapturedPlanViewer plansUrl="/results/r1.plans.json" />);
+
+    fireEvent.click(screen.getByRole("button", { name: "View query plans" }));
+
+    expect(await screen.findByText("<img src=x onerror=alert(1)>", { exact: false })).toBeTruthy();
+    expect(container.querySelector("img")).toBeNull();
   });
 });

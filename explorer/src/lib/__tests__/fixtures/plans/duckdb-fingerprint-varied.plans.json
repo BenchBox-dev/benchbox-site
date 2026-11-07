@@ -1,0 +1,298 @@
+{
+  "version": "2.3",
+  "run_id": "plan-stability-fixture",
+  "plans_captured": 1,
+  "capture_failures": 0,
+  "max_depth": 50,
+  "truncated": false,
+  "queries": {
+    "Q1#0:power": {
+      "fingerprint": "9b7e5d419b7e5d419b7e5d419b7e5d419b7e5d419b7e5d419b7e5d419b7e5d41",
+      "capture_time_ms": 1.2,
+      "iteration": 3,
+      "run_type": "measurement",
+      "plan": {
+        "estimated_cost": null,
+        "estimated_rows": null,
+        "fingerprint_version": 2,
+        "logical_root": {
+          "aggregation_functions": null,
+          "children": [
+            {
+              "aggregation_functions": null,
+              "children": [
+                {
+                  "aggregation_functions": null,
+                  "children": [
+                    {
+                      "aggregation_functions": null,
+                      "children": [
+                        {
+                          "aggregation_functions": [
+                            "{\"Groups\": [\"#0\", \"#1\"], \"Aggregates\": [\"sum_no_overflow(#2)\", \"sum_no_overflow(#3)\", \"sum_no_overflow(#4)\", \"sum_no_overflow(#5)\", \"avg(#6)\", \"avg(#7)\", \"avg(#8)\", \"count_star()\"]}"
+                          ],
+                          "children": [
+                            {
+                              "aggregation_functions": null,
+                              "children": [
+                                {
+                                  "aggregation_functions": null,
+                                  "children": [
+                                    {
+                                      "aggregation_functions": null,
+                                      "children": [
+                                        {
+                                          "aggregation_functions": null,
+                                          "children": [],
+                                          "filter_expressions": null,
+                                          "group_by_keys": null,
+                                          "join_conditions": null,
+                                          "join_type": null,
+                                          "limit_count": null,
+                                          "offset_count": null,
+                                          "operator_id": "scan_2",
+                                          "operator_type": "Scan",
+                                          "physical_operator": {
+                                            "operator_id": "seq_scan_1",
+                                            "operator_type": "SEQ_SCAN",
+                                            "platform_metadata": {
+                                              "extra_info": "{\"Table\": \"tpch_sf001_notuning_noconstraints.main.lineitem\", \"Type\": \"Sequential Scan\", \"Projections\": [\"l_returnflag\", \"l_linestatus\", \"l_quantity\", \"l_extendedprice\", \"l_discount\", \"l_tax\"], \"Filters\": \"(CAST(l_shipdate AS TIMESTAMP) <= '1998-09-02 00:00:00'::TIMESTAMP)\", \"Estimated Cardinality\": \"12049\"}"
+                                            },
+                                            "properties": {
+                                              "cardinality": null,
+                                              "timing": null
+                                            }
+                                          },
+                                          "projection_expressions": null,
+                                          "properties": {},
+                                          "sort_keys": null,
+                                          "table_name": "tpch_sf001_notuning_noconstraints.main.lineitem"
+                                        }
+                                      ],
+                                      "filter_expressions": null,
+                                      "group_by_keys": null,
+                                      "join_conditions": null,
+                                      "join_type": null,
+                                      "limit_count": null,
+                                      "offset_count": null,
+                                      "operator_id": "project_4",
+                                      "operator_type": "Project",
+                                      "physical_operator": {
+                                        "operator_id": "projection_3",
+                                        "operator_type": "PROJECTION",
+                                        "platform_metadata": {
+                                          "extra_info": "{\"Projections\": [\"l_returnflag\", \"l_linestatus\", \"l_quantity\", \"l_extendedprice\", \"(l_extendedprice * (1.00 - l_discount))\", \"l_tax\", \"l_discount\"], \"Estimated Cardinality\": \"12049\"}"
+                                        },
+                                        "properties": {
+                                          "cardinality": null,
+                                          "timing": null
+                                        }
+                                      },
+                                      "projection_expressions": null,
+                                      "properties": {},
+                                      "sort_keys": null,
+                                      "table_name": null
+                                    }
+                                  ],
+                                  "filter_expressions": null,
+                                  "group_by_keys": null,
+                                  "join_conditions": null,
+                                  "join_type": null,
+                                  "limit_count": null,
+                                  "offset_count": null,
+                                  "operator_id": "project_6",
+                                  "operator_type": "Project",
+                                  "physical_operator": {
+                                    "operator_id": "projection_5",
+                                    "operator_type": "PROJECTION",
+                                    "platform_metadata": {
+                                      "extra_info": "{\"Projections\": [\"__internal_compress_string_utinyint(#0)\", \"__internal_compress_string_utinyint(#1)\", \"#2\", \"#3\", \"#4\", \"#5\", \"#6\"], \"Estimated Cardinality\": \"12049\"}"
+                                    },
+                                    "properties": {
+                                      "cardinality": null,
+                                      "timing": null
+                                    }
+                                  },
+                                  "projection_expressions": null,
+                                  "properties": {},
+                                  "sort_keys": null,
+                                  "table_name": null
+                                }
+                              ],
+                              "filter_expressions": null,
+                              "group_by_keys": null,
+                              "join_conditions": null,
+                              "join_type": null,
+                              "limit_count": null,
+                              "offset_count": null,
+                              "operator_id": "project_8",
+                              "operator_type": "Project",
+                              "physical_operator": {
+                                "operator_id": "projection_7",
+                                "operator_type": "PROJECTION",
+                                "platform_metadata": {
+                                  "extra_info": "{\"Projections\": [\"l_returnflag\", \"l_linestatus\", \"l_quantity\", \"l_extendedprice\", \"#4\", \"(#4 * (1.00 + l_tax))\", \"l_quantity\", \"l_extendedprice\", \"l_discount\"], \"Estimated Cardinality\": \"12049\"}"
+                                },
+                                "properties": {
+                                  "cardinality": null,
+                                  "timing": null
+                                }
+                              },
+                              "projection_expressions": null,
+                              "properties": {},
+                              "sort_keys": null,
+                              "table_name": null
+                            }
+                          ],
+                          "filter_expressions": null,
+                          "group_by_keys": null,
+                          "join_conditions": null,
+                          "join_type": null,
+                          "limit_count": null,
+                          "offset_count": null,
+                          "operator_id": "aggregate_10",
+                          "operator_type": "Aggregate",
+                          "physical_operator": {
+                            "operator_id": "perfect_hash_group_by_9",
+                            "operator_type": "PERFECT_HASH_GROUP_BY",
+                            "platform_metadata": {
+                              "extra_info": "{\"Groups\": [\"#0\", \"#1\"], \"Aggregates\": [\"sum_no_overflow(#2)\", \"sum_no_overflow(#3)\", \"sum_no_overflow(#4)\", \"sum_no_overflow(#5)\", \"avg(#6)\", \"avg(#7)\", \"avg(#8)\", \"count_star()\"]}"
+                            },
+                            "properties": {
+                              "cardinality": null,
+                              "timing": null
+                            }
+                          },
+                          "projection_expressions": null,
+                          "properties": {},
+                          "sort_keys": null,
+                          "table_name": null
+                        }
+                      ],
+                      "filter_expressions": null,
+                      "group_by_keys": null,
+                      "join_conditions": null,
+                      "join_type": null,
+                      "limit_count": null,
+                      "offset_count": null,
+                      "operator_id": "project_12",
+                      "operator_type": "Project",
+                      "physical_operator": {
+                        "operator_id": "projection_11",
+                        "operator_type": "PROJECTION",
+                        "platform_metadata": {
+                          "extra_info": "{\"Projections\": [\"__internal_decompress_string(#0)\", \"__internal_decompress_string(#1)\", \"#2\", \"#3\", \"#4\", \"#5\", \"#6\", \"#7\", \"#8\", \"#9\"], \"Estimated Cardinality\": \"5\"}"
+                        },
+                        "properties": {
+                          "cardinality": null,
+                          "timing": null
+                        }
+                      },
+                      "projection_expressions": null,
+                      "properties": {},
+                      "sort_keys": null,
+                      "table_name": null
+                    }
+                  ],
+                  "filter_expressions": null,
+                  "group_by_keys": null,
+                  "join_conditions": null,
+                  "join_type": null,
+                  "limit_count": null,
+                  "offset_count": null,
+                  "operator_id": "project_14",
+                  "operator_type": "Project",
+                  "physical_operator": {
+                    "operator_id": "projection_13",
+                    "operator_type": "PROJECTION",
+                    "platform_metadata": {
+                      "extra_info": "{\"Projections\": [\"__internal_compress_string_utinyint(#0)\", \"__internal_compress_string_utinyint(#1)\", \"#2\", \"#3\", \"#4\", \"#5\", \"#6\", \"#7\", \"#8\", \"#9\"], \"Estimated Cardinality\": \"5\"}"
+                    },
+                    "properties": {
+                      "cardinality": null,
+                      "timing": null
+                    }
+                  },
+                  "projection_expressions": null,
+                  "properties": {},
+                  "sort_keys": null,
+                  "table_name": null
+                }
+              ],
+              "filter_expressions": null,
+              "group_by_keys": null,
+              "join_conditions": null,
+              "join_type": null,
+              "limit_count": null,
+              "offset_count": null,
+              "operator_id": "sort_16",
+              "operator_type": "Sort",
+              "physical_operator": {
+                "operator_id": "order_by_15",
+                "operator_type": "ORDER_BY",
+                "platform_metadata": {
+                  "extra_info": "{\"Order By\": [\"tpch_sf001_notuning_noconstraints.main.lineitem.l_returnflag ASC\", \"tpch_sf001_notuning_noconstraints.main.lineitem.l_linestatus ASC\"]}"
+                },
+                "properties": {
+                  "cardinality": null,
+                  "timing": null
+                }
+              },
+              "projection_expressions": null,
+              "properties": {},
+              "sort_keys": [
+                {
+                  "direction": "ASC",
+                  "expr": "{\"Order By\": [\"tpch_sf001_notuning_noconstraints.main.lineitem.l_returnflag ASC\", \"tpch_sf001_notuning_noconstraints.main.lineitem.l_linestatus ASC\"]}"
+                }
+              ],
+              "table_name": null
+            }
+          ],
+          "filter_expressions": null,
+          "group_by_keys": null,
+          "join_conditions": null,
+          "join_type": null,
+          "limit_count": null,
+          "offset_count": null,
+          "operator_id": "project_18",
+          "operator_type": "Project",
+          "physical_operator": {
+            "operator_id": "projection_17",
+            "operator_type": "PROJECTION",
+            "platform_metadata": {
+              "extra_info": "{\"Projections\": [\"__internal_decompress_string(#0)\", \"__internal_decompress_string(#1)\", \"#2\", \"#3\", \"#4\", \"#5\", \"#6\", \"#7\", \"#8\", \"#9\"], \"Estimated Cardinality\": \"0\"}"
+            },
+            "properties": {
+              "cardinality": null,
+              "timing": null
+            }
+          },
+          "projection_expressions": null,
+          "properties": {},
+          "sort_keys": null,
+          "table_name": null
+        },
+        "plan_fingerprint": "9b7e5d419b7e5d419b7e5d419b7e5d419b7e5d419b7e5d419b7e5d419b7e5d41",
+        "platform": "duckdb",
+        "query_id": "1",
+        "raw_explain_output": "[\n    {\n        \"name\": \"PROJECTION\",\n        \"children\": [\n            {\n                \"name\": \"ORDER_BY\",\n                \"children\": [\n                    {\n                        \"name\": \"PROJECTION\",\n                        \"children\": [\n                            {\n                                \"name\": \"PROJECTION\",\n                                \"children\": [\n                                    {\n                                        \"name\": \"PERFECT_HASH_GROUP_BY\",\n                                        \"children\": [\n                                            {\n                                                \"name\": \"PROJECTION\",\n                                                \"children\": [\n                                                    {\n                                                        \"name\": \"PROJECTION\",\n                                                        \"children\": [\n                                                            {\n                                                                \"name\": \"PROJECTION\",\n                                                                \"children\": [\n                                                                    {\n                                                                        \"name\": \"SEQ_SCAN\",\n                                                                        \"children\": [],\n                                                                        \"extra_info\": {\n                                                                            \"Table\": \"tpch_sf001_notuning_noconstraints.main.lineitem\",\n                                                                            \"Type\": \"Sequential Scan\",\n                                                                            \"Projections\": [\n                                                                                \"l_returnflag\",\n                                                                                \"l_linestatus\",\n                                                                                \"l_quantity\",\n                                                                                \"l_extendedprice\",\n                                                                                \"l_discount\",\n                                                                                \"l_tax\"\n                                                                            ],\n                                                                            \"Filters\": \"(CAST(l_shipdate AS TIMESTAMP) <= '1998-09-02 00:00:00'::TIMESTAMP)\",\n                                                                            \"Estimated Cardinality\": \"12049\"\n                                                                        }\n                                                                    }\n                                                                ],\n                                                                \"extra_info\": {\n                                                                    \"Projections\": [\n                                                                        \"l_returnflag\",\n                                                                        \"l_linestatus\",\n                                                                        \"l_quantity\",\n                                                                        \"l_extendedprice\",\n                                                                        \"(l_extendedprice * (1.00 - l_discount))\",\n                                                                        \"l_tax\",\n                                                                        \"l_discount\"\n                                                                    ],\n                                                                    \"Estimated Cardinality\": \"12049\"\n                                                                }\n                                                            }\n                                                        ],\n                                                        \"extra_info\": {\n                                                            \"Projections\": [\n                                                                \"__internal_compress_string_utinyint(#0)\",\n                                                                \"__internal_compress_string_utinyint(#1)\",\n                                                                \"#2\",\n                                                                \"#3\",\n                                                                \"#4\",\n                                                                \"#5\",\n                                                                \"#6\"\n                                                            ],\n                                                            \"Estimated Cardinality\": \"12049\"\n                                                        }\n                                                    }\n                                                ],\n                                                \"extra_info\": {\n                                                    \"Projections\": [\n                                                        \"l_returnflag\",\n                                                        \"l_linestatus\",\n                                                        \"l_quantity\",\n                                                        \"l_extendedprice\",\n                                                        \"#4\",\n                                                        \"(#4 * (1.00 + l_tax))\",\n                                                        \"l_quantity\",\n                                                        \"l_extendedprice\",\n                                                        \"l_discount\"\n                                                    ],\n                                                    \"Estimated Cardinality\": \"12049\"\n                                                }\n                                            }\n                                        ],\n                                        \"extra_info\": {\n                                            \"Groups\": [\n                                                \"#0\",\n                                                \"#1\"\n                                            ],\n                                            \"Aggregates\": [\n                                                \"sum_no_overflow(#2)\",\n                                                \"sum_no_overflow(#3)\",\n                                                \"sum_no_overflow(#4)\",\n                                                \"sum_no_overflow(#5)\",\n                                                \"avg(#6)\",\n                                                \"avg(#7)\",\n                                                \"avg(#8)\",\n                                                \"count_star()\"\n                                            ]\n                                        }\n                                    }\n                                ],\n                                \"extra_info\": {\n                                    \"Projections\": [\n                                        \"__internal_decompress_string(#0)\",\n                                        \"__internal_decompress_string(#1)\",\n                                        \"#2\",\n                                        \"#3\",\n                                        \"#4\",\n                                        \"#5\",\n                                        \"#6\",\n                                        \"#7\",\n                                        \"#8\",\n                                        \"#9\"\n                                    ],\n                                    \"Estimated Cardinality\": \"5\"\n                                }\n                            }\n                        ],\n                        \"extra_info\": {\n                            \"Projections\": [\n                                \"__internal_compress_string_utinyint(#0)\",\n                                \"__internal_compress_string_utinyint(#1)\",\n                                \"#2\",\n                                \"#3\",\n                                \"#4\",\n                                \"#5\",\n                                \"#6\",\n                                \"#7\",\n                                \"#8\",\n                                \"#9\"\n                            ],\n                            \"Estimated Cardinality\": \"5\"\n                        }\n                    }\n                ],\n                \"extra_info\": {\n                    \"Order By\": [\n                        \"tpch_sf001_notuning_noconstraints.main.lineitem.l_returnflag ASC\",\n                        \"tpch_sf001_notuning_noconstraints.main.lineitem.l_linestatus ASC\"\n                    ]\n                }\n            }\n        ],\n        \"extra_info\": {\n            \"Projections\": [\n                \"__internal_decompress_string(#0)\",\n                \"__internal_decompress_string(#1)\",\n                \"#2\",\n                \"#3\",\n                \"#4\",\n                \"#5\",\n                \"#6\",\n                \"#7\",\n                \"#8\",\n                \"#9\"\n            ],\n            \"Estimated Cardinality\": \"0\"\n        }\n    }\n]"
+      },
+      "plan_format": "dag",
+      "fingerprint_varied": true,
+      "fingerprint_variants": [
+        {
+          "fingerprint": "a1f0c3d2a1f0c3d2a1f0c3d2a1f0c3d2a1f0c3d2a1f0c3d2a1f0c3d2a1f0c3d2",
+          "iteration": 1,
+          "run_type": "measurement"
+        },
+        {
+          "fingerprint": "9b7e5d419b7e5d419b7e5d419b7e5d419b7e5d419b7e5d419b7e5d419b7e5d41",
+          "iteration": 2,
+          "run_type": "measurement"
+        }
+      ]
+    }
+  },
+  "errors": null
+}
