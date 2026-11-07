@@ -265,8 +265,23 @@ ceiling. With no 503 in the window, no download-reducing change was made. If
 artifact on every pull request push, and comparing against the deployed
 generation needs only the pages it captures.
 
-The seven-day window ends 2026-11-07T19:33Z. To close it, list the runs of
-deploy.yml, visual.yml and ci.yml created after 2026-10-31T19:33Z with
-`gh run list -w <workflow> --json databaseId,createdAt,conclusion`, sum the
-artifact bytes above per run from `gh api repos/BenchBox-dev/benchbox-site/actions/runs/<id>/artifacts`,
-and search each run's `gh run view <id> --log` for `Egress is over`.
+### Seven days after the bounded resolver
+
+From 2026-10-31T19:33Z to 2026-11-07T19:33Z, 238 deploy.yml, visual.yml and
+ci.yml runs downloaded about 18.6 GB of artifacts: 14.5 GB through
+`actions/download-artifact` (summed from the `Size:` each download logs) and
+4.1 GB in 36 visual runs that fetched the deployed site artifact with
+`gh run download` (summed from that artifact's size in the artifacts API).
+Core bundle and receipt downloads, about 2 MB per run, are not included.
+
+No run logged `Egress is over`, `ServerBusy` or an HTTP 5xx response. GitHub
+returned no log for 20 runs, all cancelled: 17 before any job started and 3
+after starting jobs, so their downloads are not counted. The 503s of
+2026-10-30 did not recur, so the downloads stay as they are, and the
+visual.yml reduction above remains the first change to make if they do.
+
+To measure another window, list the runs of deploy.yml, visual.yml and ci.yml
+with `gh run list -w <workflow> --json databaseId,createdAt,conclusion`, sum
+the artifact sizes each run downloaded from
+`gh api repos/BenchBox-dev/benchbox-site/actions/runs/<id>/artifacts`, and
+search each run's `gh run view <id> --log` for `Egress is over`.
