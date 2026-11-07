@@ -1,0 +1,359 @@
+{
+  "capture_failures": 0,
+  "errors": null,
+  "max_depth": 50,
+  "plans_captured": 3,
+  "queries": {
+    "Q1#0:power": {
+      "capture_time_ms": 4.3,
+      "fingerprint": "28c6264cd3f5a6a7949620ca6b4b17c028e2688c71d5a1681b4ef9be20cd88fe",
+      "fingerprint_version": 2,
+      "iteration": 3,
+      "plan": {
+        "estimated_cost": null,
+        "estimated_rows": null,
+        "fingerprint_version": 2,
+        "logical_root": {
+          "aggregation_functions": null,
+          "children": [
+            {
+              "aggregation_functions": null,
+              "children": [],
+              "filter_expressions": null,
+              "group_by_keys": null,
+              "join_conditions": null,
+              "join_type": null,
+              "limit_count": null,
+              "offset_count": null,
+              "operator_id": "scan_2",
+              "operator_type": "Scan",
+              "physical_operator": {
+                "operator_id": "scan_1",
+                "operator_type": "SCAN",
+                "platform_metadata": {
+                  "level": 0,
+                  "text": "SCAN lineitem"
+                },
+                "properties": {
+                  "table_name": "lineitem"
+                }
+              },
+              "projection_expressions": null,
+              "properties": {},
+              "sort_keys": null,
+              "table_name": "lineitem"
+            },
+            {
+              "aggregation_functions": null,
+              "children": [],
+              "filter_expressions": null,
+              "group_by_keys": null,
+              "join_conditions": null,
+              "join_type": null,
+              "limit_count": null,
+              "offset_count": null,
+              "operator_id": "aggregate_4",
+              "operator_type": "Aggregate",
+              "physical_operator": {
+                "operator_id": "aggregate_3",
+                "operator_type": "AGGREGATE",
+                "platform_metadata": {
+                  "level": 0,
+                  "text": "USE TEMP B-TREE FOR GROUP BY"
+                },
+                "properties": {}
+              },
+              "projection_expressions": null,
+              "properties": {
+                "temp_btree": true
+              },
+              "sort_keys": null,
+              "table_name": null
+            },
+            {
+              "aggregation_functions": null,
+              "children": [],
+              "filter_expressions": null,
+              "group_by_keys": null,
+              "join_conditions": null,
+              "join_type": null,
+              "limit_count": null,
+              "offset_count": null,
+              "operator_id": "sort_6",
+              "operator_type": "Sort",
+              "physical_operator": {
+                "operator_id": "sort_5",
+                "operator_type": "SORT",
+                "platform_metadata": {
+                  "level": 0,
+                  "text": "USE TEMP B-TREE FOR ORDER BY"
+                },
+                "properties": {}
+              },
+              "projection_expressions": null,
+              "properties": {
+                "temp_btree": true
+              },
+              "sort_keys": null,
+              "table_name": null
+            }
+          ],
+          "filter_expressions": null,
+          "group_by_keys": null,
+          "join_conditions": null,
+          "join_type": null,
+          "limit_count": null,
+          "offset_count": null,
+          "operator_id": "other_8",
+          "operator_type": "Other",
+          "physical_operator": {
+            "operator_id": "other_7",
+            "operator_type": "OTHER",
+            "platform_metadata": {
+              "level": -1,
+              "text": "QUERY PLAN"
+            },
+            "properties": {}
+          },
+          "projection_expressions": null,
+          "properties": {},
+          "sort_keys": null,
+          "table_name": null
+        },
+        "plan_fingerprint": "28c6264cd3f5a6a7949620ca6b4b17c028e2688c71d5a1681b4ef9be20cd88fe",
+        "platform": "sqlite",
+        "query_id": "1",
+        "raw_explain_output": "QUERY PLAN\n7|0|SCAN lineitem\n16|0|USE TEMP B-TREE FOR GROUP BY\n102|0|USE TEMP B-TREE FOR ORDER BY"
+      },
+      "plan_format": "dag",
+      "run_type": "measurement"
+    },
+    "Q3#0:power": {
+      "capture_time_ms": 0.3,
+      "fingerprint": "a76d711a5adbaf1f3de2b283c6b706b7dbdedfb4c345e2456a00838122547e7e",
+      "fingerprint_version": 2,
+      "iteration": 3,
+      "plan": {
+        "estimated_cost": null,
+        "estimated_rows": null,
+        "fingerprint_version": 2,
+        "logical_root": {
+          "aggregation_functions": null,
+          "children": [
+            {
+              "aggregation_functions": null,
+              "children": [],
+              "filter_expressions": null,
+              "group_by_keys": null,
+              "join_conditions": null,
+              "join_type": null,
+              "limit_count": null,
+              "offset_count": null,
+              "operator_id": "scan_2",
+              "operator_type": "Scan",
+              "physical_operator": {
+                "operator_id": "scan_1",
+                "operator_type": "SCAN",
+                "platform_metadata": {
+                  "level": 0,
+                  "text": "SCAN customer"
+                },
+                "properties": {
+                  "table_name": "customer"
+                }
+              },
+              "projection_expressions": null,
+              "properties": {},
+              "sort_keys": null,
+              "table_name": "customer"
+            },
+            {
+              "aggregation_functions": null,
+              "children": [],
+              "filter_expressions": null,
+              "group_by_keys": null,
+              "join_conditions": null,
+              "join_type": null,
+              "limit_count": null,
+              "offset_count": null,
+              "operator_id": "scan_4",
+              "operator_type": "Scan",
+              "physical_operator": {
+                "operator_id": "index_scan_3",
+                "operator_type": "INDEX_SCAN",
+                "platform_metadata": {
+                  "level": 0,
+                  "text": "SEARCH orders USING INDEX idx_bb_tpch_orders_customer_date (o_custkey=? AND o_orderdate<?)"
+                },
+                "properties": {
+                  "index_name": "idx_bb_tpch_orders_customer_date",
+                  "table_name": "orders"
+                }
+              },
+              "projection_expressions": null,
+              "properties": {},
+              "sort_keys": null,
+              "table_name": "orders"
+            },
+            {
+              "aggregation_functions": null,
+              "children": [],
+              "filter_expressions": null,
+              "group_by_keys": null,
+              "join_conditions": null,
+              "join_type": null,
+              "limit_count": null,
+              "offset_count": null,
+              "operator_id": "scan_6",
+              "operator_type": "Scan",
+              "physical_operator": {
+                "operator_id": "index_scan_5",
+                "operator_type": "INDEX_SCAN",
+                "platform_metadata": {
+                  "level": 0,
+                  "text": "SEARCH lineitem USING INDEX idx_bb_tpch_lineitem_order_supp_dates (l_orderkey=?)"
+                },
+                "properties": {
+                  "index_name": "idx_bb_tpch_lineitem_order_supp_dates",
+                  "table_name": "lineitem"
+                }
+              },
+              "projection_expressions": null,
+              "properties": {},
+              "sort_keys": null,
+              "table_name": "lineitem"
+            },
+            {
+              "aggregation_functions": null,
+              "children": [],
+              "filter_expressions": null,
+              "group_by_keys": null,
+              "join_conditions": null,
+              "join_type": null,
+              "limit_count": null,
+              "offset_count": null,
+              "operator_id": "aggregate_8",
+              "operator_type": "Aggregate",
+              "physical_operator": {
+                "operator_id": "aggregate_7",
+                "operator_type": "AGGREGATE",
+                "platform_metadata": {
+                  "level": 0,
+                  "text": "USE TEMP B-TREE FOR GROUP BY"
+                },
+                "properties": {}
+              },
+              "projection_expressions": null,
+              "properties": {
+                "temp_btree": true
+              },
+              "sort_keys": null,
+              "table_name": null
+            },
+            {
+              "aggregation_functions": null,
+              "children": [],
+              "filter_expressions": null,
+              "group_by_keys": null,
+              "join_conditions": null,
+              "join_type": null,
+              "limit_count": null,
+              "offset_count": null,
+              "operator_id": "sort_10",
+              "operator_type": "Sort",
+              "physical_operator": {
+                "operator_id": "sort_9",
+                "operator_type": "SORT",
+                "platform_metadata": {
+                  "level": 0,
+                  "text": "USE TEMP B-TREE FOR ORDER BY"
+                },
+                "properties": {}
+              },
+              "projection_expressions": null,
+              "properties": {
+                "temp_btree": true
+              },
+              "sort_keys": null,
+              "table_name": null
+            }
+          ],
+          "filter_expressions": null,
+          "group_by_keys": null,
+          "join_conditions": null,
+          "join_type": null,
+          "limit_count": null,
+          "offset_count": null,
+          "operator_id": "other_12",
+          "operator_type": "Other",
+          "physical_operator": {
+            "operator_id": "other_11",
+            "operator_type": "OTHER",
+            "platform_metadata": {
+              "level": -1,
+              "text": "QUERY PLAN"
+            },
+            "properties": {}
+          },
+          "projection_expressions": null,
+          "properties": {},
+          "sort_keys": null,
+          "table_name": null
+        },
+        "plan_fingerprint": "a76d711a5adbaf1f3de2b283c6b706b7dbdedfb4c345e2456a00838122547e7e",
+        "platform": "sqlite",
+        "query_id": "3",
+        "raw_explain_output": "QUERY PLAN\n13|0|SCAN customer\n17|0|SEARCH orders USING INDEX idx_bb_tpch_orders_customer_date (o_custkey=? AND o_orderdate<?)\n29|0|SEARCH lineitem USING INDEX idx_bb_tpch_lineitem_order_supp_dates (l_orderkey=?)\n40|0|USE TEMP B-TREE FOR GROUP BY\n100|0|USE TEMP B-TREE FOR ORDER BY"
+      },
+      "plan_format": "dag",
+      "run_type": "measurement"
+    },
+    "Q6#0:power": {
+      "capture_time_ms": 0.1,
+      "fingerprint": "bb8c3a7dfa75f99872ef54bfecc11f3aacaf34c94653d4797b30f2b7f467570d",
+      "fingerprint_version": 2,
+      "iteration": 3,
+      "plan": {
+        "estimated_cost": null,
+        "estimated_rows": null,
+        "fingerprint_version": 2,
+        "logical_root": {
+          "aggregation_functions": null,
+          "children": [],
+          "filter_expressions": null,
+          "group_by_keys": null,
+          "join_conditions": null,
+          "join_type": null,
+          "limit_count": null,
+          "offset_count": null,
+          "operator_id": "scan_2",
+          "operator_type": "Scan",
+          "physical_operator": {
+            "operator_id": "scan_1",
+            "operator_type": "SCAN",
+            "platform_metadata": {
+              "level": 0,
+              "text": "SCAN lineitem"
+            },
+            "properties": {
+              "table_name": "lineitem"
+            }
+          },
+          "projection_expressions": null,
+          "properties": {},
+          "sort_keys": null,
+          "table_name": "lineitem"
+        },
+        "plan_fingerprint": "bb8c3a7dfa75f99872ef54bfecc11f3aacaf34c94653d4797b30f2b7f467570d",
+        "platform": "sqlite",
+        "query_id": "6",
+        "raw_explain_output": "QUERY PLAN\n3|0|SCAN lineitem"
+      },
+      "plan_format": "dag",
+      "run_type": "measurement"
+    }
+  },
+  "run_id": "8f781271",
+  "truncated": false,
+  "version": "2.3"
+}
