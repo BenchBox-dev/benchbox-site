@@ -48,6 +48,7 @@ Location is the one maintained copy: published posts link their `blog/` canonica
 | 17  | How the Results Explorer qualifies comparisons | [Draft](../drafts/17-results-explorer-qualifies-comparisons.md) | The Explorer separates display, comparison, and ranking, suppresses unsupported winner claims, and keeps missing evidence visible |
 | 18  | BenchBox v0.4.1: more lakehouse pairings, stricter results | [Draft](../drafts/18-v0-4-1-release-overview.md) | New lakehouse table pairings, stricter result submissions, cost reported as unavailable instead of guessed, and raised dependency floors |
 | 19  | A 'spezial' new look for the benchbox project | [Article](../../../blog/2026-10-07-site-redesign.md) | Block-character logo and burgundy and cream design, with clear, consistent navigation |
+| 20  | Why BenchBox ships its own SQLGlot fork | [Article](../../../blog/2026-11-07-why-benchbox-ships-its-own-sqlglot-fork.md) | Translation bugs changed benchmark answers, so v0.5.0 bundles a permanent SQLGlot fork proven on ten real engines; the published results that ran the old SQL are flagged and rerun |
 | 21  | BenchBox v0.5.0: one SQL translator, execution engines, and tuning that fails loudly | [Article](../../../blog/2026-11-06-v0-5-0-release-overview.md) | Bundled SQLGlot in every install, runs record deployment and execution engine, unapplicable tuning fails, TPC-H refresh functions and QphH@Size, and a long rerun list |
 
 ---
@@ -64,4 +65,4 @@ Location is the one maintained copy: published posts link their `blog/` canonica
 ---
 
 *Series created: 2026-02-13*
-*Last updated: 2026-11-06 (post 21 added)*
+*Last updated: 2026-11-07 (post 20 published)*
