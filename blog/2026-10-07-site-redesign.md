@@ -10,11 +10,11 @@ tags: benchbox, design, website, results-explorer
 meta_description: "benchbox.dev has a new block-character logo and a burgundy and cream design inspired by the Adidas Handball Spezial, with clear, consistent navigation."
 ---
 
-# A 'spezial' new look for the benchbox project
+# A 'spezial' new look for the BenchBox project
 
-> `benchbox` has a new logo and updated burgundy color scheme inspired by a certain shoe
+> BenchBox has a new logo and updated burgundy color scheme inspired by a certain shoe
 
-**TL;DR**: We updated the `benchbox` site with a new logo and a new look inspired by the Adidas Handball Spezial. The new design drops the generic templated look and provides clear and consistent navigation.
+**TL;DR**: We updated the BenchBox site with a new logo and a new look inspired by the Adidas Handball Spezial. The new design drops the generic templated look and provides clear and consistent navigation.
 
 ![Light and dark versions of the new benchbox.dev home page, side by side.](./images/redesign_light_vs_dark.png)
 
@@ -34,7 +34,7 @@ The new burgundy and cream color scheme was mostly inspired by the Adidas Handba
 
 The palette has seven colors: three burgundies, three creams and tans, and one light blue. The blue is our only highlight color. It marks where you are: the current page, the current section, and the current tab in the header.
 
-Headings use Martian Mono, a monospace font that echoes the terminal where `benchbox` runs. Body text uses Instrument Sans, so long pages stay easy to read.
+Headings use Martian Mono, a monospace font that echoes the terminal where `benchbox run` happens. Body text uses Instrument Sans, so long pages stay easy to read.
 
 ## Light, dark and auto
 
