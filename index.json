@@ -9,17 +9,12 @@
       "title": "Remove the legacy static landing and Sphinx-era parity files from benchbox-site"
     },
     "astro-site-60-results-embeds": {
-      "claim": {
-        "expires_at": "2026-11-08T14:53:37Z",
-        "generation": "461e5acbd4544b48a7060f39b7083ff1",
-        "renewals": 0,
-        "worker": "mcp:leader:joe@joe-mac-mini.local:727aec1f5cab611da92d7aba"
-      },
+      "claim": null,
       "needs": [
         "site-browser-acceptance-ci-20261017"
       ],
       "priority": "low",
-      "status": "active",
+      "status": "done",
       "title": "Add result embeds for docs and blog that cite their snapshot and obey Explorer withdrawal rules"
     },
     "astro-site-61-results-discovery-pages": {
