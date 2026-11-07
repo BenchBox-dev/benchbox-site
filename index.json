@@ -48,10 +48,15 @@
       "title": "Tighten or document what the deploy's canonical snapshot digest ignores"
     },
     "deploy-artifact-egress-503-20261101": {
-      "claim": null,
+      "claim": {
+        "expires_at": "2026-11-08T20:01:05Z",
+        "generation": "405e54fec1ec422dbd01863cd5f280db",
+        "renewals": 0,
+        "worker": "mcp:leader:joe@joe-mac-mini.local:727aec1f5cab611da92d7aba"
+      },
       "needs": [],
       "priority": "medium",
-      "status": "open",
+      "status": "active",
       "title": "Find the account limit behind 'HTTP 503 Egress is over the account limit' and keep deploy artifact downloads under it"
     },
     "deploy-bundle-selection-by-commit-order-20261031": {
