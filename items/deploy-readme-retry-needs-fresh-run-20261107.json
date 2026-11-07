@@ -1,0 +1,23 @@
+{
+  "acceptance": [
+    "deploy/README.md says how to recognise a Pages-side failure (artifact unchanged, failure inside the Deploy to GitHub Pages step) and to retry with a fresh mode=deploy dispatch rather than a job rerun, naming the duplicate github-pages artifact error",
+    "It states what the fresh run deploys (the current main commit with the resolved bundle) so the operator knows when a redeploy is the right mode instead",
+    "The page passes markdownlint and cspell"
+  ],
+  "context": "Noticed 2026-11-06 while recovering the deploy of PR #119. Failure issue #58 and core issue BenchBox-dev/benchbox#3973 carry the recovery note.",
+  "description": "On 2026-11-06 two deploy runs for site commit 92c910f3d6 failed inside GitHub Pages (run 42278553437 stalled at syncing_files until the 10-minute deploy-pages timeout; run 42279882633 was cancelled by Pages after 7 seconds). Rerunning the failed job of 42279882633 with `gh run rerun --failed` cannot succeed: actions/deploy-pages then fails with 'Multiple artifacts named \"github-pages\" were unexpectedly found for this workflow run'. A fresh `gh workflow run deploy.yml --ref main -f mode=deploy` (run 42281848276) deployed the same commit and bundle. Neither deploy/README.md nor AGENTS.md says how to retry a deploy after a Pages-side failure.",
+  "links": [
+    "deploy/README.md",
+    ".github/workflows/deploy.yml"
+  ],
+  "sessions": [
+    {
+      "actor": "mcp:leader:joe@joe-mac-mini.local:727aec1f5cab611da92d7aba",
+      "at": "2026-11-07T22:08:06Z",
+      "client": "leader",
+      "op": "create",
+      "op_id": "db61b98ad5ba40b8ad029fe0c55babad",
+      "session_id": "f3965d839c074422a61a31c2537cd6d8"
+    }
+  ]
+}

@@ -63,6 +63,13 @@
       "status": "done",
       "title": "Choose the core bundle to deploy by core commit order, not by site-inputs run creation time"
     },
+    "deploy-readme-retry-needs-fresh-run-20261107": {
+      "claim": null,
+      "needs": [],
+      "priority": "low",
+      "status": "open",
+      "title": "Document that a failed deploy is retried with a fresh run, not a job rerun"
+    },
     "deploy-redeploy-uses-deployed-bundle-20261031": {
       "claim": null,
       "needs": [
