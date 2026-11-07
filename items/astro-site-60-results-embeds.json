@@ -5,7 +5,7 @@
     "Metric values match the Explorer for the same snapshot (shared-code test)",
     "Pages without embeds still fetch zero Explorer bytes; axe clean"
   ],
-  "context": "2026-10-17, after the site split: still a future feature that needs its own owner approval before starting. Needs moved from astro-site-54 to site-browser-acceptance-ci-20261017, because the zero-Explorer-bytes and axe checks this item relies on only run once those browser checks are in CI. Corrections to the description: components import from the explorer/ workspace in BenchBox-dev/benchbox-site (there is no separate Explorer package); embeds read the snapshot the site-inputs bundle delivers (results/data/results.duckdb), identified by the bundle's snapshot_sha256.\n\nMoved from the BenchBox core tracker on 2026-10-30, when this repository gained its own tracker.\n\n2026-11-02: Owner deferred starting this feature; approval to start is still pending. It remains dependent on site-browser-acceptance-ci-20261017.",
+  "context": "2026-10-17, after the site split: still a future feature that needs its own owner approval before starting. Needs moved from astro-site-54 to site-browser-acceptance-ci-20261017, because the zero-Explorer-bytes and axe checks this item relies on only run once those browser checks are in CI. Corrections to the description: components import from the explorer/ workspace in BenchBox-dev/benchbox-site (there is no separate Explorer package); embeds read the snapshot the site-inputs bundle delivers (results/data/results.duckdb), identified by the bundle's snapshot_sha256.\n\nMoved from the BenchBox core tracker on 2026-10-30, when this repository gained its own tracker.\n\n2026-11-02: Owner deferred starting this feature; approval to start is still pending. It remains dependent on site-browser-acceptance-ci-20261017.\n\n2026-11-06: Owner approved starting this item. Done in PR #119 (merge 92c910f3d6). A ```benchbox-result fence in docs or blog Markdown renders a cited result (frozen values, snapshot sha256 and date, live drift note without replacing values; `npm run results:cite -w website -- <id>` generates the block) or current results (labelled Live, up to ten ids). Metric names, formats, primary metric, ranking and visibility come from explorer/src/lib/resultEmbed.ts; withdrawn means absent from the snapshot or non-public and renders as withdrawn with values removed. Acceptance: component tests for both variants including withdrawn fixtures; results-embed-parity.test.ts matches the Explorer's primary metric for all 480 bundle results; verify:results-embed in ci checks no Explorer/DuckDB bytes or worker before the embed is visible and axe clean in both themes; verify:explorer still passes. Author docs: docs/design/results-embeds.md. Deployed by run 42281848276 after two GitHub Pages faults on an unchanged artifact.",
   "description": "A post-cutover feature with its own owner approval before starting. Add two distinct Preact-island components:\n- **Cited result.** Frozen to a named corpus snapshot or bundle id. Shows that id and date, and never changes after publication. Use this in blog analysis.\n- **Current results.** Explicitly labelled live, reading the current published snapshot.\n\nBoth use the Explorer's canonical metric definitions, imported from the Explorer package, never reimplemented. Both honour the same visibility, admission and withdrawal rules as the Explorer: a withdrawn result renders as withdrawn and is never silently dropped or kept. Both load DuckDB only when scrolled into view, and pages without embeds ship zero Explorer bytes.",
   "sessions": [
     {
@@ -23,6 +23,14 @@
       "op": "update",
       "op_id": "75030031a515461c81dfaefb4f2cd735",
       "session_id": "2708a39948944f4299911f72f62ba6c5"
+    },
+    {
+      "actor": "mcp:leader:joe@joe-mac-mini.local:727aec1f5cab611da92d7aba",
+      "at": "2026-11-07T14:53:34Z",
+      "client": "leader",
+      "op": "update",
+      "op_id": "d5323860b7ee4f9ea230ab1545fdb542",
+      "session_id": "f3965d839c074422a61a31c2537cd6d8"
     }
   ]
 }
