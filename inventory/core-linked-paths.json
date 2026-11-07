@@ -25,7 +25,7 @@
       "path": "benchbox/sql_compat",
       "kind": "directory",
       "sources": [
-        "docs/development/adr/adr-sql-compat-phase-aware-pipeline.md:11",
+        "docs/development/adr/adr-sql-compat-phase-aware-pipeline.md:16",
         "docs/development/adr/adr-sqlglot-use-and-non-use.md:216"
       ]
     },
