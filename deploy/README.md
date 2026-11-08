@@ -20,6 +20,29 @@ Run `npm run test:deploy` to check mismatch evidence, receipt serialization, and
 rollback behavior. `npm run deploy -- probe` writes `deploy-work/probe.json`;
 `npm run deploy -- receipt` includes that evidence in the deployment receipt.
 
+## Plans companion privacy
+
+The privacy gate scans the built artifact. Besides secrets and credentials, it
+parses every `*.plans.json` in the artifact, which is where the core bundle's
+per-result plans companions are published under `results/data/bundles/`, and
+rejects any string or object key that holds a local filesystem path: a
+`~`, `/Users`, `/home`, `/root`, `/private`, `/var/folders`, `/var/run`,
+`/Volumes`, `/tmp`, `/mnt` or `/opt` path, any Windows drive letter path, or a
+UNC path with backslashes or forward slashes. `<redacted>` and the bare `/data`
+and `/output` placeholders pass. This mirrors the detector in core's
+`benchbox/validation/bundle.py` (`PRIVATE_LOCAL_PATH_RE` and the neutral
+placeholders) and lives in `deploy/gates/local-paths.ts`; keep the two in step.
+The check does not flag every absolute path.
+
+`SITE_PRIVATE_PATH_ROOTS` adds run-specific data or output directories to
+reject, separated like `PATH` entries. A finding names the file and the field,
+never the path, and a companion that is not valid JSON fails closed.
+
+The gate covers only companions inside the artifact it is given. A companion
+hosted elsewhere and fetched through a result's download URL, and anything
+ingested after the build, is outside it. Other JSON files and the DuckDB
+snapshot are not checked for local paths.
+
 ## Gates on a rollback
 
 A rollback re-runs only the gates that read the restored bytes themselves:

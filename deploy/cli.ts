@@ -194,6 +194,7 @@ async function gates(): Promise<void> {
   const canonical = existsSync(snapshot) ? await canonicalDigest(snapshot) : null;
   const report = runGates({
     siteDir: SITE_DIR,
+    privatePathRoots: (process.env.SITE_PRIVATE_PATH_ROOTS ?? "").split(path.delimiter).filter(Boolean),
     mode: resolution.mode,
     target: process.env.SITE_DEPLOY_TARGET ?? "",
     corpusSha: resolution.corpus_sha,

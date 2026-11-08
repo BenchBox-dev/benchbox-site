@@ -140,7 +140,10 @@ versioned core bundle; it reads nothing else from core.
   benchbox.dev. Only the owner decides to set `production`.
 - Nothing deploys unless every gate passes: privacy, Explorer
   compatibility, snapshot digest, links (within
-  `inventory/known-broken-links.json`) and origin.
+  `inventory/known-broken-links.json`) and origin. The privacy gate also
+  rejects a `*.plans.json` plans companion in the artifact that carries a
+  local filesystem path; `deploy/README.md` lists the rule and what it does
+  not cover.
 - The snapshot digest gate fails when the corpus is unchanged but the
   snapshot contents differ from the deployed ones, for example after a core
   pipeline change. After reviewing the change, the owner sets the repository
