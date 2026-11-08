@@ -7,6 +7,7 @@ import { skipped, type GateResult } from "./types.ts";
 
 export type GateInputs = {
   siteDir: string;
+  privatePathRoots?: string[];
   mode: "deploy" | "redeploy" | "rollback";
   target: string;
   corpusSha: string;
@@ -35,7 +36,7 @@ export function runGates(inputs: GateInputs): GateReport {
   const deployedVersions = inputs.deployed ? { ui: inputs.deployed.ui, snapshot: inputs.deployed.snapshot } : null;
   const rollback = inputs.mode === "rollback";
   const results: Record<string, GateResult> = {
-    privacy: run(() => privacyGate(inputs.siteDir)),
+    privacy: run(() => privacyGate(inputs.siteDir, inputs.privatePathRoots)),
     explorer_compat: run(() =>
       explorerCompatGate({
         siteDir: inputs.siteDir,
