@@ -1,5 +1,10 @@
 import { afterEach, describe, expect, it } from "vitest";
 import { displayTag, tagBasename } from "../src/converter/tag-pages.ts";
+import { mkdtempSync, rmSync } from "node:fs";
+import os from "node:os";
+import path from "node:path";
+import { assembleDocsSource } from "../src/lib/site-inputs.ts";
+import { buildSite } from "../src/converter/build.ts";
 import { build, bodyOf, cleanup, pageOf } from "./support.ts";
 
 afterEach(cleanup);
@@ -48,9 +53,14 @@ describe("tag page generation", () => {
         "cat-audience",
         "cat-benchmark",
         "cat-content-type",
+        "cat-data-format",
+        "cat-deployment",
         "cat-feature",
+        "cat-maturity",
         "cat-platform",
         "cat-platform-type",
+        "cat-results",
+        "cat-workload",
         "cli",
         "python-api",
         "reference",
@@ -113,6 +123,11 @@ describe("links to generated tag pages", () => {
       "/docs/_tags/cat-platform-type.html",
       "/docs/_tags/cat-content-type.html",
       "/docs/_tags/cat-feature.html",
+      "/docs/_tags/cat-data-format.html",
+      "/docs/_tags/cat-deployment.html",
+      "/docs/_tags/cat-workload.html",
+      "/docs/_tags/cat-results.html",
+      "/docs/_tags/cat-maturity.html",
     ]);
     expect(sidebar.groups[0].items[0].items?.map((item) => item.link)).toEqual(["/docs/_tags/beginner.html", "/docs/_tags/advanced.html"]);
   });
@@ -127,6 +142,48 @@ describe("links to generated tag pages", () => {
     expect([...result.files.keys()].filter((name) => name.startsWith("content/blog/") || name.includes("blogonly"))).toEqual(["content/blog/2026-01-01-post.md"]);
     const tags = JSON.parse(result.files.get("manifest/tags.json") ?? "{}") as Record<string, { path: string }[]>;
     expect(tags.blogonly.map((entry) => entry.path)).toEqual(["blog/2026-01-01-post.md"]);
+  });
+});
+
+const scratchRoots: string[] = [];
+
+function writeScratch(): string {
+  const root = mkdtempSync(path.join(os.tmpdir(), "benchbox-tags-"));
+  scratchRoots.push(root);
+  return root;
+}
+
+afterEach(() => {
+  for (const root of scratchRoots.splice(0)) rmSync(root, { recursive: true, force: true });
+});
+
+describe("browse paths for every tag", () => {
+  const tagPageLinks = (result: ReturnType<typeof build>) => [...result.files.keys()].filter((key) => /^content\/docs\/_tags\/(?!cat-|tagsindex)/.test(key)).map((key) => key.replace(/^content\/docs\/_tags\/(.*)\.md$/, "/docs/_tags/$1.html"));
+
+  it("lists tags outside every category under a catch-all category in the index and sidebar", () => {
+    const result = build({ ...files, "extra.md": "---\ntags: [zzz-uncategorized, Another One]\n---\n\n# Extra\n" });
+    expect(result.errors).toEqual([]);
+    expect(bodyOf(result, "docs/_tags/cat-other.md")).toContain("- [another-one (1)](/docs/_tags/another-one.html)\n- [zzz-uncategorized (1)](/docs/_tags/zzz-uncategorized.html)");
+    const index = bodyOf(result, "docs/_tags/tagsindex.md");
+    expect(index).toContain("- [Other Tags](/docs/_tags/cat-other.html)\n  - [another-one (1)](/docs/_tags/another-one.html)\n  - [zzz-uncategorized (1)](/docs/_tags/zzz-uncategorized.html)");
+    const sidebar = JSON.parse(result.files.get("manifest/sidebar.json") ?? "{}") as { groups: { items: { link: string; items?: { link: string }[] }[] }[] };
+    const other = sidebar.groups[0].items.at(-1);
+    expect(other?.link).toBe("/docs/_tags/cat-other.html");
+    expect(other?.items?.map((item) => item.link)).toEqual(["/docs/_tags/another-one.html", "/docs/_tags/zzz-uncategorized.html"]);
+  });
+
+  it("omits the catch-all category when every tag is categorized", () => {
+    expect([...build(files).files.keys()]).not.toContain("content/docs/_tags/cat-other.md");
+  });
+
+  it("links every tag page from the tags index and reaches it from the sidebar in the real docs", () => {
+    const result = buildSite({ docsRoot: assembleDocsSource(writeScratch()) });
+    const pages = tagPageLinks(result);
+    expect(pages.length).toBeGreaterThan(100);
+    const index = bodyOf(result, "docs/_tags/tagsindex.md");
+    expect(pages.filter((page) => !index.includes(`(${page})`))).toEqual([]);
+    const sidebar = result.files.get("manifest/sidebar.json") ?? "";
+    expect(pages.filter((page) => !sidebar.includes(`"${page}"`))).toEqual([]);
   });
 });
 

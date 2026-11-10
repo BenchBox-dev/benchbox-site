@@ -1,5 +1,5 @@
 ---
-tags: [intermediate, guide, questdb, sql-platform, self-hosted, timeseries]
+tags: [intermediate, guide, questdb, sql-platform, self-hosted, time-series]
 ---
 
 <!-- Copyright 2026 Joe Harris / BenchBox Project. Licensed under the MIT License. -->
