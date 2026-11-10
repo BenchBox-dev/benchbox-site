@@ -143,10 +143,15 @@
       "title": "Public-site visual regression reported every /results/ page changed for a PR that cannot affect rendering"
     },
     "results-header-link-on-summary-pages-20261107": {
-      "claim": null,
+      "claim": {
+        "expires_at": "2026-11-11T00:53:26Z",
+        "generation": "d8c18d9e2dc448a6b1d004cce9b58abc",
+        "renewals": 0,
+        "worker": "mcp:omp-coding-agent:joe@joe-mac-mini.local:5f110a19e01eac8c504c96a2"
+      },
       "needs": [],
       "priority": "low",
-      "status": "open",
+      "status": "active",
       "title": "Highlight the Results header link on /result-summaries/ pages"
     },
     "rollback-gates-on-pre-allowlist-removal-artifacts-20261029": {
