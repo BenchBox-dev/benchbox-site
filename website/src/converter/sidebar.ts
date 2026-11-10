@@ -3,8 +3,7 @@ import type { DocsIndex } from "./docs-index.ts";
 import { ConverterError } from "./errors.ts";
 import type { DocInfo } from "./model.ts";
 import { NAV_FILE, type Nav, type NavGroup, type NavItem } from "./nav.ts";
-import { TAG_CATEGORIES } from "./tag-categories.ts";
-import { TAGS_DIRECTORY } from "./tag-pages.ts";
+import { browseCategories, TAGS_DIRECTORY } from "./tag-pages.ts";
 
 export type SidebarItem = { label: string; link: string; items?: SidebarItem[] };
 
@@ -37,7 +36,7 @@ function navItem(walk: Walk, entry: NavItem): SidebarItem {
 }
 
 function tagCategoryItems(walk: Walk, group: NavGroup, tagCounts: ReadonlyMap<string, number>): SidebarItem[] {
-  return TAG_CATEGORIES.map((category) => {
+  return browseCategories(tagCounts.keys()).map((category) => {
     const info = walk.index.get(`${TAGS_DIRECTORY}/cat-${category.slug}.md`);
     if (!info) throw new ConverterError(NAV_FILE, group.line, `generated tag category page cat-${category.slug} is missing`);
     claim(walk, info.path);
