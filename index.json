@@ -129,15 +129,10 @@
       "title": "Point the canonical link of every /docs/dev/ page at its /docs/ counterpart"
     },
     "docs-uncategorised-tags-20261107": {
-      "claim": {
-        "expires_at": "2026-11-11T01:11:45Z",
-        "generation": "6b0cd5b96027472abdbb5e1745d64257",
-        "renewals": 0,
-        "worker": "mcp:omp-coding-agent:joe@joe-mac-mini.local:5f110a19e01eac8c504c96a2"
-      },
+      "claim": null,
       "needs": [],
       "priority": "low",
-      "status": "active",
+      "status": "done",
       "title": "Place the 65 uncategorised docs and blog tags so tag browsing reaches them"
     },
     "public-site-visual-regression-false-mismatch-20261014": {
