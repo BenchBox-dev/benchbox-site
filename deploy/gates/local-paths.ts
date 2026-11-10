@@ -1,7 +1,53 @@
-import { existsSync, realpathSync } from "node:fs";
+import { existsSync, readFileSync, realpathSync } from "node:fs";
 import path from "node:path";
 
+export type PathPrivacyCase = {
+  id: string;
+  text: string;
+  roots?: string[];
+  home?: boolean;
+  leak: boolean;
+};
+
+export type PathPrivacyContract = {
+  schema_version: number;
+  known_roots: string[];
+  drive_letter: {
+    separators: string[];
+    double_slash_excluded_for_forward: boolean;
+  };
+  unc: {
+    prefixes: string[];
+  };
+  placeholder_allowlist: string[];
+  redacted_placeholder: string;
+  home_root: {
+    scanned_as_root: boolean;
+    synthetic_home: string;
+  };
+  pattern: {
+    source: string;
+    flags: number;
+  };
+  cases: PathPrivacyCase[];
+};
+
+export const KNOWN_ROOTS = [
+  "/Users",
+  "/Volumes",
+  "/home",
+  "/mnt",
+  "/opt",
+  "/private",
+  "/root",
+  "/tmp",
+  "/var/folders",
+  "/var/run",
+  "~",
+];
+
 export const NEUTRAL_PLACEHOLDERS = new Set(["/data", "/output"]);
+export const REDACTED_PLACEHOLDER = "<redacted>";
 
 const PATH_TAIL = String.raw`[^\s'",;)]*`;
 const PATH_BOUNDARY = String.raw`(?=[/\\\s'",;)\]}]|$)`;
@@ -14,6 +60,61 @@ export const PRIVATE_LOCAL_PATH = new RegExp(
   "gi",
 );
 
+export function loadPathPrivacyContract(inputsDir?: string): PathPrivacyContract {
+  const dir = inputsDir ?? process.env.SITE_INPUTS ?? path.join(import.meta.dirname, "..", "..", ".site-inputs");
+  const contractPath = path.join(dir, "doc-contracts.json");
+  if (!existsSync(contractPath)) {
+    throw new Error(`Path privacy contract is missing at ${contractPath}`);
+  }
+  const parsed = JSON.parse(readFileSync(contractPath, "utf8")) as { path_privacy?: PathPrivacyContract };
+  if (!parsed.path_privacy) {
+    throw new Error(`doc-contracts.json at ${contractPath} does not define path_privacy`);
+  }
+  return parsed.path_privacy;
+}
+
+export function tryLoadPathPrivacyContract(inputsDir?: string): PathPrivacyContract | null {
+  try {
+    return loadPathPrivacyContract(inputsDir);
+  } catch {
+    return null;
+  }
+}
+
+export function pathPrivacyDrift(contract: PathPrivacyContract): string[] {
+  const drift: string[] = [];
+  const expectedRoots = [...contract.known_roots].sort();
+  const actualRoots = [...KNOWN_ROOTS].sort();
+  if (JSON.stringify(actualRoots) !== JSON.stringify(expectedRoots)) {
+    drift.push(`known_roots drift: contract has [${expectedRoots.join(", ")}], live gate has [${actualRoots.join(", ")}]`);
+  }
+  const expectedPlaceholders = [...contract.placeholder_allowlist].sort();
+  const actualPlaceholders = [...NEUTRAL_PLACEHOLDERS].sort();
+  if (JSON.stringify(actualPlaceholders) !== JSON.stringify(expectedPlaceholders)) {
+    drift.push(`placeholder_allowlist drift: contract has [${expectedPlaceholders.join(", ")}], live gate has [${actualPlaceholders.join(", ")}]`);
+  }
+  if (contract.redacted_placeholder !== REDACTED_PLACEHOLDER) {
+    drift.push(`redacted_placeholder drift: contract has '${contract.redacted_placeholder}', live gate has '${REDACTED_PLACEHOLDER}'`);
+  }
+  for (const c of contract.cases ?? []) {
+    const roots = [...(c.roots ?? [])];
+    if (c.home && contract.home_root?.synthetic_home) roots.push(contract.home_root.synthetic_home);
+    const matcher = localPathMatcher(roots);
+    const verdict = matcher(c.text);
+    if (verdict !== c.leak) {
+      drift.push(`case drift on '${c.id}': expected leak=${c.leak}, got ${verdict} for '${c.text}'`);
+    }
+  }
+  return drift;
+}
+
+export function assertNoPathPrivacyDrift(contract?: PathPrivacyContract): void {
+  const c = contract ?? loadPathPrivacyContract();
+  const drift = pathPrivacyDrift(c);
+  if (drift.length > 0) {
+    throw new Error(`Path privacy gate drifted from doc-contracts.json:\n  ${drift.join("\n  ")}`);
+  }
+}
 export function isNeutralPlaceholder(text: string): boolean {
   return NEUTRAL_PLACEHOLDERS.has(text.replace(/[/\\]+$/, ""));
 }

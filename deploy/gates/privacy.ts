@@ -1,7 +1,7 @@
 import { readFileSync } from "node:fs";
 import path from "node:path";
 import { filesUnder } from "./files.ts";
-import { findPathLeaks } from "./local-paths.ts";
+import { findPathLeaks, pathPrivacyDrift, tryLoadPathPrivacyContract, type PathPrivacyContract } from "./local-paths.ts";
 import { fail, pass, type GateResult } from "./types.ts";
 
 const PATTERNS: { description: string; pattern: RegExp }[] = [
@@ -40,8 +40,13 @@ export function planCompanionFindings(text: string, roots: string[] = []): strin
   return fields.length === 0 ? [] : [`Detected local filesystem path in plans companion field(s): ${fields.join(", ")}`];
 }
 
-export function privacyGate(siteDir: string, roots: string[] = []): GateResult {
+export function privacyGate(siteDir: string, roots: string[] = [], contract?: PathPrivacyContract): GateResult {
   const findings: string[] = [];
+  const c = contract ?? tryLoadPathPrivacyContract();
+  if (c) {
+    const drift = pathPrivacyDrift(c);
+    for (const d of drift) findings.push(`Path privacy gate drifted from doc-contracts.json: ${d}`);
+  }
   for (const file of filesUnder(siteDir).filter((name) => SCANNED.test(name))) {
     const text = readFileSync(path.join(siteDir, file), "utf8");
     const found = privacyFindings(path.basename(file), text);

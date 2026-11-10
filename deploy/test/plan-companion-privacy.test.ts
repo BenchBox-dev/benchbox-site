@@ -2,74 +2,102 @@ import { test } from "node:test";
 import assert from "node:assert/strict";
 import { readFileSync, readdirSync } from "node:fs";
 import path from "node:path";
-import { findPathLeaks, localPathMatcher } from "../gates/local-paths.ts";
+import {
+  KNOWN_ROOTS,
+  NEUTRAL_PLACEHOLDERS,
+  PRIVATE_LOCAL_PATH,
+  REDACTED_PLACEHOLDER,
+  assertNoPathPrivacyDrift,
+  findPathLeaks,
+  loadPathPrivacyContract,
+  localPathMatcher,
+  pathPrivacyDrift,
+} from "../gates/local-paths.ts";
 import { privacyGate } from "../gates/privacy.ts";
 import { runGates } from "../gates/index.ts";
 import { site } from "./helpers.ts";
 
 const FIXTURES = path.join(import.meta.dirname, "..", "..", "explorer", "src", "lib", "__tests__", "fixtures", "plans");
 const BUNDLE = "results/data/bundles/abcdef1234567890.plans.json";
-
-const LEAKING = [
-  "/Users/alice/data/lineitem.parquet",
-  "/home/alice/data/lineitem.parquet",
-  "/root/data/lineitem.parquet",
-  "/tmp/bench/lineitem.parquet",
-  "/var/folders/ab/cd/T/x.parquet",
-  "/private/var/folders/ab/cd/T/x.parquet",
-  "/private/tmp/bench/x.parquet",
-  "/mnt/disk1/tpch/lineitem.parquet",
-  "/opt/bench/lineitem.parquet",
-  "/Volumes/ssd/lineitem.parquet",
-  "~/bench/lineitem.parquet",
-  "C:\\Users\\alice\\lineitem.parquet",
-  "D:\\data\\lineitem.parquet",
-  "z:\\scratch\\x",
-  "E:/bench/lineitem.parquet",
-  "\\\\fileserver\\share\\tpch\\lineitem.parquet",
-  "//fileserver/share/tpch/lineitem.parquet",
-  "Parquet SCAN [/tmp/bench/lineitem.parquet]",
-  "Location: InMemoryFileIndex(1 paths)[file:/mnt/x/lineitem.parquet]",
-  "Location: file:///opt/bench/x",
-  "scan D:\\\\data\\\\orders",
-];
-
-const NEUTRAL = [
-  "<redacted>",
-  "<redacted>/lineitem.parquet",
-  "file:<redacted>",
-  "/data",
-  "/data/",
-  "/output",
-  "s3://bucket/tpch/lineitem.parquet",
-  "https://example.com/tmp/opt/home",
-  "gs://bucket/mnt/x",
-  "abfss://c@acct.dfs.core.windows.net/opt/x",
-  "tpch/sf1/lineitem.parquet",
-  "lineitem.1.parquet",
-  "catalog.schema.lineitem",
-  "main.tpch_sf1.orders",
-  'FILTER col("tag") == "tmp", opt, mnt, home',
-  "Parquet SCAN [<redacted>/lineitem.parquet]",
-  "FileScan parquet [l_orderkey#1L] Location: InMemoryFileIndex(1 paths)[file:<redacted>/lineitem.parquet]",
-  "a:b c:d x=1:2",
-  "ratio 3:4 http://host:80/x",
-];
-
 function companion(plan: Record<string, unknown>): string {
   return JSON.stringify({ capture_failures: 0, errors: null, queries: { "Q1#0:": { plan } } });
 }
 
-test("local path detector flags local roots, drive letters and UNC paths", () => {
-  const contains = localPathMatcher();
-  for (const text of LEAKING) assert.equal(contains(text), true, text);
+test("live gate matches exported path_privacy contract facts", () => {
+  const contract = loadPathPrivacyContract();
+  assert.equal(contract.schema_version, 1);
+  assert.deepEqual([...KNOWN_ROOTS].sort(), [...contract.known_roots].sort());
+  assert.deepEqual([...NEUTRAL_PLACEHOLDERS].sort(), [...contract.placeholder_allowlist].sort());
+  assert.equal(REDACTED_PLACEHOLDER, contract.redacted_placeholder);
 });
 
-test("local path detector accepts placeholders, URLs and relative tails", () => {
-  const contains = localPathMatcher();
-  for (const text of NEUTRAL) assert.equal(contains(text), false, text);
+test("local path detector matches all contract cases", () => {
+  const contract = loadPathPrivacyContract();
+  assert.ok(contract.cases.length > 0, "contract has cases");
+  for (const c of contract.cases) {
+    const roots = [...(c.roots ?? [])];
+    if (c.home && contract.home_root?.synthetic_home) roots.push(contract.home_root.synthetic_home);
+    const contains = localPathMatcher(roots);
+    assert.equal(contains(c.text), c.leak, `case ${c.id}: expected leak=${c.leak} for text: ${c.text}`);
+  }
 });
 
+test("local path detector flags leaking contract cases", () => {
+  const contract = loadPathPrivacyContract();
+  const contains = localPathMatcher();
+  const leaking = contract.cases.filter((c) => c.leak && !c.home && (!c.roots || c.roots.length === 0));
+  assert.ok(leaking.length > 0);
+  for (const c of leaking) assert.equal(contains(c.text), true, `case ${c.id}: ${c.text}`);
+});
+
+test("local path detector accepts neutral contract cases", () => {
+  const contract = loadPathPrivacyContract();
+  const contains = localPathMatcher();
+  const neutral = contract.cases.filter((c) => !c.leak && !c.home && (!c.roots || c.roots.length === 0));
+  assert.ok(neutral.length > 0);
+  for (const c of neutral) assert.equal(contains(c.text), false, `case ${c.id}: ${c.text}`);
+});
+
+test("path privacy drift detection fails on known_roots drift", () => {
+  const contract = loadPathPrivacyContract();
+  const tampered = { ...contract, known_roots: [...contract.known_roots, "/rogue_root"] };
+  const drift = pathPrivacyDrift(tampered);
+  assert.ok(drift.some((d) => d.includes("known_roots drift")));
+});
+
+test("path privacy drift detection fails on placeholder_allowlist drift", () => {
+  const contract = loadPathPrivacyContract();
+  const tampered = { ...contract, placeholder_allowlist: ["/data"] };
+  const drift = pathPrivacyDrift(tampered);
+  assert.ok(drift.some((d) => d.includes("placeholder_allowlist drift")));
+});
+
+test("path privacy drift detection fails on case verdict drift", () => {
+  const contract = loadPathPrivacyContract();
+  const tampered = {
+    ...contract,
+    cases: contract.cases.map((c) => (c.id === "known-root-users" ? { ...c, leak: false } : c)),
+  };
+  const drift = pathPrivacyDrift(tampered);
+  assert.ok(drift.some((d) => d.includes("case drift on 'known-root-users'")));
+});
+
+test("assertNoPathPrivacyDrift passes for the exported contract and throws on drift", () => {
+  const contract = loadPathPrivacyContract();
+  assert.doesNotThrow(() => assertNoPathPrivacyDrift(contract));
+  assert.throws(
+    () => assertNoPathPrivacyDrift({ ...contract, known_roots: [] }),
+    /Path privacy gate drifted from doc-contracts\.json/,
+  );
+});
+
+test("privacyGate fails when contract drift is detected", () => {
+  const contract = loadPathPrivacyContract();
+  const tampered = { ...contract, known_roots: ["/different"] };
+  const result = privacyGate(site({}), [], tampered);
+  assert.equal(result.status, "fail");
+  assert.ok(result.findings?.some((f) => f.includes("Path privacy gate drifted")));
+});
 test("configured roots are flagged, neutral placeholders stay allowed", () => {
   const text = "Parquet SCAN [/srv/runs/tpch_sf1/lineitem.parquet]";
   assert.equal(localPathMatcher()(text), false);
