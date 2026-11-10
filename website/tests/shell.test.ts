@@ -42,6 +42,35 @@ describe("shell header links", () => {
   });
 });
 
+describe("surfaceFor", () => {
+  it("maps summary pages to the results surface", () => {
+    for (const route of [
+      "/result-summaries",
+      "/result-summaries/",
+      "/result-summaries/platforms.html",
+      "/result-summaries/benchmarks.html",
+      "/result-summaries/platforms/duckdb.html",
+      "/result-summaries/benchmarks/tpch.html",
+    ]) {
+      expect(surfaceFor(route)).toBe("results");
+      expect(shellLinks(route).filter((link) => link.current).map((link) => link.label)).toEqual(["Results"]);
+    }
+  });
+
+  it("does not match near-miss paths", () => {
+    expect(surfaceFor("/result-summaries-old")).toBeUndefined();
+    expect(surfaceFor("/result-summaries-old/")).toBeUndefined();
+    expect(surfaceFor("/results-old")).toBeUndefined();
+  });
+
+  it("keeps existing surfaces", () => {
+    expect(surfaceFor("/results/")).toBe("results");
+    expect(surfaceFor("/docs/usage/getting-started.html")).toBe("docs");
+    expect(surfaceFor("/blog/")).toBe("blog");
+    expect(surfaceFor("/")).toBe("landing");
+  });
+});
+
 describe("edit links", () => {
   it("points authored pages at their source", () => {
     expect(editUrlFor("docs/usage/getting-started.md")).toBe("https://github.com/BenchBox-dev/benchbox-site/edit/main/docs/usage/getting-started.md");

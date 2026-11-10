@@ -180,6 +180,13 @@ for (const [size, width] of Object.entries(widths).filter(([size]) => size !== "
   await context.close();
 }
 
+for (const route of ["/result-summaries/", "/result-summaries/platforms.html", "/result-summaries/benchmarks.html", "/result-summaries/platforms/duckdb.html", "/result-summaries/benchmarks/tpch.html"]) {
+  const { page, context } = await open(widths.desktop, route);
+  const current = await page.evaluate(() => [...document.querySelectorAll("[data-site-header-nav] a[aria-current='page']")].map((a) => a.textContent.trim()));
+  if (current.join() !== "Results") fail(`header current on ${route} is ${current}`);
+  await context.close();
+}
+
 for (const [name, query, expectedFirst, size, section] of [
   ["docs term", "installation environment setup", "/docs/usage/installation.html", "desktop"],
   ["blog title", "BenchBox v0.3.0: JoinOrder fix, approximate analytics, and agent prompt composer", "/blog/2026-05-18-v0-3-0-release-overview.html", "desktop"],
