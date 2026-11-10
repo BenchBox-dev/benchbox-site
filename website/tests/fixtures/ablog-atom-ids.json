@@ -11,6 +11,14 @@
   ],
   "entries": [
     {
+      "id": "https://benchbox.dev/blog/blog/2026-11-10-tpcds-one-big-table.html",
+      "links": [
+        {
+          "href": "https://benchbox.dev/blog/2026-11-10-tpcds-one-big-table.html"
+        }
+      ]
+    },
+    {
       "id": "https://benchbox.dev/blog/blog/2026-11-07-why-benchbox-ships-its-own-sqlglot-fork.html",
       "links": [
         {
@@ -79,14 +87,6 @@
       "links": [
         {
           "href": "https://benchbox.dev/blog/2026-04-26-scale-factor-harmonization.html"
-        }
-      ]
-    },
-    {
-      "id": "https://benchbox.dev/blog/blog/2026-04-26-v0-2-1-release-summary.html",
-      "links": [
-        {
-          "href": "https://benchbox.dev/blog/2026-04-26-v0-2-1-release-summary.html"
         }
       ]
     }
