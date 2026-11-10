@@ -4,7 +4,7 @@
     "It states what the fresh run deploys (the current main commit with the resolved bundle) so the operator knows when a redeploy is the right mode instead",
     "The page passes markdownlint and cspell"
   ],
-  "context": "Noticed 2026-11-06 while recovering the deploy of PR #119. Failure issue #58 and core issue BenchBox-dev/benchbox#3973 carry the recovery note.",
+  "context": "Noticed 2026-11-06 while recovering the deploy of PR #119. Failure issue #58 and core issue BenchBox-dev/benchbox#3973 carry the recovery note.\n\n2026-11-07: Done in PR #129 (merge 145ac26c0e). deploy/README.md gains 'Retrying a Pages-side failure' after 'Redeploy': how to recognise the failure (artifact unchanged, failure inside Deploy to GitHub Pages, no probe or rollback), the duplicate github-pages artifact error that makes `gh run rerun --failed` fail, a fresh `gh workflow run deploy.yml --ref main -f mode=deploy` as the retry, what that run deploys, and when mode=redeploy is the right mode. Facts checked against runs 42278553437, 42279882633 and 42281848276.",
   "description": "On 2026-11-06 two deploy runs for site commit 92c910f3d6 failed inside GitHub Pages (run 42278553437 stalled at syncing_files until the 10-minute deploy-pages timeout; run 42279882633 was cancelled by Pages after 7 seconds). Rerunning the failed job of 42279882633 with `gh run rerun --failed` cannot succeed: actions/deploy-pages then fails with 'Multiple artifacts named \"github-pages\" were unexpectedly found for this workflow run'. A fresh `gh workflow run deploy.yml --ref main -f mode=deploy` (run 42281848276) deployed the same commit and bundle. Neither deploy/README.md nor AGENTS.md says how to retry a deploy after a Pages-side failure.",
   "links": [
     "deploy/README.md",
@@ -18,6 +18,14 @@
       "op": "create",
       "op_id": "db61b98ad5ba40b8ad029fe0c55babad",
       "session_id": "f3965d839c074422a61a31c2537cd6d8"
+    },
+    {
+      "actor": "mcp:omp-coding-agent:joe@joe-mac-mini.local:5f110a19e01eac8c504c96a2",
+      "at": "2026-11-10T00:48:08Z",
+      "client": "omp-coding-agent",
+      "op": "update",
+      "op_id": "cfc193899a70424eaf31d18e08e8707d",
+      "session_id": "8c824ce3d356493d937fb1329a373184"
     }
   ]
 }
