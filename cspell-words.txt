@@ -331,6 +331,7 @@ joeharris
 joinorder
 joinpath
 kaleido
+Kaminsky
 kemper
 kusto
 kwargs
