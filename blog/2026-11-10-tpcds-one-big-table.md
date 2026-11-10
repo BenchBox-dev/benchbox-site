@@ -35,8 +35,6 @@ We built on TPC-DS instead of designing a new workload because TPC-DS already pr
 
 ## What we learned from our first take
 
-A benchmark we invented has no external specification and no second implementation to compare with. Its only reference is TPC-DS itself. So the intention is simple: each query on the big table returns the same result as the TPC-DS query with the same number.
-
 We wrote the first version of TPC-DS OBT as a converter: about 1,600 lines that parsed each TPC-DS template with SQLGlot at startup and rewrote it onto the big table. By the end it converted 89 queries and could not convert 10. For a first version that was a reasonable way to get 89 queries running on a new schema, and we published results from it on six platforms.
 
 What it lacked was any way to tell us when it was wrong. The SQL was regenerated in memory on every run, so nothing in the repository recorded what a query was supposed to be. We also had no test that compared an answer with TPC-DS. A change to the converter, to SQLGlot, or to a template could change the benchmark without a diff anyone would review. We built a benchmark whose one external check, matching TPC-DS, we were not running.
