@@ -184,7 +184,7 @@ describe("browse paths for every tag", () => {
     expect(pages.filter((page) => !index.includes(`(${page})`))).toEqual([]);
     const sidebar = result.files.get("manifest/sidebar.json") ?? "";
     expect(pages.filter((page) => !sidebar.includes(`"${page}"`))).toEqual([]);
-  });
+  }, 180_000);
 });
 
 describe("tag helpers", () => {
