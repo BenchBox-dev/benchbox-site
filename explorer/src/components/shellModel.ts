@@ -106,10 +106,17 @@ export function sitePath(href: string): string {
   return href.startsWith(`${SITE_ORIGIN}/`) ? href.slice(SITE_ORIGIN.length) : href;
 }
 
+const SURFACE_ROOTS: ReadonlyArray<readonly [string, Surface]> = [
+  ["docs", "docs"],
+  ["blog", "blog"],
+  ["results", "results"],
+  ["result-summaries", "results"],
+];
+
 export function surfaceFor(pathname: string): Surface | undefined {
   if (pathname === "/" || pathname === "/index.html") return "landing";
-  for (const surface of ["docs", "blog", "results"] as const) {
-    if (pathname === `/${surface}` || pathname.startsWith(`/${surface}/`) || pathname.startsWith(`/${surface}.`)) return surface;
+  for (const [root, surface] of SURFACE_ROOTS) {
+    if (pathname === `/${root}` || pathname.startsWith(`/${root}/`) || pathname.startsWith(`/${root}.`)) return surface;
   }
   return undefined;
 }
