@@ -4,7 +4,7 @@
     "A converter test fails when a page uses a tag that no browse path reaches",
     "The built tag index links every tag page that exists"
   ],
-  "context": "Noticed during the MyST retirement (PRs #112 to #114); recounted 2026-11-07: 145 tags, 65 uncategorised.",
+  "context": "Noticed during the MyST retirement (PRs #112 to #114); recounted 2026-11-07: 145 tags, 65 uncategorised.\n\n2026-11-07: Done in PR #131 (merge 37f4919815). tag-categories.ts gains five categories (data format, deployment, workload, results and analysis, maturity) and more tags in platform, benchmark and platform-type; browseCategories() in tag-pages.ts appends an 'Other Tags' category for any tag no category lists, used by the tag index, category pages and sidebar (currently 9 leftovers). Category-tag pattern now allows underscores. tag-pages.test.ts covers leftover placement, no Other Tags when all are categorised, and a build of the assembled docs fails if a tag page is missing from the index or sidebar. All 156 tags that have a page are reachable. Left: docs/index.md still links the original six category pages; about 50 blog-only tags have no pages by design; generator underscore tags (tpch_skew etc.) come from core. Only front matter edit: questdb timeseries to time-series.",
   "description": "Docs and blog front matter use 145 distinct tags; 65 of them (for example accelerated, ai-ml, analysis, benchmarks, beta, cedardb, citus, cloud-native, columnstore, comparison, credentials) are in no TAG_CATEGORIES entry in website/src/converter/tag-categories.ts. The tag index (_tags/tagsindex.md) and the category pages list only categorised tags, so those tags have pages but no browse path from the index or the sidebar's tag categories.",
   "links": [
     "website/src/converter/tag-categories.ts",
@@ -18,6 +18,14 @@
       "op": "create",
       "op_id": "22b51b782a7744d393c4485232e0df71",
       "session_id": "f3965d839c074422a61a31c2537cd6d8"
+    },
+    {
+      "actor": "mcp:omp-coding-agent:joe@joe-mac-mini.local:5f110a19e01eac8c504c96a2",
+      "at": "2026-11-10T01:11:42Z",
+      "client": "omp-coding-agent",
+      "op": "update",
+      "op_id": "9f5d89dd083a4cfbb09b471a2eab5bf3",
+      "session_id": "8c824ce3d356493d937fb1329a373184"
     }
   ]
 }
