@@ -158,6 +158,40 @@ It never picks the newest bundle and runs no freshness compare. With no
 receipt deployed for the target it fails with "redeploy needs a deployed
 receipt".
 
+## Retrying a Pages-side failure
+
+A Pages-side failure is one where the artifact was fine and GitHub Pages did
+not publish it. Recognise it by all of these:
+
+- The `resolve, build and gate` job passed and the artifact has the same size
+  and file count as the last good deploy.
+- The `deploy, probe and record` job failed inside the `Deploy to GitHub Pages`
+  step. Typical logs are `Current status: syncing_files` until `Timeout
+  reached, aborting!` after the 10-minute `actions/deploy-pages` timeout, or
+  `Deployment cancelled.` a few seconds after the deployment was created.
+- The probe, receipt and rollback steps were skipped. No probe ran, so no
+  rollback applies and nothing was deployed by that run.
+
+Retry with a fresh dispatch, not a job rerun:
+
+```sh
+gh workflow run deploy.yml -R BenchBox-dev/benchbox-site --ref main -f mode=deploy
+```
+
+`gh run rerun --failed` cannot succeed. The first attempt's `github-pages`
+artifact stays with the run and the rerun uploads another, so
+`actions/deploy-pages` fails with `Multiple artifacts named "github-pages" were
+unexpectedly found for this workflow run`. A new run starts with a single
+artifact.
+
+A `mode=deploy` dispatch on `main` builds the current `main` commit with the
+bundle the run resolves: the newest certified bundle, or the live one when the
+newest is older than the live one (see "Choosing the core bundle"). That is the
+commit and bundle the failed run would have deployed unless `main` or core
+moved since. If the failed run was a `core-bundle` dispatch, the fresh run
+deploys the newest bundle rather than the dispatched one. Use `mode=redeploy`
+instead when the bundle must stay the one that is live; see "Redeploy".
+
 ## Snapshot digest
 
 While the corpus is unchanged, the deploy compares the candidate
