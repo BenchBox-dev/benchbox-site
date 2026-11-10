@@ -134,6 +134,8 @@ ClickHouse Local fails Q41 and Q44 because ClickHouse 26.1, the engine inside ch
 
 We maintain the query templates by hand. A change to a TPC-DS template fails a test, but the rewritten SQL is only as right as its reviewer and the answer check.
 
+In v0.5.0, `benchbox run` accepts only scale factor 1 for TPC-DS OBT and rejects every other scale factor. That is a bug, and v0.5.1 will correct it.
+
 ## What to do next
 
 Upgrade to v0.5.0 and rerun any TPC-DS OBT workload.
