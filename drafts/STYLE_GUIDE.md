@@ -401,6 +401,17 @@ Benchmark: TPC-H SF1
 
 Use `$` to denote the prompt (readers won't copy it by accident).
 
+### Project name
+
+- BenchBox, intercaps, for the project, the team and the site in prose,
+  headings, titles, alt text and meta descriptions.
+- `benchbox`, backticked lowercase, for the command (`benchbox run`), the
+  PyPI package and its extras (`benchbox[duckdb]`), repository paths and
+  `tags:` values.
+- benchbox.dev bare, as the domain.
+- Never Benchbox, _benchbox_, *benchbox*, or bare lowercase benchbox in prose.
+  "`benchbox` has a new logo" is wrong; "BenchBox has a new logo" is right.
+
 ### Inline Code
 
 Use backticks for:
@@ -410,7 +421,7 @@ Use backticks for:
 - Short code: `SELECT * FROM table`
 
 Don't use for:
-- Product names: DuckDB (not `DuckDB`)
+- Product names: BenchBox, DuckDB (not `benchbox`, `DuckDB`)
 - Emphasis: Use **bold** or *italic*
 
 ---

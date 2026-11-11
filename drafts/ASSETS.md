@@ -36,7 +36,7 @@ running the published CLI as an external tool, pinned to the bundle's
 `building-benchbox/images/`; add `--publish` to copy the result into
 `blog/images/`, or `--out-dir <dir>` to write elsewhere.
 
-Regenerating `sf1_before_after` with benchbox 0.4.2 reproduces the
+Regenerating `sf1_before_after` with BenchBox 0.4.2 reproduces the
 published chart's text, numbers and layout. Two differences remain and
 are expected: the image is cropped to its content (862 px wide instead of
 the 1050 px window the published copy was captured at), and bar segments

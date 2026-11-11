@@ -83,7 +83,7 @@ Location is the one maintained copy: published posts link their `blog/` canonica
 
 Every post demonstrates the same workflow pattern:
 - **MCP** to explore (list_platforms, get_benchmark_info, dry_run)
-- **CLI** to execute (benchbox run with specific flags)
+- **CLI** to execute (`benchbox run` with specific flags)
 - **MCP** to analyze (compare_results, get_query_details, get_results)
 - **Investigation** when something interesting surfaces
 
