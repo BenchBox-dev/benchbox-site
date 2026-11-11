@@ -223,7 +223,7 @@ Planned platform and benchmark additions, including DataFrame support expansion 
 
 - **CLI name**: `write_primitives`
 - **Purpose**: Comprehensive non-transactional write operation testing
-- **Queries**: 12 write operations across 7 categories (INSERT, UPDATE, DELETE, BULK_LOAD, MERGE, DDL, TRANSACTION)
+- **Queries**: 112 write operations across 6 categories (INSERT, UPDATE, DELETE, BULK_LOAD, MERGE, DDL)
 - **Schema**: TPC-H schema with 16 category-based staging tables
 - **Scale**: Configurable via scale factors
 - **Platform Support**: Broad (ClickHouse, BigQuery, Snowflake, Databricks, Redshift, DuckDB, SQLite)
@@ -235,7 +235,7 @@ Planned platform and benchmark additions, including DataFrame support expansion 
 
 - **CLI name**: `transaction_primitives`
 - **Purpose**: ACID transaction guarantees and isolation level testing
-- **Queries**: 12 transaction operations (COMMIT, ROLLBACK, SAVEPOINT, isolation levels)
+- **Queries**: 23 transaction operations (COMMIT, ROLLBACK, SAVEPOINT, isolation levels)
 - **Schema**: TPC-H schema with transaction staging tables
 - **Scale**: Configurable via scale factors
 - **Platform Support**: Designed for ACID databases (PostgreSQL, MySQL, SQL Server - adapters planned; currently limited support via DuckDB/SQLite)

@@ -67,9 +67,9 @@ integrity spec, query count, dataset/source, scales, and DataFrame capability.
 | `h2odb` | `beta` | 10-query data-science groupby/join; generated; integrity spec; docs; DataFrame-capable. | Broaden cross-platform coverage evidence before `stable`. |
 | `amplab` | `beta` | 8-query big-data subset; generated; integrity spec; docs; DataFrame-capable. | Small canonical subset; confirm dataset contract breadth before `stable`. |
 | `read_primitives` | `beta` | 157-query read-primitive matrix; derived from TPC-H data; integrity spec; docs; DataFrame-capable. | Pin the derived-from-`tpch` dataset contract and confirm DataFrame parity before `stable`. |
-| `write_primitives` | `beta` | 12-query non-transactional writes; derived from TPC-H; integrity spec; docs; DataFrame-capable. | Broad cross-platform write support still maturing. |
+| `write_primitives` | `beta` | 112-query non-transactional writes; derived from TPC-H; integrity spec; docs; DataFrame-capable. | Broad cross-platform write support still maturing. |
 | `metadata_primitives` | `beta` | 62-query catalog introspection; no data generation (`requires_tables_object=false`); integrity spec; docs; DataFrame-capable. | Cross-dialect catalog coverage still expanding. |
-| `transaction_primitives` | `beta` | 12-query ACID/isolation workload; derived from TPC-H; integrity spec (`high_failure_expected`); docs; DataFrame-capable. | ACID adapter coverage limited (PostgreSQL/MySQL/SQL Server adapters planned). |
+| `transaction_primitives` | `beta` | 23-query ACID/isolation workload; derived from TPC-H; integrity spec (`high_failure_expected`); docs; DataFrame-capable. | ACID adapter coverage limited (PostgreSQL/MySQL/SQL Server adapters planned). |
 | `coffeeshop` | `beta` | 11-query point-of-sale workload; generated; integrity spec; docs; DataFrame-capable. | Confirm dataset/query stability before `stable`. |
 | `tsbs_devops` | `beta` | 18-query time-series DevOps workload; generated; integrity spec; docs; DataFrame-capable. | Time-series engine coverage breadth still expanding. |
 | `nyctaxi` | `beta` | 25-query real-world OLAP; external NYC TLC data; integrity spec; docs; DataFrame-capable. | External-dataset availability and a pinned source contract before `stable`. |
