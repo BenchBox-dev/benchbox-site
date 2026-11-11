@@ -111,7 +111,9 @@ groups:
           - platforms/databricks-dataframe.md
       - page: platforms/cloud-platforms.md
         items:
-          - platforms/snowflake.md
+          - page: platforms/snowflake.md
+            items:
+              - platforms/snowflake-gateways.md
           - platforms/databricks.md
           - platforms/bigquery.md
           - platforms/clickhouse-cloud.md

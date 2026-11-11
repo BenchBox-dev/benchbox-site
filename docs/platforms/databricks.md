@@ -96,7 +96,7 @@ or a `DatabricksAdapter` argument in the Python API.
 | `compute_resource` | `--platform-option` | (none) | SQL warehouse ID; sets `http_path` to `/sql/1.0/warehouses/<id>` |
 | `uc_catalog`, `uc_schema`, `uc_volume` | `--platform-option` | (none) | Unity Catalog volume for staging uploads |
 | `staging_root` | `--platform-option` | (none) | Staging path (`dbfs:/Volumes/...`, `s3://...`, `abfss://...`) |
-| `gateway` | Python API | `native` | Query gateway: `native` (none), `espresso` or `custom`. A gateway needs personal access token authentication |
+| `gateway` | Python API | `native` | Query gateway: `native` (none), `espresso` or `custom`. A gateway needs personal access token authentication; see [Snowflake Gateways](snowflake-gateways.md#databricks) |
 | `driver_version` | `--platform-option` | (latest) | Pin the Databricks SQL connector version (e.g. `3.3.0`) |
 | `driver_auto_install` | `--platform-option` | false | Auto-install the requested driver version via uv if missing |
 | `table_format` | Python API | `delta` | Table format: `delta` or `hudi` (Hudi emits `USING HUDI` DDL) |
