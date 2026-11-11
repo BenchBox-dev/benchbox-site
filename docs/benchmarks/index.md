@@ -294,7 +294,7 @@ schema variants.
 
 - **CLI name**: `tpcds_obt`
 - **Purpose**: Denormalized wide-table analytical workloads
-- **Queries**: 17 TPC-DS queries adapted for single-table schema
+- **Queries**: 90 of the 99 TPC-DS queries adapted for single-table schema
 - **Schema**: Single denormalized "One Big Table" with all TPC-DS attributes
 - **Scale**: Same as TPC-DS (1.0 to 100+)
 - **Use Cases**: Wide-table analytics, columnar database testing, denormalization trade-off analysis
