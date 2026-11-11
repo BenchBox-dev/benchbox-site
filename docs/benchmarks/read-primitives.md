@@ -94,7 +94,7 @@ These extensions reflect modern SQL:2016+ features and real-world analytical wor
 - **Smart performance testing** with resource-aware optimization capabilities
 - **Enhanced developer experience** with intelligent query discovery
 - **Extensible architecture** supporting custom primitive operations
-- **Multiple scale factors** for different testing scenarios (micro to xlarge)
+- **Multiple scale factors** for different testing scenarios (small to xlarge)
 
 ## Value Proposition
 
@@ -416,8 +416,7 @@ The categories are sorted by total time to identify bottlenecks.
 
 | Scale Factor | Data Size | Query Times | Use Case |
 |-------------|-----------|-------------|----------|
-| 0.001 (micro) | ~1 MB | Milliseconds | Unit tests |
-| 0.01 (small) | ~10 MB | 10-100ms | CI/CD pipelines |
+| 0.01 (small) | ~10 MB | 10-100ms | Unit tests, CI/CD pipelines |
 | 0.1 (medium) | ~100 MB | 100ms-1s | Regression testing |
 | 1.0 (large) | ~1 GB | 1-10s | Performance validation |
 | 10.0 (xlarge) | ~10 GB | 10s-60s | Stress testing |
@@ -427,9 +426,9 @@ The categories are sorted by total time to identify bottlenecks.
 ### Basic Configuration
 
 ```python
-primitives = ReadPrimitives(scale_factor=0.001, output_dir="primitives_dev")
+primitives = ReadPrimitives(scale_factor=0.01, output_dir="primitives_dev")
 
-primitives = ReadPrimitives(scale_factor=0.01, output_dir="primitives_ci")
+primitives = ReadPrimitives(scale_factor=0.1, output_dir="primitives_ci")
 
 primitives = ReadPrimitives(scale_factor=1.0, output_dir="primitives_prod")
 ```
@@ -492,10 +491,10 @@ Solution: use a smaller scale factor or parallel generation.
 #### Issue: Out of disk space
 
 ```python
-primitives = ReadPrimitives(scale_factor=0.001)
+primitives = ReadPrimitives(scale_factor=0.01)
 ```
 
-Solution: use the micro scale factor (about 1MB) or clean up old data.
+Solution: use the smallest scale factor, 0.01 (about 10 MB), or clean up old data.
 
 ### Query Execution Issues
 

@@ -41,8 +41,6 @@ print(f"Generated {len(tables)} TPC-DS tables")
 Scale factors control the amount of data generated:
 
 ```python
-benchmark = TPCH(scale_factor=0.001)
-
 benchmark = TPCH(scale_factor=0.01)
 
 benchmark = TPCH(scale_factor=0.1)
@@ -50,7 +48,7 @@ benchmark = TPCH(scale_factor=0.1)
 benchmark = TPCH(scale_factor=1.0)
 ```
 
-The four scale factors give about 1MB (development and testing), 10MB (CI/CD pipelines, for fast execution), 100MB (performance testing, moderate size) and 1GB (production validation, full scale).
+The three scale factors give about 10MB (development and CI/CD pipelines, for fast execution), 100MB (performance testing, moderate size) and 1GB (production validation, full scale).
 
 ### Output Directory Management
 
@@ -197,7 +195,7 @@ The `tables_info` mapping shows the expected tables and approximate row counts a
 
 **TPC-H specific features:**
 
-- Minimum scale factor of 0.1 (dbgen limitation)
+- Minimum scale factor of 0.01
 - Fixed-size dimension tables (nation, region)
 - Standards-compliant data distribution
 
@@ -210,7 +208,7 @@ generator. It now produces three tables (`dim_locations`, `dim_products`, and
 ```python
 from benchbox import CoffeeShop
 
-coffeeshop = CoffeeShop(scale_factor=0.001)
+coffeeshop = CoffeeShop(scale_factor=0.01)
 data_files = coffeeshop.generate_data()
 print(data_files["order_lines"])
 ```
@@ -223,7 +221,6 @@ recommended operating ranges:
 
 | Scale Factor | Orders Generated | Approx. Order Lines | Approx. Size |
 |--------------|-----------------|---------------------|--------------|
-| 0.001        | 50,000          | ~75,000             | ~5 MB        |
 | 0.01         | 500,000         | ~750,000            | ~50 MB       |
 | 0.1          | 5,000,000       | ~7,500,000          | ~500 MB      |
 | 1.0          | 50,000,000      | ~75,000,000         | ~5 GB        |
@@ -615,7 +612,7 @@ This shows detailed generation and validation steps.
 
 ### Development Workflow
 
-1. **Start Small**: Use scale factors 0.001-0.01 during development
+1. **Start Small**: Use scale factors 0.01-0.1 during development
 2. **Cache Aggressively**: Reuse generated data when possible
 3. **Validate Early**: Test with small datasets before scaling up
 4. **Monitor Resources**: Track memory and disk usage
@@ -675,7 +672,7 @@ import tempfile
 
 def test_data_generation():
     with tempfile.TemporaryDirectory() as temp_dir:
-        benchmark = TPCH(scale_factor=0.001, output_dir=temp_dir)
+        benchmark = TPCH(scale_factor=0.01, output_dir=temp_dir)
         tables = benchmark.generate_data()
 
         assert len(tables) == 8
@@ -685,10 +682,10 @@ def test_data_generation():
 
 def test_smart_generation():
     with tempfile.TemporaryDirectory() as temp_dir:
-        benchmark1 = TPCH(scale_factor=0.001, output_dir=temp_dir)
+        benchmark1 = TPCH(scale_factor=0.01, output_dir=temp_dir)
         tables1 = benchmark1.generate_data()
 
-        benchmark2 = TPCH(scale_factor=0.001, output_dir=temp_dir, verbose=True)
+        benchmark2 = TPCH(scale_factor=0.01, output_dir=temp_dir, verbose=True)
         tables2 = benchmark2.generate_data()
 
         assert tables1.keys() == tables2.keys()

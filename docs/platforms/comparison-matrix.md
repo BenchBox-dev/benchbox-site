@@ -632,7 +632,7 @@ Polars supports DataFrame mode only. DataFusion supports SQL mode (`datafusion`)
 
 | Scale Factor   | Dataset Size | Recommended Platforms                       |
 | -------------- | ------------ | ------------------------------------------- |
-| **0.001-0.01** | 1-10MB       | DuckDB, DataFusion, SQLite                  |
+| **0.01**       | ~10MB        | DuckDB, DataFusion, SQLite                  |
 | **0.1-1**      | 100MB-1GB    | DuckDB, DataFusion, ClickHouse, Polars      |
 | **1-10**       | 1-10GB       | DuckDB, ClickHouse, BigQuery, All DataFrame |
 | **10-100**     | 10-100GB     | DuckDB, ClickHouse, All Cloud DW, PySpark   |

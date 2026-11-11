@@ -124,8 +124,7 @@ print(result)
 
 The scale factor controls the volume of data generated. SF=1 targets approximately 1 GB of uncompressed CSV data, consistent with other BenchBox benchmarks.
 
-- **0.001**: ~8,500 orders (development/testing)
-- **0.01**: ~85,000 orders (CI/CD, quick validation)
+- **0.01**: ~85,000 orders (development, CI/CD, quick validation)
 - **0.1**: ~850,000 orders (integration testing)
 - **1.0**: ~8,500,000 orders (standard benchmark, ~1 GB)
 - **10.0**: ~85,000,000 orders (large-scale testing)
@@ -222,7 +221,7 @@ ORDER BY revenue DESC;
 
 ### Testing Recommendations
 
-**Development**: Use DuckDB with scale factor 0.001-0.01 for fast iteration
+**Development**: Use DuckDB with scale factor 0.01 for fast iteration
 
 **CI/CD**: Use scale factor 0.01 with key queries ([SA1](queries/coffeeshop/sa1.md), [SA2](queries/coffeeshop/sa2.md), [PR1](queries/coffeeshop/pr1.md)) for regression testing
 
@@ -242,7 +241,6 @@ ORDER BY revenue DESC;
 
 | Scale Factor | Orders | Order Lines | Data Size |
 |--------------|--------|-------------|-----------|
-| 0.001 | ~8.5K | ~13K | ~1 MB |
 | 0.01 | ~85K | ~133K | ~10 MB |
 | 0.1 | ~850K | ~1.3M | ~100 MB |
 | 1.0 | ~8.5M | ~13.3M | ~1 GB |

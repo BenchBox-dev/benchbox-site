@@ -255,7 +255,7 @@ diff ./preview_duckdb/*_queries_*/query_1.sql ./preview_clickhouse-local/*_queri
 Test different scale factors to understand resource requirements:
 
 ```bash
-for scale in 0.001 0.01 0.1 1.0; do
+for scale in 0.01 0.1 1.0; do
   benchbox run --dry-run ./scale_${scale} \
     --platform duckdb \
     --benchmark tpch \
@@ -277,7 +277,7 @@ if git diff --cached --name-only | grep -q "benchbox/"; then
   echo "Running benchmark validation..."
 
   benchbox run --dry-run /tmp/validation_tpch \
-    --platform duckdb --benchmark tpch --scale 0.001
+    --platform duckdb --benchmark tpch --scale 0.01
 
   benchbox run --dry-run /tmp/validation_primitives \
     --platform duckdb --benchmark read_primitives --scale 0.01
@@ -451,7 +451,7 @@ diff ./platform_test/*_queries_*/query_1.sql ./reference/duckdb_query_1.sql
 ### Development Workflow
 
 1. **Start with Dry Run** - Always use dry run to validate configuration before executing
-2. **Test Scale Factors** - Use small scale factors (0.001-0.01) for development
+2. **Test Scale Factors** - Use small scale factors (0.01-0.1) for development
 3. **Validate Queries** - Check extracted queries for syntax and logic issues
 4. **Resource Planning** - Use estimates to plan execution environment
 5. **Cross-Platform Testing** - Test configurations across target platforms

@@ -18,7 +18,7 @@ Creates a CoffeeShop benchmark that generates three comma-delimited CSV tables a
 
 | Name | Type | Default | Meaning |
 | --- | --- | --- | --- |
-| `scale_factor` | `float` | `1.0` | Data size multiplier. Must be positive. Values of 1 or more must be whole numbers. `order_lines` has 13,260 rows at 0.001 and 132,600 at 0.01. `dim_locations` (1,000 rows) and `dim_products` (26 rows) do not change with the scale factor. |
+| `scale_factor` | `float` | `1.0` | Data size multiplier. Must be positive. Values of 1 or more must be whole numbers. `order_lines` has 132,600 rows at 0.01. `dim_locations` (1,000 rows) and `dim_products` (26 rows) do not change with the scale factor. |
 | `output_dir` | `str`, `Path` or `None` | `None` | Directory for generated data files. When `None`, the directory is `benchmark_runs/datagen/coffeeshop_<sf token>` under the current directory (for example `coffeeshop_sf001` for 0.01), or under `$BENCHBOX_OUTPUT_DIR/datagen` when that variable is set. |
 | `**kwargs` | keyword arguments | none | `verbose` (`bool` or `int`) and `quiet` (`bool`) set the log level. `compress_data=True` writes each table as `<table>.csv.zst`; add `compression_type="gzip"` for `.csv.gz`. Other keywords are stored as attributes and are not validated. |
 

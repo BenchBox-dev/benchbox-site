@@ -11,7 +11,7 @@ TPCDSOBT flattens the TPC-DS sales and returns facts and their dimensions into o
 Two limits apply to the 0.4.1 release:
 
 - `get_query()` and `get_queries()` fail with `FileNotFoundError` when BenchBox is installed from PyPI, because the TPC-DS query templates they read are not at the location they look in. See `get_query()` below.
-- `generate_data()` needs a scale factor of at least 1, which writes the full TPC-DS source data first.
+- `generate_data()` writes the full TPC-DS source data first.
 
 ## `benchbox.TPCDSOBT`
 
@@ -23,7 +23,7 @@ Creates a TPC-DS OBT benchmark that provides a single wide table and its `CREATE
 
 | Name | Type | Default | Meaning |
 | --- | --- | --- | --- |
-| `scale_factor` | `float` | `1.0` | TPC-DS scale factor. Must be a whole number of at least 1. |
+| `scale_factor` | `float` | `1.0` | TPC-DS scale factor. Must be a number from 0.01 up to 100000. Values of 1 or more must be whole numbers. |
 | `output_dir` | `str`, `Path` or `None` | `None` | Directory for the OBT file. When `None`, the directory is `benchmark_runs/datagen/tpcds_obt_<sf token>` under the current directory (for example `tpcds_obt_sf1`), or under `$BENCHBOX_OUTPUT_DIR/datagen` when that variable is set. |
 | `**kwargs` | keyword arguments | none | `tpcds_source_dir` is the directory for the TPC-DS source data (default `benchmark_runs/datagen/tpcds_<sf token>`). `output_format` is `"parquet"` (default) or `"dat"`. `dimension_mode` is `"full"` (default) or `"minimal"`. `channels` is a list drawn from `"store"`, `"web"` and `"catalog"` (default: all three). `parallel` (`int`, default `1`), `force_regenerate` (`bool`) and the compression keywords `compress_data`, `compression_type` and `compression_level` are passed to the TPC-DS generator. `verbose` (`bool` or `int`) and `quiet` (`bool`) set the log level. The constructor does not validate their values. |
 
@@ -35,7 +35,7 @@ A `TPCDSOBT` instance. It subclasses `BaseBenchmark`; see [Base Benchmark API](.
 
 ### Raises
 
-- `ValueError` when `scale_factor` is below 1, including zero and negative values: `TPC-DS-OBT requires scale_factor >= 1.0 to align with TPC-DS generation.`
+- `ValueError` when `scale_factor` is below 0.01, including zero and negative values, or above 100000.
 - `ValueError` when `scale_factor` is above 1 and not a whole number: `Scale factors >= 1 must be whole integers. Got: 1.5. ...`
 
 ### Example
@@ -44,11 +44,10 @@ A `TPCDSOBT` instance. It subclasses `BaseBenchmark`; see [Base Benchmark API](.
 from pathlib import Path
 from benchbox import TPCDSOBT
 
-for scale_factor in (0.5, 1.5):
-    try:
-        TPCDSOBT(scale_factor=scale_factor)
-    except ValueError as error:
-        print(scale_factor, str(error)[:53])
+try:
+    TPCDSOBT(scale_factor=1.5)
+except ValueError as error:
+    print(str(error)[:53])
 print(TPCDSOBT(scale_factor=1).output_dir.relative_to(Path.cwd()))
 custom = TPCDSOBT(scale_factor=1, output_dir="obt_out", tpcds_source_dir="tpcds_src", output_format="dat")
 print(custom.output_dir)
@@ -57,8 +56,7 @@ print(custom.output_dir)
 Output on 0.4.1:
 
 ```text
-0.5 TPC-DS-OBT requires scale_factor >= 1.0 to align with
-1.5 Scale factors >= 1 must be whole integers. Got: 1.5.
+Scale factors >= 1 must be whole integers. Got: 1.5.
 benchmark_runs/datagen/tpcds_obt_sf1
 obt_out
 ```

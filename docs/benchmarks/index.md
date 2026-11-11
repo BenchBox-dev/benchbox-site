@@ -27,6 +27,25 @@ per-benchmark rationale and promotion criteria live in
 [Benchmark Support Status Criteria](support-status.md). `support_status` is
 separate from public discovery visibility and from DataFrame capability.
 
+## Scale factors
+
+Each benchmark has a set of standard scale factors, listed in the table below. BenchBox accepts any value from 0.01
+to 100000, with whole numbers from 1 upward (1, 2, 10, but not 1.5). A value that is not in the standard set runs
+with a one-line note that its results are not comparable with published results. `joinorder` and
+`metadata_primitives` are fixed at 1 and accept no other value.
+
+| Benchmark | Standard scale factors |
+|-----------|------------------------|
+| `tpch`, `tpcds` | 0.01, 0.1, 1, 10, 30, 100, 300, 1000, 3000, 10000, 30000, 100000 |
+| `tpcds_obt`, `tpcdi`, `ssb`, `tpchavoc`, `tpch_skew`, `datavault`, `tsbs_devops` | 0.01, 0.1, 1, 10 |
+| `nyctaxi`, `flightdata`, `vector_search` | 0.01, 0.1, 1, 10, 100 |
+| `h2odb`, `amplab`, `write_primitives`, `transaction_primitives`, `ai_primitives` | 0.01, 0.1, 1 |
+| `coffeeshop` | 0.01, 0.1, 1 |
+| `joinorder_synthetic` | 0.01, 0.1, 0.5, 1, 2 |
+| `read_primitives` | 0.01, 0.1 |
+| `clickbench` | 1 |
+| `joinorder`, `metadata_primitives` | 1 (fixed) |
+
 ## Contents
 
 ### Roadmap & Research
@@ -47,7 +66,7 @@ Planned platform and benchmark additions, including DataFrame support expansion 
 - **Purpose**: Standard decision support and analytical query performance
 - **Queries**: 22 business-oriented analytical queries
 - **Schema**: 8 tables modeling a wholesale supplier database
-- **Scale**: 0.001 to 1000+ scale factors supported
+- **Scale**: Standard values from 0.01 to 100000; see [Scale factors](#scale-factors)
 - **Use Cases**: General analytical performance, database comparison, regression testing
 
 #### [TPC-DS](tpc-ds.md)
@@ -58,7 +77,7 @@ Planned platform and benchmark additions, including DataFrame support expansion 
 - **Purpose**: Complex analytical workloads with advanced SQL features
 - **Queries**: 99 complex analytical queries with CTEs, window functions
 - **Schema**: 24 tables modeling a retail data warehouse
-- **Scale**: 0.001 to 100+ scale factors supported
+- **Scale**: Standard values from 0.01 to 100000; see [Scale factors](#scale-factors)
 - **Use Cases**: Advanced-level analytics, complex query optimization, modern SQL feature testing
 
 #### [TPC-DI](tpc-di.md)
@@ -84,7 +103,7 @@ Planned platform and benchmark additions, including DataFrame support expansion 
 - **Purpose**: TPC-H adapted for Data Vault 2.0 modeling pattern performance testing
 - **Queries**: 22 TPC-H queries adapted for Hub-Link-Satellite joins
 - **Schema**: 21 tables (7 Hubs, 6 Links, 8 Satellites) from TPC-H source
-- **Scale**: Same as TPC-H (0.01 to 100+)
+- **Scale**: Standard values 0.01 to 10; see [Scale factors](#scale-factors)
 - **Use Cases**: Data Vault architecture evaluation, hub-link-satellite join performance, enterprise DWH patterns
 
 ### Academic Benchmarks
@@ -99,7 +118,7 @@ Planned platform and benchmark additions, including DataFrame support expansion 
 - **Purpose**: Star schema analytical query performance
 - **Queries**: 13 queries across 4 query flights
 - **Schema**: Classic star schema with fact and dimension tables
-- **Scale**: 1 to 1000+ scale factors supported
+- **Scale**: Standard values 0.01 to 10; see [Scale factors](#scale-factors)
 - **Use Cases**: OLAP performance, dimensional modeling validation, columnar database testing
 
 #### [AMPLab](amplab.md)
@@ -296,7 +315,7 @@ schema variants.
 - **Purpose**: Denormalized wide-table analytical workloads
 - **Queries**: 90 of the 99 TPC-DS queries adapted for single-table schema
 - **Schema**: Single denormalized "One Big Table" with all TPC-DS attributes
-- **Scale**: Same as TPC-DS (1.0 to 100+)
+- **Scale**: Standard values 0.01 to 10; see [Scale factors](#scale-factors)
 - **Use Cases**: Wide-table analytics, columnar database testing, denormalization trade-off analysis
 
 #### [TPC-Havoc](tpc-havoc.md)
@@ -318,7 +337,7 @@ schema variants.
 - **Purpose**: Test optimizer behavior on non-uniform data distributions
 - **Queries**: 22 TPC-H queries with configurable skew parameters
 - **Schema**: TPC-H schema with Zipfian, normal, or exponential data distributions
-- **Scale**: Same as TPC-H (0.01 to 10+)
+- **Scale**: Standard values 0.01 to 10; see [Scale factors](#scale-factors)
 - **Use Cases**: Skew handling, cardinality estimation testing, join strategy evaluation under data imbalance
 
 ## Benchmark Selection Guide
@@ -360,7 +379,7 @@ schema variants.
 
 #### **Development and CI/CD**
 
-- **Unit Testing**: [Read Primitives](read-primitives.md) with micro scale factors
+- **Unit Testing**: [Read Primitives](read-primitives.md) with small scale factors
 - **Regression Testing**: [TPC-H](tpc-h.md) with small scale factors
 - **Feature Validation**: Category-specific [Read Primitives](read-primitives.md) queries
 

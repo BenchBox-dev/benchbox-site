@@ -650,7 +650,7 @@ if not result.validation_passed:
 **Optimization**:
 
 ```python
-bench = WritePrimitives(scale_factor=0.001)
+bench = WritePrimitives(scale_factor=0.01)
 ```
 
 Use smaller scale factors for faster testing.

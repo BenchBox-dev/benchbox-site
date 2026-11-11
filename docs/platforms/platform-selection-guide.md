@@ -732,7 +732,7 @@ Start with the cost-effective option and upgrade to a cloud platform only when t
 
 ```python
 sqlite_adapter = SQLiteAdapter()
-small_benchmark = ReadPrimitivesBenchmark(scale_factor=0.001)
+small_benchmark = ReadPrimitivesBenchmark(scale_factor=0.01)
 sqlite_results = sqlite_adapter.run_benchmark(small_benchmark)
 
 duckdb_adapter = DuckDBAdapter()
@@ -856,8 +856,7 @@ Develop on DuckDB, validate the migration on any cloud platform (`auto_terminate
    ```
 
 2. **Scale factor options**
-   - 0.001 (1MB): Rapid iteration
-   - 0.01 (10MB): Quick testing
+   - 0.01 (10MB): Rapid iteration and quick testing
    - 0.1 (100MB): SF0.1 testing
    - 1.0 (1GB): Medium-scale testing
 
@@ -884,7 +883,7 @@ Develop on DuckDB, validate the migration on any cloud platform (`auto_terminate
    - Development: DuckDB
 
 2. **Use appropriate scale factors for testing**
-   - Development: 0.001-0.01
+   - Development: 0.01
    - Integration testing: 0.1-1
    - Performance testing: 10-100+
 
