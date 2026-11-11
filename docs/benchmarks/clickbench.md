@@ -786,13 +786,16 @@ if successful_queries:
 
 ### Scale Factor Guidelines
 
-| Scale Factor | Rows | Data Size | Query Times | Use Case |
-|-------------|------|-----------|-------------|----------|
-| 0.001 | ~100K | ~10 MB | Milliseconds | Development |
-| 0.01 | ~1M | ~100 MB | Seconds | Testing |
-| 0.1 | ~10M | ~1 GB | 10s-60s | Integration |
-| 1.0 | ~100M | ~10 GB | Minutes | Standard benchmark |
-| 10.0 | ~1B | ~100 GB | Hours | Large-scale testing |
+The generator is synthetic and writes 1,000,000 rows per scale factor unit. Only the SF 1 size is measured
+(552,136,075 bytes, about 0.55 GB, see [SF1 calibrated sizes](sf1-calibrated-sizes.md)); the other sizes are
+estimates that scale in proportion.
+
+| Scale Factor | Rows | Data Size | Use Case |
+|-------------|------|-----------|----------|
+| 0.01 | 10,000 | ~5 MB (estimate) | Development |
+| 0.1 | 100,000 | ~55 MB (estimate) | Testing |
+| 1.0 | 1,000,000 | ~0.55 GB (measured) | Standard benchmark |
+| 10.0 | 10,000,000 | ~5.5 GB (estimate) | Large-scale testing |
 
 ### Advanced-level Configuration
 

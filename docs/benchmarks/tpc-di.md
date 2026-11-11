@@ -417,6 +417,10 @@ This enables parallel ETL with 4 workers.
 | 10.0 | ~1 GB | Complex | Stress testing |
 | 30.0+ | ~3+ GB | Production-like | Enterprise simulation |
 
+Four fact tables stop growing at fixed row caps: FactCashBalances at 100,000 rows, FactHoldings at 50,000,
+FactMarketHistory at 100,000 and FactWatches at 25,000. At large scale factors the data size therefore grows
+more slowly than the table suggests.
+
 ### ETL Configuration
 
 ```python
