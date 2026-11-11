@@ -1,6 +1,12 @@
 import { useEffect, useRef, useState } from "preact/hooks";
-import type { CapturedQueryPlan, QueryPlanDocument, QueryPlanNode } from "@/lib/queryPlans";
-import { MAX_PLAN_SIDECAR_BYTES, parseQueryPlanDocument, plansForQuery } from "@/lib/queryPlans";
+import type { CapturedQueryPlan, PlanCaptureError, QueryPlanDocument, QueryPlanNode } from "@/lib/queryPlans";
+import {
+  captureErrorsForQuery,
+  groupCaptureErrors,
+  MAX_PLAN_SIDECAR_BYTES,
+  parseQueryPlanDocument,
+  plansForQuery,
+} from "@/lib/queryPlans";
 
 interface CapturedPlanViewerProps {
   plansUrl: string | null;
@@ -50,7 +56,8 @@ export function CapturedPlanViewer({ plansUrl, queryId }: CapturedPlanViewerProp
       }
       const text = await readCappedSidecarText(response);
       const parsed = parseQueryPlanDocument(JSON.parse(text) as unknown);
-      if (parsed.plans.length === 0) {
+      const hasCaptureFailure = parsed.captureFailures > 0 || parsed.captureErrors.length > 0;
+      if (parsed.plans.length === 0 && !hasCaptureFailure) {
         setStatus("unavailable");
         return;
       }
@@ -73,6 +80,8 @@ export function CapturedPlanViewer({ plansUrl, queryId }: CapturedPlanViewerProp
 
   const visiblePlans = document === null ? [] : queryId === undefined ? document.plans : plansForQuery(document.plans, queryId);
   const selectedPlan = visiblePlans.find((plan) => plan.id === selectedId) ?? visiblePlans[0] ?? null;
+  const scopedErrors =
+    document === null ? [] : queryId === undefined ? document.captureErrors : captureErrorsForQuery(document.captureErrors, queryId);
 
   return (
     <section id="execution-plans" class="card" aria-label="Execution plans">
@@ -104,12 +113,24 @@ export function CapturedPlanViewer({ plansUrl, queryId }: CapturedPlanViewerProp
                 </p>
               )}
               {status === "ready" && document && selectedPlan && (
-                <PlanDetail document={document} plans={visiblePlans} plan={selectedPlan} onSelect={setSelectedId} />
+                <PlanDetail
+                  document={document}
+                  plans={visiblePlans}
+                  plan={selectedPlan}
+                  errors={scopedErrors}
+                  onSelect={setSelectedId}
+                />
               )}
-              {status === "ready" && queryId !== undefined && selectedPlan === null && (
-                <p role="status" class="text-sm text-[var(--bb-data-fg-muted)]">
-                  {`No captured plan for query ${queryId.trim()} in this run.`}
-                </p>
+              {status === "ready" && document && selectedPlan === null && queryId !== undefined && (
+                <>
+                  <p role="status" class="text-sm text-[var(--bb-data-fg-muted)]">
+                    {`No captured plan for query ${queryId.trim()} in this run.`}
+                  </p>
+                  <CaptureErrorList errors={scopedErrors} />
+                </>
+              )}
+              {status === "ready" && document && selectedPlan === null && queryId === undefined && (
+                <CaptureFailureState document={document} />
               )}
             </div>
           )}
@@ -154,11 +175,13 @@ function PlanDetail({
   document,
   plans,
   plan,
+  errors,
   onSelect,
 }: {
   document: QueryPlanDocument;
   plans: CapturedQueryPlan[];
   plan: CapturedQueryPlan;
+  errors: PlanCaptureError[];
   onSelect: (id: string) => void;
 }) {
   return (
@@ -184,6 +207,13 @@ function PlanDetail({
           {document.captureFailures} query plan{document.captureFailures === 1 ? " was" : "s were"} not captured.
         </p>
       )}
+      {errors.length > 0 && (
+        <details class="mb-3 text-sm">
+          <summary class="cursor-pointer font-medium">Plan capture errors</summary>
+          <CaptureErrorList errors={errors} />
+        </details>
+      )}
+      {plan.variants.length > 1 && <PlanStabilityWarning plan={plan} />}
       {document.truncated && (
         <p class="mb-3 text-sm text-[var(--bb-data-fg-muted)]">The published plan sidecar is marked as truncated.</p>
       )}
@@ -191,7 +221,13 @@ function PlanDetail({
         {plan.platform && <span>Platform: {plan.platform}</span>}
         {plan.estimatedRows && <span>Estimated rows: {plan.estimatedRows}</span>}
         {plan.estimatedCost && <span>Estimated cost: {plan.estimatedCost}</span>}
-        {plan.fingerprint && <span>Plan fingerprint: {plan.fingerprint}</span>}
+        {plan.fingerprint && <span class="break-all">Plan fingerprint: {plan.fingerprint}</span>}
+        {plan.runType && (
+          <span>
+            Captured from: {plan.runType}
+            {plan.iteration ? ` iteration ${plan.iteration}` : ""}
+          </span>
+        )}
       </div>
       <section
         aria-label={`Query plan for ${plan.label}`}
@@ -218,6 +254,63 @@ function PlanDetail({
         )}
       </section>
     </div>
+  );
+}
+
+function PlanStabilityWarning({ plan }: { plan: CapturedQueryPlan }) {
+  return (
+    <section
+      aria-label="Plan stability"
+      class="mb-3 rounded-lg border border-[var(--bb-tone-warning-fg)] p-3 text-sm text-[var(--bb-tone-warning-fg)]"
+    >
+      <p class="font-medium">
+        The plan changed between executions: {plan.variants.length} different plans were captured for this query.
+      </p>
+      <p class="mt-1">The plan shown is the last one captured.</p>
+      <ul class="mt-2 space-y-1 text-xs" aria-label="Plan fingerprints seen">
+        {plan.variants.map((variant) => (
+          <li key={variant.fingerprint} class="break-all">
+            {variant.fingerprint}
+            {variant.runType || variant.iteration
+              ? ` (${[variant.runType, variant.iteration ? `iteration ${variant.iteration}` : null]
+                  .filter((part) => part)
+                  .join(" ")})`
+              : ""}
+          </li>
+        ))}
+      </ul>
+    </section>
+  );
+}
+
+function CaptureFailureState({ document }: { document: QueryPlanDocument }) {
+  return (
+    <div role="alert" class="text-sm text-[var(--bb-tone-danger-fg)]">
+      <p class="font-medium">Plan capture failed for this run. No plans were captured.</p>
+      {document.captureFailures > 0 && (
+        <p class="mt-1">
+          {document.captureFailures} query plan{document.captureFailures === 1 ? " was" : "s were"} not captured.
+        </p>
+      )}
+      <CaptureErrorList errors={document.captureErrors} />
+    </div>
+  );
+}
+
+function CaptureErrorList({ errors }: { errors: PlanCaptureError[] }) {
+  if (errors.length === 0) return null;
+  return (
+    <ul class="mt-2 space-y-1 text-xs" aria-label="Plan capture errors">
+      {groupCaptureErrors(errors).map((group, index) => (
+        <li key={`${group.queryId}-${group.streamId}-${index}`} class="break-words">
+          {group.queryId}
+          {group.streamId !== null ? ` · stream ${group.streamId}` : ""}: {group.message}
+          {group.iterations.length > 0
+            ? ` (iteration${group.iterations.length === 1 ? "" : "s"} ${group.iterations.join(", ")})`
+            : ""}
+        </li>
+      ))}
+    </ul>
   );
 }
 

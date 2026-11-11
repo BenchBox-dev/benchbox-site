@@ -20,6 +20,29 @@ Run `npm run test:deploy` to check mismatch evidence, receipt serialization, and
 rollback behavior. `npm run deploy -- probe` writes `deploy-work/probe.json`;
 `npm run deploy -- receipt` includes that evidence in the deployment receipt.
 
+## Plans companion privacy
+
+The privacy gate scans the built artifact. Besides secrets and credentials, it
+parses every `*.plans.json` in the artifact, which is where the core bundle's
+per-result plans companions are published under `results/data/bundles/`, and
+rejects any string or object key that holds a local filesystem path: a
+`~`, `/Users`, `/home`, `/root`, `/private`, `/var/folders`, `/var/run`,
+`/Volumes`, `/tmp`, `/mnt` or `/opt` path, any Windows drive letter path, or a
+UNC path with backslashes or forward slashes. `<redacted>` and the bare `/data`
+and `/output` placeholders pass. This mirrors the detector in core's
+`benchbox/validation/bundle.py` (`PRIVATE_LOCAL_PATH_RE` and the neutral
+placeholders) and lives in `deploy/gates/local-paths.ts`; keep the two in step.
+The check does not flag every absolute path.
+
+`SITE_PRIVATE_PATH_ROOTS` adds run-specific data or output directories to
+reject, separated like `PATH` entries. A finding names the file and the field,
+never the path, and a companion that is not valid JSON fails closed.
+
+The gate covers only companions inside the artifact it is given. A companion
+hosted elsewhere and fetched through a result's download URL, and anything
+ingested after the build, is outside it. Other JSON files and the DuckDB
+snapshot are not checked for local paths.
+
 ## Gates on a rollback
 
 A rollback re-runs only the gates that read the restored bytes themselves:
@@ -27,6 +50,15 @@ privacy, Explorer compatibility and the origin check. It skips the links and
 snapshot digest gates, which compare the artifact with current repository
 inventory and the deployed snapshot, because a restored artifact passed them
 when it was first deployed. The links allowance file is not read.
+
+## Rolling back past the docs removal
+
+Core no longer ships `docs` or `downloads` bundle members, and this site
+verifies only bundle schemas 4 and 5. To return to pages from before the
+removal, dispatch a rollback with the `receipt_run_id` of a deploy from before
+it: the run restores that built artifact and needs no bundle. A rebuild from an
+older core revision does not restore them, because the site no longer reads
+those members, and schema 3 bundles are rejected.
 
 ## Holding a rollback
 
@@ -125,6 +157,40 @@ carries that `core_sha` and its digest equals the receipt's `bundle_digest`.
 It never picks the newest bundle and runs no freshness compare. With no
 receipt deployed for the target it fails with "redeploy needs a deployed
 receipt".
+
+## Retrying a Pages-side failure
+
+A Pages-side failure is one where the artifact was fine and GitHub Pages did
+not publish it. Recognise it by all of these:
+
+- The `resolve, build and gate` job passed and the artifact has the same size
+  and file count as the last good deploy.
+- The `deploy, probe and record` job failed inside the `Deploy to GitHub Pages`
+  step. Typical logs are `Current status: syncing_files` until `Timeout
+  reached, aborting!` after the 10-minute `actions/deploy-pages` timeout, or
+  `Deployment cancelled.` a few seconds after the deployment was created.
+- The probe, receipt and rollback steps were skipped. No probe ran, so no
+  rollback applies and nothing was deployed by that run.
+
+Retry with a fresh dispatch, not a job rerun:
+
+```sh
+gh workflow run deploy.yml -R BenchBox-dev/benchbox-site --ref main -f mode=deploy
+```
+
+`gh run rerun --failed` cannot succeed. The first attempt's `github-pages`
+artifact stays with the run and the rerun uploads another, so
+`actions/deploy-pages` fails with `Multiple artifacts named "github-pages" were
+unexpectedly found for this workflow run`. A new run starts with a single
+artifact.
+
+A `mode=deploy` dispatch on `main` builds the current `main` commit with the
+bundle the run resolves: the newest certified bundle, or the live one when the
+newest is older than the live one (see "Choosing the core bundle"). That is the
+commit and bundle the failed run would have deployed unless `main` or core
+moved since. If the failed run was a `core-bundle` dispatch, the fresh run
+deploys the newest bundle rather than the dispatched one. Use `mode=redeploy`
+instead when the bundle must stay the one that is live; see "Redeploy".
 
 ## Snapshot digest
 
@@ -256,8 +322,23 @@ ceiling. With no 503 in the window, no download-reducing change was made. If
 artifact on every pull request push, and comparing against the deployed
 generation needs only the pages it captures.
 
-The seven-day window ends 2026-11-07T19:33Z. To close it, list the runs of
-deploy.yml, visual.yml and ci.yml created after 2026-10-31T19:33Z with
-`gh run list -w <workflow> --json databaseId,createdAt,conclusion`, sum the
-artifact bytes above per run from `gh api repos/BenchBox-dev/benchbox-site/actions/runs/<id>/artifacts`,
-and search each run's `gh run view <id> --log` for `Egress is over`.
+### Seven days after the bounded resolver
+
+From 2026-10-31T19:33Z to 2026-11-07T19:33Z, 238 deploy.yml, visual.yml and
+ci.yml runs downloaded about 18.6 GB of artifacts: 14.5 GB through
+`actions/download-artifact` (summed from the `Size:` each download logs) and
+4.1 GB in 36 visual runs that fetched the deployed site artifact with
+`gh run download` (summed from that artifact's size in the artifacts API).
+Core bundle and receipt downloads, about 2 MB per run, are not included.
+
+No run logged `Egress is over`, `ServerBusy` or an HTTP 5xx response. GitHub
+returned no log for 20 runs, all cancelled: 17 before any job started and 3
+after starting jobs, so their downloads are not counted. The 503s of
+2026-10-30 did not recur, so the downloads stay as they are, and the
+visual.yml reduction above remains the first change to make if they do.
+
+To measure another window, list the runs of deploy.yml, visual.yml and ci.yml
+with `gh run list -w <workflow> --json databaseId,createdAt,conclusion`, sum
+the artifact sizes each run downloaded from
+`gh api repos/BenchBox-dev/benchbox-site/actions/runs/<id>/artifacts`, and
+search each run's `gh run view <id> --log` for `Egress is over`.

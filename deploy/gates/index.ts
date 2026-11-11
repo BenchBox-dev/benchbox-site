@@ -2,11 +2,14 @@ import { explorerCompatGate } from "./explorer-compat.ts";
 import { linksGate, type BrokenLink } from "./links.ts";
 import { originGate } from "./origin.ts";
 import { privacyGate } from "./privacy.ts";
+import type { PathPrivacyContract } from "./local-paths.ts";
 import { snapshotDigestGate, type SnapshotApproval } from "./snapshot-digest.ts";
 import { skipped, type GateResult } from "./types.ts";
 
 export type GateInputs = {
   siteDir: string;
+  privatePathRoots?: string[];
+  pathPrivacyContract?: PathPrivacyContract;
   mode: "deploy" | "redeploy" | "rollback";
   target: string;
   corpusSha: string;
@@ -35,7 +38,7 @@ export function runGates(inputs: GateInputs): GateReport {
   const deployedVersions = inputs.deployed ? { ui: inputs.deployed.ui, snapshot: inputs.deployed.snapshot } : null;
   const rollback = inputs.mode === "rollback";
   const results: Record<string, GateResult> = {
-    privacy: run(() => privacyGate(inputs.siteDir)),
+    privacy: run(() => privacyGate(inputs.siteDir, inputs.privatePathRoots, inputs.pathPrivacyContract)),
     explorer_compat: run(() =>
       explorerCompatGate({
         siteDir: inputs.siteDir,

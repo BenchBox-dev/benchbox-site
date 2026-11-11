@@ -1,3 +1,5 @@
+import type { PathPrivacyContract } from "../../deploy/gates/local-paths.ts";
+
 export type Violation = { check: string; page: string; invariant: string };
 
 export type Counts = Record<string, number>;
@@ -80,6 +82,7 @@ export type Contracts = {
   write_primitives: { validation_bounds: Record<string, Record<string, { min: number; max: number | null }>> };
   publication: { gated_roots: string[]; allowlist: string[]; exclusions: string[]; excluded_roots: string[]; gated_pages: string[] };
   ownership: { counts: Counts; site_owned: string[]; core_generated: string[] };
+  path_privacy?: PathPrivacyContract;
 };
 
 export type Manifest = { schema: number; package_version: string; core_sha: string };

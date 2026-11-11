@@ -8,8 +8,13 @@ moves the SQL rewrites and DDL rule bodies described below into the fork, which 
 reaches only through `translate_sql_query` and its sibling wrappers. The phase taxonomy,
 the skip policy and the capability registry in this ADR remain in force.
 
+**Superseded in part**: `scripts/generate_compat_docs.py` has been retired. This site renders the
+capability matrix and skip reference from the compatibility data core exports, as recorded in
+[SQLGlot use and non-use](adr-sqlglot-use-and-non-use.md). References below to that script, to its
+`_render_skip_reference` function, and to generating either page from core are historical.
+
 The shipped subsystem lives at [`benchbox/sql_compat/`](../../../benchbox/sql_compat/). Generated
-references regenerated from the registry by `scripts/generate_compat_docs.py`:
+references, formerly regenerated from the registry by `scripts/generate_compat_docs.py`:
 
 - [Capability matrix](../../compat/capability-matrix.md)
 - [Skip reference](../../compat/skip-reference.md)
@@ -807,7 +812,7 @@ The lint check is warn-only. It moves to error mode once all existing rules comp
 
 #### (f) Doc Restructure Plan for skip-reference.md
 
-The generator (`scripts/generate_compat_docs.py: _render_skip_reference`) is restructured to
+The generator (the retired `scripts/generate_compat_docs.py: _render_skip_reference`) was restructured to
 partition the skip reference into two top-level sections:
 
 - **"Will not run"**: `BLOCKED` + `SKIPPED_QUERY` rows - outcomes that remove a query or benchmark

@@ -1,6 +1,7 @@
 import { readFileSync } from "node:fs";
 import path from "node:path";
 import { filesUnder } from "./files.ts";
+import { findPathLeaks, pathPrivacyDrift, tryLoadPathPrivacyContract, type PathPrivacyContract } from "./local-paths.ts";
 import { fail, pass, type GateResult } from "./types.ts";
 
 const PATTERNS: { description: string; pattern: RegExp }[] = [
@@ -12,6 +13,7 @@ const PATTERNS: { description: string; pattern: RegExp }[] = [
 const AWS_EXAMPLES = new Set(["AKIAIOSFODNN7EXAMPLE", "wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY"]);
 const CONNECTION = /(?:postgresql|postgres|mysql):\/\/([^\s/:@]+):([^\s/@]+)@([^\s/@]+)/g;
 const PLACEHOLDER_PASSWORDS = new Set(["password", "pass", "your-password", "your_password", "changeme", "***", "<password>"]);
+const PLANS_COMPANION = /\.plans\.json$/i;
 const SCANNED = /\.(html?|json|js|css|svg|txt|xml|csv|ya?ml)$/i;
 
 export function privacyFindings(name: string, text: string): string[] {
@@ -27,12 +29,29 @@ export function privacyFindings(name: string, text: string): string[] {
   return findings;
 }
 
-export function privacyGate(siteDir: string): GateResult {
-  const findings: string[] = [];
-  for (const file of filesUnder(siteDir).filter((name) => SCANNED.test(name))) {
-    for (const finding of privacyFindings(path.basename(file), readFileSync(path.join(siteDir, file), "utf8"))) {
-      findings.push(`${file}: ${finding}`);
-    }
+export function planCompanionFindings(text: string, roots: string[] = []): string[] {
+  let payload: unknown;
+  try {
+    payload = JSON.parse(text);
+  } catch {
+    return ["Plans companion is not valid JSON and cannot be checked for local filesystem paths"];
   }
-  return findings.length === 0 ? pass("no secrets or credentials in the artifact") : fail(`${findings.length} privacy findings`, findings);
+  const fields = findPathLeaks(payload, roots);
+  return fields.length === 0 ? [] : [`Detected local filesystem path in plans companion field(s): ${fields.join(", ")}`];
+}
+
+export function privacyGate(siteDir: string, roots: string[] = [], contract?: PathPrivacyContract): GateResult {
+  const findings: string[] = [];
+  const c = contract ?? tryLoadPathPrivacyContract();
+  if (c) {
+    const drift = pathPrivacyDrift(c);
+    for (const d of drift) findings.push(`Path privacy gate drifted from doc-contracts.json: ${d}`);
+  }
+  for (const file of filesUnder(siteDir).filter((name) => SCANNED.test(name))) {
+    const text = readFileSync(path.join(siteDir, file), "utf8");
+    const found = privacyFindings(path.basename(file), text);
+    if (PLANS_COMPANION.test(file)) found.push(...planCompanionFindings(text, roots));
+    for (const finding of found) findings.push(`${file}: ${finding}`);
+  }
+  return findings.length === 0 ? pass("no secrets, credentials or local paths in the artifact") : fail(`${findings.length} privacy findings`, findings);
 }

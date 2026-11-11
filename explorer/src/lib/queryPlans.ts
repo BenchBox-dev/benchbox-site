@@ -6,6 +6,12 @@ export interface QueryPlanNode {
   omittedChildren: number;
 }
 
+export interface PlanVariant {
+  fingerprint: string;
+  iteration: string | null;
+  runType: string | null;
+}
+
 export interface CapturedQueryPlan {
   id: string;
   label: string;
@@ -14,14 +20,25 @@ export interface CapturedQueryPlan {
   estimatedCost: string | null;
   estimatedRows: string | null;
   fingerprint: string | null;
+  iteration: string | null;
+  runType: string | null;
+  variants: PlanVariant[];
   root: QueryPlanNode | null;
   textualPlan: string | null;
   textualPlanTruncated: boolean;
 }
 
+export interface PlanCaptureError {
+  queryId: string;
+  streamId: string | null;
+  iteration: string | null;
+  message: string;
+}
+
 export interface QueryPlanDocument {
   plans: CapturedQueryPlan[];
   captureFailures: number;
+  captureErrors: PlanCaptureError[];
   truncated: boolean;
 }
 
@@ -30,6 +47,8 @@ export const MAX_PLAN_SIDECAR_BYTES = 2_000_000;
 const MAX_PLAN_COUNT = 500;
 const MAX_PLAN_NODES = 500;
 const MAX_PLAN_DEPTH = 60;
+const MAX_CAPTURE_ERRORS = 200;
+const MAX_PLAN_VARIANTS = 50;
 const MAX_DISPLAY_VALUE_CHARS = 2_000;
 const MAX_PLAN_TEXT_CHARS = 20_000;
 
@@ -143,8 +162,7 @@ function queryEntries(rawQueries: unknown): Array<[string, unknown]> {
 }
 
 function textualPlan(plan: unknown, planRecord: JsonObject | null): { text: string | null; truncated: boolean } {
-  const rawOutput = asText(planRecord?.raw_explain_output);
-  let text = rawOutput;
+  let text = asText(planRecord?.raw_explain_output) ?? asText(planRecord?.plan_text);
   if (text === null && (typeof plan === "string" || typeof plan === "number" || typeof plan === "boolean")) {
     text = planFallbackText(plan);
   }
@@ -158,6 +176,26 @@ function textualPlan(plan: unknown, planRecord: JsonObject | null): { text: stri
   };
 }
 
+const QUALIFIED_KEY = /^(.+?)#(\d+)(?::(.*))?$/;
+
+function planLabel(id: string, queryId: string): string {
+  const qualified = QUALIFIED_KEY.exec(id);
+  if (!qualified) return id === queryId ? id : `${queryId} (${id})`;
+  const [, base, stream, testType] = qualified;
+  const label = [base, `stream ${stream}`, testType].filter((part) => part).join(" · ");
+  return normalizeQueryIdForMatch(base!) === normalizeQueryIdForMatch(queryId) ? label : `${queryId} (${label})`;
+}
+
+function parseVariants(value: unknown): PlanVariant[] {
+  if (!Array.isArray(value)) return [];
+  return value.slice(0, MAX_PLAN_VARIANTS).flatMap((item) => {
+    const record = asObject(item);
+    const fingerprint = displayValue(record?.fingerprint);
+    if (record === null || fingerprint === null) return [];
+    return [{ fingerprint, iteration: displayValue(record.iteration), runType: displayValue(record.run_type) }];
+  });
+}
+
 function parseEntry(id: string, value: unknown): CapturedQueryPlan | null {
   const entry = asObject(value);
   const plan = entry && "plan" in entry ? entry.plan : value;
@@ -167,19 +205,37 @@ function parseEntry(id: string, value: unknown): CapturedQueryPlan | null {
   if (!root && text.text === null) return null;
 
   const queryId = displayValue(planRecord?.query_id) ?? displayValue(entry?.query_id) ?? id;
-  const label = id === queryId || id.startsWith(`${queryId}#`) ? id : `${queryId} (${id})`;
   return {
     id,
-    label,
+    label: planLabel(id, queryId),
     queryId,
     platform: displayValue(planRecord?.platform),
     estimatedCost: displayValue(planRecord?.estimated_cost),
     estimatedRows: displayValue(planRecord?.estimated_rows),
-    fingerprint: displayValue(planRecord?.plan_fingerprint),
+    fingerprint: displayValue(planRecord?.plan_fingerprint) ?? displayValue(entry?.fingerprint),
+    iteration: displayValue(entry?.iteration),
+    runType: displayValue(entry?.run_type),
+    variants: entry?.fingerprint_varied === true ? parseVariants(entry.fingerprint_variants) : [],
     root,
     textualPlan: text.text,
     textualPlanTruncated: text.truncated,
   };
+}
+
+function parseCaptureErrors(value: unknown): PlanCaptureError[] {
+  if (!Array.isArray(value)) return [];
+  return value.slice(0, MAX_CAPTURE_ERRORS).flatMap((item) => {
+    const record = asObject(item);
+    if (record === null) return [];
+    return [
+      {
+        queryId: displayValue(record.query_id) ?? "unknown",
+        streamId: displayValue(record.stream_id),
+        iteration: displayValue(record.iteration),
+        message: displayValue(record.error) ?? "Unknown error",
+      },
+    ];
+  });
 }
 
 export function normalizeQueryIdForMatch(queryId: string): string {
@@ -193,9 +249,35 @@ export function plansForQuery(plans: readonly CapturedQueryPlan[], queryId: stri
   return plans.filter((plan) => normalizeQueryIdForMatch(plan.queryId) === wanted);
 }
 
+export function captureErrorsForQuery(errors: readonly PlanCaptureError[], queryId: string): PlanCaptureError[] {
+  const wanted = normalizeQueryIdForMatch(queryId);
+  return errors.filter((error) => normalizeQueryIdForMatch(error.queryId) === wanted);
+}
+
+export interface PlanCaptureErrorGroup {
+  queryId: string;
+  streamId: string | null;
+  message: string;
+  iterations: string[];
+}
+
+export function groupCaptureErrors(errors: readonly PlanCaptureError[]): PlanCaptureErrorGroup[] {
+  const groups = new Map<string, PlanCaptureErrorGroup>();
+  for (const error of errors) {
+    const key = JSON.stringify([error.queryId, error.streamId, error.message]);
+    let group = groups.get(key);
+    if (!group) {
+      group = { queryId: error.queryId, streamId: error.streamId, message: error.message, iterations: [] };
+      groups.set(key, group);
+    }
+    if (error.iteration !== null) group.iterations.push(error.iteration);
+  }
+  return [...groups.values()];
+}
+
 export function parseQueryPlanDocument(payload: unknown): QueryPlanDocument {
   const document = asObject(payload);
-  if (!document) return { plans: [], captureFailures: 0, truncated: false };
+  if (!document) return { plans: [], captureFailures: 0, captureErrors: [], truncated: false };
 
   const plans = queryEntries(document.queries)
     .map(([id, value]) => parseEntry(id, value))
@@ -208,6 +290,7 @@ export function parseQueryPlanDocument(payload: unknown): QueryPlanDocument {
       typeof captureFailures === "number" && Number.isFinite(captureFailures) && captureFailures > 0
         ? Math.floor(captureFailures)
         : 0,
+    captureErrors: parseCaptureErrors(document.errors),
     truncated: document.truncated === true,
   };
 }

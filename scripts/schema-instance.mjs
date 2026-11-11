@@ -1,6 +1,6 @@
 import { readFileSync } from "node:fs";
 
-const STRING_CANDIDATES = ["x", "0.0.0", "benchbox"];
+const STRING_CANDIDATES = ["x", "0.0.0", "benchbox", "/x"];
 
 function resolve(root, node) {
   if (!node.$ref) return node;

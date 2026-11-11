@@ -187,6 +187,12 @@ round trip (`show-plan`, `compare --include-plans`). Each entry records the `ite
 of the execution it was captured from, and a reloaded result attaches the plan (SQL included) only to the
 row with that iteration and run type. There are no per-iteration `@N` keys.
 
+When DataFrame executions that share one companion entry captured different plans, the entry also carries
+`fingerprint_varied: true` and `fingerprint_variants`, a list of `{fingerprint, iteration, run_type}` objects with one
+item per distinct fingerprint. The entry's own `plan` and `fingerprint` are those of the last execution captured. The
+Results Explorer shows the variants as a plan-stability warning above the plan, and shows a capture-failure message in
+place of the plan when a companion holds only plan capture errors.
+
 > **Bespoke DML query sets.** A *bespoke* query set that runs an `INSERT`/`UPDATE`/`DELETE` partway
 > through and then more `SELECT`s has no maintenance phase boundary and no pre-mutation checkpoint. Its
 > mid-run mutations are captured against the **end-of-run** state, so the later reads are explained after

@@ -11,7 +11,6 @@ actuals
 adbc
 adls
 advengineid
-Æther
 affordances
 aggs
 aiml
@@ -58,6 +57,7 @@ benchmarkers
 benchuser
 bgkqh
 biglake
+BIGNUMERIC
 bijective
 blas
 blocka
@@ -122,8 +122,8 @@ conftest
 contextlib
 contextmanager
 credentialfile
-crème
 Crun
+crème
 cssb
 ctes
 cuda
@@ -331,6 +331,7 @@ joeharris
 joinorder
 joinpath
 kaleido
+Kaminsky
 kemper
 kusto
 kwargs
@@ -358,7 +359,6 @@ linkcheck
 listagg
 listdir
 literalinclude
-Łódź
 logfile
 logm
 logpath
@@ -490,7 +490,6 @@ orderstatus
 ordtotalprice
 orgname
 orsted
-Ørsted
 outputdir
 outputdirectory
 outputlocation
@@ -693,8 +692,8 @@ starrocks
 staticmethod
 stdev
 steelman
-straße
 strasze
+straße
 streamable
 strptime
 subclassing
@@ -730,6 +729,7 @@ timedelta
 timescaledb
 titlebar
 tnot
+tobymao
 tolist
 tomllib
 topk
@@ -775,6 +775,7 @@ unixodbc
 unkeyed
 unledgered
 unmappable
+unpadded
 unparseable
 unpartitioned
 unquiesced
@@ -793,6 +794,7 @@ unsuffixed
 unvalidated
 uppercased
 upserts
+upstreaming
 uservisits
 usmallint
 vaex
@@ -837,3 +839,6 @@ zorder
 zscore
 zstandard
 zstd
+Æther
+Ørsted
+Łódź

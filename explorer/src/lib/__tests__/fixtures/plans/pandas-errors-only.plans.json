@@ -1,0 +1,65 @@
+{
+  "capture_failures": 3,
+  "errors": [
+    {
+      "error": "Pandas is an eager DataFrame engine with no query plan to capture",
+      "iteration": 1,
+      "query_id": "Q1",
+      "stream_id": 0
+    },
+    {
+      "error": "Pandas is an eager DataFrame engine with no query plan to capture",
+      "iteration": 2,
+      "query_id": "Q1",
+      "stream_id": 0
+    },
+    {
+      "error": "Pandas is an eager DataFrame engine with no query plan to capture",
+      "iteration": 3,
+      "query_id": "Q1",
+      "stream_id": 0
+    },
+    {
+      "error": "Pandas is an eager DataFrame engine with no query plan to capture",
+      "iteration": 1,
+      "query_id": "Q3",
+      "stream_id": 0
+    },
+    {
+      "error": "Pandas is an eager DataFrame engine with no query plan to capture",
+      "iteration": 2,
+      "query_id": "Q3",
+      "stream_id": 0
+    },
+    {
+      "error": "Pandas is an eager DataFrame engine with no query plan to capture",
+      "iteration": 3,
+      "query_id": "Q3",
+      "stream_id": 0
+    },
+    {
+      "error": "Pandas is an eager DataFrame engine with no query plan to capture",
+      "iteration": 1,
+      "query_id": "Q6",
+      "stream_id": 0
+    },
+    {
+      "error": "Pandas is an eager DataFrame engine with no query plan to capture",
+      "iteration": 2,
+      "query_id": "Q6",
+      "stream_id": 0
+    },
+    {
+      "error": "Pandas is an eager DataFrame engine with no query plan to capture",
+      "iteration": 3,
+      "query_id": "Q6",
+      "stream_id": 0
+    }
+  ],
+  "max_depth": 50,
+  "plans_captured": 0,
+  "queries": {},
+  "run_id": "85919fe9",
+  "truncated": false,
+  "version": "2.3"
+}

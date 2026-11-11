@@ -1,0 +1,127 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1250" height="608" viewBox="0 0 1250 608">
+<defs><style>
+@font-face{font-family:"Martian Mono";src:local("Martian Mono");font-weight:400;font-stretch:75% 112.5%}
+@font-face{font-family:"Instrument Sans";src:local("Instrument Sans");font-weight:400 700}
+.h{font-family:"Martian Mono",monospace;font-stretch:87.5%;fill:#5c1a2e}
+.m{font-family:"Instrument Sans",sans-serif;fill:#7d4656}
+.c-ok{fill:#5c1a2e;stroke:#5c1a2e;stroke-width:1.5}
+.c-unv{fill:#a7c6ed;stroke:#a7c6ed;stroke-width:1.5}
+.c-inv{fill:#f9f0e7;stroke:#5c1a2e;stroke-width:1.5;stroke-dasharray:5 4}
+.c-nos{fill:#e8d2c0;stroke:#7d4656;stroke-width:1.5}
+.t-ok,.t-unv,.t-inv,.t-nos{font-family:"Martian Mono",monospace;font-stretch:87.5%}
+.t-ok{fill:#f9f0e7}
+.t-unv{fill:#5c1a2e}
+.t-inv{fill:#5c1a2e}
+.t-nos{fill:#5c1a2e}
+</style></defs>
+<rect width="1250" height="608" fill="#f9f0e7"/>
+<text x="48" y="56" class="h" font-size="24">90 of 99 TPC-DS queries fit one big table</text>
+<text x="48" y="82" class="m" font-size="15">TPC-DS OBT in BenchBox v0.5.0: every TPC-DS query is either checked against the TPC-DS answer or named as incompatible, with a reason</text>
+<rect class="c-ok" x="48" y="118" width="64" height="42" rx="6"/><text class="t-ok" x="80" y="145" text-anchor="middle" font-size="15">Q1</text>
+<rect class="c-ok" x="120" y="118" width="64" height="42" rx="6"/><text class="t-ok" x="152" y="145" text-anchor="middle" font-size="15">Q2</text>
+<rect class="c-ok" x="192" y="118" width="64" height="42" rx="6"/><text class="t-ok" x="224" y="145" text-anchor="middle" font-size="15">Q3</text>
+<rect class="c-ok" x="264" y="118" width="64" height="42" rx="6"/><text class="t-ok" x="296" y="145" text-anchor="middle" font-size="15">Q4</text>
+<rect class="c-ok" x="336" y="118" width="64" height="42" rx="6"/><text class="t-ok" x="368" y="145" text-anchor="middle" font-size="15">Q5</text>
+<rect class="c-ok" x="408" y="118" width="64" height="42" rx="6"/><text class="t-ok" x="440" y="145" text-anchor="middle" font-size="15">Q6</text>
+<rect class="c-ok" x="480" y="118" width="64" height="42" rx="6"/><text class="t-ok" x="512" y="145" text-anchor="middle" font-size="15">Q7</text>
+<rect class="c-nos" x="552" y="118" width="64" height="42" rx="6"/><text class="t-nos" x="584" y="145" text-anchor="middle" font-size="15">Q8</text>
+<rect class="c-ok" x="624" y="118" width="64" height="42" rx="6"/><text class="t-ok" x="656" y="145" text-anchor="middle" font-size="15">Q9</text>
+<rect class="c-ok" x="696" y="118" width="64" height="42" rx="6"/><text class="t-ok" x="728" y="145" text-anchor="middle" font-size="15">Q10</text>
+<rect class="c-ok" x="768" y="118" width="64" height="42" rx="6"/><text class="t-ok" x="800" y="145" text-anchor="middle" font-size="15">Q11</text>
+<rect class="c-ok" x="48" y="168" width="64" height="42" rx="6"/><text class="t-ok" x="80" y="195" text-anchor="middle" font-size="15">Q12</text>
+<rect class="c-ok" x="120" y="168" width="64" height="42" rx="6"/><text class="t-ok" x="152" y="195" text-anchor="middle" font-size="15">Q13</text>
+<rect class="c-ok" x="192" y="168" width="64" height="42" rx="6"/><text class="t-ok" x="224" y="195" text-anchor="middle" font-size="15">Q14</text>
+<rect class="c-ok" x="264" y="168" width="64" height="42" rx="6"/><text class="t-ok" x="296" y="195" text-anchor="middle" font-size="15">Q15</text>
+<rect class="c-ok" x="336" y="168" width="64" height="42" rx="6"/><text class="t-ok" x="368" y="195" text-anchor="middle" font-size="15">Q16</text>
+<rect class="c-ok" x="408" y="168" width="64" height="42" rx="6"/><text class="t-ok" x="440" y="195" text-anchor="middle" font-size="15">Q17</text>
+<rect class="c-ok" x="480" y="168" width="64" height="42" rx="6"/><text class="t-ok" x="512" y="195" text-anchor="middle" font-size="15">Q18</text>
+<rect class="c-ok" x="552" y="168" width="64" height="42" rx="6"/><text class="t-ok" x="584" y="195" text-anchor="middle" font-size="15">Q19</text>
+<rect class="c-ok" x="624" y="168" width="64" height="42" rx="6"/><text class="t-ok" x="656" y="195" text-anchor="middle" font-size="15">Q20</text>
+<rect class="c-inv" x="696" y="168" width="64" height="42" rx="6"/><text class="t-inv" x="728" y="195" text-anchor="middle" font-size="15">Q21</text>
+<rect class="c-inv" x="768" y="168" width="64" height="42" rx="6"/><text class="t-inv" x="800" y="195" text-anchor="middle" font-size="15">Q22</text>
+<rect class="c-unv" x="48" y="218" width="64" height="42" rx="6"/><text class="t-unv" x="80" y="245" text-anchor="middle" font-size="15">Q23</text>
+<rect class="c-unv" x="120" y="218" width="64" height="42" rx="6"/><text class="t-unv" x="152" y="245" text-anchor="middle" font-size="15">Q24</text>
+<rect class="c-ok" x="192" y="218" width="64" height="42" rx="6"/><text class="t-ok" x="224" y="245" text-anchor="middle" font-size="15">Q25</text>
+<rect class="c-ok" x="264" y="218" width="64" height="42" rx="6"/><text class="t-ok" x="296" y="245" text-anchor="middle" font-size="15">Q26</text>
+<rect class="c-ok" x="336" y="218" width="64" height="42" rx="6"/><text class="t-ok" x="368" y="245" text-anchor="middle" font-size="15">Q27</text>
+<rect class="c-ok" x="408" y="218" width="64" height="42" rx="6"/><text class="t-ok" x="440" y="245" text-anchor="middle" font-size="15">Q28</text>
+<rect class="c-ok" x="480" y="218" width="64" height="42" rx="6"/><text class="t-ok" x="512" y="245" text-anchor="middle" font-size="15">Q29</text>
+<rect class="c-ok" x="552" y="218" width="64" height="42" rx="6"/><text class="t-ok" x="584" y="245" text-anchor="middle" font-size="15">Q30</text>
+<rect class="c-ok" x="624" y="218" width="64" height="42" rx="6"/><text class="t-ok" x="656" y="245" text-anchor="middle" font-size="15">Q31</text>
+<rect class="c-ok" x="696" y="218" width="64" height="42" rx="6"/><text class="t-ok" x="728" y="245" text-anchor="middle" font-size="15">Q32</text>
+<rect class="c-ok" x="768" y="218" width="64" height="42" rx="6"/><text class="t-ok" x="800" y="245" text-anchor="middle" font-size="15">Q33</text>
+<rect class="c-ok" x="48" y="268" width="64" height="42" rx="6"/><text class="t-ok" x="80" y="295" text-anchor="middle" font-size="15">Q34</text>
+<rect class="c-ok" x="120" y="268" width="64" height="42" rx="6"/><text class="t-ok" x="152" y="295" text-anchor="middle" font-size="15">Q35</text>
+<rect class="c-ok" x="192" y="268" width="64" height="42" rx="6"/><text class="t-ok" x="224" y="295" text-anchor="middle" font-size="15">Q36</text>
+<rect class="c-inv" x="264" y="268" width="64" height="42" rx="6"/><text class="t-inv" x="296" y="295" text-anchor="middle" font-size="15">Q37</text>
+<rect class="c-ok" x="336" y="268" width="64" height="42" rx="6"/><text class="t-ok" x="368" y="295" text-anchor="middle" font-size="15">Q38</text>
+<rect class="c-inv" x="408" y="268" width="64" height="42" rx="6"/><text class="t-inv" x="440" y="295" text-anchor="middle" font-size="15">Q39</text>
+<rect class="c-ok" x="480" y="268" width="64" height="42" rx="6"/><text class="t-ok" x="512" y="295" text-anchor="middle" font-size="15">Q40</text>
+<rect class="c-ok" x="552" y="268" width="64" height="42" rx="6"/><text class="t-ok" x="584" y="295" text-anchor="middle" font-size="15">Q41</text>
+<rect class="c-ok" x="624" y="268" width="64" height="42" rx="6"/><text class="t-ok" x="656" y="295" text-anchor="middle" font-size="15">Q42</text>
+<rect class="c-ok" x="696" y="268" width="64" height="42" rx="6"/><text class="t-ok" x="728" y="295" text-anchor="middle" font-size="15">Q43</text>
+<rect class="c-ok" x="768" y="268" width="64" height="42" rx="6"/><text class="t-ok" x="800" y="295" text-anchor="middle" font-size="15">Q44</text>
+<rect class="c-ok" x="48" y="318" width="64" height="42" rx="6"/><text class="t-ok" x="80" y="345" text-anchor="middle" font-size="15">Q45</text>
+<rect class="c-ok" x="120" y="318" width="64" height="42" rx="6"/><text class="t-ok" x="152" y="345" text-anchor="middle" font-size="15">Q46</text>
+<rect class="c-ok" x="192" y="318" width="64" height="42" rx="6"/><text class="t-ok" x="224" y="345" text-anchor="middle" font-size="15">Q47</text>
+<rect class="c-ok" x="264" y="318" width="64" height="42" rx="6"/><text class="t-ok" x="296" y="345" text-anchor="middle" font-size="15">Q48</text>
+<rect class="c-ok" x="336" y="318" width="64" height="42" rx="6"/><text class="t-ok" x="368" y="345" text-anchor="middle" font-size="15">Q49</text>
+<rect class="c-ok" x="408" y="318" width="64" height="42" rx="6"/><text class="t-ok" x="440" y="345" text-anchor="middle" font-size="15">Q50</text>
+<rect class="c-ok" x="480" y="318" width="64" height="42" rx="6"/><text class="t-ok" x="512" y="345" text-anchor="middle" font-size="15">Q51</text>
+<rect class="c-ok" x="552" y="318" width="64" height="42" rx="6"/><text class="t-ok" x="584" y="345" text-anchor="middle" font-size="15">Q52</text>
+<rect class="c-ok" x="624" y="318" width="64" height="42" rx="6"/><text class="t-ok" x="656" y="345" text-anchor="middle" font-size="15">Q53</text>
+<rect class="c-nos" x="696" y="318" width="64" height="42" rx="6"/><text class="t-nos" x="728" y="345" text-anchor="middle" font-size="15">Q54</text>
+<rect class="c-ok" x="768" y="318" width="64" height="42" rx="6"/><text class="t-ok" x="800" y="345" text-anchor="middle" font-size="15">Q55</text>
+<rect class="c-ok" x="48" y="368" width="64" height="42" rx="6"/><text class="t-ok" x="80" y="395" text-anchor="middle" font-size="15">Q56</text>
+<rect class="c-ok" x="120" y="368" width="64" height="42" rx="6"/><text class="t-ok" x="152" y="395" text-anchor="middle" font-size="15">Q57</text>
+<rect class="c-ok" x="192" y="368" width="64" height="42" rx="6"/><text class="t-ok" x="224" y="395" text-anchor="middle" font-size="15">Q58</text>
+<rect class="c-ok" x="264" y="368" width="64" height="42" rx="6"/><text class="t-ok" x="296" y="395" text-anchor="middle" font-size="15">Q59</text>
+<rect class="c-ok" x="336" y="368" width="64" height="42" rx="6"/><text class="t-ok" x="368" y="395" text-anchor="middle" font-size="15">Q60</text>
+<rect class="c-unv" x="408" y="368" width="64" height="42" rx="6"/><text class="t-unv" x="440" y="395" text-anchor="middle" font-size="15">Q61</text>
+<rect class="c-ok" x="480" y="368" width="64" height="42" rx="6"/><text class="t-ok" x="512" y="395" text-anchor="middle" font-size="15">Q62</text>
+<rect class="c-ok" x="552" y="368" width="64" height="42" rx="6"/><text class="t-ok" x="584" y="395" text-anchor="middle" font-size="15">Q63</text>
+<rect class="c-ok" x="624" y="368" width="64" height="42" rx="6"/><text class="t-ok" x="656" y="395" text-anchor="middle" font-size="15">Q64</text>
+<rect class="c-ok" x="696" y="368" width="64" height="42" rx="6"/><text class="t-ok" x="728" y="395" text-anchor="middle" font-size="15">Q65</text>
+<rect class="c-ok" x="768" y="368" width="64" height="42" rx="6"/><text class="t-ok" x="800" y="395" text-anchor="middle" font-size="15">Q66</text>
+<rect class="c-ok" x="48" y="418" width="64" height="42" rx="6"/><text class="t-ok" x="80" y="445" text-anchor="middle" font-size="15">Q67</text>
+<rect class="c-ok" x="120" y="418" width="64" height="42" rx="6"/><text class="t-ok" x="152" y="445" text-anchor="middle" font-size="15">Q68</text>
+<rect class="c-ok" x="192" y="418" width="64" height="42" rx="6"/><text class="t-ok" x="224" y="445" text-anchor="middle" font-size="15">Q69</text>
+<rect class="c-ok" x="264" y="418" width="64" height="42" rx="6"/><text class="t-ok" x="296" y="445" text-anchor="middle" font-size="15">Q70</text>
+<rect class="c-ok" x="336" y="418" width="64" height="42" rx="6"/><text class="t-ok" x="368" y="445" text-anchor="middle" font-size="15">Q71</text>
+<rect class="c-inv" x="408" y="418" width="64" height="42" rx="6"/><text class="t-inv" x="440" y="445" text-anchor="middle" font-size="15">Q72</text>
+<rect class="c-ok" x="480" y="418" width="64" height="42" rx="6"/><text class="t-ok" x="512" y="445" text-anchor="middle" font-size="15">Q73</text>
+<rect class="c-ok" x="552" y="418" width="64" height="42" rx="6"/><text class="t-ok" x="584" y="445" text-anchor="middle" font-size="15">Q74</text>
+<rect class="c-ok" x="624" y="418" width="64" height="42" rx="6"/><text class="t-ok" x="656" y="445" text-anchor="middle" font-size="15">Q75</text>
+<rect class="c-ok" x="696" y="418" width="64" height="42" rx="6"/><text class="t-ok" x="728" y="445" text-anchor="middle" font-size="15">Q76</text>
+<rect class="c-ok" x="768" y="418" width="64" height="42" rx="6"/><text class="t-ok" x="800" y="445" text-anchor="middle" font-size="15">Q77</text>
+<rect class="c-ok" x="48" y="468" width="64" height="42" rx="6"/><text class="t-ok" x="80" y="495" text-anchor="middle" font-size="15">Q78</text>
+<rect class="c-ok" x="120" y="468" width="64" height="42" rx="6"/><text class="t-ok" x="152" y="495" text-anchor="middle" font-size="15">Q79</text>
+<rect class="c-ok" x="192" y="468" width="64" height="42" rx="6"/><text class="t-ok" x="224" y="495" text-anchor="middle" font-size="15">Q80</text>
+<rect class="c-ok" x="264" y="468" width="64" height="42" rx="6"/><text class="t-ok" x="296" y="495" text-anchor="middle" font-size="15">Q81</text>
+<rect class="c-inv" x="336" y="468" width="64" height="42" rx="6"/><text class="t-inv" x="368" y="495" text-anchor="middle" font-size="15">Q82</text>
+<rect class="c-ok" x="408" y="468" width="64" height="42" rx="6"/><text class="t-ok" x="440" y="495" text-anchor="middle" font-size="15">Q83</text>
+<rect class="c-nos" x="480" y="468" width="64" height="42" rx="6"/><text class="t-nos" x="512" y="495" text-anchor="middle" font-size="15">Q84</text>
+<rect class="c-ok" x="552" y="468" width="64" height="42" rx="6"/><text class="t-ok" x="584" y="495" text-anchor="middle" font-size="15">Q85</text>
+<rect class="c-ok" x="624" y="468" width="64" height="42" rx="6"/><text class="t-ok" x="656" y="495" text-anchor="middle" font-size="15">Q86</text>
+<rect class="c-ok" x="696" y="468" width="64" height="42" rx="6"/><text class="t-ok" x="728" y="495" text-anchor="middle" font-size="15">Q87</text>
+<rect class="c-ok" x="768" y="468" width="64" height="42" rx="6"/><text class="t-ok" x="800" y="495" text-anchor="middle" font-size="15">Q88</text>
+<rect class="c-ok" x="48" y="518" width="64" height="42" rx="6"/><text class="t-ok" x="80" y="545" text-anchor="middle" font-size="15">Q89</text>
+<rect class="c-ok" x="120" y="518" width="64" height="42" rx="6"/><text class="t-ok" x="152" y="545" text-anchor="middle" font-size="15">Q90</text>
+<rect class="c-ok" x="192" y="518" width="64" height="42" rx="6"/><text class="t-ok" x="224" y="545" text-anchor="middle" font-size="15">Q91</text>
+<rect class="c-ok" x="264" y="518" width="64" height="42" rx="6"/><text class="t-ok" x="296" y="545" text-anchor="middle" font-size="15">Q92</text>
+<rect class="c-ok" x="336" y="518" width="64" height="42" rx="6"/><text class="t-ok" x="368" y="545" text-anchor="middle" font-size="15">Q93</text>
+<rect class="c-ok" x="408" y="518" width="64" height="42" rx="6"/><text class="t-ok" x="440" y="545" text-anchor="middle" font-size="15">Q94</text>
+<rect class="c-ok" x="480" y="518" width="64" height="42" rx="6"/><text class="t-ok" x="512" y="545" text-anchor="middle" font-size="15">Q95</text>
+<rect class="c-ok" x="552" y="518" width="64" height="42" rx="6"/><text class="t-ok" x="584" y="545" text-anchor="middle" font-size="15">Q96</text>
+<rect class="c-ok" x="624" y="518" width="64" height="42" rx="6"/><text class="t-ok" x="656" y="545" text-anchor="middle" font-size="15">Q97</text>
+<rect class="c-ok" x="696" y="518" width="64" height="42" rx="6"/><text class="t-ok" x="728" y="545" text-anchor="middle" font-size="15">Q98</text>
+<rect class="c-ok" x="768" y="518" width="64" height="42" rx="6"/><text class="t-ok" x="800" y="545" text-anchor="middle" font-size="15">Q99</text>
+<rect class="c-ok" x="880" y="118" width="64" height="42" rx="6"/><text class="t-ok" x="912" y="146" text-anchor="middle" font-size="18">87</text><text class="h" x="958" y="136" font-size="14">proven equal to TPC-DS</text><text class="m" x="958" y="156" font-size="13">on real rows, DuckDB at SF 1</text>
+<rect class="c-unv" x="880" y="214" width="64" height="42" rx="6"/><text class="t-unv" x="912" y="242" text-anchor="middle" font-size="18">3</text><text class="h" x="958" y="232" font-size="14">compatible, not yet provable</text><text class="m" x="958" y="252" font-size="13">TPC-DS returns no rows or only zeros at SF 1</text>
+<rect class="c-inv" x="880" y="310" width="64" height="42" rx="6"/><text class="t-inv" x="912" y="338" text-anchor="middle" font-size="18">6</text><text class="h" x="958" y="328" font-size="14">incompatible</text><text class="m" x="958" y="348" font-size="13">read the inventory fact table</text>
+<rect class="c-nos" x="880" y="406" width="64" height="42" rx="6"/><text class="t-nos" x="912" y="434" text-anchor="middle" font-size="18">3</text><text class="h" x="958" y="424" font-size="14">incompatible</text><text class="m" x="958" y="444" font-size="13">need customers or stores with no sales</text>
+<line x1="880" y1="508" x2="1202" y2="508" stroke="#d7bca8" stroke-width="1.5"/>
+<text class="h" x="880" y="536" font-size="14">90 compatible, 9 incompatible</text>
+<text class="m" x="880" y="556" font-size="13">nothing else is run under a TPC-DS query number</text>
+<text x="1202" y="592" class="m" font-size="11" text-anchor="end">benchbox.dev</text>
+</svg>
