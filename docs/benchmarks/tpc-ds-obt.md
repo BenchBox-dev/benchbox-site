@@ -83,9 +83,9 @@ Measured on DuckDB. The size is the Parquet output on disk.
 | 1 | 5,041,336 | 1.38 GB |
 | 10 | 50,399,818 | 18.2 GB |
 
-The staged TPC-DS source data that the table is built from is larger than the Parquet output; the
-[SF1 calibrated sizes](sf1-calibrated-sizes.md) page gives 2,406,484,046 bytes for `tpcds_obt` at SF 1,
-which includes that source.
+The [SF1 calibrated sizes](sf1-calibrated-sizes.md) page reports 2,406,484,046 bytes for `tpcds_obt` at SF 1.
+That figure is an uncompressed total that includes the staged TPC-DS source, so it is larger than the Parquet
+size above.
 
 ## Quick Start
 

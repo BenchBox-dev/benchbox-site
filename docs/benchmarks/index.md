@@ -29,22 +29,10 @@ separate from public discovery visibility and from DataFrame capability.
 
 ## Scale factors
 
-Each benchmark has a set of standard scale factors, listed in the table below. BenchBox accepts any value from 0.01
-to 100000, with whole numbers from 1 upward (1, 2, 10, but not 1.5). A value that is not in the standard set runs
-with a one-line note that its results are not comparable with published results. `joinorder` and
-`metadata_primitives` are fixed at 1 and accept no other value.
-
-| Benchmark | Standard scale factors |
-|-----------|------------------------|
-| `tpch`, `tpcds` | 0.01, 0.1, 1, 10, 30, 100, 300, 1000, 3000, 10000, 30000, 100000 |
-| `tpcds_obt`, `tpcdi`, `ssb`, `tpchavoc`, `tpch_skew`, `datavault`, `tsbs_devops` | 0.01, 0.1, 1, 10 |
-| `nyctaxi`, `flightdata`, `vector_search` | 0.01, 0.1, 1, 10, 100 |
-| `h2odb`, `amplab`, `write_primitives`, `transaction_primitives`, `ai_primitives` | 0.01, 0.1, 1 |
-| `coffeeshop` | 0.01, 0.1, 1 |
-| `joinorder_synthetic` | 0.01, 0.1, 0.5, 1, 2 |
-| `read_primitives` | 0.01, 0.1 |
-| `clickbench` | 1 |
-| `joinorder`, `metadata_primitives` | 1 (fixed) |
+Each benchmark has a short set of standard scale factors, typically 0.01, 0.1, 1 and 10. BenchBox accepts any
+value from 0.01 to 100000, with whole numbers from 1 upward (1, 2, 10, but not 1.5). A value that is not in the
+benchmark's standard set runs with a one-line note that its results are not comparable with published results.
+`joinorder` and `metadata_primitives` are fixed at 1 and accept no other value.
 
 ## Contents
 
