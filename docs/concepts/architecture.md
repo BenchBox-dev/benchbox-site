@@ -211,7 +211,7 @@ benchmarks use Python, and the coffee shop generator generates data with Faker.
 generator = TPCHGenerator(scale_factor=1.0, output_dir="./data")
 file_paths = generator.generate()
 
-generator = CoffeeShopGenerator(scale_factor=0.001)
+generator = CoffeeShopGenerator(scale_factor=0.01)
 file_paths = generator.generate()
 ```
 

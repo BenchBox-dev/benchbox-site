@@ -176,7 +176,7 @@ The Write Primitives benchmark is designed for **broad platform compatibility** 
 **Operation Count**:
 
 - **Write Primitives**: 112 operations (INSERT, UPDATE, DELETE, MERGE, BULK_LOAD, DDL)
-- **Transaction Primitives**: 8 operations (COMMIT, ROLLBACK, SAVEPOINT, isolation levels)
+- **Transaction Primitives**: 23 operations (COMMIT, ROLLBACK, SAVEPOINT, isolation levels)
 
 ## Design
 
@@ -650,7 +650,7 @@ if not result.validation_passed:
 **Optimization**:
 
 ```python
-bench = WritePrimitives(scale_factor=0.001)
+bench = WritePrimitives(scale_factor=0.01)
 ```
 
 Use smaller scale factors for faster testing.
@@ -672,7 +672,7 @@ Write Primitives and Transaction Primitives are complementary benchmarks designe
 - **Focus**: Multi-statement transactions and ACID guarantees
 - **Platform support**: Designed for ACID-capable databases (PostgreSQL, MySQL, SQL Server - adapters not yet available; currently limited support via DuckDB/SQLite)
 - **Transaction requirements**: Required (tests transaction semantics)
-- **Operations**: 8 operations focused on ACID behavior
+- **Operations**: 23 operations focused on ACID behavior
 - **Use case**: Testing transaction isolation, atomicity, consistency, durability
 
 ### Using Both Together

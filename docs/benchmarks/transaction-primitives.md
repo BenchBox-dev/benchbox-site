@@ -527,7 +527,7 @@ results = bench.run_benchmark(conn, operation_ids=supported_ops)
 **Optimization**: Use smaller scale factors for faster testing.
 
 ```python
-bench = TransactionPrimitives(scale_factor=0.001)
+bench = TransactionPrimitives(scale_factor=0.01)
 ```
 
 ## Relationship to Write Primitives

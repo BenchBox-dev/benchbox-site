@@ -169,7 +169,7 @@ The first command uses a user-level CLI installation. The second checks the outp
 ```bash
 benchbox profile
 
-benchbox run --platform duckdb --benchmark tpch --scale 0.001
+benchbox run --platform duckdb --benchmark tpch --scale 0.01
 
 benchbox run --platform duckdb --benchmark tpch --compression zstd:9
 ```

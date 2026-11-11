@@ -265,8 +265,7 @@ All benchmarks accept these parameters:
 
 | Scale Factor | Data Size | Use Case          |
 | ------------ | --------- | ----------------- |
-| 0.001        | ~1MB      | Unit tests        |
-| 0.01         | ~10MB     | Development       |
+| 0.01         | ~10MB     | Unit tests and development |
 | 0.1          | ~100MB    | Integration tests |
 | 1.0          | ~1GB      | Benchmarking      |
 

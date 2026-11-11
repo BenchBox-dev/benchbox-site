@@ -974,7 +974,7 @@ def health_check() -> bool:
         print("✅ Import test passed")
 
         with tempfile.TemporaryDirectory() as temp_dir:
-            benchmark = TPCDI(scale_factor=0.001, output_dir=temp_dir)
+            benchmark = TPCDI(scale_factor=0.01, output_dir=temp_dir)
             print("✅ Instantiation test passed")
 
             schema = benchmark.get_schema()

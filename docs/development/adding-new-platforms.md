@@ -968,7 +968,7 @@ class TestNewDatabaseIntegration:
     def test_end_to_end_benchmark(self, integration_adapter):
         from benchbox import ReadPrimitives
 
-        benchmark = ReadPrimitives(scale_factor=0.001)
+        benchmark = ReadPrimitives(scale_factor=0.01)
         results = integration_adapter.run_benchmark(benchmark)
 
         assert results.status == 'SUCCESS'
@@ -1028,7 +1028,7 @@ Test with small benchmark:
 from benchbox import ReadPrimitives
 from benchbox.platforms.newdatabase import NewDatabaseAdapter
 
-benchmark = ReadPrimitives(scale_factor=0.001)
+benchmark = ReadPrimitives(scale_factor=0.01)
 adapter = NewDatabaseAdapter(
     host="localhost",
     database="test",

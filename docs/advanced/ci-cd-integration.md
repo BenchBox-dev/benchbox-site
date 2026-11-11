@@ -894,11 +894,11 @@ if webhook:
 benchbox run \
   --platform duckdb \
   --benchmark tpch \
-  --scale 0.001 \
+  --scale 0.01 \
   --queries 1,6,12
 ```
 
-``--scale 0.001`` is a very small scale, and ``--queries 1,6,12`` runs a subset of queries.
+``--scale 0.01`` is the smallest scale, and ``--queries 1,6,12`` runs a subset of queries.
 
 ### Resource Constraints
 
