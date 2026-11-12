@@ -85,7 +85,7 @@ inline series navigation inside posts.
 
 Create the post in `drafts/{series}/drafts/`. Name the file with the
 series post number and slug, for example
-`drafts/building-benchbox/drafts/18-v0-4-1-release-overview.md`. Follow the
+`drafts/building-benchbox/drafts/17-results-explorer-qualifies-comparisons.md`. Follow the
 style guide:
 
 - **Voice**: Community-inclusive ("we" not "I"), enthusiastic but grounded

@@ -2,7 +2,7 @@
 
 > The BenchBox blog publication queue: one row per unpublished
 > actionable article.
-> **Last updated:** 2026-10-19
+> **Last updated:** 2026-11-11
 
 ## How this queue works
 
@@ -39,7 +39,6 @@
 | ------- | ------ | -------- | ----- | ----------- | ------------- | ---------------- |
 | BenchBox in action: when the same query needs different code | [Draft](benchbox-in-action/drafts/06-platform-specific-optimization-patterns.md) | High | Joe / author | Human editorial check and review | - | - |
 | How the Results Explorer qualifies comparisons | [Draft](building-benchbox/drafts/17-results-explorer-qualifies-comparisons.md) | Medium | Joe / author | Resolve hold with Joe, then editorial check | - | Publication withheld |
-| BenchBox v0.4.1: more lakehouse pairings, stricter results | [Draft](building-benchbox/drafts/18-v0-4-1-release-overview.md) | Medium | Joe / author | Human editorial check and review | - | Verify lakehouse pairing count against the draft before publish |
 | Free trials intro: a benchmarker's guide | [Draft](free-trial-benchmarking/drafts/00-series-intro.md) | Medium | Joe / author | Human editorial check and review | never | Time-sensitive: trial terms change; verify before publish |
 | Free trial benchmarking: Snowflake | [Draft](free-trial-benchmarking/drafts/01-snowflake.md) | Medium | Joe / author | Human editorial check and review | never | Time-sensitive: trial terms change; verify before publish |
 | Free trial benchmarking: Databricks | [Draft](free-trial-benchmarking/drafts/02-databricks.md) | Medium | Joe / author | Human editorial check and review | never | Time-sensitive: trial terms change; verify before publish |
