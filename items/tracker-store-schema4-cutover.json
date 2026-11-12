@@ -1,0 +1,23 @@
+{
+  "acceptance": [
+    "Every tractable-mcp process bound to BenchBox-dev/benchbox-site is confirmed stopped or running a version that supports schema 4",
+    "A `register_batch` with `confirm_schema3_cutover=true` succeeds, or the owner records a decision to stay serial and this item is dropped",
+    "AGENTS.md states the minimum tractable version the store now needs"
+  ],
+  "context": "Decision gate: owner confirms no older client on any machine still needs the store. One-way: older clients refuse the store afterwards.",
+  "description": "Problem: the todo-state store is below schema 4, so `register_batch` is refused until a one-way cutover is confirmed, and the cutover requires every process with access to the store to be stopped or upgraded. On 2026-11-12 another session's tractable-mcp (started before that day's reinstall of tractable 1.1.1) was bound to this store, so the cutover could not be confirmed and the release-pin work ran as a serial batch. Outcome: the store is at schema 4 and a prepared batch can be registered.",
+  "links": [
+    "AGENTS.md",
+    ".tractable/config.json"
+  ],
+  "sessions": [
+    {
+      "actor": "mcp:omp-coding-agent:joe@joe-mac-mini.local:9c85f43e97659072aa9dbbd3",
+      "at": "2026-11-12T16:49:54Z",
+      "client": "omp-coding-agent",
+      "op": "create",
+      "op_id": "49960af5208b4278b57ecbe44d8fbc0a",
+      "session_id": "524c11ecc7864e4f81039b54632b8c82"
+    }
+  ]
+}

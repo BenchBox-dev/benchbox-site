@@ -276,6 +276,13 @@
       "status": "dropped",
       "title": "Fix the site-parity header shrink-toggle mismatch between docs and results sites"
     },
+    "tracker-store-schema4-cutover": {
+      "claim": null,
+      "needs": [],
+      "priority": "low",
+      "status": "open",
+      "title": "Cut the tracker store over to schema 4 so registered batches can run"
+    },
     "tuning-page-empty-aliases-sentence-20261029": {
       "claim": null,
       "needs": [],
