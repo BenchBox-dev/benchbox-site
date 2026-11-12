@@ -149,6 +149,13 @@
       "status": "done",
       "title": "Highlight the Results header link on /result-summaries/ pages"
     },
+    "revisit-multi-warehouse-post-after-core-0-5-1": {
+      "claim": null,
+      "needs": [],
+      "priority": "high",
+      "status": "open",
+      "title": "Revisit the multi-warehouse pattern post once BenchBox v0.5.1 is released"
+    },
     "rollback-gates-on-pre-allowlist-removal-artifacts-20261029": {
       "claim": null,
       "needs": [],

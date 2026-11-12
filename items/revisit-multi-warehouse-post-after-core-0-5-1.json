@@ -1,0 +1,29 @@
+{
+  "acceptance": [
+    "The post states what v0.5.1 changed in Q16 and Q95 and cites the release, with no remaining claim that the platform branch is unchanged.",
+    "Complete DataFrame Q16 and Q95 are timed on BenchBox 0.5.0 and 0.5.1 on an idle machine, on polars-df, datafusion-df and pyspark-df, and the post reports the before and after.",
+    "The isolated-step timings are rerun on an idle machine with the commands in the research note, and the post's tables and ratios match the new run or are corrected.",
+    "Engine versions are re-checked against the newest releases at that date, including whether DuckDB 2.0.x still shows the slow isolated EXISTS plan and whether v0.5.1 accepts DuckDB 2.",
+    "The research note records the new run, and the draft's front matter has a real date and post_number.",
+    "The publication schedule row's next action is updated to the human editorial check."
+  ],
+  "context": "Blocked on the BenchBox v0.5.1 release; unblock when the v0.5.1 tag and PyPI package exist. The core work item for the DataFrame change had not been created in core's tracker when this item was written (2026-11-12); the proposed id was tpcds-df-multi-warehouse-min-max. Findings core is acting on: on DataFusion 55.0.0 the self-join is the slower option on every dataset; a min/max per order pattern was fastest in 39 of 40 tests on current engine releases; Polars n_unique() counts NULL as a value and the Q95 helper does not drop NULL warehouses first. Pull request 143 holds the rewritten draft and evidence and was an unmerged draft on 2026-11-12. If the full-query timings do not support the isolated-step result, the post's conclusion changes, not only its numbers.",
+  "description": "The draft \"BenchBox in action: when the same query needs different code\" says BenchBox 0.5.0 still picks the multi-warehouse pattern by platform name in TPC-DS DataFrame Q16 and Q95, and that we have not changed it. Core will change that logic and release it in v0.5.1. When v0.5.1 is out, bring the post in line with what shipped and finish the evidence it still lacks.\n\nWhat the draft is missing today:\n- Timings from an idle machine. The 2026-11-11 run shared the machine with other jobs, so the draft reports best times and ratios only.\n- Timings of the complete DataFrame Q16 and Q95. Only the isolated step was timed, plus the complete SQL queries on DuckDB.\n- The outcome. The section \"What this means for BenchBox\" describes the branch as unchanged.",
+  "links": [
+    "https://github.com/BenchBox-dev/benchbox-site/pull/143",
+    "drafts/benchbox-in-action/drafts/06-platform-specific-optimization-patterns.md",
+    "drafts/benchbox-in-action/research/multi-warehouse-patterns-remeasured-2026-11-11.md",
+    "drafts/benchbox-in-action/outlines/06-platform-specific-optimization-patterns.md",
+    "drafts/PUBLICATION_SCHEDULE.md"
+  ],
+  "sessions": [
+    {
+      "actor": "mcp:omp-coding-agent:joe@joe-mac-mini.local:e23a6582b4d3c0e6561b3066",
+      "at": "2026-11-12T13:24:24Z",
+      "client": "omp-coding-agent",
+      "op": "create",
+      "op_id": "88faf79c2c4549c7a04e4ecd05072fe0",
+      "session_id": "daa9f52bad874d94b3dcac4c023e90df"
+    }
+  ]
+}
