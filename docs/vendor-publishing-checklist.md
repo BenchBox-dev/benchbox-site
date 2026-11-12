@@ -2,7 +2,7 @@
 
 Result bundles are public downloads, so a cloud platform's terms apply to
 publishing them. The terms were read for each platform and are recorded in the
-[Terms check](../development/adr/adr-client-link-locality-disclosure.md#terms-check)
+[Terms check](development/adr/adr-client-link-locality-disclosure.md#terms-check)
 of the client-link locality ADR. This page turns each condition in that table
 into one of two things: an automated check, or a manual step you perform
 before you publish a cloud result.
@@ -14,7 +14,7 @@ request. The conditions are the ADR's; this page adds none.
 
 `benchbox submit` writes five vendor fields into the submission manifest. The
 bundle validator reads the same fields when your pull request is validated
-(see [Contributing Benchmark Results](../contributing-results.md)), and
+(see [Contributing Benchmark Results](contributing-results.md)), and
 `benchbox submit` runs the same evaluation before it packages anything.
 
 | Manifest field | `benchbox submit` option | What it records |
@@ -139,4 +139,4 @@ to meet and nothing to record. No telemetry clause was found either.
 3. Keep the vendor's reply or permission reference. The manifest holds a
    reference to it, not the message itself.
 4. Open the pull request as described in
-   [Contributing Benchmark Results](../contributing-results.md).
+   [Contributing Benchmark Results](contributing-results.md).

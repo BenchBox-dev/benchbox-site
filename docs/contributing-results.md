@@ -125,7 +125,7 @@ MotherDuck is subject to that vendor's publishing terms. `benchbox submit` takes
 `--plan-tier`, `--preview-feature`, `--vendor-permission`, `--vendor-notice-date`,
 `--vendor-notice-ref` and `--self-run` to record them in the manifest, and refuses
 free-tier, trial and preview results without the vendor's permission. Follow the
-[vendor publishing checklist](operations/vendor-publishing-checklist.md) for your
+[vendor publishing checklist](vendor-publishing-checklist.md) for your
 platform before you open the pull request.
 
 ### 5. CI validation
