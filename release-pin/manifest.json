@@ -1,0 +1,23 @@
+{
+  "schema": 5,
+  "core_sha": "dfe585e0944ee7a4b0e52da4994f1e1fee6669f1",
+  "package_version": "0.5.0",
+  "certified_by": "42112094059",
+  "corpus_sha": "381b3322aa329bf8c2b3df0392dccae08660371b",
+  "parent_core_sha": "e3b793bdf55a538e06c8dcffd5530fc548fedad9",
+  "parent_source": "bundle",
+  "members": {
+    "repo-files.json": "5406e5eb7c41abfbf24a384740ff16c617986a0494b09597fd5a623ba84781f1",
+    "explorer/results.duckdb": "88d98be718e1a6174049c6ef2b0751b4e2752ece792a7be232652a12b49925d2",
+    "explorer/contract.json": "f8b4683aec7733e7198777fdca23957009b9320f0336cf756eea14af2e1c5524",
+    "explorer/fixtures": "80ade9381f34fa103c334b3ac33136f36f5fa031bbaea6e93e1d71a1ca739600",
+    "explorer/parity": "210268130b33c24fde73cabf21c3b7ab0a1c81f07e27e090e4c92f4e2e5fbc80",
+    "explorer/bundles": "922ba1cb4e5191eab9b463cadefc5aaa1f7cbc457e410924cbe9a7725a5c5c45",
+    "landing/prompt-catalog.json": "3cfcf3afb12d3dca012edd095ec098dc0d6ba1659c422bba2e14a5d191d9a42e",
+    "api-public-symbols.json": "a41ccb728ad91fd64a3ba2a626b68052882c38ed24383017a7aaa20b691e2375",
+    "attestations.json": "c117fc7d2c316d9d42a607e6be4553517d78bfdaf86bb56b1f2c572843dd7bf1",
+    "docs-data": "0e758b3a32a4c8edb2c780a7472d806d51a0519f5a6bc550ec23ed1ea760e661",
+    "doc-contracts.json": "ccb5991b9d9bc4d2e97d60e72e57428acf23a115f75b0e779f9134a08061307d"
+  },
+  "produced_at": "2026-11-05T21:41:12.875242+00:00"
+}

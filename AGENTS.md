@@ -5,7 +5,8 @@ This repository builds and deploys benchbox.dev: the Astro site in
 `landing/`, the published blog in `blog/` and blog drafts in `drafts/`.
 Benchmark code and results data live in the core
 repository, `BenchBox-dev/BenchBox`. The documentation under `docs/` is
-authored here. The site builds from the repository itself plus one
+authored here. Apart from the documentation inputs
+described under "Release pin", the site builds from the repository itself plus one
 versioned core bundle; it reads nothing else from core.
 
 ## Language
@@ -16,7 +17,7 @@ versioned core bundle; it reads nothing else from core.
 - Tooling is Node and TypeScript. A third-party tool fetched at run time is
   allowed, for example a pinned `npx` package. The one Python tool the site
   runs is the published `benchbox` CLI, as an external program pinned to the
-  bundle's version, from `scripts/render-blog-charts.mjs` only.
+  release pin's version, from `scripts/render-blog-charts.mjs` only.
 
 ## The core bundle
 
@@ -38,7 +39,7 @@ versioned core bundle; it reads nothing else from core.
   `candidate` is valid for schemas 4 and 5 under `--offline` verification
   only, and never passes online certification.
 - `npm run docs:check` (`docs-contracts/`, TypeScript) checks the site's
-  documentation against the `doc-contracts.json` facts core exports: registry
+  documentation against the `doc-contracts.json` facts of the docs inputs (the release pin, or the newest bundle when `DOCS_INPUTS` names it): registry
   and platform counts, the benchmark API surface, the quickstart commands,
   `--platform-option` examples, the MCP reference, SF1 sizes, sketch bounds,
   version markers, the Python API headings and the publication boundary. It
@@ -49,8 +50,8 @@ versioned core bundle; it reads nothing else from core.
   with `--docs-mode block` (the default) and only print with
   `--docs-mode report`; `ci` and the deploy build pass `block` (rollback
   restores an artifact and runs no check), so page drift fails the run
-  before the build and before publication. A bundle without
-  `doc-contracts.json` always fails. `npm run test:docs-contracts` runs the
+  before the build and before publication. Docs inputs without
+  `doc-contracts.json` always fail. `npm run test:docs-contracts` runs the
   seeded drift tests; `DOC_CONTRACTS_SCHEMA4_BUNDLE=<bundle dir>` adds a run
   against a real bundle.
 - `inventory/core-linked-paths.json` lists every core path that a relative
@@ -68,7 +69,7 @@ versioned core bundle; it reads nothing else from core.
 
 - `docs/` holds the published pages, authored here, with their original
   MIT license text in `docs/LICENSE`. The build assembles them with the
-  pages that `npm run docs:generate -w website` renders from the bundle's
+  pages that `npm run docs:generate -w website` renders from the docs inputs'
   `docs-data` (the generated scope: `benchmarks/queries/`, `compat/` and
   `reference/tuning-platform-support.md`) and with `blog/`. An authored page
   in the generated scope or under `docs/blog/` fails the assembly.
@@ -105,8 +106,8 @@ versioned core bundle; it reads nothing else from core.
 - The blog index is rendered by the blog template from the published posts;
   `blog/index.md` holds only the introduction.
 - `docs/README.md` is the landing page. Its `{{package_version}}` token
-  becomes the bundle manifest's `package_version`, so the release marker in
-  the page always matches the bundle.
+  becomes the `package_version` of the docs inputs' manifest, so the release
+  marker in the page always matches the release the docs describe.
 - Core keeps maintainer-only material (`docs/agent/`, `docs/internal/`,
   `design/future-state/`, the threat model, the workaround index, the TPC
   licensing analysis and the publication lists). The site publishes
@@ -118,6 +119,36 @@ versioned core bundle; it reads nothing else from core.
 - `npm run lint:docs` runs markdown lint and spelling over `docs/`. Fix
   findings; add a genuine word to `cspell-words.txt` instead of exempting a
   page. `ci` runs it.
+
+## Release pin
+
+- `release-pin/` holds the docs inputs of one published core release. Docs
+  assembly, `docs:check`, `docs:generate`, core-file link pinning and the blog
+  chart renderer read it.
+- The Explorer, the result summaries, the prompt catalog and the deploy gates
+  still read the newest certified bundle.
+- `DOCS_INPUTS` names the directory the docs inputs are read from. Unset or
+  empty means `release-pin/`. `ci` and the Visual workflow set it to the
+  fetched bundle for pushes to `next` and pull requests into `next`.
+- `ci` checks the pin with `npm run docs:pin -- --check`: the pin must be
+  well formed and its tag a published release.
+- Unreleased documentation merges to `next`, where CI checks it against the
+  newest develop bundle. Fixes to released documentation merge to `main`;
+  whoever merges one then merges `main` into `next` with a merge commit.
+- A release is: the owner runs `npm run docs:pin -- vX.Y.Z` on `next` by pull
+  request, then opens one pull request from `next` into `main`. After that
+  squash merge, merge `main` into `next` to bring it level.
+- The Nightly workflow opens or updates the `docs-release-pending` issue when
+  core has published a release newer than the pin. The owner acts on it.
+- Compatibility window: site code on `main` must read the pinned release's
+  `docs-data` and `doc-contracts.json`. Code on `next` must read both the pin
+  and the newest develop bundle until the next release is pinned.
+- Never edit pinned members by hand; `npm run docs:pin` writes them.
+- `docs:pin` fetches and verifies the certified bundle of the tag's commit, so
+  a tag whose commit has no such bundle cannot be pinned. Bundles expire after
+  90 days, so pin soon after a release. `--from <dir>` pins a bundle directory
+  that was verified elsewhere and skips the fetch and its certification check;
+  use it only for a release whose bundle the current verifier cannot read.
 
 ## Deploys
 
@@ -209,7 +240,8 @@ versioned core bundle; it reads nothing else from core.
 ## Core and this repository
 
 Core's data and pipeline changes reach this repository through the core
-bundle and need no action here: core's `site-inputs.yml` builds the
+bundle and need no action here, apart from pinning each release as described
+under "Release pin": core's `site-inputs.yml` builds the
 `site-inputs-<sha>` artifact after each successful push to `develop` and
 dispatches `core-bundle`, and the deploy fetches and verifies it.
 
@@ -229,7 +261,7 @@ Adaptations to keep:
   because it is gone from the snapshot. See
   `docs/design/adr-results-summary-pages.md`.
 - The site serves no copies of core files. Documentation links to files
-  outside `docs/` point at GitHub, pinned to the bundle's `core_sha`. The
+  outside `docs/` point at GitHub, pinned to the docs inputs' `core_sha`. The
   Sphinx-era URLs `/docs/_downloads/<md5>/<name>`, and the `TPC_EULA.txt`
   sidecars beside TPC query templates, are a closed set recorded in
   `inventory/legacy-downloads.json`. Each is published, also under
@@ -243,8 +275,10 @@ Adaptations to keep:
 
 ## Changes
 
-- Work on a named branch and open a pull request to `main`. `main` accepts
-  squash merges only and requires the `ci` check.
+- Work on a named branch and open a pull request to `main` (fixes to released
+  documentation and everything that is not unreleased documentation) or to
+  `next` (unreleased documentation), as described under "Release pin". `main`
+  accepts squash merges only and requires the `ci` check.
 - Stage files by explicit path. Never run `git add -A` or `git add .`.
 - Commit identity: `Joe Harris <joeharris76@gmail.com>`. Add no agent or
   co-author trailers.
