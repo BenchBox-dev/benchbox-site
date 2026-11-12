@@ -507,6 +507,9 @@ optimize_for_columnar(ssb, conn)
 | 10 | ~60,000,000 | ~5 GB | Performance testing |
 | 100 | ~600,000,000 | ~50 GB | Large-scale testing |
 
+The standard scale factors for SSB are 0.01, 0.1, 1 and 10. The 100 row runs with a note that its results are not
+comparable with published results; see [Scale factors](index.md#scale-factors).
+
 ### Advanced-level Configuration
 
 In the constructor, `date_range_years` sets the date range (default 7 years), `enable_compression` compresses output files, `partition_fact_table` partitions LINEORDER by date, and `generate_indices` generates the recommended indices. The `query_params` dictionary sets the year for temporal queries, the geographic focus, the product category, and the discount selectivity.
