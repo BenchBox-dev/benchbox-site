@@ -107,67 +107,9 @@ revert a manually-installed version and how to work around it.
 
 ### Gateway Endpoint
 
-`--gateway espresso|greybeam|custom` routes the Snowflake connection through a gateway endpoint. Every gateway
-needs `gateway_host`; the Snowflake `account` is still sent so login succeeds. Gateway options are accepted only
-with a non-native gateway.
-
-```bash
-benchbox run --platform snowflake --benchmark tpch --gateway custom \
-  --platform-option gateway_host=gateway.example.com \
-  --platform-option gateway_port=8443
-```
-
-| Option | Default | Description |
-|--------|---------|-------------|
-| `gateway_host` | (required) | Bare gateway host name or address; a value with credentials (`user:password@`), a scheme or a path is rejected |
-| `gateway_port` | connector default | Gateway port (1-65535) |
-| `gateway_protocol` | `https` | `https` or `http` |
-| `gateway_ca_bundle` | (none) | CA bundle file for a private-CA gateway. The connector reads it from the process environment, so `REQUESTS_CA_BUNDLE` must name the same file before BenchBox starts; otherwise construction fails. BenchBox never changes the environment |
-| `gateway_ocsp_fail_open` | (connector default) | Passed to the connector only when set |
-| `allow_insecure_gateway` | false | Disables certificate verification (`insecure_mode`) |
-
-`allow_insecure_gateway` and `http` to a non-loopback host both require `BENCHBOX_ALLOW_INSECURE_GATEWAY=1` and
-log a warning. Gateway options are not available through MCP. A gateway-routed run records
-`platform.gateway`, is marked `tpc_compliant: false`, and never compares with native runs. Its
-`benchmark.compliance_class` is always `unofficial_nonstandard`, whatever the benchmark reports, so TPC metrics are
-suppressed and publish, submit, bundle validation, the results database and metrics readiness all refuse it as
-non-official. A stored result that claims `official` while `platform.gateway.routed` is true is treated the same way.
-
-#### Greybeam lifecycle guardrails
-
-Greybeam queries an Iceberg replica that CDC keeps in sync with the native Snowflake tables. Loading or refreshing
-through the gateway therefore leaves the replica empty or stale, and queries against it return wrong answers.
-BenchBox enforces these runtime restrictions:
-
-- **Generate and load phases** raise `ConfigurationError`. Pass explicit query phases (for example
-  `--phases power,throughput`) after loading natively. Query-only runs also refuse automatic database recreation or
-  loading when the database is missing, empty, or incompatible. `--force-recreate` fails before database management.
-  The SQL adapter checks before database reset/drop, fresh setup, schema creation, and data loading, so a missing or
-  stale replica cannot trigger writes as a side effect of a query-only run. Fix the native dataset and wait for CDC
-  quiescence rather than recreating it through the gateway.
-  Read-only validation connections and dry-run database checks do not decide whether the database needs recreation;
-  they remain available without the inline-load override. Mutation entrypoints still enforce the guard independently.
-  The escape hatch needs both `--allow-greybeam-inline-load` and `BENCHBOX_I_UNDERSTAND_GREYBEAM_LOAD=1`; it also covers
-  automatic reload/recreation, and results from such a run are invalid data.
-- **TPC-H RF1/RF2 and TPC-DS maintenance streams** fail fast when `maintenance` is named in `--phases` or the
-  maintenance test type is selected. When the maintenance phase is only implied (a combined run without `--phases`), it
-  is skipped with a loud warning and a `maintenance_skipped: true` row with status `SKIPPED` in the query results.
-  The escape hatch does not cover maintenance.
-  TPC-H refresh functions enabled inside the power or throughput phase (`tpch_refresh_functions`) also fail closed
-  before any refresh set is generated or applied; the phase reports a `FAILED` row naming the greybeam gateway.
-
-Quiescence runbook, to run after every native load or refresh and before the first gateway query:
-
-1. **Row-count parity.** For every benchmark table, compare `SELECT COUNT(*)` through the native endpoint with the same
-   count through the gateway. Any difference means the replica has not caught up.
-2. **Lag threshold.** Repeat the parity check at a fixed interval (for example 60 seconds). Treat the replica as
-   quiescent only after parity holds on three consecutive checks with no source writes in between. Replication lag
-   itself comes from the vendor's own monitoring; BenchBox does not read it.
-3. **Abort criteria.** Abort the run without recording results if parity is not reached within the time budget you set
-   before the load (size it to the data volume), if row counts ever move backwards, or if a gateway query returns zero
-   rows for a table that is non-empty natively.
-
-Only after step 3 passes run `benchbox run --platform snowflake --gateway greybeam ... --phases power`.
+`--gateway espresso|greybeam|custom` routes the connection through a gateway endpoint. A gateway run is recorded as
+non-comparable and non-compliant, and BenchBox reports its cost as not comparable. Options, security, caching, cost and
+the Greybeam lifecycle guardrails are on the [Snowflake Gateways](snowflake-gateways.md) page.
 
 ## Authentication Methods
 
@@ -311,8 +253,8 @@ ALTER SESSION SET QUERY_TAG = 'benchbox:tpch:power:Q1';
 A gateway-routed run appends a run-level suffix, `_gw-<8 hex characters>`, to the per-query tag
 (for example `BenchBox_Q1_gw-3fa9c2d1`). The suffix is generated once per adapter instance, so every query in one run
 shares it and a gateway vendor can join its logs to the run. The statistics lookup against `QUERY_HISTORY` uses the
-same tag, so execution time, compilation time, bytes scanned and credits are still recorded. Native runs keep the
-unsuffixed tag.
+statement id the connector returns, never the tag, so execution time, compilation time, bytes scanned and credits are
+still recorded when a gateway rewrites the tag. Native runs keep the unsuffixed tag.
 
 ## Data Loading
 
@@ -402,4 +344,5 @@ benchbox run --platform snowflake --benchmark tpch --scale 100.0 \
 - [BigQuery](bigquery.md) - Google Cloud alternative
 - [Redshift](redshift.md) - AWS native warehouse
 - [Databricks](databricks.md) - Lakehouse alternative
+- [Snowflake Gateways](snowflake-gateways.md) - Routing a run through a gateway endpoint
 - [Platform Comparison](comparison-matrix.md)
