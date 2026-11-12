@@ -1,0 +1,24 @@
+{
+  "acceptance": [
+    "The failing log lines and the failure class are recorded here",
+    "The site-deploy-failed and core site-bundle-undeployed issues for that run are located and are closed or correctly open",
+    "Either a fix is merged with a test, or the cause is recorded as expected behaviour with the reason"
+  ],
+  "context": "Observed while GitHub runners were heavily queued and the API later returned rate-limit errors for the user token, so a producing-run wait timeout or an API failure are the first hypotheses; neither is verified.",
+  "description": "Problem: Deploy run 43234165099 (repository_dispatch from core, site commit 802ac09, started 14:08 UTC on 2026-11-12) failed in `Resolve the bundle and the deployed generation` with exit code 1. The run before it (43232632689) was cancelled. It was not investigated; later deploys succeeded. Outcome: the cause is known and either fixed or shown to be an expected, reported condition.",
+  "links": [
+    "https://github.com/BenchBox-dev/benchbox-site/actions/runs/43234165099",
+    "deploy/README.md",
+    "scripts/bundle-fetch.mjs"
+  ],
+  "sessions": [
+    {
+      "actor": "mcp:omp-coding-agent:joe@joe-mac-mini.local:9c85f43e97659072aa9dbbd3",
+      "at": "2026-11-12T16:49:50Z",
+      "client": "omp-coding-agent",
+      "op": "create",
+      "op_id": "e64251579415466b95155a8cd2de7175",
+      "session_id": "524c11ecc7864e4f81039b54632b8c82"
+    }
+  ]
+}

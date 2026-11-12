@@ -100,6 +100,13 @@
       "status": "done",
       "title": "Test deploy/cli.ts resolve() end to end for the superseded, use-deployed-bundle and redeploy paths"
     },
+    "deploy-resolve-failure-2026-11-12": {
+      "claim": null,
+      "needs": [],
+      "priority": "medium",
+      "status": "open",
+      "title": "Find why the core-dispatched deploy failed in the resolve step on 2026-11-12"
+    },
     "deploy-resolver-reads-every-deployment-20261031": {
       "claim": null,
       "needs": [],
