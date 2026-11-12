@@ -454,11 +454,11 @@ The workflow has four steps: system analysis and optimization (the `thorough` pr
    - Test with smaller scale factors first
    - Monitor resource usage during execution
 
-## TPC Specification Compliance
+## TPC Specification Query Ordering
 
-BenchBox ensures compliance with official TPC specifications for query ordering in both power and throughput tests.
+BenchBox follows the TPC specification's query ordering in both power and throughput tests. BenchBox results are derived from the TPC benchmarks: they do not comply with the TPC specifications and must not be compared with official TPC results.
 
-### Power Run Compliance
+### Power Run Ordering
 
 Every TPC-H power run iteration, warm-up and measured, runs stream 00 of the TPC specification: the same query permutation and the same substitution parameters, so iterations are repeats of one workload and can be compared directly. Row-count validation applies to every measured iteration under the default validation mode. TPC-DS power iterations keep their existing stream ordering.
 
@@ -469,7 +469,7 @@ config.iterations = 5
 
 All five iterations repeat stream 0. For TPC-H, its permutation is `[14, 2, 9, 20, 6, 17, 18, 8, 21, 13, 3, 22, 16, 4, 11, 15, 1, 10, 19, 5, 7, 12]`.
 
-### Throughput Compliance
+### Throughput Ordering
 
 Throughput streams are numbered 1 to S, as in the TPC specifications. Stream 0 is the power stream, so no throughput stream repeats the power ordering, and each throughput stream uses its own permutation and parameters.
 
@@ -477,16 +477,16 @@ Stream N uses TPC-H permutation N, or TPC-DS dsqgen stream N. A 4-stream through
 
 Results record this under `phases.throughput_test.stream_numbering`.
 
-### Why TPC Compliance Matters
+### Why Specification Ordering Matters
 
-1. **Valid Comparisons**: Results comparable to official TPC publications
+1. **Valid Comparisons**: Runs use the same query ordering, so BenchBox results can be compared with each other (never with official TPC publications)
 2. **Optimizer Testing**: Each throughput stream uses a different ordering, which stresses different optimization paths
 3. **Statistical Validity**: Repeated stream 00 iterations measure variance on one fixed workload
-4. **Research Validity**: Academic research can rely on specification-compliant results
+4. **Research Validity**: Research can rely on a documented, reproducible query ordering
 
 ### Verification
 
-Check result compliance:
+Check the query ordering of a result:
 
 ```python
 assert result.query_results[0]['query_id'] == 14
@@ -496,7 +496,7 @@ assert result.query_results[0]['position'] == 1
 
 These assertions verify that the first query in a TPC-H power test follows the stream permutation. Stream 0 starts with query 14, the stream ID is recorded, and the position is the query's place in the permutation.
 
-For detailed compliance documentation, see:
+For detailed specification coverage, see:
 [TPC-H Official Guide → Specification Coverage](../guides/tpc/tpc-h-official-guide.md#tpc-h-specification-coverage),
 [TPC-DS Official Guide](../guides/tpc/tpc-ds-official-guide.md), and the shared
 [TPC Patterns Usage Guide](../guides/tpc/tpc-patterns-usage.md) (stream/permutation

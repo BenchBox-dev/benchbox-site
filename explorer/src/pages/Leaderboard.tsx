@@ -40,7 +40,7 @@ import { stringSerde, useUrlState } from "@/lib/useUrlState";
 import { useDocumentTitle } from "@/lib/useDocumentTitle";
 import { useOptionalPickingState } from "@/lib/pickingState";
 import { formatTimingExclusion } from "@/lib/displayEligibility";
-import { SubscaleBadge } from "@/components/SubscaleNotice";
+import { DerivedResultsNotice, SubscaleBadge } from "@/components/SubscaleNotice";
 import { isSubscaleTpc, subscaleCohortNote, subscaleTpcName } from "@/lib/subscale";
 import {
   buildCompareUrl,
@@ -1342,6 +1342,9 @@ function LeaderboardComparePicker({
               {subscaleCohortNote(subscaleTpcName(cohort.benchmark, cohort.scaleFactor) as string)}
             </p>
           )}
+          <div class="mt-1">
+            <DerivedResultsNotice benchmark={cohort.benchmark} testId="leaderboard-cohort-derived-notice" />
+          </div>
           <p class="mt-1 text-xs text-[var(--bb-fg-muted)]">
             {cohort.results.length} {scopeRunsNoun} {cohort.results.length === 1 ? "run is" : "runs are"} available in this cohort.
           </p>
