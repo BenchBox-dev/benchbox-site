@@ -1,6 +1,6 @@
 import { render, screen } from "@testing-library/preact";
 import { describe, expect, it } from "vitest";
-import { SubscaleCohortNotice } from "@/components/SubscaleNotice";
+import { DerivedResultsNotice, SubscaleCohortNotice } from "@/components/SubscaleNotice";
 
 describe("SubscaleCohortNotice", () => {
   it("shows the badge and TPC-DS disclaimer for a subscale TPC-DS cohort", () => {
@@ -17,5 +17,23 @@ describe("SubscaleCohortNotice", () => {
 
     expect(sf1.textContent).toBe("");
     expect(ssb.textContent).toBe("");
+  });
+});
+
+describe("DerivedResultsNotice", () => {
+  it("states the derived-results disclaimer for TPC-H and TPC-DS", () => {
+    render(<DerivedResultsNotice benchmark="tpch" testId="h" />);
+    render(<DerivedResultsNotice benchmark="tpcds" testId="ds" />);
+
+    expect(screen.getByTestId("h").textContent).toBe(
+      "Derived from TPC-H. These results do not comply with the TPC-H Specification and must not be compared with official TPC-H results.",
+    );
+    expect(screen.getByTestId("ds").textContent).toContain("Derived from TPC-DS.");
+  });
+
+  it("renders nothing for other benchmarks", () => {
+    const { container } = render(<DerivedResultsNotice benchmark="ssb" />);
+
+    expect(container.textContent).toBe("");
   });
 });

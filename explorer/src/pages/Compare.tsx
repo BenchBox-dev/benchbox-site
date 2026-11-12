@@ -80,8 +80,8 @@ import { Select } from "@/components/Select";
 import { StatusBadge } from "@/components/StatusBadge";
 import { ProvenanceLegend } from "@/components/ProvenanceLegend";
 import { useDocumentTitle } from "@/lib/useDocumentTitle";
-import { SubscaleBadge } from "@/components/SubscaleNotice";
-import { DERIVED_POWER_NOTE, isDerivedPowerScore, isSubscaleTpc, subscaleCohortNote, subscaleTpcName } from "@/lib/subscale";
+import { DerivedResultsNotice, SubscaleBadge } from "@/components/SubscaleNotice";
+import { DERIVED_POWER_NOTE, derivedTpcName, isDerivedPowerScore, isSubscaleTpc, subscaleCohortNote, subscaleTpcName } from "@/lib/subscale";
 import {
   planCompareIds,
   recoverCompareResults,
@@ -542,6 +542,7 @@ export function Compare({ url }: CompareProps) {
   const subscaleName = resolvedResults
     .map((r) => subscaleTpcName(r.benchmark, r.scale_factor))
     .find((name): name is string => name !== null);
+  const derivedBenchmark = resolvedResults.map((r) => r.benchmark).find((name) => derivedTpcName(name) !== null);
   const runColorSlots = assignRunColorSlots(
     resolvedResults.map((r) => ({ result_id: r.result_id, platform_id: r.platform_id, platform: r.platform })),
   );
@@ -586,6 +587,8 @@ export function Compare({ url }: CompareProps) {
           <span>{subscaleCohortNote(subscaleName)}</span>
         </div>
       )}
+
+      <DerivedResultsNotice benchmark={derivedBenchmark} testId="compare-derived-results-notice" />
 
       {compareNotice && (
         <div

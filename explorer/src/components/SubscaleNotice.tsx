@@ -1,4 +1,4 @@
-import { SUBSCALE_BADGE, subscaleCohortNote, subscaleTpcName } from "@/lib/subscale";
+import { SUBSCALE_BADGE, derivedResultsDisclaimer, derivedTpcName, subscaleCohortNote, subscaleTpcName } from "@/lib/subscale";
 
 export function SubscaleBadge({ testId }: { testId?: string }) {
   return (
@@ -31,5 +31,21 @@ export function SubscaleCohortNotice({
       <SubscaleBadge />
       <span>{subscaleCohortNote(name)}</span>
     </div>
+  );
+}
+
+export function DerivedResultsNotice({
+  benchmark,
+  testId = "derived-results-notice",
+}: {
+  benchmark: string | null | undefined;
+  testId?: string;
+}) {
+  const name = derivedTpcName(benchmark);
+  if (!name) return null;
+  return (
+    <p class="mb-4 text-xs text-[var(--bb-fg-muted)]" data-testid={testId} role="note">
+      {derivedResultsDisclaimer(name)}
+    </p>
   );
 }

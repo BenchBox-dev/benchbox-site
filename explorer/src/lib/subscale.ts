@@ -10,6 +10,17 @@ export function subscaleTpcName(benchmark: string | null | undefined, scaleFacto
   return name && Number.isFinite(scale) && scale > 0 && scale < 1 ? name : null;
 }
 
+export function derivedTpcName(benchmark: string | null | undefined): string | null {
+  return SUBSCALE_TPC_NAMES[(benchmark ?? "").toLowerCase().replace(/[^a-z0-9]/g, "")] ?? null;
+}
+
+export function derivedResultsDisclaimer(benchmarkName: string): string {
+  return (
+    `Derived from ${benchmarkName}. These results do not comply with the ${benchmarkName} Specification ` +
+    `and must not be compared with official ${benchmarkName} results.`
+  );
+}
+
 export function isSubscaleTpc(benchmark: string | null | undefined, scaleFactor: number | string | null | undefined) {
   return subscaleTpcName(benchmark, scaleFactor) !== null;
 }

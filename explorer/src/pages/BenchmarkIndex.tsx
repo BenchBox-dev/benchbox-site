@@ -41,7 +41,7 @@ import { CompareCta, isCompareAllAvailable } from "@/components/CompareCta";
 import { CompareTray } from "@/components/CompareTray";
 import { TrayAnnouncer } from "@/components/TrayAnnouncer";
 import { RunDateChip } from "@/components/RunAge";
-import { SubscaleCohortNotice } from "@/components/SubscaleNotice";
+import { DerivedResultsNotice, SubscaleCohortNotice } from "@/components/SubscaleNotice";
 import { DERIVED_POWER_NOTE, isDerivedPowerScore } from "@/lib/subscale";
 import { NotFound } from "@/pages/NotFound";
 import { useDocumentTitle } from "@/lib/useDocumentTitle";
@@ -820,6 +820,8 @@ export function BenchmarkIndex({ benchmark = "" }: BenchmarkIndexProps) {
       {filteredSummary && (
         <SubscaleCohortNotice benchmark={filteredSummary.benchmark} scaleFactor={filteredSummary.scale_factor} />
       )}
+
+      <DerivedResultsNotice benchmark={filteredSummary?.benchmark ?? benchmark} />
 
       <CohortFilterPanel
         testId="benchmark-filters"
