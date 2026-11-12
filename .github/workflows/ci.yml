@@ -3,7 +3,7 @@ name: CI
 on:
   pull_request:
   push:
-    branches: [main]
+    branches: [main, next]
   workflow_dispatch:
 
 permissions:
@@ -16,6 +16,7 @@ concurrency:
 env:
   SITE_INPUTS: ${{ github.workspace }}/.site-inputs
   CORE_REPO: ${{ vars.CORE_REPO || 'BenchBox-dev/BenchBox' }}
+  DOCS_INPUTS: ${{ (github.base_ref == 'next' || github.ref == 'refs/heads/next') && format('{0}/.site-inputs', github.workspace) || '' }}
 
 jobs:
   bundle:
@@ -80,7 +81,11 @@ jobs:
       - run: npm run lint:blog
       - run: npm run lint:docs
       - run: npm run bundle:verify -- --offline
-      - name: Check the site documentation against the bundle's contracts
+      - name: Check that the release pin is a published release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: npm run docs:pin -- --check
+      - name: Check the site documentation against the docs inputs' contracts
         run: npm run docs:check -- --docs-mode block
       - name: Check the inventory of core paths that the documentation links to
         run: npm run inventory:core-links -w website -- --check

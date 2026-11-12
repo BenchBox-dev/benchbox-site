@@ -20,6 +20,13 @@ Run `npm run test:deploy` to check mismatch evidence, receipt serialization, and
 rollback behavior. `npm run deploy -- probe` writes `deploy-work/probe.json`;
 `npm run deploy -- receipt` includes that evidence in the deployment receipt.
 
+## Documentation source
+
+Deploys build the documentation from the release pin in `release-pin/`, so a
+`core-bundle` dispatch no longer changes the published documentation; the
+Explorer, result summaries and deploy gates still use the newest bundle.
+Reverting a pin is a revert pull request on `main`.
+
 ## Plans companion privacy
 
 The privacy gate scans the built artifact. Besides secrets and credentials, it
