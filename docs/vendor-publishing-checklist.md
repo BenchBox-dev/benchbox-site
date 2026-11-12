@@ -30,9 +30,11 @@ Three outcomes matter:
 - **Refusal.** A `free` or `trial` `plan_tier`, or any entry in
   `preview_features`, with no `vendor_permission`, is an error: `benchbox
   submit` exits without writing a package and the validator rejects the
-  bundle. `self_run: false` on BigQuery is also an error, as is a malformed
-  `vendor_notice` (it needs a `sent_on` date in `YYYY-MM-DD` form and a
-  non-empty `reference`) or a `plan_tier` outside the four values above.
+  bundle. On Databricks, any entry in `preview_features` is an error even
+  with `vendor_permission` recorded. `self_run: false` on BigQuery is also an
+  error, as is a malformed `vendor_notice` (it needs a `sent_on` date in
+  `YYYY-MM-DD` form and a non-empty `reference`) or a `plan_tier` outside the
+  four values above.
 - **Warning.** A missing `vendor_notice` on a platform that needs one, a
   missing `self_run` attestation on BigQuery, and a missing `plan_tier` on a
   platform with tier or preview conditions are warnings. They do not block the
@@ -92,7 +94,7 @@ Terms: Acceptable Use Policy and the Free Edition Acceptable Use Policy.
 | --- | --- |
 | Replication information in the disclosure. | The bundle's recorded configuration and query text. |
 | Reciprocity. | Manual step: no check exists. Publishing under these terms accepts that Databricks may do the same. |
-| Beta services are excluded. | Manual step: do not publish Beta results. Permission does not lift this exclusion, though the check lets a result with a recorded `vendor_permission` through. Declare any Beta or Preview feature with `--preview-feature` so that the refusal stops a result with no permission recorded. |
+| Beta services are excluded. | Automated: declare any Beta or Preview feature with `--preview-feature`; a Databricks result that lists one is refused even with `--vendor-permission`, because permission does not lift this exclusion. Manual step: do not run published Databricks benchmarks on Beta services. |
 | Free Edition results need Databricks' express permission. | Automated: `plan_tier` of `free` with `vendor_permission`. A free tier without permission refuses. Manual step: obtain the express permission first. |
 
 Accepted risk: AUP item 7(b) restricts bulk export of metadata that Databricks
