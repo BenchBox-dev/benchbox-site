@@ -26,6 +26,13 @@
       "status": "done",
       "title": "Generate static, searchable result summary pages for platforms and benchmarks"
     },
+    "audit-post-release-docs-on-main": {
+      "claim": null,
+      "needs": [],
+      "priority": "medium-high",
+      "status": "open",
+      "title": "Audit docs on main for statements about unreleased core and move them to next"
+    },
     "blog-draft-byte-sha-of-snapshot-stale-20261029": {
       "claim": null,
       "needs": [],

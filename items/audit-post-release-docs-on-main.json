@@ -1,0 +1,25 @@
+{
+  "acceptance": [
+    "A table lists each commit above with a verdict (released, unreleased, correction) and the evidence at core v0.5.0 for each unreleased verdict",
+    "Each unreleased passage is restored to its v0.5.0 text on main by pull request, and next still carries the newer text after main is merged into it",
+    "`npm run docs:check -- --docs-mode block` passes on main (pin) and on next (develop bundle)",
+    "The owner has confirmed the verdicts for any passage where the evidence is not conclusive"
+  ],
+  "context": "Decision gate: classification needs judgement; do not revert on a guess, ask the owner. Guardrails: never edit release-pin/; do not weaken a check. Known inconsistency left on main until the next pin: docs/benchmarks/support-status.md states 17, 12 and 12 queries because the v0.5.0 contract exports those values, while the v0.5.0 query catalog holds 93, 112 and 23; that one is bound by docs:check and is not in scope here.",
+  "description": "Problem: when main was cut over to the v0.5.0 release pin, only the four statements docs:check rejects were restored to v0.5.0 values. Other documentation merged after v0.5.0 was published is still live on benchbox.dev and may describe unreleased behaviour. Outcome: every statement on main is true for the pinned release, and each unreleased statement lives on next.\n\nScope to audit against core at tag v0.5.0 (commit dfe585e) and release-pin/: the remaining edits of #137 and #138 (catalog counts, scale-factor ranges, size tables, `measured at SF 0.01 to 10`); the accepted-versions list in docs/reference/public-contracts.md, which names 2.4 while the current version reads 2.3; and the other docs commits since the release: #118, #119, #121, #124, #125, #131, #139, #140, #142, #144. Statements that only correct an error that was already wrong at v0.5.0 stay on main.",
+  "links": [
+    "https://github.com/BenchBox-dev/benchbox-site/pull/145",
+    "release-pin/doc-contracts.json",
+    "release-pin/docs-data/docs-data.json"
+  ],
+  "sessions": [
+    {
+      "actor": "mcp:omp-coding-agent:joe@joe-mac-mini.local:9c85f43e97659072aa9dbbd3",
+      "at": "2026-11-12T16:49:42Z",
+      "client": "omp-coding-agent",
+      "op": "create",
+      "op_id": "3ff298d3b608439096d4557a1bbe3bf9",
+      "session_id": "524c11ecc7864e4f81039b54632b8c82"
+    }
+  ]
+}
