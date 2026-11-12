@@ -39,6 +39,9 @@ note records what was re-verified on
   files to `POLARS_TEMP_DIR`, and R6 says joins and group-bys do not spill.
   Supportable claim: "we saw no files in the configured temp directory". Not
   supportable: "2.0.0 completed TPC-DS without spilling".
+  Corrected 2026-11-12: 2.0.0 does not spill to `POLARS_TEMP_DIR`, so the
+  first claim is misleading too. See
+  `polars-2-version-matrix-reverification-2026-11-12.md`.
 
 ## Consequences of the swap gate (R1)
 

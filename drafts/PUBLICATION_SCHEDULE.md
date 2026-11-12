@@ -2,7 +2,7 @@
 
 > The BenchBox blog publication queue: one row per unpublished
 > actionable article.
-> **Last updated:** 2026-10-19
+> **Last updated:** 2026-11-12
 
 ## How this queue works
 
@@ -80,6 +80,7 @@ planning value, not queued for publication.
 | Vector search across six engines | [Outline](benchbox-in-action/outlines/02-vector-search-recall-latency.md) | Outlined; needs drafting |
 | Discovering the SQL vs DataFrame optimization gap | BenchBox in action idea, no draft | Research notes in series plan; 9.4x gap reveals decorrelation architecture |
 | Rewriting TPC-DS Q10 and Q35 for ClickHouse | [Outline](platform-deep-dives/outlines/clickhouse-tpcds-q10-q35-semijoin-rewrites.md) | Plan only; do not draft until the listed experiments run |
+| Naming the engine in a Polars 2.0 upgrade comparison | [Outline](platform-deep-dives/outlines/polars-2-version-matrix.md) | Plan only; do not draft until the outline's "Before drafting" checks are done. Measured 2026-10-09 on 2.0.0; 2.1.0 is not measured |
 | Spark Adaptive Query Execution | [Outline](platform-deep-dives/outlines/spark-adaptive-query-execution.md) | Outlined; BenchBox measurements are future work |
 | TPC binary wrangling (building-benchbox idea) | Series plan idea, no file | Cross-platform binary distribution for TPC data generation |
 | DataFrame benchmarking: SQL to Polars/Pandas (building-benchbox idea) | Series plan idea, no file | Faithful TPC-H translation challenges |
