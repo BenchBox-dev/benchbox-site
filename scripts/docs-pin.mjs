@@ -162,6 +162,13 @@ export async function pendingStatus(pinDir = PIN_DIR, env = process.env) {
   return { code: 1, message: `latest release is ${latest}, release pin is ${pin.tag}` };
 }
 
+export function pinArguments(argv) {
+  const fromIndex = argv.indexOf("--from");
+  const from = fromIndex === -1 ? undefined : argv[fromIndex + 1];
+  const tag = argv.find((arg, index) => !arg.startsWith("--") && (fromIndex === -1 || index !== fromIndex + 1));
+  return { tag, from, valid: Boolean(tag) && (fromIndex === -1 || Boolean(from)) };
+}
+
 async function main(argv) {
   if (argv.includes("--pending")) {
     const { code, message } = await pendingStatus();
@@ -176,10 +183,8 @@ async function main(argv) {
     console.log(`docs:pin OK${offline ? " (release not checked)" : ""}`);
     return 0;
   }
-  const fromIndex = argv.indexOf("--from");
-  const from = fromIndex === -1 ? undefined : argv[fromIndex + 1];
-  const tag = argv.find((arg, index) => !arg.startsWith("--") && index !== fromIndex + 1);
-  if (!tag || (fromIndex !== -1 && !from)) {
+  const { tag, from, valid } = pinArguments(argv);
+  if (!valid) {
     console.error("docs:pin: usage: docs:pin vX.Y.Z [--from <bundle dir>] | --check [--offline] | --pending");
     return 1;
   }

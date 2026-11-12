@@ -4,7 +4,7 @@ import { cpSync, existsSync, mkdirSync, mkdtempSync, readFileSync, writeFileSync
 import { tmpdir } from "node:os";
 import path from "node:path";
 import { memberDigest } from "./bundle-lib.mjs";
-import { checkPin, checkPinOffline, pendingStatus, pinRelease } from "./docs-pin.mjs";
+import { checkPin, checkPinOffline, pendingStatus, pinArguments, pinRelease } from "./docs-pin.mjs";
 
 const COMMIT = "d".repeat(40);
 const OTHER = "e".repeat(40);
@@ -198,4 +198,13 @@ test("--pending exits 2 on an API error", async () => {
   const pinDir = await pinned();
   stubApi({ fail: true });
   assert.equal((await pendingStatus(pinDir)).code, 2);
+});
+
+test("the tag is read with and without --from, in either order", () => {
+  assert.deepEqual(pinArguments(["v1.2.3"]), { tag: "v1.2.3", from: undefined, valid: true });
+  assert.deepEqual(pinArguments(["v1.2.3", "--from", "dir"]), { tag: "v1.2.3", from: "dir", valid: true });
+  assert.deepEqual(pinArguments(["--from", "dir", "v1.2.3"]), { tag: "v1.2.3", from: "dir", valid: true });
+  assert.equal(pinArguments(["--from", "dir"]).valid, false);
+  assert.equal(pinArguments(["v1.2.3", "--from"]).valid, false);
+  assert.equal(pinArguments([]).valid, false);
 });
