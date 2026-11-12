@@ -162,6 +162,13 @@
       "status": "done",
       "title": "Place the 65 uncategorised docs and blog tags so tag browsing reaches them"
     },
+    "first-default-docs-pin-run": {
+      "claim": null,
+      "needs": [],
+      "priority": "medium",
+      "status": "open",
+      "title": "Pin the next core release through the default docs:pin path and confirm the status matrix corrects itself"
+    },
     "next-branch-ci-and-alert": {
       "claim": null,
       "needs": [

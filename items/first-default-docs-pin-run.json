@@ -1,0 +1,27 @@
+{
+  "acceptance": [
+    "`npm run docs:pin -- <tag>` without `--from` exits 0 and `npm run docs:pin -- --check` passes online",
+    "The next into main pull request has ci green and the deploy for its merge commit succeeds",
+    "benchbox.dev home page and /docs/README.html show the new version",
+    "docs/benchmarks/support-status.md on main states the catalog counts for tpcds_obt, write_primitives and transaction_primitives, and docs:check passes against the new pin",
+    "The `docs-release-pending` issue, if open, is closed",
+    "Any step of the AGENTS.md procedure that did not work as written is corrected in AGENTS.md"
+  ],
+  "context": "Blocked on core publishing a release newer than v0.5.0; the nightly docs-release-pending issue announces it. Guardrails: owner decides when to publish a release in the docs; if the tag's commit has no certified bundle, stop and report rather than using --from on an unverified directory. Open question to settle during this run: nothing closes the docs-release-pending issue automatically.",
+  "description": "Problem: v0.5.0 was pinned with `--from` after verification by an older verifier, because the current verifier rejects that bundle. The default path of `npm run docs:pin -- vX.Y.Z` (child bundle-fetch with full verification, then the pin swap) has only been exercised up to the expected verification failure and through an injected fetch in tests. Outcome: the first release after v0.5.0 is pinned by the default path, and the release procedure in AGENTS.md is proven end to end.\n\nAt the next published core release: run `npm run docs:pin -- <tag>` on next by pull request, open the next into main pull request, merge on green ci, then merge main into next.",
+  "links": [
+    "scripts/docs-pin.mjs",
+    "AGENTS.md",
+    ".github/workflows/nightly.yml"
+  ],
+  "sessions": [
+    {
+      "actor": "mcp:omp-coding-agent:joe@joe-mac-mini.local:9c85f43e97659072aa9dbbd3",
+      "at": "2026-11-12T16:49:44Z",
+      "client": "omp-coding-agent",
+      "op": "create",
+      "op_id": "f3893c3311284ad7bf980fb2d091c535",
+      "session_id": "524c11ecc7864e4f81039b54632b8c82"
+    }
+  ]
+}
