@@ -17,6 +17,7 @@ export const ORIGIN_ALLOWLIST = [
   /^docs\//,
   /^drafts\//,
   /^inventory\//,
+  /^release-pin\//,
   /^landing\/(index|prompts\/index)\.html$/,
   /(^|\/)tests?\//,
   /\.test\.(ts|tsx|mjs)$/,
