@@ -74,7 +74,7 @@ Location is the one maintained copy: published posts link their `blog/` canonica
 | 4 | BenchBox in action: cloud vs embedded cost-per-query | Idea, no file yet | What does a TPC-H query actually cost on Snowflake vs local DuckDB? |
 | 5 | BenchBox in action: tuned vs untuned benchmarking | Idea, no file yet | How much does platform-specific tuning change results? |
 | 6 | BenchBox in action: DataFrame translation challenges | Idea, no file yet | Where do DataFrame implementations diverge from SQL semantics? |
-| 7 | BenchBox in action: when the same query needs different code | [Draft](../drafts/06-platform-specific-optimization-patterns.md) ([outline](06-platform-specific-optimization-patterns.md)) | Same DataFrame pattern, 5x difference across platforms → query planner architecture |
+| 7 | BenchBox in action: when the same query needs different code | [Draft](../drafts/06-platform-specific-optimization-patterns.md) ([outline](06-platform-specific-optimization-patterns.md)) | A platform-specific code path holds for the versions and data it was measured on; remeasured nine months later, one pattern is fastest on all four engines |
 
 
 ## Key themes

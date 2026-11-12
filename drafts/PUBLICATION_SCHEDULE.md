@@ -37,7 +37,7 @@
 
 | Article | Source | Priority | Owner | Next action | Facts verified | Blockers / notes |
 | ------- | ------ | -------- | ----- | ----------- | ------------- | ---------------- |
-| BenchBox in action: when the same query needs different code | [Draft](benchbox-in-action/drafts/06-platform-specific-optimization-patterns.md) | High | Joe / author | Human editorial check and review | - | - |
+| BenchBox in action: when the same query needs different code | [Draft](benchbox-in-action/drafts/06-platform-specific-optimization-patterns.md) | High | Joe / author | Rerun the timings on an idle machine, then human editorial check and review | - | Rewritten 2026-11-11 around a remeasurement on old and new engine releases, taken on a shared machine; see [evidence](benchbox-in-action/research/multi-warehouse-patterns-remeasured-2026-11-11.md). `post_number` and the publication date are not set |
 | How the Results Explorer qualifies comparisons | [Draft](building-benchbox/drafts/17-results-explorer-qualifies-comparisons.md) | Medium | Joe / author | Resolve hold with Joe, then editorial check | - | Publication withheld |
 | BenchBox v0.4.1: more lakehouse pairings, stricter results | [Draft](building-benchbox/drafts/18-v0-4-1-release-overview.md) | Medium | Joe / author | Human editorial check and review | - | Verify lakehouse pairing count against the draft before publish |
 | Free trials intro: a benchmarker's guide | [Draft](free-trial-benchmarking/drafts/00-series-intro.md) | Medium | Joe / author | Human editorial check and review | never | Time-sensitive: trial terms change; verify before publish |

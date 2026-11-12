@@ -2,7 +2,49 @@
 
 **Series**: BenchBox in Action | **Post #6**
 **Target length**: 2,400-2,800 words
-**Status**: OUTLINED
+**Status**: Drafted February 2026; thesis revised 2026-11-11 after remeasurement (see "Revision" below)
+
+---
+
+## Revision, 2026-11-11
+
+The draft no longer follows the outline below, which records the February
+plan. The timings were rerun on the February releases and the current
+ones (Polars 1.37.1 to 2.1.0, DuckDB 1.4.4 to 2.0.0, DataFusion 51.0.0 to
+55.0.0, PySpark 4.1.1 to 4.3.0), on the February synthetic data and on
+TPC-DS `catalog_sales` and `web_sales` at SF1 and SF10. Evidence:
+`../research/multi-warehouse-patterns-remeasured-2026-11-11.md`.
+
+What changed:
+
+- The February result reproduces on the February releases with the
+  synthetic data.
+- On TPC-DS data DataFusion 51.0.0 no longer prefers the self-join, and
+  on DataFusion 55.0.0 the distinct count is faster on every dataset.
+- A third pattern (`min` and `max` per order) is the fastest in 39 of 40
+  tests on the current releases.
+- The isolated `EXISTS` statement is up to 45x slower on DuckDB 2.0.0
+  than on 1.5.6, but the complete Q16, Q94 and Q95 are not slower.
+
+Reframed problem: the February question was "which of two patterns does
+each engine need". The real constraint was upstream of it: the test data
+did not have the benchmark's shape, the comparison had only two
+candidates, and a step was timed in place of a query.
+
+Revised thesis:
+
+> A platform-specific code path is true for the versions and data it was
+> measured on. Rerun nine months later, the split between Polars and
+> DataFusion is gone, and one pattern is fastest on all four engines.
+
+Open before publication:
+
+- Rerun the timings on an idle machine. The November run shared the
+  machine with other jobs, so the draft reports best times and ratios.
+- Time the complete DataFrame Q16 and Q95 with each pattern. That needs a
+  change in BenchBox, which picks the pattern from the platform name.
+- Set `post_number`. The series plan lists this post as 7 and the file
+  name says 06.
 
 ---
 
