@@ -1,0 +1,28 @@
+{
+  "acceptance": [
+    "`node --test scripts/docs-pin.test.mjs` passes and covers: draft or prerelease refused, missing release refused, tag commit differing from manifest core_sha refused, package_version differing from tag refused, tampered member fails --check, --pending reports a newer release and is quiet when equal",
+    "`npm run docs:pin -- --check` exits 0 on the committed pin with network access, and `--check --offline` exits 0 without it",
+    "`release-pin/pin.json` is `{tag: v0.5.0, core_sha: dfe585e0944ee7a4b0e52da4994f1e1fee6669f1}` and `release-pin/manifest.json` has package_version 0.5.0",
+    "Editing one byte of `release-pin/docs-data/docs-data.json` makes `docs:pin -- --check --offline` exit non-zero naming the member",
+    "The v0.5.0 bundle was fully verified (digests, attestations, online certification) by the pre-a0c4525 verifier before pinning, and the landing request quotes that verifier's success line",
+    "`npm run lint:comments` and `npm run lint:guard` pass; no change to scripts/schemas or bundle-lib verification rules"
+  ],
+  "context": "Decisions (owner, 2026-11-12): vendor the release docs inputs in the repository; do not fetch a second bundle per build. Evidence: v0.5.0 = core dfe585e, bundle artifact site-inputs-dfe585e… exists until 2027-02-03; current verifier rejects it with `doc-contracts <root>: must have required property 'path_privacy'`. Guardrails: stop and report if the tag commit has no bundle or the old verifier rejects it; never hand-edit pinned members; scope is scripts/docs-pin.mjs, its test, package.json script entry and release-pin/.",
+  "description": "Problem: the published docs are built from the newest core develop bundle, so they describe unreleased code and the landing page reported v0.5.1 as the current release before it existed. Outcome: the repository carries a release pin, the docs inputs of one published core release, that the docs build can read instead of the develop bundle.\n\nBuild `scripts/docs-pin.mjs` (`npm run docs:pin`) and commit `release-pin/` for v0.5.0.\n\nPin layout (mirrors the bundle so existing digest code applies): `release-pin/pin.json` `{tag, core_sha}`, `release-pin/manifest.json` (the release bundle's manifest, byte-identical), `release-pin/docs-data/docs-data.json`, `release-pin/doc-contracts.json`, `release-pin/repo-files.json`.\n\n`docs:pin -- vX.Y.Z`: (1) GitHub release for the tag in CORE_REPO must exist, not draft, not prerelease; (2) resolve the tag to its commit; (3) fetch that commit's bundle with the existing bundle-fetch path (`SITE_INPUTS_CORE_SHA`, temp `SITE_INPUTS`), which runs full verification; (4) require manifest.core_sha == tag commit and manifest.package_version == tag without the leading v; (5) check the three members against manifest.members with `memberDigest`; (6) replace `release-pin/` atomically. `--from <bundle dir>` skips step 3 only, for a bundle verified elsewhere.\n\n`docs:pin -- --check`: offline part re-checks pin.json/manifest agreement and the three member digests; online part (skipped with `--offline`) re-checks the release is published and the tag commit equals pin.json core_sha.\n\n`docs:pin -- --pending`: exits non-zero and prints both tags when core's latest published release is newer than the pin; used by the nightly reminder.\n\nConstraints: Node only, no Python. No explanatory comments (lint:comments). Reuse `githubJson`, `CORE_REPO`, `memberDigest`, `siteInputsDir`; add no second digest format. v0.5.0 is a one-off: its doc-contracts.json lacks `path_privacy`, which the current schema requires, so fetch and fully verify it with a checkout of this repository at the parent of a0c4525, then run `docs:pin -- v0.5.0 --from <dir>`. Do not loosen the bundle schema or verifier.",
+  "links": [
+    "scripts/bundle-fetch.mjs",
+    "scripts/bundle-lib.mjs",
+    "scripts/bundle-verify.mjs",
+    "scripts/check-contract-drift.mjs"
+  ],
+  "sessions": [
+    {
+      "actor": "mcp:omp-coding-agent:joe@joe-mac-mini.local:9c85f43e97659072aa9dbbd3",
+      "at": "2026-11-12T13:38:09Z",
+      "client": "omp-coding-agent",
+      "op": "create",
+      "op_id": "09ef69adb6c74d8a8d30fc5f121b35d2",
+      "session_id": "524c11ecc7864e4f81039b54632b8c82"
+    }
+  ]
+}
