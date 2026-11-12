@@ -144,6 +144,13 @@
       "status": "done",
       "title": "Point the canonical link of every /docs/dev/ page at its /docs/ counterpart"
     },
+    "docs-pin-from-skips-certification": {
+      "claim": null,
+      "needs": [],
+      "priority": "medium",
+      "status": "open",
+      "title": "Make docs:pin --from refuse a bundle directory that was not certified"
+    },
     "docs-release-cutover-rollout": {
       "claim": null,
       "needs": [

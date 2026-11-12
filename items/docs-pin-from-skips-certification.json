@@ -1,0 +1,26 @@
+{
+  "acceptance": [
+    "A `--from` directory with a manifest whose certified_by run is not a successful trunk push on develop for that commit is refused, with a test",
+    "A `--from` directory with a failed or missing required attestation is refused, with a test",
+    "The v0.5.0 pin can still be reproduced, or `--from` is removed and AGENTS.md no longer describes it",
+    "`node --test scripts/docs-pin.test.mjs` passes"
+  ],
+  "context": "Found by the independent review of #145 (Optional). Guardrail: do not loosen bundle:fetch or bundle:verify for ordinary bundles.",
+  "description": "Problem: `npm run docs:pin -- vX.Y.Z --from <dir>` accepts any directory whose manifest core_sha, package_version and three member digests agree with each other and with the tag. It runs no attestation or certification check, so a hand-assembled directory can be pinned, and the pin's `--check` cannot tell. It exists because the v0.5.0 bundle fails the current doc-contracts schema. Outcome: a pin can only come from a bundle that core certified.\n\nOptions to choose between: run the manifest, attestation and online certification checks on the `--from` directory while skipping only the member schema validation the old bundle fails; or remove `--from` once a release newer than v0.5.0 is pinned and no old bundle needs it.",
+  "links": [
+    "scripts/docs-pin.mjs",
+    "scripts/bundle-verify.mjs",
+    "scripts/bundle-lib.mjs",
+    "AGENTS.md"
+  ],
+  "sessions": [
+    {
+      "actor": "mcp:omp-coding-agent:joe@joe-mac-mini.local:9c85f43e97659072aa9dbbd3",
+      "at": "2026-11-12T16:49:46Z",
+      "client": "omp-coding-agent",
+      "op": "create",
+      "op_id": "32d4d4a0777d4b95925db4b93660d37a",
+      "session_id": "524c11ecc7864e4f81039b54632b8c82"
+    }
+  ]
+}
