@@ -183,6 +183,7 @@ groups:
   - label: Contributing
     items:
       - contributing-results.md
+      - operations/vendor-publishing-checklist.md
   - label: Reference
     items:
       - page: reference/cli/index.md
