@@ -115,12 +115,17 @@
       "title": "Check #fragment anchors on external links in the site's nightly external-link step"
     },
     "docs-build-from-pin": {
-      "claim": null,
+      "claim": {
+        "expires_at": "2026-11-13T15:29:47Z",
+        "generation": "65041775673d4f3e8ecc6358e580062b",
+        "renewals": 0,
+        "worker": "mcp:omp-coding-agent:joe@joe-mac-mini.local:9c85f43e97659072aa9dbbd3"
+      },
       "needs": [
         "release-pin-tooling"
       ],
       "priority": "high",
-      "status": "open",
+      "status": "active",
       "title": "Build and check the docs from the release pin, and remove unreleased content the v0.5.0 contracts reject"
     },
     "docs-contracts-option-values-and-fences-coverage-20261029": {
