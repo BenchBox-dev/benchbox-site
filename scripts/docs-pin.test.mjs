@@ -14,7 +14,7 @@ afterEach(() => {
   globalThis.fetch = realFetch;
 });
 
-function stubApi({ release = { draft: false, prerelease: false, tag_name: "v1.2.3" }, commit = COMMIT, latest = { tag_name: "v1.2.3" }, fail = false } = {}) {
+function stubApi({ release = { draft: false, prerelease: false, tag_name: "v1.2.3" }, commit = COMMIT, releases = [{ tag_name: "v1.2.3" }], fail = false } = {}) {
   globalThis.fetch = async (url) => {
     const route = String(url).replace("https://api.github.com/", "");
     if (fail) return { ok: false, status: 500, json: async () => ({}) };
@@ -22,7 +22,7 @@ function stubApi({ release = { draft: false, prerelease: false, tag_name: "v1.2.
       return release ? { ok: true, json: async () => release } : { ok: false, status: 404, json: async () => ({}) };
     }
     if (route.includes("/commits/")) return { ok: true, json: async () => ({ sha: commit }) };
-    if (route.endsWith("/releases/latest")) return { ok: true, json: async () => latest };
+    if (route.includes("/releases?")) return { ok: true, json: async () => releases };
     throw new Error(`unexpected route ${route}`);
   };
 }
@@ -187,10 +187,10 @@ test("--pending exits 0 when the pin is the latest release", async () => {
 
 test("--pending exits 1 naming both tags when a newer release exists", async () => {
   const pinDir = await pinned();
-  stubApi({ latest: { tag_name: "v1.3.0" } });
+  stubApi({ releases: [{ tag_name: "v1.2.3" }, { tag_name: "v1.10.0" }, { tag_name: "v1.9.0" }] });
   const result = await pendingStatus(pinDir);
   assert.equal(result.code, 1);
-  assert.match(result.message, /v1\.3\.0/);
+  assert.match(result.message, /v1\.10\.0/);
   assert.match(result.message, /v1\.2\.3/);
 });
 
@@ -207,4 +207,21 @@ test("the tag is read with and without --from, in either order", () => {
   assert.equal(pinArguments(["--from", "dir"]).valid, false);
   assert.equal(pinArguments(["v1.2.3", "--from"]).valid, false);
   assert.equal(pinArguments([]).valid, false);
+});
+
+test("--pending ignores drafts, prereleases, data releases and releases older than the pin", async () => {
+  const pinDir = await pinned();
+  stubApi({
+    releases: [
+      { tag_name: "data/joinorder-imdb-2013-v1" },
+      { tag_name: "v2.0.0", draft: true },
+      { tag_name: "v1.3.0", prerelease: true },
+      { tag_name: "v1.3.0rc1" },
+    ],
+  });
+  assert.equal((await pendingStatus(pinDir)).code, 2);
+  stubApi({ releases: [{ tag_name: "data/joinorder-imdb-2013-v1" }, { tag_name: "v1.2.2" }, { tag_name: "v1.2.3" }] });
+  assert.equal((await pendingStatus(pinDir)).code, 0);
+  stubApi({ releases: [{ tag_name: "v1.2.2" }] });
+  assert.equal((await pendingStatus(pinDir)).code, 0);
 });

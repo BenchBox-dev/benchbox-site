@@ -149,17 +149,32 @@ export async function checkPin(pinDir = PIN_DIR, { offline = false, env = proces
   return errors;
 }
 
+const versionParts = (tag) => versionOf(tag).split(".").map(Number);
+
+export function compareTags(left, right) {
+  const [a, b] = [versionParts(left), versionParts(right)];
+  for (let index = 0; index < 3; index += 1) if (a[index] !== b[index]) return a[index] - b[index];
+  return 0;
+}
+
+export function newestRelease(releases) {
+  const tags = releases.filter((release) => !release.draft && !release.prerelease && TAG_PATTERN.test(release.tag_name ?? "")).map((release) => release.tag_name);
+  return tags.sort(compareTags).at(-1);
+}
+
 export async function pendingStatus(pinDir = PIN_DIR, env = process.env) {
   let pin;
-  let latest;
+  let newest;
   try {
     pin = readJson(path.join(pinDir, "pin.json"));
-    latest = (await githubJson(`repos/${CORE_REPO}/releases/latest`, env)).tag_name;
+    if (!TAG_PATTERN.test(pin.tag ?? "")) throw new Error(`pin tag ${pin.tag} is not of the form vX.Y.Z`);
+    newest = newestRelease(await githubJson(`repos/${CORE_REPO}/releases?per_page=100`, env));
+    if (!newest) throw new Error("no published vX.Y.Z release is listed");
   } catch (error) {
     return { code: 2, message: `could not check for a newer release: ${error.message}` };
   }
-  if (latest === pin.tag) return { code: 0, message: `release pin ${pin.tag} is the latest release` };
-  return { code: 1, message: `latest release is ${latest}, release pin is ${pin.tag}` };
+  if (compareTags(newest, pin.tag) <= 0) return { code: 0, message: `release pin ${pin.tag} is not behind the newest release ${newest}` };
+  return { code: 1, message: `newest release is ${newest}, release pin is ${pin.tag}` };
 }
 
 export function pinArguments(argv) {

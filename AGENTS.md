@@ -144,8 +144,11 @@ versioned core bundle; it reads nothing else from core.
   `docs-data` and `doc-contracts.json`. Code on `next` must read both the pin
   and the newest develop bundle until the next release is pinned.
 - Never edit pinned members by hand; `npm run docs:pin` writes them.
-- A tag whose commit has no certified bundle cannot be pinned. Bundles expire
-  after 90 days, so pin soon after a release.
+- `docs:pin` fetches and verifies the certified bundle of the tag's commit, so
+  a tag whose commit has no such bundle cannot be pinned. Bundles expire after
+  90 days, so pin soon after a release. `--from <dir>` pins a bundle directory
+  that was verified elsewhere and skips the fetch and its certification check;
+  use it only for a release whose bundle the current verifier cannot read.
 
 ## Deploys
 
@@ -237,7 +240,8 @@ versioned core bundle; it reads nothing else from core.
 ## Core and this repository
 
 Core's data and pipeline changes reach this repository through the core
-bundle and need no action here: core's `site-inputs.yml` builds the
+bundle and need no action here, apart from pinning each release as described
+under "Release pin": core's `site-inputs.yml` builds the
 `site-inputs-<sha>` artifact after each successful push to `develop` and
 dispatches `core-bundle`, and the deploy fetches and verifies it.
 
