@@ -537,6 +537,9 @@ The framework runs each query type with standard parameters so results are repro
 | 10.0 | ~2.5M | ~25M | ~1.25M | ~11 GB | Large-scale testing |
 | 100.0 | ~25M | ~250M | ~12.5M | ~110 GB | Production simulation |
 
+The standard scale factors for AMPLab are 0.01, 0.1 and 1. The 10 and 100 rows run with a note that their results
+are not comparable with published results; see [Scale factors](index.md#scale-factors).
+
 ### Advanced-level Configuration
 
 ```python
