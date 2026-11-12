@@ -15,6 +15,7 @@ concurrency:
 env:
   CORE_REPO: ${{ vars.CORE_REPO || 'BenchBox-dev/BenchBox' }}
   GH_TOKEN: ${{ github.token }}
+  DOCS_INPUTS: ${{ github.base_ref == 'next' && format('{0}/.site-inputs', github.workspace) || '' }}
 
 jobs:
   visual:
