@@ -1,0 +1,29 @@
+{
+  "acceptance": [
+    "`node scripts/check-yaml.mjs` (or the repository's YAML check) passes for both workflows and `npm test` at the root passes, including any workflow shape test updated or added for the new trigger and job",
+    "In ci.yml, an expression review shows DOCS_INPUTS is set only for base_ref `next` or ref `refs/heads/next`, and every job that runs docs:check, the build, website tests or the core-links inventory receives it",
+    "`ci` gains the pin check as a blocking step and the aggregate `ci` job still lists every job in `needs`",
+    "The nightly job fails closed: a GitHub API error fails the job without opening a `docs-release-pending` issue that claims a release is pending",
+    "`rg -n \"deploy.yml\" -l` aside, `git diff` shows no DOCS_INPUTS in `.github/workflows/deploy.yml`",
+    "AGENTS.md no longer says the landing version comes from the bundle manifest, and states the full release procedure in order; `npm run lint:comments` passes"
+  ],
+  "context": "Decisions (owner, 2026-11-12): unreleased docs wait on a `next` branch; add the nightly reminder. main's ruleset allows squash only and requires `ci`; `next` gets its own ruleset after merge (tracked in docs-release-cutover-rollout), so do not create the branch or ruleset here. Guardrails: do not change required check names, deploy gates, or bundle fetch selection; scope is the two workflows, their tests, AGENTS.md and deploy/README.md.",
+  "description": "Problem: nothing lets unreleased docs land ahead of a release, nothing proves the pin still matches a published release, and nothing reports that core released while the docs still show the old release. Outcome: a `next` branch workflow that CI understands, a pin check in `ci`, a nightly reminder, and written instructions.\n\nChange:\n1. `.github/workflows/ci.yml`: also run on `push` to `next`. When the pull request base is `next` or the pushed ref is `next`, set `DOCS_INPUTS` to the fetched bundle directory (`.site-inputs`) for every job that assembles, checks or builds docs; otherwise leave it unset so the pin is used. Add `npm run docs:pin -- --check` (online, in the job that has a token) so `ci` fails on a tampered pin or a pin whose tag is not a published release. Keep the required check name `ci` and its `needs` complete.\n2. `.github/workflows/nightly.yml`: add a job, in the existing style (label created with --force, one open issue updated by comment), that runs `npm run docs:pin -- --pending` and opens or updates the issue labelled `docs-release-pending` when core's latest release is newer than the pin.\n3. `AGENTS.md` and `deploy/README.md`: replace the statements that the landing token and generated pages come from the bundle; describe the pin, `DOCS_INPUTS`, the `next` branch (unreleased docs merge to `next`; fixes to released docs merge to `main` and are merged forward into `next` with a merge commit; a release is `npm run docs:pin -- vX.Y.Z` on `next` then one pull request `next` into `main`; after that squash merge, `next` is brought level by merging `main` into it), and the nightly reminder. Plain English, no session or tracker references.\n\nContract with the docs build work: the override variable is exactly `DOCS_INPUTS`; unset means `release-pin/`. Do not implement the resolver here.\n\nConstraints: workflows keep pinned action SHAs and least permissions; `deploy.yml` needs no DOCS_INPUTS and must not gain one (production always builds from the pin). No new workflow file.",
+  "links": [
+    ".github/workflows/ci.yml",
+    ".github/workflows/nightly.yml",
+    "AGENTS.md",
+    "deploy/README.md",
+    "scripts/nightly-browser-workflow.test.mjs"
+  ],
+  "sessions": [
+    {
+      "actor": "mcp:omp-coding-agent:joe@joe-mac-mini.local:9c85f43e97659072aa9dbbd3",
+      "at": "2026-11-12T13:38:14Z",
+      "client": "omp-coding-agent",
+      "op": "create",
+      "op_id": "418ec4f13cf84b6788b5f4e0fa63b011",
+      "session_id": "524c11ecc7864e4f81039b54632b8c82"
+    }
+  ]
+}

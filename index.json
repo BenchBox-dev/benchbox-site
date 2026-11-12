@@ -144,6 +144,15 @@
       "status": "done",
       "title": "Place the 65 uncategorised docs and blog tags so tag browsing reaches them"
     },
+    "next-branch-ci-and-alert": {
+      "claim": null,
+      "needs": [
+        "release-pin-tooling"
+      ],
+      "priority": "high",
+      "status": "open",
+      "title": "Check next against develop, verify the pin in CI, remind on an unpublished release and document the release flow"
+    },
     "public-site-visual-regression-false-mismatch-20261014": {
       "claim": null,
       "needs": [],
