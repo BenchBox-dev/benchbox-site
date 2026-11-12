@@ -47,6 +47,13 @@
       "status": "done",
       "title": "Add the SF1 basic row to the SCD2 blog scale table for balance"
     },
+    "blog-unreleased-content-decision": {
+      "claim": null,
+      "needs": [],
+      "priority": "medium",
+      "status": "open",
+      "title": "Decide whether blog posts wait for a release, and state how blog links to core resolve"
+    },
     "canonical-snapshot-digest-looseness-20261029": {
       "claim": null,
       "needs": [],
