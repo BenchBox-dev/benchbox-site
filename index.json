@@ -114,6 +114,15 @@
       "status": "done",
       "title": "Check #fragment anchors on external links in the site's nightly external-link step"
     },
+    "docs-build-from-pin": {
+      "claim": null,
+      "needs": [
+        "release-pin-tooling"
+      ],
+      "priority": "high",
+      "status": "open",
+      "title": "Build and check the docs from the release pin, and remove unreleased content the v0.5.0 contracts reject"
+    },
     "docs-contracts-option-values-and-fences-coverage-20261029": {
       "claim": null,
       "needs": [],
