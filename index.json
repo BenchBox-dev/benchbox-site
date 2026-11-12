@@ -138,14 +138,19 @@
       "title": "Point the canonical link of every /docs/dev/ page at its /docs/ counterpart"
     },
     "docs-release-cutover-rollout": {
-      "claim": null,
+      "claim": {
+        "expires_at": "2026-11-13T15:29:59Z",
+        "generation": "9c9c0aab1c3e4ac2acd704cf1f426efe",
+        "renewals": 0,
+        "worker": "mcp:omp-coding-agent:joe@joe-mac-mini.local:9c85f43e97659072aa9dbbd3"
+      },
       "needs": [
         "release-pin-tooling",
         "docs-build-from-pin",
         "next-branch-ci-and-alert"
       ],
       "priority": "high",
-      "status": "open",
+      "status": "active",
       "title": "Merge the release-pin change, create and protect next, restore held docs there and confirm the live site"
     },
     "docs-uncategorised-tags-20261107": {
