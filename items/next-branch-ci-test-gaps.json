@@ -1,0 +1,24 @@
+{
+  "acceptance": [
+    "A test evaluates the DOCS_INPUTS rule for: pull request into main, pull request into next, push to main, push to next, workflow_dispatch on each branch, and the next into main pull request",
+    "Either visual.yml builds next pull requests from the newest develop docs inputs, or AGENTS.md states the difference",
+    "ci for next also runs docs assembly and docs:generate against release-pin/, or the owner records that the release pull request is the accepted place to find such breaks"
+  ],
+  "context": "Items 1 and 2 come from the independent review of #145 (Optional). Guardrail: keep the required check name `ci`; deploy.yml must not gain DOCS_INPUTS.",
+  "description": "Problem: three gaps remain from the release-pin change. (1) `scripts/docs-release-pin-workflow.test.mjs` checks substrings of the DOCS_INPUTS expressions, so a wrong `&&`/`||` would pass. (2) `visual.yml` sets DOCS_INPUTS for pull requests into next to the bundle it fetches, which is the deployed bundle, not the newest develop bundle that ci uses; the advisory comparison can therefore build different docs from ci. (3) ci on next reads only the develop bundle, so nothing on next proves site code still reads the pin, which AGENTS.md requires until the next release is pinned; a break shows up only in the release pull request.",
+  "links": [
+    ".github/workflows/ci.yml",
+    ".github/workflows/visual.yml",
+    "scripts/docs-release-pin-workflow.test.mjs"
+  ],
+  "sessions": [
+    {
+      "actor": "mcp:omp-coding-agent:joe@joe-mac-mini.local:9c85f43e97659072aa9dbbd3",
+      "at": "2026-11-12T16:49:52Z",
+      "client": "omp-coding-agent",
+      "op": "create",
+      "op_id": "1139eca97bcf47898960460da266f484",
+      "session_id": "524c11ecc7864e4f81039b54632b8c82"
+    }
+  ]
+}
