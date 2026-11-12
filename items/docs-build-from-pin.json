@@ -8,7 +8,7 @@
     "`rg -n \"siteInputsPath\\(\\\"docs-data|inputs, \\\"docs-data|inputs, \\\"repo-files\" website docs-contracts scripts` finds no docs input still read from SITE_INPUTS",
     "The landing request lists every reverted passage as file, source commit and the failing check, or states that none was needed"
   ],
-  "context": "Decisions (owner, 2026-11-12): Explorer data stays continuous from the newest bundle; only docs wait for a release. Cutover reverts only what the checks flag against v0.5.0; the other docs commits since the release are listed in the pull request for owner review, not audited. Known flagged candidate: #137 (90-query TPC-DS-OBT count). Docs commits since v0.5.0 on main: a6edff5 2a101a6 9b699fe f638c7c 4349fac 22a3a25 37f4919 9090989 1bc7d17 7c708b0 92c910f 896f8e8 plus any newer. Guardrails: never edit files under release-pin/ by hand; never weaken a docs-contracts check to pass; a revert removes unreleased statements only and keeps unrelated fixes in the same commit.",
+  "context": "Decisions (owner, 2026-11-12): Explorer data stays continuous from the newest bundle; only docs wait for a release. Cutover reverts only what the checks flag against v0.5.0; the other docs commits since the release are listed in the pull request for owner review, not audited. Known flagged candidate: #137 (90-query TPC-DS-OBT count). Docs commits since v0.5.0 on main: a6edff5 2a101a6 9b699fe f638c7c 4349fac 22a3a25 37f4919 9090989 1bc7d17 7c708b0 92c910f 896f8e8 plus any newer. Guardrails: never edit files under release-pin/ by hand; never weaken a docs-contracts check to pass; a revert removes unreleased statements only and keeps unrelated fixes in the same commit.\n\nDelivered in pull request #145, squash-merged to main as fdcc060 with ci green on fb3a119. Implemented on the shared integration branch feat/docs-release-pin; independent review found no Critical and its two Required findings were fixed before merge.",
   "description": "Problem: docs assembly, docs:check, docs:generate and the blog chart renderer read docs inputs from the develop bundle in SITE_INPUTS. Outcome: they read `release-pin/` by default, so `main` publishes docs for the pinned release; the Explorer, result summaries, prompt catalog and deploy gates keep reading SITE_INPUTS.\n\nChange: add one resolver for the docs inputs root: `DOCS_INPUTS` when set, else `release-pin/` in the repository. Route through it: `assembleAuthoredDocs`/`assembleDocsSource` (manifest package_version for `{{package_version}}`, docs-data, repo-files.json), `website/scripts/generate-docs-pages.ts`, `docs-contracts/cli.ts` default `--inputs`, `scripts/render-blog-charts.mjs` `benchboxVersion`, and the website tests that load docs-data. `docs/README.md` keeps the `{{package_version}}` token. Leave `bundleManifest()`, results-summary, snapshot-mount, prompt-catalog, deploy/ and explorer/ on SITE_INPUTS.\n\nCutover: with the v0.5.0 pin, run `npm run docs:check -- --docs-mode block`, the website build and `npm run inventory:core-links -w website -- --check`. For each failure caused by docs or blog content describing unreleased core, restore the page text from before the offending commit (docs touched since 2026-11-06) with the smallest edit, and record file, commit and reason in a list for the pull request; that content is restored on `next` later. For a failure caused by site code needing a contract field the v0.5.0 pin lacks, make the code tolerate its absence only where the field is already optional in types; otherwise stop and report.\n\nConstraints: clean cutover, no fallback from pin to SITE_INPUTS when the pin is missing (fail with the path and `npm run docs:pin`). No explanatory comments. Do not change bundle verification, deploy receipts or the Explorer.",
   "links": [
     "website/src/lib/site-inputs.ts",
@@ -26,6 +26,14 @@
       "client": "omp-coding-agent",
       "op": "create",
       "op_id": "866f556f1e524068a00479a02dee9a37",
+      "session_id": "524c11ecc7864e4f81039b54632b8c82"
+    },
+    {
+      "actor": "mcp:omp-coding-agent:joe@joe-mac-mini.local:9c85f43e97659072aa9dbbd3",
+      "at": "2026-11-12T15:29:44Z",
+      "client": "omp-coding-agent",
+      "op": "update",
+      "op_id": "d294a24693c54e67b3ce1212be38ccbf",
       "session_id": "524c11ecc7864e4f81039b54632b8c82"
     }
   ]
