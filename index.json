@@ -137,6 +137,17 @@
       "status": "done",
       "title": "Point the canonical link of every /docs/dev/ page at its /docs/ counterpart"
     },
+    "docs-release-cutover-rollout": {
+      "claim": null,
+      "needs": [
+        "release-pin-tooling",
+        "docs-build-from-pin",
+        "next-branch-ci-and-alert"
+      ],
+      "priority": "high",
+      "status": "open",
+      "title": "Merge the release-pin change, create and protect next, restore held docs there and confirm the live site"
+    },
     "docs-uncategorised-tags-20261107": {
       "claim": null,
       "needs": [],

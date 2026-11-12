@@ -1,0 +1,26 @@
+{
+  "acceptance": [
+    "The batch pull request is merged by squash with `ci` green, and the deploy run for that commit concluded success",
+    "`curl -s https://benchbox.dev/docs/` shows `Current release:` followed by `v0.5.0`, and no `v0.5.1`",
+    "`npm run deploy -- deployed` reports a core_sha that is not dfe585e…, showing the Explorer still follows the newest bundle",
+    "`git ls-remote --heads origin next` returns a commit, and `gh api repos/BenchBox-dev/benchbox-site/rulesets` lists an active ruleset for `next` with deletion, non_fast_forward, pull_request and required `ci`",
+    "Either a merged pull request on `next` restores every reverted passage with `ci` green, or the cutover list was empty and that is recorded here",
+    "Tracker items release-pin-tooling, docs-build-from-pin and next-branch-ci-and-alert are done"
+  ],
+  "context": "Decisions (owner, 2026-11-12): merge once ci is green, create next, add the ruleset, confirm the live page. SITE_DEPLOY_TARGET is production. Not a batch member: it starts only after the batch members are done. Guardrails: stop and report rather than bypass a gate; a failed deploy opens its own issue; never set or clear repository variables.",
+  "description": "Problem: the code change alone does not correct benchbox.dev or give unreleased docs a home. Outcome: production docs show v0.5.0, `next` exists, is protected and carries the docs held back at cutover.\n\nSteps, in order:\n1. Decision gate: the batch pull request to `main` has `ci` green on its final head and its body lists the reverted passages and the docs commits since v0.5.0 left for owner review. Merge with `gh pr merge --squash`. Do not merge on a red or pending `ci`.\n2. Watch the deploy run for the merge commit. Gate: it concludes success. On failure, read the run, fix forward by pull request, and do not dispatch a manual rollback (the workflow dispatches its own).\n3. Verify production: `https://benchbox.dev/docs/` contains `Current release: v0.5.0`; one generated page (for example a `benchmarks/queries/` page) matches the pinned docs-data; `/results/` still loads the newest snapshot (deployed receipt core_sha is the newest bundle, not dfe585e). Allow for the ten-minute page max-age.\n4. Create `next` from the merged `main` commit and push it.\n5. Add a repository ruleset targeting `next`: no deletion, no force-push, pull request required, `ci` required, merge and squash methods allowed.\n6. Open a pull request to `next` restoring every passage reverted at cutover (from the list in the batch pull request). Gate: `ci` green with DOCS_INPUTS on the develop bundle. Merge it.\n7. Close the tracker items.\n\nConstraints: owner authorized merge to `main` and production deploy for this change on 2026-11-12; that authority covers this pull request only. No force-push anywhere. Commit identity Joe Harris <joeharris76@gmail.com>, no agent trailers.",
+  "links": [
+    ".github/workflows/deploy.yml",
+    "deploy/README.md"
+  ],
+  "sessions": [
+    {
+      "actor": "mcp:omp-coding-agent:joe@joe-mac-mini.local:9c85f43e97659072aa9dbbd3",
+      "at": "2026-11-12T13:38:16Z",
+      "client": "omp-coding-agent",
+      "op": "create",
+      "op_id": "44d509ab3df248819f422142687f0acf",
+      "session_id": "524c11ecc7864e4f81039b54632b8c82"
+    }
+  ]
+}
