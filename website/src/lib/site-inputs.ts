@@ -55,6 +55,10 @@ export function requireDocsInputs(env: NodeJS.ProcessEnv = process.env): string 
   return root;
 }
 
+export function releaseVersion(env: NodeJS.ProcessEnv = process.env): string {
+  return (JSON.parse(readFileSync(path.join(requireDocsInputs(env), "manifest.json"), "utf-8")) as BundleManifest).package_version;
+}
+
 export function bundleManifest(): BundleManifest {
   return JSON.parse(readFileSync(path.join(requireSiteInputs(), "manifest.json"), "utf-8")) as BundleManifest;
 }
