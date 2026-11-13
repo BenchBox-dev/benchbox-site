@@ -51,7 +51,7 @@
       "claim": null,
       "needs": [],
       "priority": "medium",
-      "status": "open",
+      "status": "blocked",
       "title": "Decide whether blog posts wait for a release, and state how blog links to core resolve"
     },
     "canonical-snapshot-digest-looseness-20261029": {

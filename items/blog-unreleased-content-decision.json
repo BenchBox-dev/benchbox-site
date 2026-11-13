@@ -4,7 +4,7 @@
     "AGENTS.md states the rule and how a blog link to a post-release core path must be written",
     "If posts must wait, a pull request to main that adds such a post fails a named check, with a test"
   ],
-  "context": "Decision gate: owner decision first; no code before it. Evidence: at cutover no blog link broke against v0.5.0 (core-links inventory check was fresh).",
+  "context": "Decision gate: owner decision first; no code before it. Evidence: at cutover no blog link broke against v0.5.0 (core-links inventory check was fresh).\n\nReview 2026-11-13: set to blocked on the owner decision; nothing can be implemented before it. Put the question to the owner with both options and their cost: (free) blog posts keep publishing from main and AGENTS.md says a post may describe unreleased behaviour only if it says so and links to core by commit SHA; (held) posts about unreleased behaviour merge to next, which needs a rule a check can apply, since nothing mechanical can tell what a post describes. Recommendation to offer: free, with the written rule, because release-overview posts are published with the release and the pin already fails the build on a link to a path missing at the pinned release. Verification rubric: AGENTS.md text merged; if a check is added, a seeded test fails for a violating post and passes for a compliant one. Guardrails: no published post is unpublished or rewritten as part of this item; the drafts/ tree is out of scope.",
   "description": "Problem: the release pin holds back documentation only. Blog posts still publish from main as soon as they merge, so a post can describe unreleased core behaviour while the docs it links to describe the pinned release. Blog links to core files are also resolved against the pinned repo-files.json and core SHA, so a post that links a path added after the pinned release fails the build until the link is pinned to a SHA. Neither rule is written down. Outcome: an owner decision, recorded in AGENTS.md, and a check if the decision needs one.",
   "links": [
     "website/src/lib/site-inputs.ts",
@@ -18,6 +18,14 @@
       "client": "omp-coding-agent",
       "op": "create",
       "op_id": "e97a29b13d8e41f09fb9270677c2a447",
+      "session_id": "524c11ecc7864e4f81039b54632b8c82"
+    },
+    {
+      "actor": "mcp:omp-coding-agent:joe@joe-mac-mini.local:9c85f43e97659072aa9dbbd3",
+      "at": "2026-11-13T13:59:15Z",
+      "client": "omp-coding-agent",
+      "op": "update",
+      "op_id": "b50b47ec4fc743df87ebb7a7057cb795",
       "session_id": "524c11ecc7864e4f81039b54632b8c82"
     }
   ]
