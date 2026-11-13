@@ -4,7 +4,7 @@
     "Either visual.yml builds next pull requests from the newest develop docs inputs, or AGENTS.md states the difference",
     "ci for next also runs docs assembly and docs:generate against release-pin/, or the owner records that the release pull request is the accepted place to find such breaks"
   ],
-  "context": "Items 1 and 2 come from the independent review of #145 (Optional). Guardrail: keep the required check name `ci`; deploy.yml must not gain DOCS_INPUTS.",
+  "context": "Items 1 and 2 come from the independent review of #145 (Optional). Guardrail: keep the required check name `ci`; deploy.yml must not gain DOCS_INPUTS.\n\nReview 2026-11-13. Decision gates: for gap 2 choose fix or document; for gap 3 the owner chooses between running the pin checks on next and accepting discovery in the release pull request; record both before coding. Verification rubric: `node --test scripts/docs-release-pin-workflow.test.mjs` passes and, with the `||` in the ci.yml expression changed to `&&` locally, fails (state that you tried it); `node scripts/check-yaml.mjs .github/workflows/*.yml` passes; one pull request into next shows the chosen behaviour in its ci log. Guardrails: required check name stays `ci` and its `needs` stays complete; `.github/workflows/deploy.yml` gains no DOCS_INPUTS; no added job may make ci on main slower by more than the docs assembly step it adds.",
   "description": "Problem: three gaps remain from the release-pin change. (1) `scripts/docs-release-pin-workflow.test.mjs` checks substrings of the DOCS_INPUTS expressions, so a wrong `&&`/`||` would pass. (2) `visual.yml` sets DOCS_INPUTS for pull requests into next to the bundle it fetches, which is the deployed bundle, not the newest develop bundle that ci uses; the advisory comparison can therefore build different docs from ci. (3) ci on next reads only the develop bundle, so nothing on next proves site code still reads the pin, which AGENTS.md requires until the next release is pinned; a break shows up only in the release pull request.",
   "links": [
     ".github/workflows/ci.yml",
@@ -18,6 +18,14 @@
       "client": "omp-coding-agent",
       "op": "create",
       "op_id": "1139eca97bcf47898960460da266f484",
+      "session_id": "524c11ecc7864e4f81039b54632b8c82"
+    },
+    {
+      "actor": "mcp:omp-coding-agent:joe@joe-mac-mini.local:9c85f43e97659072aa9dbbd3",
+      "at": "2026-11-13T13:59:19Z",
+      "client": "omp-coding-agent",
+      "op": "update",
+      "op_id": "cf14b1e96ded4fe6b10ba9f2f30601b2",
       "session_id": "524c11ecc7864e4f81039b54632b8c82"
     }
   ]
