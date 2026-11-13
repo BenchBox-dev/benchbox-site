@@ -1,0 +1,27 @@
+{
+  "acceptance": [
+    "Decision recorded: automatic merge pull request, or a reminder issue",
+    "With the chosen mechanism in place, a commit merged to main appears in next within one day, shown on a real merge: `git rev-list --count origin/next..origin/main` returns 0",
+    "A merge conflict does not get resolved automatically: the mechanism leaves a pull request or issue naming the conflicting files",
+    "The mechanism uses the repository token with the least permissions that work and adds no secret; if the default token cannot open or merge the pull request under the next ruleset, that is reported and the reminder option is used",
+    "The current drift is cleared by a merge of main into next with ci green",
+    "AGENTS.md describes the mechanism in place of the manual rule"
+  ],
+  "context": "Found at review on 2026-11-13: `git rev-list --left-right --count origin/main...origin/next` was 2 and 3. Guardrails: never push to next or main directly and never force-push; merges into next are merge commits, not squashes, so main's commits stay identifiable; do not change the main ruleset; the mechanism must not trigger a production deploy (deploys run only on main).",
+  "description": "Problem: AGENTS.md says whoever merges a fix to main then merges main into next, but nothing does it or reports when it is missed. One day after next was created, main already held two commits that next lacks (#149 and #150), while next held three of its own. The longer they drift, the more the release pull request from next into main conflicts, and a fix made on main can be lost from the next release's documentation review.\n\nOutcome: next always contains main shortly after main moves, without relying on memory.\n\nOptions: a workflow on push to main that opens (or updates) a pull request merging main into next and merges it when ci is green; or a nightly check that opens an issue when `git rev-list --count origin/next..origin/main` is above zero for more than a day. The next ruleset requires a pull request and ci and allows merge commits.",
+  "links": [
+    "AGENTS.md",
+    ".github/workflows/ci.yml",
+    "https://github.com/BenchBox-dev/benchbox-site/pull/145"
+  ],
+  "sessions": [
+    {
+      "actor": "mcp:omp-coding-agent:joe@joe-mac-mini.local:9c85f43e97659072aa9dbbd3",
+      "at": "2026-11-13T13:59:23Z",
+      "client": "omp-coding-agent",
+      "op": "create",
+      "op_id": "c33ffcc94bf842e4a56fb3a850672ffc",
+      "session_id": "524c11ecc7864e4f81039b54632b8c82"
+    }
+  ]
+}

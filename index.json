@@ -190,6 +190,13 @@
       "status": "blocked",
       "title": "Pin the next core release through the default docs:pin path and confirm the status matrix corrects itself"
     },
+    "keep-next-level-with-main": {
+      "claim": null,
+      "needs": [],
+      "priority": "medium",
+      "status": "open",
+      "title": "Keep next level with main after each merge to main"
+    },
     "next-branch-ci-and-alert": {
       "claim": null,
       "needs": [
