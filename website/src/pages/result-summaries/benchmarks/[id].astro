@@ -1,6 +1,6 @@
 ---
 import ResultSummary from "../../../layouts/ResultSummary.astro";
-import { loadResultsSummary, SUMMARY_ROOT } from "../../../lib/results-summary.ts";
+import { loadResultsSummary, reasonCounts, SUMMARY_ROOT } from "../../../lib/results-summary.ts";
 
 export async function getStaticPaths() {
   const { benchmarks } = await loadResultsSummary();
@@ -35,7 +35,7 @@ const description = `${page.label} on BenchBox: ${page.resultCount} published ${
             <tr><th scope="col">Rank</th><th scope="col">Platform</th><th scope="col">Version</th><th scope="col">Run date</th><th scope="col">{cohort.metricLabel}</th><th scope="col">Geomean</th><th scope="col">Ranking</th></tr>
           </thead>
           <tbody>
-            {cohort.ranking.map((line) => (
+            {cohort.ranked.map((line) => (
               <tr>
                 <td>{line.rank ?? "—"}</td>
                 <th scope="row"><a href={line.receiptHref}>{line.platformLabel}</a></th>
@@ -43,7 +43,7 @@ const description = `${page.label} on BenchBox: ${page.resultCount} published ${
                 <td>{line.runDate.slice(0, 10)}</td>
                 <td>{line.score}</td>
                 <td>{line.geomean}</td>
-                <td>{line.exclusion ?? "Ranked"}</td>
+                <td>Ranked</td>
               </tr>
             ))}
           </tbody>
@@ -51,4 +51,35 @@ const description = `${page.label} on BenchBox: ${page.resultCount} published ${
       </div>
     </>
   ))}
+
+  {page.excluded.length > 0 && (
+    <>
+      <h2 id="not-ranked">Runs not included in rankings</h2>
+      <p>
+        {page.excluded.length} {page.excluded.length === 1 ? "run is" : "runs are"} published with {page.excluded.length === 1 ? "its" : "their"} numbers and receipt but {page.excluded.length === 1 ? "is" : "are"} not ranked. Reason: {reasonCounts(page.excluded.map((line) => line.exclusion ?? "")).map((entry) => `${entry.reason} (${entry.count})`).join("; ")}
+      </p>
+      <div class="result-summary__table">
+        <table>
+          <caption>Runs excluded from ranking</caption>
+          <thead>
+            <tr><th scope="col">Scale</th><th scope="col">Phase</th><th scope="col">Platform</th><th scope="col">Version</th><th scope="col">Run date</th><th scope="col">Score</th><th scope="col">Geomean</th><th scope="col">Reason not ranked</th></tr>
+          </thead>
+          <tbody>
+            {page.excluded.map((line) => (
+              <tr>
+                <td>{line.scale}</td>
+                <td>{line.phase}</td>
+                <th scope="row"><a href={line.receiptHref}>{line.platformLabel}</a></th>
+                <td>{line.version ?? "—"}</td>
+                <td>{line.runDate.slice(0, 10)}</td>
+                <td>{line.score}</td>
+                <td>{line.geomean}</td>
+                <td>{line.exclusion}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </>
+  )}
 </ResultSummary>
