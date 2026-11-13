@@ -113,3 +113,4 @@ quoted number can lose its label.
   `trust_internal_source` exempts bundles whose manifest sidecar declares
   `result_source: internal`, and the submission CI never sets it)
 - [Corpus validation-status admission policy](adr-corpus-validation-admission-policy.md)
+- [Benchmark Methodology](../../concepts/benchmark-methodology.md), which states this decision for readers running benchmarks
