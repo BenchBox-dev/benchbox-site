@@ -422,7 +422,7 @@ one name covers requested and observed values.
 - The core owns `variants_comparable(a, b)` over deployment, requested engine
   and gateway. A bundle without `platform.deployment.selected` uses the
   manifest default deployment, so a legacy bundle compares with a new run of
-  the default deployment. `benchbox compare`, the MCP `compare_results` tool,
+  the default deployment. `benchbox compare`, the MCP `analyze_results` tool,
   analytics regression detection and `benchbox report` regression baselines
   all call it. Compare refuses incomparable inputs and names the parts that
   differ; regression baselines use only runs of the same variant.

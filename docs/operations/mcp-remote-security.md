@@ -47,6 +47,7 @@ the lowercase SHA-256 digest of its exact bearer value.
   "allowed_platforms": ["duckdb"],
   "allowed_benchmarks": ["tpch"],
   "max_scale_factor": 1.0,
+  "max_iterations": 10,
   "admission": {
     "requests_per_minute": 120,
     "global_concurrency": 8,
@@ -75,7 +76,9 @@ The scope contract is:
 - `benchbox:write`: chart generation and other non-benchmark artifact writes;
 - `benchbox:execute`: `run_benchmark`, `start_benchmark`, and
   `cancel_benchmark`, still constrained by platform, benchmark, and
-  maximum-scale policy.
+  maximum-scale and maximum-iterations policy.
+
+`max_iterations` caps the `iterations` argument of `run_benchmark` and `start_benchmark`. It defaults to 10 and accepts 3 to 1000; the floor is the default iteration count, so a call that omits `iterations` can never exceed the cap. A larger or non-integer `iterations` value is refused before any work starts.
 
 ## Server-owned ClickHouse connection profiles
 
