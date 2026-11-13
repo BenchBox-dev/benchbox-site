@@ -1,11 +1,13 @@
 {
   "acceptance": [
-    "A table lists each commit above with a verdict (released, unreleased, correction) and the evidence at core v0.5.0 for each unreleased verdict",
-    "Each unreleased passage is restored to its v0.5.0 text on main by pull request, and next still carries the newer text after main is merged into it",
-    "`npm run docs:check -- --docs-mode block` passes on main (pin) and on next (develop bundle)",
-    "The owner has confirmed the verdicts for any passage where the evidence is not conclusive"
+    "The audit set is computed, not copied: `git log --format='%h %s' v0.5.0-publish-date..origin/main -- docs` with the release publish time 2026-11-06T02:55:34Z, so commits merged after this item was written (for example #149 and #150) are included",
+    "A table lists each commit in that set with a verdict (released, unreleased, correction) and, for each unreleased verdict, the evidence: the core path and what `git show v0.5.0:<path>` in BenchBox-dev/BenchBox shows, or the field in release-pin/",
+    "Each unreleased passage is restored to its v0.5.0 text on main by pull request with ci green, and after main is merged into next, next still carries the newer text (checked with `git diff origin/main origin/next -- <file>`)",
+    "`npm run docs:check -- --docs-mode block` passes on main with DOCS_INPUTS unset and on next with DOCS_INPUTS on the newest develop bundle",
+    "The owner has confirmed, in a recorded answer, the verdict for every passage where the evidence is not conclusive; no such passage is reverted without it",
+    "Decision recorded: either a standing guard is added (for example a pull request checklist line or a named check) that makes authors choose main or next for documentation, or the owner records that the written rule in AGENTS.md is enough"
   ],
-  "context": "Decision gate: classification needs judgement; do not revert on a guess, ask the owner. Guardrails: never edit release-pin/; do not weaken a check. Known inconsistency left on main until the next pin: docs/benchmarks/support-status.md states 17, 12 and 12 queries because the v0.5.0 contract exports those values, while the v0.5.0 query catalog holds 93, 112 and 23; that one is bound by docs:check and is not in scope here.",
+  "context": "Decision gate: classification needs judgement; do not revert on a guess, ask the owner. Guardrails: never edit release-pin/; do not weaken a check. Known inconsistency left on main until the next pin: docs/benchmarks/support-status.md states 17, 12 and 12 queries because the v0.5.0 contract exports those values, while the v0.5.0 query catalog holds 93, 112 and 23; that one is bound by docs:check and is not in scope here.\n\nReview 2026-11-13: the commit list in the description is a snapshot. Two documentation commits merged to main after the cutover (#149 per-vendor publishing checklist, #150 Databricks Beta or Preview refusal) and nothing checked whether they describe released behaviour, which shows the written rule alone does not route unreleased documentation to next. Decision gates, in order: (1) owner confirms inconclusive verdicts before any revert; (2) owner chooses guard or no guard. Guardrails: one pull request may revert several passages but each passage names its source commit; never revert a correction of something that was already wrong at v0.5.0; do not touch blog/ (see blog-unreleased-content-decision).",
   "description": "Problem: when main was cut over to the v0.5.0 release pin, only the four statements docs:check rejects were restored to v0.5.0 values. Other documentation merged after v0.5.0 was published is still live on benchbox.dev and may describe unreleased behaviour. Outcome: every statement on main is true for the pinned release, and each unreleased statement lives on next.\n\nScope to audit against core at tag v0.5.0 (commit dfe585e) and release-pin/: the remaining edits of #137 and #138 (catalog counts, scale-factor ranges, size tables, `measured at SF 0.01 to 10`); the accepted-versions list in docs/reference/public-contracts.md, which names 2.4 while the current version reads 2.3; and the other docs commits since the release: #118, #119, #121, #124, #125, #131, #139, #140, #142, #144. Statements that only correct an error that was already wrong at v0.5.0 stay on main.",
   "links": [
     "https://github.com/BenchBox-dev/benchbox-site/pull/145",
@@ -19,6 +21,14 @@
       "client": "omp-coding-agent",
       "op": "create",
       "op_id": "3ff298d3b608439096d4557a1bbe3bf9",
+      "session_id": "524c11ecc7864e4f81039b54632b8c82"
+    },
+    {
+      "actor": "mcp:omp-coding-agent:joe@joe-mac-mini.local:9c85f43e97659072aa9dbbd3",
+      "at": "2026-11-13T13:59:08Z",
+      "client": "omp-coding-agent",
+      "op": "update",
+      "op_id": "f7e6f32e419c4f489263a21628a92bb5",
       "session_id": "524c11ecc7864e4f81039b54632b8c82"
     }
   ]
