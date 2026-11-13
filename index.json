@@ -280,7 +280,7 @@
       "claim": null,
       "needs": [],
       "priority": "low",
-      "status": "open",
+      "status": "blocked",
       "title": "Cut the tracker store over to schema 4 so registered batches can run"
     },
     "tuning-page-empty-aliases-sentence-20261029": {
