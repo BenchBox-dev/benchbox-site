@@ -61,9 +61,10 @@ const publishStatic = (): AstroIntegration => ({
       const out = fileURLToPath(dir);
       const explorerDist = path.join(repoRoot, "explorer", "dist");
       if (!existsSync(explorerDist)) throw new Error(`Results Explorer build is missing: ${explorerDist}`);
+      if (existsSync(path.join(explorerDist, "r"))) throw new Error("The Results Explorer build has an r directory, which belongs to the result permalink pages");
       const sourceDigest = treeDigest(explorerDist);
       cpSync(explorerDist, path.join(out, "results"), { recursive: true });
-      const mountedDigest = treeDigest(path.join(out, "results")).sha256;
+      const mountedDigest = treeDigest(path.join(out, "results"), ["r"]).sha256;
       if (mountedDigest !== sourceDigest.sha256) throw new Error(`Results Explorer was altered while mounting: ${sourceDigest.sha256} became ${mountedDigest}`);
       assertMountedSnapshotMatchesBundle(out);
       cpSync(path.join(repoRoot, "landing", "hero.png"), path.join(out, "hero.png"));
