@@ -45,7 +45,7 @@ Use this checklist before opening a platform-support PR. It is deliberately conc
   other `--gateway` value fails before work starts with "gateway routing is not implemented for <platform>
   yet". A routed result records `platform.gateway` with `name` and `routed: true`, sets the top-level
   `tpc_compliant: false`, restricts per-query `execution_engine` to `routes_to` targets plus `unknown`, and
-  observes `mixed` when queries differ. `benchbox compare` and MCP `compare_results` refuse runs that differ
+  observes `mixed` when queries differ. `benchbox compare` and MCP `analyze_results` refuse runs that differ
   in deployment, requested engine or gateway (the CLI accepts `--allow-heterogeneous-comparison`), and
   regression baselines use only runs of the same variant.
 - Declare execution engines when the platform offers more than one way to execute a query: add a manifest

@@ -234,6 +234,8 @@ modes remain available because they do not hold the request for execution.
 | `validate_only` | boolean | No | `false` | Validate platform, benchmark, scale, and mode without executing. |
 | `link_probe` | boolean | No | `true` | Measure post-benchmark statement overhead (6 metered `SELECT 1` statements on billable warehouses). Set `false` to skip; equivalent to the CLI `--no-link-probe` flag. |
 | `platform_options` | object or null | No | `null` | Typed, bounded, non-secret settings approved for the selected platform; credentials, endpoints, paths, and package-install controls are rejected. |
+| `seed` | integer or null | No | `null` | RNG seed for query parameter generation, 0 to 2147483647; equivalent to the CLI `--seed` flag. The effective value is reported in `mcp_metadata.seed`. |
+| `iterations` | integer or null | No | `null` | Power test measurement iterations, at least 1 (the shared default is 3); equivalent to the CLI `--iterations` flag and applies to the power or standard phase. `mcp_metadata.iterations` reports the count the result bundle recorded. Remote servers bound it with `max_iterations`. |
 
 **Behavior:**
 
@@ -439,8 +441,6 @@ the same three categories as above.
 | `--no-progress` | Omitted | interaction-scoped | Progress bars are terminal presentation; MCP returns structured JSON. |
 | `--quiet` | Omitted | interaction-scoped | Console verbosity control; MCP already suppresses console output. |
 | `--verbose` | Omitted | interaction-scoped | Console verbosity control; MCP response detail is governed by tool schemas. |
-| `--iterations` | Omitted | not-yet-demanded | Repeated power-test measurement is expressible over MCP; no client has demanded it. |
-| `--seed` | Omitted | not-yet-demanded | RNG seed for query parameter generation; bounded integer, no client demand yet. |
 | `--official` | Omitted | not-yet-demanded | TPC official mode is a bounded boolean; it additionally requires `--seed`, so both promote together. |
 | `--compression` | Omitted | not-yet-demanded | Bounded codec enum; no client demand yet. |
 | `--table-format` | Omitted | not-yet-demanded | Bounded table-format spec; no client demand yet. |
