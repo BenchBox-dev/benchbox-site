@@ -41,8 +41,9 @@ Open before publication:
 
 - Rerun the timings on an idle machine. The November run shared the
   machine with other jobs, so the draft reports best times and ratios.
-- Time the complete DataFrame Q16 and Q95 with each pattern. That needs a
-  change in BenchBox, which picks the pattern from the platform name.
+- Complete DataFrame Q16, Q94 and Q95 were timed before and after the
+  move to min/max at scale factor 1 on Polars and DataFusion; PySpark and
+  larger scale factors were not timed.
 - Set `post_number`. The series plan lists this post as 7 and the file
   name says 06.
 
@@ -198,11 +199,11 @@ n_unique (countDistinct)     184ms   Still 1.3x faster
 
 ### 6. The solution: platform-specific code paths (~300 words)
 
-BenchBox now detects the platform and uses the optimal pattern:
+We added a branch meant to detect the platform and use the faster pattern. It compared the platform with `"datafusion"` while the DataFusion adapter reports `"DataFusion"`, so it was false on every platform and every platform ran the distinct count for Q16 and Q95. The code as written:
 
 ```python
 platform = getattr(ctx, "platform", "polars")
-if platform == "datafusion":
+if platform == "datafusion":  # never true: the adapter reports "DataFusion"
     # Self-join pattern (5x faster on DataFusion)
     order_wh = df.select([...]).unique()
     result = order_wh.join(...).filter(...).unique()
@@ -211,7 +212,7 @@ else:
     result = df.group_by(...).agg(n_unique()).filter(...)
 ```
 
-**Trade-off acknowledged**: This adds complexity. Single-source DataFrame code is cleaner. But a 5x performance difference is too large to ignore for benchmark tooling.
+**What replaced it**: BenchBox now uses the min/max rule for Q16, Q94 and Q95 on every platform, with one code path. The February trade-off (complexity against a 5x difference) did not arise in practice because the branch never ran.
 
 ### 7. Methodology insight (~400 words)
 
@@ -262,7 +263,7 @@ What this reveals about benchmarking and cross-platform DataFrame libraries:
 - [x] Benchmarked both patterns on PySpark (all 6 scales)
 - [x] Analyzed Polars query plans
 - [x] Analyzed DataFusion query plans
-- [x] Implemented platform-specific solution in BenchBox
+- [x] Added a platform branch in BenchBox (it never ran; see section 6)
 - [x] Verified correctness (same results, all platforms)
 - [x] Gathered primary sources for all technical claims
 - [x] Verified PySpark behavior at larger scales (500K, 1M)

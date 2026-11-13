@@ -10,15 +10,15 @@ meta_description: "In February two DataFrame patterns had opposite winners on Po
 
 # BenchBox in action: when the same query needs different code
 
-> In February, two ways of writing one TPC-DS step had opposite winners on Polars and DataFusion, and we added a platform branch to BenchBox. We reran the test in November on old and new engine releases. The February result reproduces, but only on the data shape and versions we tested then.
+> In February, two ways of writing one TPC-DS step had opposite winners on Polars and DataFusion, and we added a platform branch to BenchBox to use a different one on each. The branch never ran: a letter-case mismatch kept it false on every platform. We reran the test in November on old and new engine releases. The February result reproduces, but only on the data shape and versions we tested then.
 
-**TL;DR**: Finding orders shipped from more than one warehouse can be written as a self-join or as a distinct count. In February the self-join was 2-5x faster on DataFusion 51 and the distinct count 2-4x faster on Polars 1.37, so BenchBox picks the pattern by platform. Rerun on an Apple M4 in November, the split reproduces on those versions with our synthetic data. On TPC-DS data it reverses for DataFusion 51, and on DataFusion 55 the distinct count is faster on every dataset. A third pattern, comparing the minimum and maximum warehouse per order, was the fastest in 39 of 40 tests on the current releases of Polars, DuckDB, DataFusion and PySpark.
+**TL;DR**: Finding orders shipped from more than one warehouse can be written as a self-join or as a distinct count. In February the self-join was 2-5x faster on DataFusion 51 and the distinct count 2-4x faster on Polars 1.37, so we added a branch to BenchBox to pick the pattern by platform. The branch compared the platform name in lower case and DataFusion reports it with capitals, so it never ran: Q16 and Q95 used the distinct count on every platform. Rerun on an Apple M4 in November, the split reproduces on those versions with our synthetic data. On TPC-DS data it reverses for DataFusion 51, and on DataFusion 55 the distinct count is faster on every dataset. A third pattern, comparing the minimum and maximum warehouse per order, was the fastest in 39 of 40 tests on the current releases of Polars, DuckDB, DataFusion and PySpark. BenchBox now uses it for Q16, Q94 and Q95 on every platform.
 
 ---
 
 ## Introduction
 
-BenchBox runs each benchmark query as SQL and, on DataFrame platforms, as DataFrame code written once against a common interface. In February 2026 we found a step in two TPC-DS queries where one way of writing that code was several times faster on Polars and another was several times faster on DataFusion. We measured it, read the query plans, and added a branch that picks the pattern by platform.
+BenchBox runs each benchmark query as SQL and, on DataFrame platforms, as DataFrame code written once against a common interface. In February 2026 we found a step in two TPC-DS queries where one way of writing that code was several times faster on Polars and another was several times faster on DataFusion. We measured it, read the query plans, and added a branch meant to pick the pattern by platform. The branch never took effect, as described below.
 
 That was nine months ago. Since then Polars 2.0 made its streaming engine the default for lazy queries[^polars2], DuckDB shipped 2.0.0[^duckdb2], DataFusion moved from 51 to 55 and PySpark from 4.1 to 4.3. Before publishing the finding we reran it, and we added three things the February test lacked:
 
@@ -103,14 +103,16 @@ benchbox run --platform datafusion-df --benchmark tpcds --scale 0.1 --phases pow
 
 The MCP server's `analyze_results` tool compared the two runs query by query and flagged Q16 and Q95 as outliers. `get_query_details` returned the DataFrame code for both, and both shared the multi-warehouse step. A geometric mean over all the queries would not have shown it.
 
-BenchBox's TPC-DS DataFrame code for Q16 and Q95 has chosen the self-join on DataFusion and the distinct count elsewhere ever since:
+We added a branch to the DataFrame code for Q16 and Q95 that was meant to choose the self-join on DataFusion and the distinct count elsewhere:
 
 ```python
-if platform == "datafusion":
+if platform == "datafusion":  # never true: the DataFusion adapter reports "DataFusion"
     ...  # self-join
 else:
     ...  # group_by + n_unique
 ```
+
+The comparison was false on every platform in every release from v0.1.1 to v0.5.0, so DataFusion took the distinct-count path like every other platform. The February speed-up for DataFusion was never in BenchBox's results.
 
 ---
 
@@ -233,9 +235,21 @@ One correctness point belongs here. In SQL, `<>` is never true when a side is NU
 
 ## What this means for BenchBox
 
-The platform branch is still in BenchBox 0.5.0. Measured on the isolated step with TPC-DS data and DataFusion 55.0.0, it gives DataFusion the slower of its two options, and both options are slower than min/max on the current release of every platform we ran.
+The platform branch was in every BenchBox release through 0.5.0, and it never ran. It compared the context's platform with `"datafusion"`, and the DataFusion adapter reports `"DataFusion"`. DataFusion therefore always ran the group-by and distinct-count path for Q16 and Q95. Q94 ran the self-join on every platform that shares the expression code, because its helper was called with the optimized flag off.
 
-We have not changed it yet, for a reason the DuckDB result makes plain: this test times the step alone, over a whole table. The DataFrame versions of Q16 and Q95 compute the multi-warehouse orders for the full table before they apply the query's other filters, so we expect the step to matter more there than it does in SQL, but that is an expectation until the complete queries are timed with each pattern.
+The same code had two NULL defects. On Polars, `n_unique()` counts NULL, so Q95 treated an order with one real warehouse and one NULL warehouse as a multi-warehouse order. The pandas implementations of Q94 and Q95 made the same error, and Q94 kept sales rows whose own warehouse is NULL, which the SQL excludes. We know of no published answer that this changed.
+
+BenchBox [pull request 4169](https://github.com/BenchBox-dev/BenchBox/pull/4169) removed the dead branches, fixed the NULL handling, and moved Q16, Q94 and Q95 to the minimum and maximum rule on every platform. A second change, [pull request 4196](https://github.com/BenchBox-dev/BenchBox/pull/4196), covers TPC-H Q21, which has the same kind of step. There, carrying the minimum and maximum through the joins was about 10% slower on DataFusion than two distinct counts, and filtering before the joins brought it level.
+
+We timed the complete queries on both sides of the first change. The test used TPC-DS at scale factor 1 and the complete DataFrame queries through `benchbox run`, on the commit before the change and the commit with it, with the checkouts alternating and the best of five runs a side. The engines were the versions BenchBox locks, Polars 1.44.2 and DataFusion 54.0.0, not the newer ones measured above. Times are in milliseconds. "Before" ran the distinct count for Q16 and Q95 and the self-join for Q94, on both engines.
+
+| Query | Polars before | Polars after | Ratio | DataFusion before | DataFusion after | Ratio |
+| --- | --- | --- | --- | --- | --- | --- |
+| Q16 | 30.3 | 30.2 | 1.00 | 89.0 | 61.4 | 0.69 |
+| Q94 | 30.2 | 23.8 | 0.79 | 68.9 | 35.5 | 0.52 |
+| Q95 | 24.4 | 22.8 | 0.94 | 66.6 | 41.3 | 0.62 |
+
+The ratio is the time after divided by the time before, so below 1 is faster. The machine was a shared 16 GiB host, and differences under about 10% are noise. This test ran at scale factor 1 only, because scale factor 10 would not run on that host. PySpark has no numbers: BenchBox's memory guard refused to run it. Each round timed one run.
 
 ---
 
@@ -262,7 +276,7 @@ We have not changed it yet, for a reason the DuckDB result makes plain: this tes
 ## Limitations
 
 - The machine was not idle. Ratios between patterns on one engine version are the reliable figures. Absolute times, and absolute comparisons between versions, carry more error.
-- The step was timed alone. Only DuckDB was also run on the complete Q16, Q94 and Q95. The DataFrame platforms were not.
+- The step was timed alone. Only DuckDB was also run on the complete Q16, Q94 and Q95 in that test. The complete DataFrame queries were timed on Polars and DataFusion at scale factor 1 only, in a separate test, and not at all on PySpark.
 - One machine, one architecture, one node. A Spark cluster pays more for each shuffle than `local[*]` mode does.
 - One query step. Other steps may still need different code on different platforms.
 

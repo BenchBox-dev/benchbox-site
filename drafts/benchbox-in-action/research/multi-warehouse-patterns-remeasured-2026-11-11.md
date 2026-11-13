@@ -385,9 +385,17 @@ direction, and Q95 is 2.7 times faster at SF1 and 5.5 times faster at
 SF10. The slow `exists` times
 belong to the isolated statement, not to these queries.
 
-The DataFrame engines were not run on the full queries. BenchBox chooses
-the pattern from the platform name, so comparing patterns inside the full
-DataFrame Q16 and Q95 needs a change in BenchBox itself.
+The DataFrame engines were not run on the full queries in this test. The
+platform branch in BenchBox 0.5.0 never ran, because it compared the
+platform name with "datafusion" and the DataFusion adapter reports
+"DataFusion", so Q16 and Q95 used the distinct count on every platform and
+Q94 used the self-join. BenchBox now uses min/max for Q16, Q94 and Q95 on
+every platform. Complete-query timings before and after that change
+(TPC-DS SF1, Polars 1.44.2 and DataFusion 54.0.0, best of 5 alternating
+runs, ms; differences under about 10% are noise) are in the draft: Polars
+Q16 30.3 to 30.2, Q94 30.2 to 23.8, Q95 24.4 to 22.8; DataFusion Q16 89.0
+to 61.4, Q94 68.9 to 35.5, Q95 66.6 to 41.3. SF10 would not run on that
+host and PySpark was refused by BenchBox's memory guard.
 
 ## Query plans
 
