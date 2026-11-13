@@ -11,7 +11,9 @@ export async function getStaticPaths() {
   return receipts.map((receipt) => ({ params: { id: receipt.resultId }, props: { receipt } }));
 }
 
+let template: string | undefined;
+
 export const GET: APIRoute = ({ props }) => {
-  const template = readFileSync(path.join(REPO_ROOT, "explorer", "dist", "index.html"), "utf-8");
+  template ??= readFileSync(path.join(REPO_ROOT, "explorer", "dist", "index.html"), "utf-8");
   return new Response(renderReceiptPage(template, props.receipt as ResultReceipt, siteOrigin()), { headers: { "Content-Type": "text/html; charset=utf-8" } });
 };

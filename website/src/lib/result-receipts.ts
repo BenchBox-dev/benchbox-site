@@ -1,10 +1,11 @@
 import { canonicalBenchmarkSlug, canonicalPhase, formatArchitecture, formatBenchmarkLabel, formatCpuFamily, formatExecutionMode, formatMemoryGb, formatPhaseWithStreams, formatTrustLabel, formatTuningMode } from "@/lib/displayLabels";
-import { formatTimingExclusion, normalizePrimaryMetric, primaryMetricHigherIsBetter, primaryMetricLabel, primaryMetricValue, type PrimaryMetric } from "@/lib/displayEligibility";
+import { formatTimingExclusion, normalizePrimaryMetric, type PrimaryMetric } from "@/lib/displayEligibility";
 import { detailResultFromWideRow, getPrimaryMetricForBenchmark, getResultDetailMetrics, type ResultDetailMetricsRow, type ResultRow } from "@/lib/duckdbQueries";
-import { formatScaleFactor, formatScoreMetric } from "@/lib/metricFormatters";
+import { formatScaleFactor } from "@/lib/metricFormatters";
+import { embedFacts, presentEmbedResult } from "@/lib/resultEmbed";
 import { visibleResultIdForRow } from "@/lib/resultLinks";
 import { formatRunDate } from "@/lib/runAge";
-import { complianceBadge, derivedResultsDisclaimer, derivedTpcName, isDerivedPowerScore } from "@/lib/subscale";
+import { complianceBadge, derivedResultsDisclaimer, derivedTpcName, isDerivedPowerScore, isSubscaleTpc, powerScoreTitle } from "@/lib/subscale";
 import { platformVersionDisplay } from "@/lib/versionLabel";
 import { fmtGeomean } from "@/utils";
 import { formatCitationBlock } from "./results-embed.ts";
@@ -31,13 +32,11 @@ export interface ResultReceipt {
   title: string;
   description: string;
   headline: string;
-  ranked: boolean;
   rankingStatus: string;
   derivedNotice: string | null;
   sections: ReceiptSection[];
   citeLine: string;
   citationBlock: string;
-  bundleHref: string;
   summaryHrefs: { label: string; href: string }[];
 }
 
@@ -66,10 +65,14 @@ export function buildReceipt(wide: ResultDetailMetricsRow, primaryMetric: Primar
   const platformWithVersion = version === null ? detail.platform : `${detail.platform} ${version}`;
   const runDate = formatRunDate(detail.run_date);
   const metric = normalizePrimaryMetric(primaryMetric);
-  const metricValue = metric === "display_geomean_ms" ? fmtGeomean(detail.display_geomean_ms) : formatScoreMetric(metric, primaryMetricValue(detail, metric));
-  const direction = primaryMetricHigherIsBetter(metric) ? "higher is better" : "lower is better";
-  const headline = `${primaryMetricLabel(metric)}: ${metricValue} (${direction})`;
-  const ranked = detail.ranking_exclusion_reason === null;
+  const embedded = presentEmbedResult(detail.result_id, wide, metric);
+  if (embedded.state !== "published") throw new Error(`result ${detail.result_id} is not published, so it cannot get a permalink page`);
+  const facts = embedFacts(embedded);
+  const metricValue = facts.metric.text;
+  const direction = facts.metric.direction;
+  const metricName = metric === "power_score" && isSubscaleTpc(detail.benchmark, detail.scale_factor) ? powerScoreTitle(true) : facts.metric.label;
+  const headline = `${metricName}: ${metricValue} (${direction})`;
+  const ranked = embedded.ranked;
   const rankingStatus = ranked ? "Ranked" : "Not ranked";
   const rankingReason = ranked ? "Included in the rankings for its benchmark, scale factor and phase." : formatTimingExclusion(detail.ranking_exclusion_reason, "This result is not included in rankings.");
   const derivedName = derivedTpcName(detail.benchmark);
@@ -80,11 +83,11 @@ export function buildReceipt(wide: ResultDetailMetricsRow, primaryMetric: Primar
     result: detail.result_id,
     snapshot: snapshot.snapshotSha256,
     snapshotDate: snapshot.snapshotDate,
-    platform: platformWithVersion,
-    benchmark,
-    scale,
-    runDate,
-    metric: primaryMetricLabel(metric),
+    platform: facts.platform,
+    benchmark: facts.benchmark,
+    scale: facts.scale,
+    runDate: facts.runDate,
+    metric: facts.metric.label,
     direction,
     value: metricValue,
   };
@@ -101,7 +104,7 @@ export function buildReceipt(wide: ResultDetailMetricsRow, primaryMetric: Primar
         { label: "Scale factor", value: scale },
         { label: "Phase", value: phase },
         { label: "Run date", value: runDate },
-        { label: primaryMetricLabel(metric), value: `${metricValue} (${direction})` },
+        { label: metricName, value: `${metricValue} (${direction})` },
         { label: "Geomean query time", value: fmtGeomean(detail.display_geomean_ms) },
         ...(isDerivedPowerScore(detail.power_score_source) ? [{ label: "Power@Size source", value: "Derived from exported query timings" }] : []),
       ],
@@ -148,13 +151,11 @@ export function buildReceipt(wide: ResultDetailMetricsRow, primaryMetric: Primar
     title: `${benchmark} on ${platformWithVersion}, ${scale}, ${runDate}`,
     description: `${benchmark} ${scale} ${phase} run on ${platformWithVersion} from ${runDate}. ${headline}. ${rankingStatus}.`,
     headline,
-    ranked,
     rankingStatus,
     derivedNotice,
     sections,
     citeLine: `Cite as: ${platformWithVersion}, ${benchmark}, ${scale}, run ${runDate}, result ${detail.result_id}, BenchBox results snapshot sha256:${snapshot.snapshotSha256} of ${snapshot.snapshotDate}.`,
     citationBlock: formatCitationBlock(citation),
-    bundleHref: detail.bundle_download_url,
     summaryHrefs: [platformSummary, benchmarkSummary],
   };
 }

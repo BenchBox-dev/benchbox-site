@@ -136,13 +136,11 @@ describe("result permalink pages", () => {
       title: "<script>alert(1)</script>",
       description: 'a "quoted" <b>',
       headline: "h",
-      ranked: true,
       rankingStatus: "Ranked",
       derivedNotice: null,
       sections: [{ title: "S", rows: [{ label: "L", value: "<img src=x onerror=alert(1)>" }] }],
       citeLine: "c",
       citationBlock: "b",
-      bundleHref: "/b.json",
       summaryHrefs: [],
     };
     expect(renderReceiptMain(receipt)).not.toContain("<script>");
