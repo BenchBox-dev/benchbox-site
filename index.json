@@ -187,7 +187,7 @@
       "claim": null,
       "needs": [],
       "priority": "medium",
-      "status": "open",
+      "status": "blocked",
       "title": "Pin the next core release through the default docs:pin path and confirm the status matrix corrects itself"
     },
     "next-branch-ci-and-alert": {
