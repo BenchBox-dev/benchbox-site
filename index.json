@@ -363,10 +363,15 @@
       "title": "Test deploy/cli.ts resolve() end to end for the superseded, use-deployed-bundle and redeploy paths"
     },
     "deploy-resolve-failure-2026-11-12": {
-      "claim": null,
+      "claim": {
+        "expires_at": "2026-11-15T14:13:49Z",
+        "generation": "31bf5204eaf0440db4ab988ead4eb5f1",
+        "renewals": 0,
+        "worker": "mcp:omp-coding-agent:joe@joe-mac-mini.local:c5b9b54747851b1eaf3e61b4"
+      },
       "needs": [],
       "priority": "medium",
-      "status": "open",
+      "status": "active",
       "title": "Explain the validator_parity base mismatch that failed deploys on 2026-11-12 and why issue #58 stays open"
     },
     "deploy-resolver-reads-every-deployment-20261031": {
