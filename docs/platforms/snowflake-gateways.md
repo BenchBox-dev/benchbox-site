@@ -12,7 +12,7 @@ accepts the same `gateway` setting with the `espresso` and `custom` values and t
 [Databricks](#databricks).
 
 A gateway-routed run measures the gateway and whatever it routes to, not Snowflake alone. BenchBox records that
-fact in the result and keeps the run out of every native comparison, ranking and cost total.
+fact in the result and keeps the run out of every native comparison and ranking.
 
 > [!WARNING]
 > A gateway sees your Snowflake credentials, every SQL statement and every result row. Use it only with disposable
@@ -94,26 +94,12 @@ verification, plus `gateway_ca_bundle` when the private endpoint presents a cert
   `platform.gateway.routed` is true is treated the same way.
 - Gateway runs never compare with native runs, with another gateway, or with another execution engine. `benchbox
   compare` and the regression baseline select only runs of the same variant.
-- Every `queries[].execution_engine` is `unknown` unless the platform manifest names the engine the gateway reported,
-  so DuckDB, Snowflake and unknown buckets stay separate and are never blended.
-- A metadata probe that the gateway answers with an empty, truncated or synthetic row does not fail the run. The
-  result records `metadata_degraded: true` and the missing fields stay empty.
 
 ## Caching
 
 BenchBox sets `USE_CACHED_RESULT = FALSE` on the Snowflake session, reads the parameter back and keeps that receipt in
 `platform.compute.cache_control`. A session parameter can only describe Snowflake's own result cache. It cannot
-verify a cache inside the gateway or inside an engine the gateway routes to, so a gateway run also records:
-
-```json
-{
-  "validated": true,
-  "cache_disabled": true,
-  "snowflake_result_cache": "disabled",
-  "gateway_cache": "unverified",
-  "warm_run_metrics": "cache_unverified"
-}
-```
+verify a cache inside the gateway or inside an engine the gateway routes to.
 
 Warm-run gateway numbers are not valid measurements: a second run may be answered from a gateway cache that nothing
 in the result can show. Report warm gateway timings only with the label cache-unverified, and never as cold-run
@@ -121,10 +107,6 @@ results. `strict_validation` keeps its meaning for the Snowflake receipt: a fail
 on.
 
 ## Cost and TCO
-
-BenchBox does not publish a cost total for a gateway run. `normalized_cost.cost_status` is
-`not_comparable_gateway`, `normalized_cost_usd` is null, per-query costs are empty and the result has no cost total,
-because the credits a gateway run consumes depend on how the gateway routes each query.
 
 For a total cost of ownership comparison, fill in the worksheet below from your own invoices. BenchBox reads none of
 these inputs and never combines them with its own cost fields.
@@ -147,14 +129,14 @@ Any table, chart or page that shows gateway-derived cost beside native cost must
 
 A gateway-routed run appends a run-level suffix, `_gw-<8 hex characters>`, to the per-query tag, for example
 `BenchBox_Q1_gw-3fa9c2d1`. Every query in the run shares the suffix, so a gateway vendor can join its logs to the run
-by tag. The statistics lookup against `QUERY_HISTORY` uses the statement id the connector returns, not the tag, so a
-gateway that rewrites or drops the tag does not break timing or credit capture. Native runs keep the unsuffixed tag.
+by tag. The statistics lookup against `QUERY_HISTORY` uses the same tag, so execution time, compilation time, bytes
+scanned and credits are still recorded. Native runs keep the unsuffixed tag.
 
 ## Semantic gaps
 
 - A gateway may answer from an engine other than Snowflake. Greybeam declares both `snowflake` and `duckdb` as
   routing targets; `espresso` and `custom` declare `snowflake` only. BenchBox cannot see which engine answered a
-  query, which is why the per-query engine is `unknown`.
+  query.
 - A delegated engine can differ from Snowflake in function behavior, type coercion, NULL ordering, rounding and
   timestamp handling. A row-count validation failure on a gateway run may be a semantic difference rather than a wrong
   result.
@@ -172,8 +154,8 @@ The Databricks adapter accepts `gateway` with `native`, `espresso` or `custom` a
 the [Databricks platform page](databricks.md). A gateway run needs an explicit `server_hostname` that names the gateway
 and an `access_token`; BenchBox does not fall back to the auto-detected workspace, which would bypass the gateway. A
 personal access token is required, and OAuth environment variables (`DATABRICKS_CLIENT_ID`, `DATABRICKS_CLIENT_SECRET`,
-`DATABRICKS_CONFIG_PROFILE`) are rejected while a gateway is set. The run records the same `platform.gateway` block,
-`unknown` per-query engines, the unverified gateway cache and `not_comparable_gateway` cost as a Snowflake run.
+`DATABRICKS_CONFIG_PROFILE`) are rejected while a gateway is set. The run records the same `platform.gateway` block as a
+Snowflake run.
 
 ## Greybeam lifecycle guardrails
 
