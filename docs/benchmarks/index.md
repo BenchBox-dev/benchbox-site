@@ -54,7 +54,7 @@ Planned platform and benchmark additions, including DataFrame support expansion 
 - **Purpose**: Standard decision support and analytical query performance
 - **Queries**: 22 business-oriented analytical queries
 - **Schema**: 8 tables modeling a wholesale supplier database
-- **Scale**: 0.01, 0.1, 1, 10, 30 and 100; see [Scale factors](#scale-factors)
+- **Scale**: 0.01, 0.1, 1, 10, 30, 100, 300, 1000, 3000, 10000, 30000 and 100000; see [Scale factors](#scale-factors)
 - **Use Cases**: General analytical performance, database comparison, regression testing
 
 #### [TPC-DS](tpc-ds.md)

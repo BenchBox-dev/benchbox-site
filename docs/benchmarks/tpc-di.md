@@ -412,13 +412,15 @@ This enables parallel ETL with 4 workers.
 
 ### Scale Factor Guidelines
 
-| Scale Factor | Data Warehouse Size | ETL Complexity | Use Case |
+| Scale Factor | Generated Data Size | ETL Complexity | Use Case |
 |-------------|---------------------|----------------|----------|
-| 0.1 | ~10 MB | Simple | Development, unit testing |
-| 1.0 | ~100 MB | Standard | Integration testing |
-| 3.0 | ~300 MB | Enhanced | Performance testing |
-| 10.0 | ~1 GB | Complex | Stress testing |
-| 30.0+ | ~3+ GB | Production-like | Enterprise simulation |
+| 0.01 | not measured | Simple | Development, unit testing |
+| 0.1 | not measured | Simple | Development, unit testing |
+| 1.0 | ~160 MB (measured) | Standard | Integration testing |
+| 10.0 | not measured | Complex | Stress testing |
+
+The standard scale factors for TPC-DI are 0.01, 0.1, 1 and 10; `benchbox run` rejects other values. The SF 1 size is
+the calibrated 160,094,804 bytes (see [SF1 calibrated sizes](sf1-calibrated-sizes.md)).
 
 Four fact tables stop growing at fixed row caps: FactCashBalances at 100,000 rows, FactHoldings at 50,000,
 FactMarketHistory at 100,000 and FactWatches at 25,000. At large scale factors the data size therefore grows

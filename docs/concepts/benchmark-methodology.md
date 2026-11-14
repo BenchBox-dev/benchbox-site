@@ -12,7 +12,7 @@ This page gathers policy that is already written down elsewhere in the documenta
 
 ## What a scale factor supports
 
-Each benchmark has a short set of standard scale factors, typically 0.01, 0.1, 1 and 10, and `benchbox run` rejects a scale factor outside the benchmark's list ([Benchmarks overview](../benchmarks/index.md)).
+Each benchmark has a short set of standard scale factors, typically 0.01, 0.1, 1 and 10, and `benchbox run` rejects a scale factor outside the benchmark's list. TPC-DS and ClickBench accept a range instead ([Benchmarks overview](../benchmarks/index.md)).
 
 | Purpose | What the existing guidance says | Source |
 |---|---|---|

@@ -88,7 +88,7 @@ The test cycles through three operation types across seven tables:
 
 1. **INSERT**: New sales transactions, returns, and inventory receipts
 2. **UPDATE**: Corrections to existing records (prices, quantities, statuses)
-3. **DELETE**: Removal of cancelled orders, consolidated returns, or expired inventory
+3. **DELETE**: Removal of old sales and returns
 
 Default configuration: **4 operations** that rotate through operation types and tables.
 
@@ -106,22 +106,9 @@ Default configuration: **4 operations** that rotate through operation types and 
 
 ### Data Modified in TPC-DS
 
-**Per-Operation Row Counts:**
-
-| Operation | Rows Modified per SF | SF=1 Example | SF=10 Example |
-|-----------|----------------------|--------------|---------------|
-| INSERT    | ~1,000               | 1,000 rows   | 10,000 rows   |
-| UPDATE    | ~500                 | 500 rows     | 5,000 rows    |
-| DELETE    | ~200                 | 200 rows     | 2,000 rows    |
-
-**Total for Default Configuration (4 operations):**
-
-| Scale Factor | Total Rows Modified | Breakdown |
-|--------------|---------------------|-----------|
-| 0.1          | ~340 rows           | 2× INSERT, 1× UPDATE, 1× DELETE |
-| 1.0          | ~3,400 rows         | 2× INSERT, 1× UPDATE, 1× DELETE |
-| 10.0         | ~34,000 rows        | 2× INSERT, 1× UPDATE, 1× DELETE |
-| 100.0        | ~340,000 rows       | 2× INSERT, 1× UPDATE, 1× DELETE |
+Each operation modifies about 10 rows at every scale factor, so the default 4 operations (2× INSERT, 1× UPDATE,
+1× DELETE) modify about 40 rows whatever the scale factor. The DELETE operations remove sales or returns dated before
+a fixed cutoff date key (2450815), up to the operation's row count.
 
 ### TPC-DS Code Example
 
@@ -194,7 +181,7 @@ All insert operations use batched multi-row INSERT statements for ~100x performa
 ```sql
 INSERT INTO STORE_SALES (...) VALUES (?, ?, ?, ...)
 INSERT INTO STORE_SALES (...) VALUES (?, ?, ?, ...)
-... (998 more times)
+... (99 more times)
 
 INSERT INTO STORE_SALES (...) VALUES
   (?, ?, ?, ...),
