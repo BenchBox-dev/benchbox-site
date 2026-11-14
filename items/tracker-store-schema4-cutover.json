@@ -4,7 +4,7 @@
     "A `register_batch` with `confirm_schema3_cutover=true` succeeds, or the owner records a decision to stay serial and this item is dropped",
     "AGENTS.md states the minimum tractable version the store now needs"
   ],
-  "context": "Decision gate: owner confirms no older client on any machine still needs the store. One-way: older clients refuse the store afterwards.\n\nReview 2026-11-13: set to blocked on the owner's confirmation that no older client on any machine needs the store. Verification rubric before the call: `ps -axo pid,lstart,command | grep tractable-mcp`, then for each process whose working directory or --state-remote is this repository, show it was started after the installed tractable was last changed (or is stopped); `list_items` shows no live claim held by another worker. After the call: `tractable validate` passes and `show_batch` on a throwaway registration, then `abort_batch`, leaves no active batch. Guardrails: never stop another session's process; the agent does not confirm the cutover on a timeout or a default answer; one-way, so no retry with different arguments after a partial failure without reading references/recovery.md.\n\nOwner decision 2026-11-14: migrate now. Both tractable-mcp processes bound to this store were started 2026-11-14 08:47, after tractable 1.1.1 was installed on 2026-11-12 07:55. Merge targets (owner, 2026-11-14): site code, workflows and corrections to released documentation go to main on green ci, then main is merged into next; only documentation of unreleased behaviour waits on next.",
+  "context": "Decision gate: owner confirms no older client on any machine still needs the store. One-way: older clients refuse the store afterwards.\n\nReview 2026-11-13: set to blocked on the owner's confirmation that no older client on any machine needs the store. Verification rubric before the call: `ps -axo pid,lstart,command | grep tractable-mcp`, then for each process whose working directory or --state-remote is this repository, show it was started after the installed tractable was last changed (or is stopped); `list_items` shows no live claim held by another worker. After the call: `tractable validate` passes and `show_batch` on a throwaway registration, then `abort_batch`, leaves no active batch. Guardrails: never stop another session's process; the agent does not confirm the cutover on a timeout or a default answer; one-way, so no retry with different arguments after a partial failure without reading references/recovery.md.\n\nOwner decision 2026-11-14: migrate now. Both tractable-mcp processes bound to this store were started 2026-11-14 08:47, after tractable 1.1.1 was installed on 2026-11-12 07:55. Merge targets (owner, 2026-11-14): site code, workflows and corrections to released documentation go to main on green ci, then main is merged into next; only documentation of unreleased behaviour waits on next.\n\nDone 2026-11-14: both tractable-mcp processes bound to this store were started after the 1.1.1 install; register_batch with confirm_schema3_cutover=true succeeded; one batch was aborted and re-registered and one completed, leaving no stray active batch from the cutover. AGENTS.md on main (72c7da5) states tractable 1.1.1 or later.",
   "description": "Problem: the todo-state store is below schema 4, so `register_batch` is refused until a one-way cutover is confirmed, and the cutover requires every process with access to the store to be stopped or upgraded. On 2026-11-12 another session's tractable-mcp (started before that day's reinstall of tractable 1.1.1) was bound to this store, so the cutover could not be confirmed and the release-pin work ran as a serial batch. Outcome: the store is at schema 4 and a prepared batch can be registered.",
   "links": [
     "AGENTS.md",
@@ -33,6 +33,14 @@
       "client": "omp-coding-agent",
       "op": "update",
       "op_id": "a9508a61f7574aa8b7f81955c995601f",
+      "session_id": "99f297d0e01b4dd1ab38d39e880d17c4"
+    },
+    {
+      "actor": "mcp:omp-coding-agent:joe@joe-mac-mini.local:c5b9b54747851b1eaf3e61b4",
+      "at": "2026-11-14T14:30:59Z",
+      "client": "omp-coding-agent",
+      "op": "update",
+      "op_id": "7d187b3e43704129b67b2000f3daa778",
       "session_id": "99f297d0e01b4dd1ab38d39e880d17c4"
     }
   ]
