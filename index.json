@@ -7,7 +7,20 @@
       "batch_schema": 2,
       "delivery_boundary": "One pull request from docs/audit-unreleased-on-main to main in BenchBox-dev/benchbox-site",
       "develop_ref": "refs/remotes/origin/main",
-      "final_pr_history": [],
+      "final_pr": {
+        "head": "a29925ae813b7047ef7da817191c27a04aaf07a4",
+        "node_id": "PR_kwDOVAHdmM8AAAABPKMWZg",
+        "number": 160,
+        "repository": "https://github.com/BenchBox-dev/benchbox-site.git"
+      },
+      "final_pr_history": [
+        {
+          "at": "2026-11-14T14:26:48Z",
+          "head": "a29925ae813b7047ef7da817191c27a04aaf07a4",
+          "op_id": "79b5133b11044459afd3b621ba55f1d7",
+          "previous_head": null
+        }
+      ],
       "integrated_members": {
         "audit-post-release-docs-on-main": {
           "accepted_head": "a29925ae813b7047ef7da817191c27a04aaf07a4",
