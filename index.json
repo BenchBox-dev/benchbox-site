@@ -1,20 +1,65 @@
 {
   "batches": {
     "docs-audit": {
-      "accepted_members": {},
+      "accepted_members": {
+        "audit-post-release-docs-on-main": "a29925ae813b7047ef7da817191c27a04aaf07a4"
+      },
       "batch_schema": 2,
       "delivery_boundary": "One pull request from docs/audit-unreleased-on-main to main in BenchBox-dev/benchbox-site",
       "develop_ref": "refs/remotes/origin/main",
       "final_pr_history": [],
-      "integrated_members": {},
+      "integrated_members": {
+        "audit-post-release-docs-on-main": {
+          "accepted_head": "a29925ae813b7047ef7da817191c27a04aaf07a4",
+          "changed_files": [
+            ".github/pull_request_template.md",
+            "docs/benchmarks/amplab.md",
+            "docs/benchmarks/clickbench.md",
+            "docs/benchmarks/coffeeshop.md",
+            "docs/benchmarks/h2odb.md",
+            "docs/benchmarks/index.md",
+            "docs/benchmarks/read-primitives.md",
+            "docs/benchmarks/ssb.md",
+            "docs/benchmarks/support-status.md",
+            "docs/benchmarks/tpc-di.md",
+            "docs/benchmarks/tpc-ds-obt.md",
+            "docs/benchmarks/tpc-havoc.md",
+            "docs/benchmarks/tsbs-devops.md",
+            "docs/concepts/benchmark-methodology.md",
+            "docs/contributing-results.md",
+            "docs/development/adr/adr-client-link-locality-disclosure.md",
+            "docs/guides/tpc/maintenance-phase-guide.md",
+            "docs/nav.yml",
+            "docs/platforms/snowflake-gateways.md",
+            "docs/platforms/snowflake.md",
+            "docs/reference/python-api/base.md",
+            "docs/reference/python-api/benchmarks/amplab.md",
+            "docs/reference/python-api/benchmarks/tpcds-obt.md",
+            "docs/reference/python-api/benchmarks/tpcds.md",
+            "docs/vendor-publishing-checklist.md",
+            "inventory/core-linked-paths.json"
+          ],
+          "integration_head": "a29925ae813b7047ef7da817191c27a04aaf07a4",
+          "integration_seq": 1
+        }
+      },
       "integration_branch": "docs/audit-unreleased-on-main",
-      "integration_head": "f427e37876f77ab82a6ea4ef3f35285a0a23228f",
+      "integration_head": "a29925ae813b7047ef7da817191c27a04aaf07a4",
       "integration_log": [
         {
           "at": "2026-11-14T14:04:00Z",
           "head": "f427e37876f77ab82a6ea4ef3f35285a0a23228f",
           "kind": "start",
           "seq": 0
+        },
+        {
+          "at": "2026-11-14T14:25:08Z",
+          "head": "a29925ae813b7047ef7da817191c27a04aaf07a4",
+          "kind": "prepare",
+          "member": "audit-post-release-docs-on-main",
+          "op_id": "c58919a36bd64f03bdd79a4d17d4ac21",
+          "previous_head": "f427e37876f77ab82a6ea4ef3f35285a0a23228f",
+          "seq": 1
         }
       ],
       "integration_worktree": "/Users/joe/Developer/benchbox-site.wt-docs-audit",
@@ -344,15 +389,10 @@
       "title": "Generate static, searchable result summary pages for platforms and benchmarks"
     },
     "audit-post-release-docs-on-main": {
-      "claim": {
-        "expires_at": "2026-11-15T14:25:06Z",
-        "generation": "ba57b764ae134b9ba1ec975e2102ddeb",
-        "renewals": 0,
-        "worker": "mcp:omp-coding-agent:joe@joe-mac-mini.local:c5b9b54747851b1eaf3e61b4"
-      },
+      "claim": null,
       "needs": [],
       "priority": "medium-high",
-      "status": "active",
+      "status": "open",
       "title": "Audit docs on main for statements about unreleased core and move them to next"
     },
     "blog-draft-byte-sha-of-snapshot-stale-20261029": {

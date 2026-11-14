@@ -19,6 +19,69 @@
     "release-pin/doc-contracts.json",
     "release-pin/docs-data/docs-data.json"
   ],
+  "prepared": {
+    "accepted_head": "a29925ae813b7047ef7da817191c27a04aaf07a4",
+    "batch_id": "docs-audit",
+    "changed_files": [
+      ".github/pull_request_template.md",
+      "docs/benchmarks/amplab.md",
+      "docs/benchmarks/clickbench.md",
+      "docs/benchmarks/coffeeshop.md",
+      "docs/benchmarks/h2odb.md",
+      "docs/benchmarks/index.md",
+      "docs/benchmarks/read-primitives.md",
+      "docs/benchmarks/ssb.md",
+      "docs/benchmarks/support-status.md",
+      "docs/benchmarks/tpc-di.md",
+      "docs/benchmarks/tpc-ds-obt.md",
+      "docs/benchmarks/tpc-havoc.md",
+      "docs/benchmarks/tsbs-devops.md",
+      "docs/concepts/benchmark-methodology.md",
+      "docs/contributing-results.md",
+      "docs/development/adr/adr-client-link-locality-disclosure.md",
+      "docs/guides/tpc/maintenance-phase-guide.md",
+      "docs/nav.yml",
+      "docs/platforms/snowflake-gateways.md",
+      "docs/platforms/snowflake.md",
+      "docs/reference/python-api/base.md",
+      "docs/reference/python-api/benchmarks/amplab.md",
+      "docs/reference/python-api/benchmarks/tpcds-obt.md",
+      "docs/reference/python-api/benchmarks/tpcds.md",
+      "docs/vendor-publishing-checklist.md",
+      "inventory/core-linked-paths.json"
+    ],
+    "integration_head": "a29925ae813b7047ef7da817191c27a04aaf07a4",
+    "integration_seq": 1,
+    "member_id": "audit-post-release-docs-on-main",
+    "overlaps": [],
+    "owner_epoch": 0,
+    "schema": "prepared_work_v2",
+    "scope_hash": "a4ca8f6b2538b45426d89ddebd3a565801a86aae1be8fdd9f4288b01b7eb085b",
+    "source_base": "f427e37876f77ab82a6ea4ef3f35285a0a23228f",
+    "source_revision": "a29925ae813b7047ef7da817191c27a04aaf07a4",
+    "source_worktree": "/Users/joe/Developer/benchbox-site.wt-docs-audit",
+    "verification": {
+      "clean": true,
+      "command": [
+        "npm",
+        "run",
+        "-s",
+        "docs:check",
+        "--",
+        "--docs-mode",
+        "block"
+      ],
+      "review": {
+        "notes": "Review of 4067875 confirmed every removal is absent at v0.5.0 and found three restored statements false at v0.5.0 (TPC-H scale list, TPC-DI size table, TPC-DS maintenance row counts); c84f63d corrects them against core v0.5.0 and a29925a regenerates the core-links inventory.",
+        "outcome": "clear",
+        "range": "f427e37..a29925a",
+        "reviewer": "independent reviewer subagent with core v0.5.0 source, then leader check of the fix commits"
+      },
+      "revision": "a29925ae813b7047ef7da817191c27a04aaf07a4",
+      "status": "passed",
+      "suite": "docs contracts check against the release pin"
+    }
+  },
   "sessions": [
     {
       "actor": "mcp:omp-coding-agent:joe@joe-mac-mini.local:9c85f43e97659072aa9dbbd3",
@@ -67,6 +130,15 @@
       "generation": "ba57b764ae134b9ba1ec975e2102ddeb",
       "op": "take",
       "op_id": "34255c0b8ed24a0b9985280e8ddd6c5e",
+      "session_id": "99f297d0e01b4dd1ab38d39e880d17c4"
+    },
+    {
+      "actor": "mcp:omp-coding-agent:joe@joe-mac-mini.local:c5b9b54747851b1eaf3e61b4",
+      "at": "2026-11-14T14:25:08Z",
+      "client": "omp-coding-agent",
+      "generation": "ba57b764ae134b9ba1ec975e2102ddeb",
+      "op": "prepare",
+      "op_id": "c58919a36bd64f03bdd79a4d17d4ac21",
       "session_id": "99f297d0e01b4dd1ab38d39e880d17c4"
     }
   ]
