@@ -110,6 +110,7 @@
     "pin-hardening-2": {
       "accepted_members": {
         "blog-unreleased-content-decision": "735ed7bb0fb115b5d3c7b0d84a33e9a0d1c8381a",
+        "deploy-resolve-failure-2026-11-12": "27ef71f13842a2860010c1f598b7587cdee6fec1",
         "docs-pin-from-skips-certification": "36ffc63e446bfd8bda0d1f4ab9130aa689b60b4d",
         "keep-next-level-with-main": "ec9e47973dd1bd40030a0dad40ca8ebbfc92fda3",
         "next-branch-ci-test-gaps": "757a2794879d8b247b842e8d2e0d5cd3fa92c3c4"
@@ -131,6 +132,20 @@
           ],
           "integration_head": "8ab538e6d0b4b5477daf48fe707c9321a9fc98d0",
           "integration_seq": 4
+        },
+        "deploy-resolve-failure-2026-11-12": {
+          "accepted_head": "27ef71f13842a2860010c1f598b7587cdee6fec1",
+          "changed_files": [
+            ".github/workflows/deploy.yml",
+            "AGENTS.md",
+            "deploy/README.md",
+            "deploy/lib/relay.ts",
+            "deploy/relay-cli.ts",
+            "deploy/test/relay-process.test.ts",
+            "deploy/test/relay.test.ts"
+          ],
+          "integration_head": "e9468bf9a1a86b22385fc295ce9563ee3ebe44e8",
+          "integration_seq": 5
         },
         "docs-pin-from-skips-certification": {
           "accepted_head": "36ffc63e446bfd8bda0d1f4ab9130aa689b60b4d",
@@ -166,7 +181,7 @@
         }
       },
       "integration_branch": "feat/pin-hardening",
-      "integration_head": "8ab538e6d0b4b5477daf48fe707c9321a9fc98d0",
+      "integration_head": "e9468bf9a1a86b22385fc295ce9563ee3ebe44e8",
       "integration_log": [
         {
           "at": "2026-11-14T14:09:52Z",
@@ -209,6 +224,15 @@
           "op_id": "f1ddbcf470fd451db8c902a2b59bdbd6",
           "previous_head": "0ebfbc7232da3c967ce8c1a5b5c03a2b90dab6cc",
           "seq": 4
+        },
+        {
+          "at": "2026-11-14T14:13:51Z",
+          "head": "e9468bf9a1a86b22385fc295ce9563ee3ebe44e8",
+          "kind": "prepare",
+          "member": "deploy-resolve-failure-2026-11-12",
+          "op_id": "06ad779ff08540e6ae91c5f5ca6edb7c",
+          "previous_head": "8ab538e6d0b4b5477daf48fe707c9321a9fc98d0",
+          "seq": 5
         }
       ],
       "integration_worktree": "/Users/joe/Developer/benchbox-site.wt-pin-hardening",
@@ -363,15 +387,10 @@
       "title": "Test deploy/cli.ts resolve() end to end for the superseded, use-deployed-bundle and redeploy paths"
     },
     "deploy-resolve-failure-2026-11-12": {
-      "claim": {
-        "expires_at": "2026-11-15T14:13:49Z",
-        "generation": "31bf5204eaf0440db4ab988ead4eb5f1",
-        "renewals": 0,
-        "worker": "mcp:omp-coding-agent:joe@joe-mac-mini.local:c5b9b54747851b1eaf3e61b4"
-      },
+      "claim": null,
       "needs": [],
       "priority": "medium",
-      "status": "active",
+      "status": "open",
       "title": "Explain the validator_parity base mismatch that failed deploys on 2026-11-12 and why issue #58 stays open"
     },
     "deploy-resolver-reads-every-deployment-20261031": {

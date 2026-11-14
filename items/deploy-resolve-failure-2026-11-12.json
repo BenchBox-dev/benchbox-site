@@ -20,6 +20,76 @@
     "deploy/lib/resolve.ts",
     "deploy/README.md"
   ],
+  "prepared": {
+    "accepted_head": "27ef71f13842a2860010c1f598b7587cdee6fec1",
+    "batch_id": "pin-hardening-2",
+    "changed_files": [
+      ".github/workflows/deploy.yml",
+      "AGENTS.md",
+      "deploy/README.md",
+      "deploy/lib/relay.ts",
+      "deploy/relay-cli.ts",
+      "deploy/test/relay-process.test.ts",
+      "deploy/test/relay.test.ts"
+    ],
+    "integration_head": "e9468bf9a1a86b22385fc295ce9563ee3ebe44e8",
+    "integration_seq": 5,
+    "member_id": "deploy-resolve-failure-2026-11-12",
+    "overlaps": [
+      {
+        "kind": "member",
+        "member": "blog-unreleased-content-decision",
+        "paths": [
+          "AGENTS.md"
+        ]
+      },
+      {
+        "kind": "member",
+        "member": "docs-pin-from-skips-certification",
+        "paths": [
+          "AGENTS.md"
+        ]
+      },
+      {
+        "kind": "member",
+        "member": "keep-next-level-with-main",
+        "paths": [
+          "AGENTS.md"
+        ]
+      },
+      {
+        "kind": "member",
+        "member": "next-branch-ci-test-gaps",
+        "paths": [
+          "AGENTS.md"
+        ]
+      }
+    ],
+    "owner_epoch": 0,
+    "schema": "prepared_work_v2",
+    "scope_hash": "bfe6ad54185c489d87e2658c324184e1c7939725c699b2001c4fc5919699871c",
+    "source_base": "f427e37876f77ab82a6ea4ef3f35285a0a23228f",
+    "source_revision": "27ef71f13842a2860010c1f598b7587cdee6fec1",
+    "source_worktree": "/Users/joe/Developer/benchbox-site.wt-m-deploy-close",
+    "verification": {
+      "clean": true,
+      "command": [
+        "npm",
+        "run",
+        "-s",
+        "test:deploy"
+      ],
+      "review": {
+        "notes": "Review of 5b5c9fe found one Required (a successful rollback closed the incident it was dispatched for); 27ef71f excludes rollback runs and asserts the condition in the workflow test. Verification ran at 27ef71f with exit 0; it leaves an ignored-by-intent stray build.duckdb.wal that was removed before capture.",
+        "outcome": "clear",
+        "range": "f427e37..27ef71f",
+        "reviewer": "independent reviewer subagent, then leader check of the fix commit"
+      },
+      "revision": "27ef71f13842a2860010c1f598b7587cdee6fec1",
+      "status": "passed",
+      "suite": "deploy tests"
+    }
+  },
   "sessions": [
     {
       "actor": "mcp:omp-coding-agent:joe@joe-mac-mini.local:9c85f43e97659072aa9dbbd3",
@@ -76,6 +146,15 @@
       "generation": "31bf5204eaf0440db4ab988ead4eb5f1",
       "op": "take",
       "op_id": "5ae12470be0e4f72874c2284d9e09289",
+      "session_id": "99f297d0e01b4dd1ab38d39e880d17c4"
+    },
+    {
+      "actor": "mcp:omp-coding-agent:joe@joe-mac-mini.local:c5b9b54747851b1eaf3e61b4",
+      "at": "2026-11-14T14:13:51Z",
+      "client": "omp-coding-agent",
+      "generation": "31bf5204eaf0440db4ab988ead4eb5f1",
+      "op": "prepare",
+      "op_id": "06ad779ff08540e6ae91c5f5ca6edb7c",
       "session_id": "99f297d0e01b4dd1ab38d39e880d17c4"
     }
   ]
