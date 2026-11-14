@@ -129,7 +129,12 @@ versioned core bundle; it reads nothing else from core.
   still read the newest certified bundle.
 - `DOCS_INPUTS` names the directory the docs inputs are read from. Unset or
   empty means `release-pin/`. `ci` and the Visual workflow set it to the
-  fetched bundle for pushes to `next` and pull requests into `next`.
+  fetched bundle for pushes to `next` and pull requests into `next`. There
+  `ci` also assembles the docs against the pin, so site code
+  that stops reading the pinned release fails before the release pull
+  request. The Visual workflow builds pull requests into `next` from the
+  deployed bundle, not the newest one; that is accepted because it is
+  advisory.
 - `ci` checks the pin with `npm run docs:pin -- --check`: the pin must be
   well formed and its tag a published release.
 - Unreleased documentation merges to `next`, where CI checks it against the
