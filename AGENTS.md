@@ -26,13 +26,9 @@ versioned core bundle; it reads nothing else from core.
   `.site-inputs/` (git-ignored) and verifies its digest, schema and
   certification before anything reads it.
 - The bundle schema is an integer major version. A schema change lands in
-  core first, then the site adds support for it, then core may drop the
-  older schema. The verifier accepts exact schemas 4 and 5, each with
-  its own exact member set; schema 3 is retired. Both schemas carry
-  `docs-data/docs-data.json` and `doc-contracts.json`, validated against
-  the schemas vendored in `scripts/schemas/`. Schema 4 still carries `docs`
-  and `downloads`, which the site no longer reads; schema 5 drops them.
-  Unknown schemas, member sets and extra entries in `docs-data` fail.
+  core first, then the site adds support, then core may drop the older
+  schema. `scripts/bundle-verify.mjs` and `scripts/schemas/` define the
+  accepted schemas.
 - `certified_by` is the numeric id of the core `trunk.yml` push run on
   `develop` for the bundle commit. Online certification requires that run
   id for schemas 4 and 5, with the same attestations. The value
@@ -80,8 +76,6 @@ versioned core bundle; it reads nothing else from core.
   directive fence (```` ```{name} ````), a role before an inline code span
   a `(label)=` line and a `myst` front matter key. Write the plain form instead: GitHub alerts, `.md`
   links, `<span id>` anchors and bold lead-ins in place of definition lists.
-- The site publishes no `objects.inv` Sphinx inventory. Nothing consumed it,
-  and the deploy probe no longer requires it.
 - The sidebar is the tree in `docs/nav.yml`: groups with a `label` and
   `items`, where an item is a page path, `{page, label, items}` for a page
   with a label override or children, or `{label, url}` for an external link.
@@ -108,11 +102,11 @@ versioned core bundle; it reads nothing else from core.
 - `docs/README.md` is the landing page. Its `{{package_version}}` token
   becomes the `package_version` of the docs inputs' manifest, so the release
   marker in the page always matches the release the docs describe.
-- Core keeps maintainer-only material (`docs/agent/`, `docs/internal/`,
+- Never copy core maintainer-only material (`docs/agent/`, `docs/internal/`,
   `design/future-state/`, the threat model, the workaround index, the TPC
-  licensing analysis and the publication lists). The site publishes
-  nothing from those paths: listing sources fails when the tree holds any
-  of them, in place of a publish list.
+  licensing analysis, the publication lists) here; listing sources fails if
+  any appears. A new page under `docs/development/` or `docs/operations/` also
+  needs an entry in core's `docs/publish-allowlist.txt`.
 - Edit links point at this repository. Generated pages (`benchmarks/queries/`,
   `compat/`, `reference/tuning-platform-support.md`) and renderer pages carry
   none.
@@ -152,90 +146,22 @@ versioned core bundle; it reads nothing else from core.
 
 ## Deploys
 
-- `.github/workflows/deploy.yml` runs on a push to `main`, on a
-  `core-bundle` dispatch from core, and by hand with `mode` set to
-  `deploy`, `redeploy` (this site commit with the core bundle that is live, fetched
-  by the deployed receipt's `core_sha` and checked against its `bundle_digest`;
-  it fails when no receipt is deployed) or `rollback` (restore the
-  artifact of the receipt run named in `receipt_run_id`).
-- A `deploy` run whose resolved core bundle is behind the deployed one does
-  not fail. If the deployed receipt's `site_sha` is this run's commit, the
-  run is superseded: it logs a notice, skips the build and the `deploy` job
-  and reports nothing. Otherwise it deploys this site commit with the
-  deployed core bundle, fetched by `core_sha` and checked against the
-  receipt's `bundle_digest`. A diverged bundle, an unknown status or a failed
-  compare still fails; divergence is class `diverged-bundle`.
+- Deploy reference is in `deploy/README.md`: trigger modes, superseded and
+  diverged-bundle runs, post-deploy probe timing, download retries, failure
+  reports, the Nightly and Visual workflows and link-check internals.
+  Deliberate negative probes set `expected_rejection`; see it there.
 - The repository variable `SITE_DEPLOY_TARGET` decides what a run does.
   Unset, it resolves, builds and gates, then stops. `rehearsal` deploys to
   `SITE_ORIGIN` with every page marked `noindex`. `production` deploys
   benchbox.dev. Only the owner decides to set `production`.
-- Nothing deploys unless every gate passes: privacy, Explorer
-  compatibility, snapshot digest, links (within
-  `inventory/known-broken-links.json`) and origin. The privacy gate also
-  rejects a `*.plans.json` plans companion in the artifact that carries a
-  local filesystem path; `deploy/README.md` lists the rule and what it does
-  not cover.
-- The snapshot digest gate fails when the corpus is unchanged but the
-  snapshot contents differ from the deployed ones, for example after a core
-  pipeline change. After reviewing the change, the owner sets the repository
-  variable `SITE_SNAPSHOT_APPROVED_CHANGE` to the exact
-  `<deployed digest>-><candidate digest>` value that the failed gate prints,
-  and `SITE_SNAPSHOT_APPROVAL_REASON` to the reason, then reruns the deploy.
-  The approval matches only that pair. Clear both variables after the deploy.
-- Each deploy writes a receipt, uploads it with the artifact, and records
-  its digest on the GitHub Pages deployment. `npm run deploy -- deployed`
-  prints the current one. If the probes fail after a deploy, the run
-  dispatches at most one rollback to the last known good receipt.
-- A rollback does not stay in place by itself: the next deploy run that
-  passes the gates replaces it. To hold one, the owner rolls back while
-  `SITE_DEPLOY_TARGET` still matches the receipt's target, waits for that run
-  to finish, then clears the variable; the steps and resume are in
-  `deploy/README.md` under "Holding a rollback".
-- The post-deploy probe compares served bytes with the artifact and repeats
-  every ten seconds for at most eleven minutes of monotonic elapsed time,
-  which covers the ten-minute `max-age` of the served pages while Pages and
-  its CDN still answer with the previous generation. The final probe runs at
-  the deadline, and a mismatch still present then fails the run.
-- A failed run opens or updates a site-local `site-deploy-failed` issue.
-  Core-dispatched failures also relay to core under `site-bundle-undeployed`,
-  classified as producer-not-concluded, contract-version-mismatch,
-  snapshot-digest, probe-mismatch or infrastructure (including unknown errors).
-  Contract mismatches require updating the Explorer for the new contract.
-  The relay comments only when the latest reported class changes; a successful
-  deploy comments and closes only issues bearing that relay label.
-- Set the boolean `expected_rejection` manual input, or the
-  `client_payload.expected_rejection` dispatch field to `true`, for deliberate
-  negative probes such as wrong digests or runs before certification.
-  The explicit marker suppresses both local and core incident writes,
-  including success closure. Error text cannot set it. Unmarked failures
-  always report. This matches the core bundle reporter's `expected_rejection`
-  input; it does not bypass any deploy gate.
-- `npm run test:deploy` includes an isolated real-process `gh` stub smoke
-  covering class transitions, unchanged creation bodies, closure and markers.
-- Bundle fetch waits at most ten minutes of monotonic elapsed time for the
-  producer to complete successfully, including API calls; an unfinished success
-  conclusion does not bypass completion. Each poll request uses the remaining
-  deadline as its fetch timeout.
-- Bundle and receipt downloads share three attempts, with delays of 5 and
-  15 seconds. Only HTTP 5xx and network failures retry. Each attempt starts
-  with an empty temporary download directory; digest, provenance and deploy
-  gates remain outside the retry boundary. Retry delays add at most 20 seconds.
-- A failed run opens or updates an issue.
-- `.github/workflows/nightly-browser.yml` runs the Explorer `@smoke` suite on
-  Firefox and WebKit daily and on dispatch. A failure opens or updates the one
-  open issue labelled `t3:browser`.
-- The Visual comparison workflow screenshots a PR's build and the deployed
-  artifact and reports the differences. It is advisory: it is not part of
-  `ci` and never fails on a difference.
-- The Nightly workflow's `links` job checks external links in `blog/`, `docs/`
-  and the site pages, including their `#fragment` anchors, with `.lychee.toml`,
-  which carries the scoped ignore policy for flaky and login-gated hosts and
-  the fragment allowlist for anchors that JavaScript builds. It then checks the published
-  documentation: every `/docs/` page in the `SITE_ORIGIN` sitemap, with
-  fragments, for links to that origin (the scoped policy's own-origin exclusion
-  yields to the check's include pattern). `scripts/check-published-links.mjs` accepts the
-  failures whose target is in `inventory/known-broken-links.json` and fails on
-  any other. Either failure opens or updates the `broken-links` issue.
+- Nothing deploys unless every gate passes: privacy, Explorer compatibility,
+  snapshot digest, links (within `inventory/known-broken-links.json`) and
+  origin (`deploy/README.md`).
+- Only the owner approves a snapshot-digest change
+  (`SITE_SNAPSHOT_APPROVED_CHANGE`, `SITE_SNAPSHOT_APPROVAL_REASON`;
+  `deploy/README.md` "Snapshot digest"). Never set these variables yourself.
+- A rollback is replaced by the next passing deploy; to hold one, the owner
+  follows `deploy/README.md` "Holding a rollback".
 
 ## Core and this repository
 
@@ -282,12 +208,8 @@ Adaptations to keep:
   documentation and everything that is not unreleased documentation) or to
   `next` (unreleased documentation), as described under "Release pin". `main`
   accepts squash merges only and requires the `ci` check.
-- Stage files by explicit path. Never run `git add -A` or `git add .`.
 - Commit identity: `Joe Harris <joeharris76@gmail.com>`. Add no agent or
   co-author trailers.
-- Commit messages, pull request text and committed files state the durable
-  reason for a change. Leave out tracker ids, plan or handoff references and
-  run-local state such as CI counts.
 - Merge with `gh pr merge --squash` once `ci` is green. Auto-merge is turned
   off for this repository.
 
