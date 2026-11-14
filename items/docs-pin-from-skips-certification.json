@@ -120,6 +120,15 @@
       "op": "prepare",
       "op_id": "cfa7fcfd323545588f2936a165191109",
       "session_id": "99f297d0e01b4dd1ab38d39e880d17c4"
+    },
+    {
+      "actor": "mcp:omp-coding-agent:joe@joe-mac-mini.local:c5b9b54747851b1eaf3e61b4",
+      "at": "2026-11-14T14:30:21Z",
+      "client": "omp-coding-agent",
+      "generation": "fe5ee368308747928c9da35003350eaf",
+      "op": "take",
+      "op_id": "474c50392b2b4ed9a9729b22af9a71c3",
+      "session_id": "99f297d0e01b4dd1ab38d39e880d17c4"
     }
   ]
 }
