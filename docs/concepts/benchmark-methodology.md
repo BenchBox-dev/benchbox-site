@@ -111,4 +111,4 @@ TPC-H and TPC-DS runs below scale factor 1 are recorded as `unofficial_subscale`
 
 ## Open questions
 
-Some questions have no written policy yet, so this page does not answer them. Vendor terms on publishing benchmark results are one of them: the page asserts nothing about what any vendor's terms allow. For the conditions that `benchbox submit` records and enforces today, see the [vendor publishing checklist](../vendor-publishing-checklist.md).
+Some questions have no written policy yet, so this page does not answer them. Vendor terms on publishing benchmark results are one of them: the page asserts nothing about what any vendor's terms allow.

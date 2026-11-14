@@ -131,16 +131,6 @@ results: <benchmark> <platform> sf<scale>
 
 Example: `results: tpch DuckDB sf1.0`
 
-### Vendor conditions for cloud platforms
-
-A result from Snowflake, BigQuery, Redshift, Athena, Databricks, ClickHouse Cloud or
-MotherDuck is subject to that vendor's publishing terms. `benchbox submit` takes
-`--plan-tier`, `--preview-feature`, `--vendor-permission`, `--vendor-notice-date`,
-`--vendor-notice-ref` and `--self-run` to record them in the manifest, and refuses
-free-tier, trial and preview results without the vendor's permission. Follow the
-[vendor publishing checklist](vendor-publishing-checklist.md) for your
-platform before you open the pull request.
-
 ### 5. CI validation
 
 When your PR is opened, the **Validate Submission** workflow runs automatically. It checks:
