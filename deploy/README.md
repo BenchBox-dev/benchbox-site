@@ -20,6 +20,9 @@ Run `npm run test:deploy` to check mismatch evidence, receipt serialization, and
 rollback behavior. `npm run deploy -- probe` writes `deploy-work/probe.json`;
 `npm run deploy -- receipt` includes that evidence in the deployment receipt.
 
+`npm run test:deploy` also runs an isolated real-process `gh` stub smoke test
+covering class transitions, unchanged creation bodies, closure and markers.
+
 ## Documentation source
 
 Deploys build the documentation from the release pin in `release-pin/`, so a
@@ -108,6 +111,10 @@ Each lookup logs `deploy lookup: <n> REST calls, <n> receipt loads`. API
 failures log the route, status, rate-limit headers and the first 200 characters
 of the message, and GET requests retry network errors twice.
 
+Each deploy writes a receipt, uploads it with the artifact, and records its
+digest on the GitHub Pages deployment. `npm run deploy -- deployed` prints the
+current one.
+
 ## Choosing the core bundle
 
 Core's site-inputs runs are created in the order Trunk finishes, not in commit
@@ -132,6 +139,10 @@ the run's other jobs. It proceeds once that job has succeeded and the run lists
 an unexpired bundle artifact, and fails if the job failed or was cancelled, is
 absent from a completed run, or the artifact is missing.
 
+The wait uses monotonic elapsed time and covers the API calls; an unfinished
+success conclusion does not bypass completion. Each poll request uses the
+remaining deadline as its fetch timeout.
+
 ## Bundles behind the deployed one
 
 Core's site-inputs runs finish in the order Trunk finishes, not in commit
@@ -155,6 +166,15 @@ the candidate's and acts on the result:
 
 A `rollback` run does not compare and behaves as before.
 
+## Deploy triggers
+
+`.github/workflows/deploy.yml` runs on a push to `main`, on a `core-bundle`
+dispatch from core, and by hand with `mode` set to `deploy`, `redeploy` (this
+site commit with the core bundle that is live, fetched by the deployed
+receipt's `core_sha` and checked against its `bundle_digest`; it fails when no
+receipt is deployed; see "Redeploy") or `rollback` (restore the artifact of
+the receipt run named in `receipt_run_id`).
+
 ## Redeploy
 
 `mode=redeploy` builds this site commit with the core bundle that is live. It
@@ -164,6 +184,64 @@ carries that `core_sha` and its digest equals the receipt's `bundle_digest`.
 It never picks the newest bundle and runs no freshness compare. With no
 receipt deployed for the target it fails with "redeploy needs a deployed
 receipt".
+
+## Post-deploy probe timing
+
+The post-deploy probe compares served bytes with the artifact and repeats
+every ten seconds for at most eleven minutes of monotonic elapsed time, which
+covers the ten-minute `max-age` of the served pages while Pages and its CDN
+still answer with the previous generation. The final probe runs at the
+deadline, and a mismatch still present then fails the run. If the probes fail
+after a deploy, the run dispatches at most one rollback to the last known good
+receipt.
+
+## Failure reports
+
+A failed run opens or updates a site-local `site-deploy-failed` issue.
+Core-dispatched failures also relay to core under `site-bundle-undeployed`,
+classified as producer-not-concluded, contract-version-mismatch,
+snapshot-digest, probe-mismatch or infrastructure (including unknown errors).
+Contract mismatches require updating the Explorer for the new contract. The
+relay comments only when the latest reported class changes; a successful
+deploy comments and closes only issues bearing that relay label.
+
+Set the boolean `expected_rejection` manual input, or the
+`client_payload.expected_rejection` dispatch field to `true`, for deliberate
+negative probes such as wrong digests or runs before certification. The
+explicit marker suppresses both local and core incident writes, including
+success closure. Error text cannot set it. Unmarked failures always report.
+This matches the core bundle reporter's `expected_rejection` input; it does
+not bypass any deploy gate.
+
+## Download retries
+
+Bundle and receipt downloads share three attempts, with delays of 5 and 15
+seconds. Only HTTP 5xx and network failures retry. Each attempt starts with an
+empty temporary download directory; digest, provenance and deploy gates remain
+outside the retry boundary. Retry delays add at most 20 seconds.
+
+## Other workflows
+
+`.github/workflows/nightly-browser.yml` runs the Explorer `@smoke` suite on
+Firefox and WebKit daily and on dispatch. A failure opens or updates the one
+open issue labelled `t3:browser`.
+
+The Visual comparison workflow screenshots a PR's build and the deployed
+artifact and reports the differences. It is advisory: it is not part of `ci`
+and never fails on a difference.
+
+## Link checks
+
+The Nightly workflow's `links` job checks external links in `blog/`, `docs/`
+and the site pages, including their `#fragment` anchors, with `.lychee.toml`,
+which carries the scoped ignore policy for flaky and login-gated hosts and the
+fragment allowlist for anchors that JavaScript builds. It then checks the
+published documentation: every `/docs/` page in the `SITE_ORIGIN` sitemap,
+with fragments, for links to that origin (the scoped policy's own-origin
+exclusion yields to the check's include pattern).
+`scripts/check-published-links.mjs` accepts the failures whose target is in
+`inventory/known-broken-links.json` and fails on any other. Either failure
+opens or updates the `broken-links` issue.
 
 ## Retrying a Pages-side failure
 
