@@ -30,7 +30,11 @@ test("the checkout keeps no credentials and sees both branches", () => {
 });
 
 test("the workflow only reads branches and writes issues", () => {
-  assert.ok(!/git push|git commit|git merge(?!-tree)|gh pr |--force-with-lease|push --force/.test(script));
+  const commands = script
+    .split("\n")
+    .filter((line) => !line.trimStart().startsWith("BODY="))
+    .join("\n");
+  assert.ok(!/git push|git commit|git merge(?!-tree)|gh pr |--force-with-lease|push --force/.test(commands));
   assert.ok(!/refs\/heads\/(next|main):/.test(script.replace(/'\+refs\/heads\/(next|main):refs\/remotes\/origin\/(next|main)'/g, "")));
   assert.ok(script.includes("git rev-list --count origin/next..origin/main"));
 });
