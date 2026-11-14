@@ -200,7 +200,8 @@ versioned core bundle; it reads nothing else from core.
   later run that actually deploys successfully comments on it with the run URL
   and the deployed core and site commits, then closes every open issue bearing
   that label. A superseded run, a run with `SITE_DEPLOY_TARGET` unset and an
-  `expected_rejection` run neither open nor close it.
+  `expected_rejection` run neither open nor close it. A rollback does not close
+  it; the next successful deploy does.
   Core-dispatched failures also relay to core under `site-bundle-undeployed`,
   classified as producer-not-concluded, contract-version-mismatch,
   snapshot-digest, probe-mismatch or infrastructure (including unknown errors).

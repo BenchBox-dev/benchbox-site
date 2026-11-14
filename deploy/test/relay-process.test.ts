@@ -127,7 +127,7 @@ test("the site-local close runs only after a deploy that succeeded and holds iss
   const job = workflow.jobs["close-site-issues"];
   assert.deepEqual(job.permissions, { contents: "read", issues: "write" });
   assert.deepEqual(job.needs, ["build", "deploy"]);
-  assert.equal(job.if, "success() && needs.deploy.result == 'success'");
+  assert.equal(job.if, "success() && needs.deploy.result == 'success' && inputs.mode != 'rollback'");
   const reporter = job.steps.find((step: { run?: string }) => step.run?.includes("relay-cli.ts site-success"));
   assert.match(reporter.env.EXPECTED_REJECTION, /inputs.expected_rejection.*client_payload.expected_rejection/);
   assert.equal(reporter.env.GH_TOKEN, "${{ github.token }}");

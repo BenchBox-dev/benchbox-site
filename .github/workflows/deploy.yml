@@ -296,7 +296,7 @@ jobs:
   close-site-issues:
     name: close site-deploy-failed issues
     needs: [build, deploy]
-    if: success() && needs.deploy.result == 'success'
+    if: success() && needs.deploy.result == 'success' && inputs.mode != 'rollback'
     runs-on: ubuntu-latest
     timeout-minutes: 5
     permissions:
