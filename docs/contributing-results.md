@@ -186,6 +186,8 @@ curated static Explorer snapshot.
 
 ## What Makes a Good Submission
 
+The [Benchmark Methodology](concepts/benchmark-methodology.md) page gathers what a result at a given scale factor and iteration count supports.
+
 - **Complete benchmark suite** - run the full query set, not a cherry-picked subset
 - **Stable environment** - run on a dedicated machine or instance, not a shared laptop under load
 - **Default configuration** - unless you're specifically benchmarking a tuned configuration, use defaults

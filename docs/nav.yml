@@ -25,6 +25,7 @@ groups:
         items:
           - concepts/architecture.md
           - concepts/workflow.md
+          - concepts/benchmark-methodology.md
           - concepts/data-model.md
           - concepts/glossary.md
           - concepts/benchmarking-tools-compared.md
