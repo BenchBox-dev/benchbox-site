@@ -292,3 +292,29 @@ jobs:
           EXPECTED_REJECTION: ${{ inputs.expected_rejection || github.event.client_payload.expected_rejection }}
         run: |
           node --experimental-strip-types deploy/relay-cli.ts success
+
+  close-site-issues:
+    name: close site-deploy-failed issues
+    needs: [build, deploy]
+    if: success() && needs.deploy.result == 'success' && inputs.mode != 'rollback'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      contents: read
+      issues: write
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@a0853c24544627f65ddf259abe73b1d18a591444
+        with:
+          node-version-file: .nvmrc
+      - name: Comment on and close open site-deploy-failed issues
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+          CORE_SHA: ${{ needs.build.outputs.core_sha }}
+          SITE_SHA: ${{ github.sha }}
+          EXPECTED_REJECTION: ${{ inputs.expected_rejection || github.event.client_payload.expected_rejection }}
+        run: node --experimental-strip-types deploy/relay-cli.ts site-success

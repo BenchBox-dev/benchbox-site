@@ -6,6 +6,8 @@ import {
   failureMessage,
   reportRelayFailure,
   closeRelayOnSuccess,
+  closeSiteIssuesOnSuccess,
+  SITE_LABEL,
   RELAY_LABEL,
   type GhClient,
 } from "../lib/relay.ts";
@@ -29,7 +31,7 @@ function fakeGhClient(initialIssues: { number: number; body?: string }[] = []): 
     closed,
     labelsCreated,
     async listOpenIssues(_repo: string, label: string) {
-      if (label !== RELAY_LABEL) return [];
+      if (label !== RELAY_LABEL && label !== SITE_LABEL) return [];
       return [...issues];
     },
     async issueBodies(_repo: string, number: number) {
@@ -151,4 +153,22 @@ test("relay never uses forbidden site-bundle-failed label", async () => {
   await reportRelayFailure(client, "BenchBox-dev/BenchBox", "egress 503");
   assert.equal(client.created[0].label, "site-bundle-undeployed");
   assert.ok(!client.labelsCreated.includes("site-bundle-failed"));
+});
+
+test("closeSiteIssuesOnSuccess closes every open site issue with the run and commits", async () => {
+  assert.equal(SITE_LABEL, "site-deploy-failed");
+  const client = fakeGhClient([{ number: 3 }, { number: 4 }]);
+  const outcome = await closeSiteIssuesOnSuccess(client, "BenchBox-dev/benchbox-site", { coreSha: "c1", siteSha: "s1", runUrl: "https://run" });
+  assert.equal(outcome.action, "closed");
+  assert.deepEqual(client.closed.map((item) => item.issueNumber), [3, 4]);
+  assert.match(client.closed[0].comment, /https:\/\/run.*c1.*s1/s);
+});
+
+test("closeSiteIssuesOnSuccess writes nothing without an open issue or under an expected rejection", async () => {
+  const empty = fakeGhClient();
+  assert.equal((await closeSiteIssuesOnSuccess(empty, "BenchBox-dev/benchbox-site")).action, "none_open");
+  assert.equal(empty.closed.length, 0);
+  const marked = fakeGhClient([{ number: 3 }]);
+  assert.equal((await closeSiteIssuesOnSuccess(marked, "BenchBox-dev/benchbox-site", { expectedRejection: true })).action, "skipped");
+  assert.equal(marked.closed.length, 0);
 });
