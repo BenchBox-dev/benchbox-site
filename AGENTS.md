@@ -208,6 +208,7 @@ Adaptations to keep:
   documentation and everything that is not unreleased documentation) or to
   `next` (unreleased documentation), as described under "Release pin". `main`
   accepts squash merges only and requires the `ci` check.
+- Stage files by explicit path. Never run `git add -A` or `git add .`.
 - Commit identity: `Joe Harris <joeharris76@gmail.com>`. Add no agent or
   co-author trailers.
 - Merge with `gh pr merge --squash` once `ci` is green. Auto-merge is turned
