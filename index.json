@@ -1,5 +1,46 @@
 {
   "batches": {
+    "docs-audit": {
+      "accepted_members": {},
+      "batch_schema": 2,
+      "delivery_boundary": "One pull request from docs/audit-unreleased-on-main to main in BenchBox-dev/benchbox-site",
+      "develop_ref": "refs/remotes/origin/main",
+      "final_pr_history": [],
+      "integrated_members": {},
+      "integration_branch": "docs/audit-unreleased-on-main",
+      "integration_head": "f427e37876f77ab82a6ea4ef3f35285a0a23228f",
+      "integration_log": [
+        {
+          "at": "2026-11-14T14:04:00Z",
+          "head": "f427e37876f77ab82a6ea4ef3f35285a0a23228f",
+          "kind": "start",
+          "seq": 0
+        }
+      ],
+      "integration_worktree": "/Users/joe/Developer/benchbox-site.wt-docs-audit",
+      "lifecycle": "active",
+      "members": [
+        "audit-post-release-docs-on-main"
+      ],
+      "owner": "mcp:omp-coding-agent:joe@joe-mac-mini.local:c5b9b54747851b1eaf3e61b4",
+      "owner_epoch": 0,
+      "owner_generation": "220d29e2bc9db7683285f30454bc1802",
+      "project_id": "benchbox-site",
+      "recoveries": [],
+      "repository": "https://github.com/BenchBox-dev/benchbox-site.git",
+      "scope": {
+        "audit-post-release-docs-on-main": [
+          "docs/**",
+          ".github/pull_request_template.md",
+          "AGENTS.md",
+          "inventory/**",
+          "cspell-words.txt"
+        ]
+      },
+      "scope_hash": "a4ca8f6b2538b45426d89ddebd3a565801a86aae1be8fdd9f4288b01b7eb085b",
+      "start_head": "f427e37876f77ab82a6ea4ef3f35285a0a23228f",
+      "terminal_outcome": "Squash-merged to main with ci green"
+    },
     "pin-hardening": {
       "accepted_members": {},
       "batch_schema": 2,
