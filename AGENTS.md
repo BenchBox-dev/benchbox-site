@@ -134,10 +134,20 @@ versioned core bundle; it reads nothing else from core.
   well formed and its tag a published release.
 - Unreleased documentation merges to `next`, where CI checks it against the
   newest develop bundle. Fixes to released documentation merge to `main`;
-  whoever merges one then merges `main` into `next` with a merge commit.
+  the Sync next workflow then opens or updates the `next-behind-main` issue
+  while `next` lacks commits that are on `main`, and closes it once `next`
+  contains them. Site code, workflows and corrections to released
+  documentation go to `main`; only documentation of unreleased behaviour goes to
+  `next`. After a merge to `main`, merge `main` into `next` by pull request
+  with a merge commit. The issue says whether that merge is clean or names the
+  conflicting files, which a person resolves by hand in that pull request.
 - A release is: the owner runs `npm run docs:pin -- vX.Y.Z` on `next` by pull
   request, then opens one pull request from `next` into `main`. After that
-  squash merge, merge `main` into `next` to bring it level.
+  squash merge, merge `main` into `next` by pull request with a merge commit to
+  bring it level; the `next-behind-main` issue tracks it. The workflow cannot
+  do this itself: a pull request it opened with `github.token` would never
+  start `ci`, and the Site bridge app has neither pull request nor workflow
+  write permission.
 - The Nightly workflow opens or updates the `docs-release-pending` issue when
   core has published a release newer than the pin. The owner acts on it.
 - Compatibility window: site code on `main` must read the pinned release's
