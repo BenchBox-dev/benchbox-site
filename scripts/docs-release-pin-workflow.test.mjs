@@ -12,11 +12,111 @@ test("ci runs on pushes to main and next", () => {
   assert.ok(ci.on.push.branches.includes("next"));
 });
 
-test("DOCS_INPUTS selects the bundle only for next", () => {
-  const expression = ci.env.DOCS_INPUTS;
-  assert.ok(expression.includes("github.base_ref == 'next'"));
-  assert.ok(expression.includes("refs/heads/next"));
-  assert.ok(expression.includes(".site-inputs"));
+function evaluate(source, context) {
+  const inner = source.trim().match(/^\$\{\{([\s\S]*)\}\}$/);
+  assert.ok(inner, `not an expression: ${source}`);
+  const tokens = inner[1].match(/'(?:[^']|'')*'|[A-Za-z_][\w.]*|==|&&|\|\||[(),]/g);
+  let at = 0;
+  const peek = () => tokens[at];
+  const take = (expected) => {
+    const token = tokens[at++];
+    assert.ok(expected === undefined || token === expected, `expected ${expected}, got ${token}`);
+    return token;
+  };
+  const truthy = (value) => value !== "" && value !== false;
+  const primary = () => {
+    const token = take();
+    if (token === "(") {
+      const value = or();
+      take(")");
+      return value;
+    }
+    if (token.startsWith("'")) return token.slice(1, -1).replaceAll("''", "'");
+    if (token === "format") {
+      take("(");
+      const template = or();
+      const args = [];
+      while (peek() === ",") {
+        take(",");
+        args.push(or());
+      }
+      take(")");
+      return template.replace(/\{(\d+)\}/g, (_, index) => args[Number(index)]);
+    }
+    assert.ok(token in context, `unknown context value ${token}`);
+    return context[token];
+  };
+  const equality = () => {
+    let left = primary();
+    while (peek() === "==") {
+      take();
+      left = left.toLowerCase() === primary().toLowerCase();
+    }
+    return left;
+  };
+  const and = () => {
+    let left = equality();
+    while (peek() === "&&") {
+      take();
+      const right = equality();
+      left = truthy(left) ? right : left;
+    }
+    return left;
+  };
+  function or() {
+    let left = and();
+    while (peek() === "||") {
+      take();
+      const right = and();
+      left = truthy(left) ? left : right;
+    }
+    return left;
+  }
+  const value = or();
+  assert.equal(at, tokens.length, "trailing tokens");
+  return value === false ? "" : value;
+}
+
+const workspace = "/work/site";
+const bundle = `${workspace}/.site-inputs`;
+const contexts = [
+  ["pull request into main", { "github.base_ref": "main", "github.ref": "refs/pull/7/merge" }, ""],
+  ["pull request into next", { "github.base_ref": "next", "github.ref": "refs/pull/7/merge" }, bundle],
+  ["push to main", { "github.base_ref": "", "github.ref": "refs/heads/main" }, ""],
+  ["push to next", { "github.base_ref": "", "github.ref": "refs/heads/next" }, bundle],
+  ["workflow_dispatch on main", { "github.base_ref": "", "github.ref": "refs/heads/main" }, ""],
+  ["workflow_dispatch on next", { "github.base_ref": "", "github.ref": "refs/heads/next" }, bundle],
+  ["release pull request from next into main", { "github.base_ref": "main", "github.ref": "refs/pull/9/merge" }, ""],
+];
+
+test("ci DOCS_INPUTS selects the develop bundle for next and the pin otherwise", () => {
+  for (const [name, context, expected] of contexts) {
+    assert.equal(evaluate(ci.env.DOCS_INPUTS, { ...context, "github.workspace": workspace }), expected, name);
+  }
+});
+
+test("visual DOCS_INPUTS selects the develop bundle only for pull requests into next", () => {
+  const visual = parse(read("visual.yml"));
+  for (const [name, context] of contexts) {
+    const expected = context["github.base_ref"] === "next" ? bundle : "";
+    assert.equal(evaluate(visual.env.DOCS_INPUTS, { ...context, "github.workspace": workspace }), expected, name);
+  }
+});
+
+test("on next the checks job also generates and assembles the docs against the pin", () => {
+  const steps = ci.jobs.checks.steps;
+  const names = ["npm run docs:generate -w website", "npm run docs:assemble -w website"];
+  for (const command of names) {
+    const step = steps.find((candidate) => (candidate.run ?? "").startsWith(command));
+    assert.ok(step, command);
+    assert.equal(step.if, "env.DOCS_INPUTS != ''");
+    assert.equal(step.env.DOCS_INPUTS, "");
+  }
+  assert.ok(!steps.some((step) => /docs:check/.test(step.run ?? "") && step.env?.DOCS_INPUTS === ""));
+  const build = steps.findIndex((step) => step.run === "npm run build");
+  for (const command of names) {
+    assert.ok(steps.findIndex((step) => (step.run ?? "").startsWith(command)) < build);
+  }
 });
 
 test("the checks job verifies the pin", () => {
@@ -32,11 +132,6 @@ test("the aggregate ci job needs every other job", () => {
 
 test("deploy builds from the pin", () => {
   assert.ok(!read("deploy.yml").includes("DOCS_INPUTS"));
-});
-
-test("visual applies the same rule to pull requests into next", () => {
-  const visual = parse(read("visual.yml"));
-  assert.ok(visual.env.DOCS_INPUTS.includes("github.base_ref == 'next'"));
 });
 
 test("the nightly reminder opens its issue only on exit code 1", () => {
