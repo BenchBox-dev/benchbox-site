@@ -16,6 +16,7 @@ function evaluate(source, context) {
   const inner = source.trim().match(/^\$\{\{([\s\S]*)\}\}$/);
   assert.ok(inner, `not an expression: ${source}`);
   const tokens = inner[1].match(/'(?:[^']|'')*'|[A-Za-z_][\w.]*|==|&&|\|\||[(),]/g);
+  assert.equal(tokens.join(""), inner[1].replace(/\s+(?=(?:[^']*'[^']*')*[^']*$)/g, ""), "unrecognised characters");
   let at = 0;
   const peek = () => tokens[at];
   const take = (expected) => {
@@ -74,7 +75,7 @@ function evaluate(source, context) {
   }
   const value = or();
   assert.equal(at, tokens.length, "trailing tokens");
-  return value === false ? "" : value;
+  return typeof value === "boolean" ? String(value) : value;
 }
 
 const workspace = "/work/site";
@@ -103,20 +104,17 @@ test("visual DOCS_INPUTS selects the develop bundle only for pull requests into 
   }
 });
 
-test("on next the checks job also generates and assembles the docs against the pin", () => {
+test("on next the checks job also assembles the docs against the pin", () => {
   const steps = ci.jobs.checks.steps;
-  const names = ["npm run docs:generate -w website", "npm run docs:assemble -w website"];
-  for (const command of names) {
-    const step = steps.find((candidate) => (candidate.run ?? "").startsWith(command));
-    assert.ok(step, command);
-    assert.equal(step.if, "env.DOCS_INPUTS != ''");
-    assert.equal(step.env.DOCS_INPUTS, "");
-  }
-  assert.ok(!steps.some((step) => /docs:check/.test(step.run ?? "") && step.env?.DOCS_INPUTS === ""));
-  const build = steps.findIndex((step) => step.run === "npm run build");
-  for (const command of names) {
-    assert.ok(steps.findIndex((step) => (step.run ?? "").startsWith(command)) < build);
-  }
+  const command = "npm run docs:assemble -w website";
+  const matching = steps.filter((candidate) => (candidate.run ?? "").includes(command));
+  assert.equal(matching.length, 1);
+  const [step] = matching;
+  assert.equal(step.if, "env.DOCS_INPUTS != ''");
+  assert.equal(step.env, undefined);
+  assert.equal(step.run, `DOCS_INPUTS= ${command}`);
+  assert.ok(!steps.some((candidate) => /docs:check/.test(candidate.run ?? "") && /DOCS_INPUTS=/.test(candidate.run ?? "")));
+  assert.ok(steps.indexOf(step) < steps.findIndex((candidate) => candidate.run === "npm run build"));
 });
 
 test("the checks job verifies the pin", () => {

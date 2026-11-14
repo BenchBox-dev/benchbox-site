@@ -87,16 +87,9 @@ jobs:
         run: npm run docs:pin -- --check
       - name: Check the site documentation against the docs inputs' contracts
         run: npm run docs:check -- --docs-mode block
-      - name: Generate the documentation pages from the pin
-        if: env.DOCS_INPUTS != ''
-        env:
-          DOCS_INPUTS: ""
-        run: npm run docs:generate -w website -- --out "$RUNNER_TEMP/docs-pages-pin"
       - name: Assemble the authored documentation against the pin
         if: env.DOCS_INPUTS != ''
-        env:
-          DOCS_INPUTS: ""
-        run: npm run docs:assemble -w website
+        run: DOCS_INPUTS= npm run docs:assemble -w website
       - name: Check the inventory of core paths that the documentation links to
         run: npm run inventory:core-links -w website -- --check
       - run: npm run typecheck -w explorer
