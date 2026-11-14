@@ -77,14 +77,12 @@ export function compareVersions(left, right) {
   return 0;
 }
 
-export function docsInputsDir(root, env = process.env) {
-  return path.resolve(env.DOCS_INPUTS || path.join(root, "release-pin"));
-}
-
-export function docsInputsVersion(dir) {
-  const manifest = JSON.parse(readFileSync(path.join(dir, "manifest.json"), "utf8"));
+export function pinnedVersion(root, env = process.env) {
+  if (env.DOCS_INPUTS) return null;
+  const file = path.join(root, "release-pin", "manifest.json");
+  const manifest = JSON.parse(readFileSync(file, "utf8"));
   if (typeof manifest.package_version !== "string" || !RELEASE_VERSION.test(manifest.package_version)) {
-    throw new Error(`${dir}/manifest.json: package_version must read X.Y.Z`);
+    throw new Error(`${file}: package_version must read X.Y.Z`);
   }
   return manifest.package_version;
 }
@@ -98,8 +96,8 @@ export function releaseFindings(posts, available) {
     const required = front.requires_release;
     if (typeof required !== "string" || !RELEASE_VERSION.test(required)) {
       findings.push(`${file}: requires_release must read X.Y.Z`);
-    } else if (compareVersions(required, available) > 0) {
-      findings.push(`${file}: requires_release ${required} is above the available release ${available}; merge this post to next, which reaches main with the release`);
+    } else if (available !== null && compareVersions(required, available) > 0) {
+      findings.push(`${file}: requires_release ${required} is above the pinned release ${available}; merge this post to next, which reaches main with the release`);
     }
   }
   return findings;
@@ -215,7 +213,7 @@ export function checkPublication(root, today = Date.now(), available = null) {
     .filter((name) => name.endsWith(".md") && name !== "index.md")
     .sort()
     .map((name) => ({ name, source: readFileSync(path.join(blogDir, name), "utf8") }));
-  const findings = [...postFindings(posts), ...(available === null ? [] : releaseFindings(posts, available))];
+  const findings = [...postFindings(posts), ...releaseFindings(posts, available)];
   const scheduleFile = "drafts/PUBLICATION_SCHEDULE.md";
   const scheduleSource = read(scheduleFile) ?? "";
   const queue = queueFindings({ scheduleSource, draftFiles: listDraftFiles(root), readDraft: read, today });
@@ -229,7 +227,7 @@ export function checkPublication(root, today = Date.now(), available = null) {
 
 function main() {
   const root = path.resolve(path.dirname(new URL(import.meta.url).pathname), "..");
-  const { findings, warnings } = checkPublication(root, Date.now(), docsInputsVersion(docsInputsDir(root)));
+  const { findings, warnings } = checkPublication(root, Date.now(), pinnedVersion(root));
   for (const warning of warnings) console.log(`warning: ${warning}`);
   for (const finding of findings) console.log(finding);
   console.log(`blog publication: ${findings.length} findings, ${warnings.length} warnings`);

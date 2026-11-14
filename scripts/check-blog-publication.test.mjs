@@ -3,7 +3,7 @@ import assert from "node:assert/strict";
 import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from "node:fs";
 import os from "node:os";
 import path from "node:path";
-import { checkPublication, compareVersions, docsInputsDir, docsInputsVersion, isoFromPostDate, linkFindings, planFindings, postFindings, releaseFindings } from "./check-blog-publication.mjs";
+import { checkPublication, compareVersions, isoFromPostDate, linkFindings, pinnedVersion, planFindings, postFindings, releaseFindings } from "./check-blog-publication.mjs";
 
 const NOW = Date.parse("2026-10-20");
 
@@ -152,7 +152,7 @@ test("a consistent tree passes", () => {
 test("a post requiring a release above the docs inputs fails and names the file and both versions", () => {
   const posts = [{ name: "2026-10-07-gated.md", source: post({ requires_release: "0.6.0" }) }];
   assert.deepEqual(releaseFindings(posts, "0.5.0"), [
-    "blog/2026-10-07-gated.md: requires_release 0.6.0 is above the available release 0.5.0; merge this post to next, which reaches main with the release",
+    "blog/2026-10-07-gated.md: requires_release 0.6.0 is above the pinned release 0.5.0; merge this post to next, which reaches main with the release",
   ]);
 });
 
@@ -186,18 +186,22 @@ test("versions compare numerically per component", () => {
   assert.deepEqual(releaseFindings([{ name: "2026-10-07-old.md", source: post({ requires_release: "0.9.0" }) }], "0.10.0"), []);
 });
 
-test("DOCS_INPUTS overrides the release pin and an empty value means the pin", () => {
+test("a non-empty DOCS_INPUTS skips the gate and an empty one gates against the pin", () => {
   const root = fixture({
     "release-pin/manifest.json": JSON.stringify({ package_version: "0.5.0" }),
-    "bundle/manifest.json": JSON.stringify({ package_version: "0.6.0" }),
+    "bundle/manifest.json": JSON.stringify({ package_version: "0.5.0rc3" }),
   });
   try {
     const bundle = path.join(root, "bundle");
-    assert.equal(docsInputsDir(root, {}), path.join(root, "release-pin"));
-    assert.equal(docsInputsDir(root, { DOCS_INPUTS: "" }), path.join(root, "release-pin"));
-    assert.equal(docsInputsDir(root, { DOCS_INPUTS: bundle }), bundle);
-    assert.equal(docsInputsVersion(docsInputsDir(root, { DOCS_INPUTS: "" })), "0.5.0");
-    assert.equal(docsInputsVersion(docsInputsDir(root, { DOCS_INPUTS: bundle })), "0.6.0");
+    assert.equal(pinnedVersion(root, {}), "0.5.0");
+    assert.equal(pinnedVersion(root, { DOCS_INPUTS: "" }), "0.5.0");
+    assert.equal(pinnedVersion(root, { DOCS_INPUTS: bundle }), null);
+    assert.equal(pinnedVersion(root, { DOCS_INPUTS: path.join(root, "absent") }), null);
+    const gated = [{ name: "2026-10-07-gated.md", source: post({ requires_release: "99.0.0" }) }];
+    assert.deepEqual(releaseFindings(gated, pinnedVersion(root, { DOCS_INPUTS: bundle })), []);
+    assert.equal(releaseFindings(gated, pinnedVersion(root, { DOCS_INPUTS: "" })).length, 1);
+    const malformed = [{ name: "2026-10-07-bad.md", source: post({ requires_release: "soon" }) }];
+    assert.deepEqual(releaseFindings(malformed, pinnedVersion(root, { DOCS_INPUTS: bundle })), ["blog/2026-10-07-bad.md: requires_release must read X.Y.Z"]);
   } finally {
     rmSync(root, { recursive: true, force: true });
   }

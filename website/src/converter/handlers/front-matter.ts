@@ -34,7 +34,11 @@ export const holdFrontMatter: FrontMatterHandler = {
 export const requiresReleaseFrontMatter: FrontMatterHandler = {
   kind: "front-matter",
   keys: ["requires_release"],
-  handle() {},
+  handle(_key, _value, at, context) {
+    if (context.collection !== "blog") {
+      throw new ConverterError(at.file, at.line, "requires_release belongs to blog articles only");
+    }
+  },
 };
 
 export const titleFrontMatter: FrontMatterHandler = {

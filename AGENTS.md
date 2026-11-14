@@ -139,8 +139,11 @@ versioned core bundle; it reads nothing else from core.
   `main` with the release. Nothing mechanical can tell what a post describes,
   so the author declares it with the front matter key `requires_release:
   X.Y.Z`, the first release that contains what the post describes.
-  `npm run lint:blog` fails a post whose `requires_release` is above the
-  docs inputs' `package_version`. A post that links a core path added after
+  `npm run lint:blog` checks the value is well formed and, only when
+  `DOCS_INPUTS` is unset or empty, fails a post whose `requires_release` is
+  above `release-pin/manifest.json`'s `package_version`. When `DOCS_INPUTS`
+  is set, as on `next`, the release gate is skipped: the develop bundle's
+  version is the last release, not the upcoming one. A post that links a core path added after
   the pinned release must link by commit SHA or carry `requires_release`.
   Site code, workflows and corrections to released documentation go to
   `main`.
