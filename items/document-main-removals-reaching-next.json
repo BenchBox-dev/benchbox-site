@@ -1,0 +1,25 @@
+{
+  "acceptance": [
+    "AGENTS.md 'Release pin' states the hazard and the remedy (after merging, restore next's version of each page main removed text from, unless the removal is a correction that also applies on develop)",
+    "The next-behind-main issue body lists docs files where the merge would delete lines from next, computed without writing a ref, with a test of the script against a scratch repository",
+    "No change to merge permissions, rulesets or the reminder's no-push design",
+    "Decision recorded: whether a checklist line in the issue is enough or the list of files is needed"
+  ],
+  "context": "Found 2026-11-14 while merging main into next after pull request #160. Guardrails: the workflow stays read-only on branches; do not auto-restore text; goes to main, then main is merged into next.",
+  "description": "Problem: when a correction on main removes text that describes unreleased behaviour, the following merge of main into next applies the same removal to next without a conflict, because next still held that text unchanged. The unreleased documentation then silently disappears from next and from the next release. On 2026-11-14 the merge after the docs audit had to restore 24 files on next by hand. AGENTS.md and the next-behind-main issue text only cover conflicts ('next keeps its text'); they do not mention clean merges that delete.\n\nOutcome: the person merging main into next is told which docs files the merge would delete from or shrink on next, and AGENTS.md says what to do.",
+  "links": [
+    "AGENTS.md",
+    ".github/workflows/sync-next.yml",
+    "https://github.com/BenchBox-dev/benchbox-site/pull/162"
+  ],
+  "sessions": [
+    {
+      "actor": "mcp:omp-coding-agent:joe@joe-mac-mini.local:c5b9b54747851b1eaf3e61b4",
+      "at": "2026-11-14T14:47:05Z",
+      "client": "omp-coding-agent",
+      "op": "create",
+      "op_id": "465e742090944ce49875348038211063",
+      "session_id": "99f297d0e01b4dd1ab38d39e880d17c4"
+    }
+  ]
+}

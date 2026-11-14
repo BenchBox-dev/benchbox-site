@@ -558,6 +558,13 @@
       "status": "done",
       "title": "Place the 65 uncategorised docs and blog tags so tag browsing reaches them"
     },
+    "document-main-removals-reaching-next": {
+      "claim": null,
+      "needs": [],
+      "priority": "medium",
+      "status": "open",
+      "title": "Document and guard that a removal on main also removes the text from next at the next merge"
+    },
     "first-default-docs-pin-run": {
       "claim": null,
       "needs": [],
