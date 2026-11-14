@@ -19,7 +19,8 @@ Install the platform extra first in your project environment (for example,
 `uv add benchbox --extra duckdb`).
 
 ```bash
-uv run -- benchbox run --platform duckdb --benchmark tpch --official --scale 1 --seed 42
+uv run -- benchbox run --platform duckdb --benchmark tpch --official --scale 1 --seed 42 \
+  --phases power,throughput --streams 2 --benchmark-option tpch_refresh_functions=true
 ```
 
 The result JSON is written to `benchmark_runs/results/`.
@@ -31,7 +32,9 @@ The result JSON is written to `benchmark_runs/results/`.
   result that `submit` refuses.
 - A run at scale factor 1 or above is `unofficial_nonstandard` unless it came from
   `benchbox run --official`, which needs an official scale factor (1, 10, 30, 100
-  and so on) and a `--seed`.
+  and so on) and a `--seed`. `--official` also refuses a partial run: it needs the
+  power and throughput phases, `--streams` of at least 2 at scale factor 1 and, for
+  TPC-H, the refresh functions.
 
 Benchmarks without a TPC compliance class, such as SSB, are not subject to that
 check. See the [TPC-H official guide](guides/tpc/tpc-h-official-guide.md) for

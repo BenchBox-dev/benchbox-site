@@ -14,7 +14,7 @@ BenchBox includes a three-tier integrity validator for benchmark result JSON fil
 |----------|-------|
 | Module | `benchbox.core.results.integrity_validator` |
 | Specs | `benchbox.core.results.benchmark_specs` |
-| CLI script | `validate_results.py` maintainer script (source checkout only) |
+| CLI | `benchbox results validate` (see [Results Commands](../reference/cli/results.md#cli-results-validate)); also the `validate_results.py` maintainer script (source checkout only) |
 | MCP tool | `validate_results` (in `benchbox.mcp.tools.analytics`) |
 | Tests | `tests/unit/core/results/test_integrity_validator.py` |
 
@@ -79,7 +79,7 @@ Validates that the result contains expected content for its benchmark type.
 | `tables_object` | WARN | Tables object present when spec requires it |
 | `tpc_metrics` | INFO | TPC performance metrics present for TPC-H/DS/Havoc/Skew; absence is informational because an unofficial run records no QphH or QthDS |
 
-### Tier 3: Believability (7 checks)
+### Tier 3: Believability (8 checks)
 
 Validates that reported metrics are statistically plausible.
 
@@ -92,6 +92,7 @@ Validates that reported metrics are statistically plausible.
 | `timing_outliers` | WARN | No individual query exceeds 30 minutes |
 | `no_duplicate_executions` | WARN | No duplicate (id, iter, stream) tuples |
 | `load_time_nonzero` | WARN | Data load time > 0 |
+| `host_load` | INFO | Host load average at the start and end of the run, from `environment.host_load`; "Host load not recorded" for bundles written before the field existed |
 
 The overall status is FAIL when any check FAILs, otherwise WARN when any check WARNs, otherwise PASS. INFO findings never change it.
 
@@ -218,11 +219,11 @@ Both functions handle invalid JSON gracefully - returning a FAIL report rather t
 
 | Interface | Usage |
 |-----------|-------|
-| **CLI script** | `validate_results.py <path> [options]` maintainer script, in a source checkout |
+| **CLI** | `benchbox results validate <path> [options]`, exiting 5 on a FAIL finding; the `validate_results.py` maintainer script wraps the same validator, in a source checkout |
 | **MCP tool** | `validate_results(result_file="...", verbose=True)` |
 | **Python API** | `from benchbox.core.results.integrity_validator import validate_file` |
 
-See the [CLI reference](../reference/cli/utilities.md#result-integrity-validation) and [MCP reference](../reference/mcp.md) for usage details.
+See the [CLI reference](../reference/cli/results.md#cli-results-validate) and [MCP reference](../reference/mcp.md) for usage details.
 
 ## Special Cases
 

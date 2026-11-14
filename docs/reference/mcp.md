@@ -262,6 +262,7 @@ modes remain available because they do not hold the request for execution.
 - Under a remote security policy, `allowed_platforms` is matched against the
   platform string exactly as sent. Listing `clickhouse` does not admit
   `clickhouse:server`; list the selector form you want to allow.
+- A billable platform (registry category `cloud` or a managed deployment mode) is refused unless the operator started the server with `BENCHBOX_ACKNOWLEDGE_BILLABLE_PLATFORM=1`. The default allows no billable platform, the variable is read once at server start, and no tool argument, including `platform_options`, can grant it. The refusal is an error response with `error_code` `RESOURCE_ACCESS_DENIED`, returned before any adapter, credential or connection is used. When the operator opts in, the acknowledgement is recorded in the result bundle under `execution.billable_platform_acknowledgement` with source `mcp_server_environment`. See [Billable platforms](cli/run.md#billable-platforms) for the platforms and limits.
 - `mode=data_only` generates benchmark data without running queries. MCP
   accepts this value but `benchbox run --mode` does not: on the CLI, use
   `--phases generate` for the same result. `sql` and `dataframe` select how

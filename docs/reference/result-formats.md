@@ -466,6 +466,7 @@ The top-level `environment` block contains execution environment metadata for th
 | `platform_runtime` | object | Target platform runtime environment profile |
 | `container` | object | Optional container environment profile |
 | `client_link` | object | Optional client-to-platform locality disclosure and statement overhead probe metrics |
+| `host_load` | object | Optional load average, CPU frequency, memory and swap samples at the start and end of the run |
 
 ##### `environment.client_link` (optional)
 
@@ -526,6 +527,48 @@ A developer running BenchBox on a local workstation or laptop against a remote d
 }
 ```
 
+##### `environment.host_load` (optional)
+
+Records the load on the machine that ran the benchmark client at two points, so a reader can judge whether other work shared the host. `host_load` has a `start` and an `end` sample. The `end` sample is the resource snapshot taken after the run. The `start` sample is taken at the beginning of the run, before the connection, data loading and every measured interval, so no measured timing includes it.
+
+| Field | Type | Description |
+| ------- | ------ | ------------- |
+| `environment.host_load.start` | object | Sample taken before the run's connection, data loading and measured intervals. |
+| `environment.host_load.end` | object | Sample taken after the run. |
+| `<sample>.load_average` | array of 3 numbers \| null | The 1, 5 and 15 minute load averages. |
+| `<sample>.cpu_frequency_mhz` | number \| null | CPU frequency in MHz. |
+| `<sample>.memory_available_mb` | number \| null | Available memory in megabytes. |
+| `<sample>.swap_used_mb` | number \| null | Swap in use, in megabytes. |
+| `<sample>.swap_percent` | number \| null | Swap in use as a percentage of swap. |
+| `<sample>.sampled_at` | string | Wall-clock time of the sample. For audit only. |
+
+A value that is unavailable is an explicit `null`, and every value is `null` when no snapshot exists, for example for DataFrame platforms, which take none. The field is optional and was added without a schema version change; bundles with and without it are both valid, and the integrity validator reports an INFO finding, "Host load not recorded", for those without it.
+
+```json
+{
+  "host_load": {
+    "start": {
+      "load_average": [62.59, 105.96, 104.65],
+      "cpu_frequency_mhz": null,
+      "memory_available_mb": 2670.78,
+      "swap_used_mb": 26669.88,
+      "swap_percent": 96.5,
+      "sampled_at": "2026-11-13T22:43:52.957884"
+    },
+    "end": {
+      "load_average": [58.7, 101.58, 103.11],
+      "cpu_frequency_mhz": null,
+      "memory_available_mb": 3090.75,
+      "swap_used_mb": 26976.0,
+      "swap_percent": 94.1,
+      "sampled_at": "2026-11-13T22:44:19.585129"
+    }
+  }
+}
+```
+
+The example is from a run on a busy shared machine; a high load average means other work was running during the measurement.
+
 #### Tables Block
 
 The optional top-level `tables` block records per-table load outcomes keyed
@@ -574,6 +617,28 @@ Consumers resolve the translator version for a bundle into exactly one of three 
 | `not_recorded` | Neither source exists. The translator version is unknown and is not guessed, which is the case for DataFrame runs and for runs that logged no translation outcomes. |
 
 A recorded runtime always takes precedence. If a bundle has both a `runtime` and an attestation and any of `version`, `fork_sha`, `upstream_sha` or `wheel_sha256` differ, the result is a conflict, not a preference: the submission validator, the corpus validation and the Explorer pipeline fail closed with an error. A malformed attestation fails the same way. The attestation does not change ranking identity.
+
+#### Execution Block: Billable Platform Acknowledgement
+
+When a run of a billable platform (registry category `cloud`, or a managed deployment mode) was acknowledged, the optional `execution.billable_platform_acknowledgement` object records that and who acknowledged it. The key is absent for platforms that are not billable and for runs that were never acknowledged, so its absence does not mean the platform was free.
+
+| Field | Type | Description |
+| ------- | ------ | ------------- |
+| `execution.billable_platform_acknowledgement.acknowledged` | boolean | Always `true` when the object is present. |
+| `execution.billable_platform_acknowledgement.source` | string | How the run was acknowledged: `cli_flag` (`--acknowledge-billable-platform`), `environment` (`BENCHBOX_ACKNOWLEDGE_BILLABLE_PLATFORM` in the CLI process), or `mcp_server_environment` (the same variable at MCP server start). |
+
+```json
+{
+  "execution": {
+    "billable_platform_acknowledgement": {
+      "acknowledged": true,
+      "source": "cli_flag"
+    }
+  }
+}
+```
+
+The record states that the caller said it accepted the cost. It is not proof that a person confirmed it, because any caller can set the flag or the variable; see [Billable platforms](cli/run.md#billable-platforms).
 
 #### Export Block
 

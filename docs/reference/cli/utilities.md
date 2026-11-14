@@ -106,22 +106,23 @@ The first command validates the default configuration and the second validates a
 ## Result Integrity Validation
 
 Result integrity validation checks benchmark result JSON files for structural
-integrity, completeness, and statistical believability. It runs 20 checks
+integrity, completeness, and statistical believability. It runs 21 checks
 across three tiers against hardcoded benchmark specifications.
 
-There is no `benchbox` subcommand for it; `benchbox validate` checks
-configuration files, not result bundles. With the installed package, use the
-`validate_results` tool of the [MCP server](../mcp.md), which accepts one
-result file or a directory of result files. Contributors working from a source
-checkout can also run the standalone `validate_results.py` script, which wraps
-the same validator.
+Run it with [`benchbox results validate`](results.md#cli-results-validate),
+which accepts one result file or a directory of result files and exits 5 when a
+file has a FAIL finding. `benchbox validate` is a different command: it checks
+configuration files, not result bundles. The `validate_results` tool of the
+[MCP server](../mcp.md) returns the same findings. Contributors working from a
+source checkout can also run the standalone `validate_results.py` script, which
+wraps the same validator.
 
 See the [Result Integrity Validation](../../development/result-integrity-validation.md)
 developer guide for the full check list.
 
 **Notes:**
 
-- Automatically excludes `.plans.json` and `.tuning.json` companion files
+- Automatically excludes `.plans.json`, `.tuning.json`, `.applied.json`, `.override.json` and `.manifest.json` companion files
 - Specs cover 21 of 22 benchmarks with 8 legacy alias mappings (e.g., `star_schema` → `ssb`); `ai_primitives` is not yet covered
 
 ## Related

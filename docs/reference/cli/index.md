@@ -13,6 +13,22 @@ These options are available for all BenchBox commands:
 - `--version`: Show version information and exit
 - `--help`: Show help message and exit
 
+## Exit Codes
+
+Scripts and CI jobs can rely on these exit codes.
+
+| Code | Meaning | Commands |
+| ---- | ------- | -------- |
+| `0`  | Success | all |
+| `1`  | Error, including a missing or unreadable input | all |
+| `2`  | Usage error, such as an invalid option combination | all |
+| `3`  | A regression exceeded the `--fail-on-regression` threshold (result-file mode only) | [`compare`](results.md#cli-compare-exit-codes) |
+| `4`  | The results cannot be compared: different variants or timing modes | [`compare`](results.md#cli-compare-exit-codes) |
+| `5`  | A result file has a FAIL finding, or a WARN finding with `--fail-on-warn` | [`results validate`](results.md#cli-results-validate) |
+| `6`  | A non-interactive run of a billable platform was refused without an acknowledgement | [`run`](run.md#billable-platforms), [`compare`](results.md#cli-compare-exit-codes) |
+
+Codes 75 to 79 belong to the heavy-work host lock and are not used by the commands above.
+
 ## Commands Overview
 
 BenchBox provides the following commands:
@@ -33,6 +49,7 @@ BenchBox provides the following commands:
 | `submit`               | Package results for PR contribution or hosted API upload | [submit](submit.md)                   |
 | `auth`                 | Manage hosted submission credentials               | [auth](auth.md)                           |
 | `results`              | Display exported benchmark results                 | [results](results.md#results-show-benchmark-results)             |
+| `results validate`     | Check result files for integrity, completeness and believability | [results](results.md#cli-results-validate) |
 | `compare`              | Compare benchmark results for regression detection | [results](results.md#compare-compare-benchmark-results)             |
 | `visualize`            | Generate ASCII charts from benchmark results       | [visualize](visualize.md)                 |
 | `report`               | Historical analysis, rankings, and regressions     | [report](report.md)                       |
