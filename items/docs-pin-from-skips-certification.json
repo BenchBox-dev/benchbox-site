@@ -18,6 +18,42 @@
     "scripts/bundle-lib.mjs",
     "AGENTS.md"
   ],
+  "prepared": {
+    "accepted_head": "36ffc63e446bfd8bda0d1f4ab9130aa689b60b4d",
+    "batch_id": "pin-hardening-2",
+    "changed_files": [
+      "AGENTS.md",
+      "scripts/docs-pin.mjs",
+      "scripts/docs-pin.test.mjs"
+    ],
+    "integration_head": "c6098835a1e45c331ebf37719f53cf3416d3df23",
+    "integration_seq": 1,
+    "member_id": "docs-pin-from-skips-certification",
+    "overlaps": [],
+    "owner_epoch": 0,
+    "schema": "prepared_work_v2",
+    "scope_hash": "bfe6ad54185c489d87e2658c324184e1c7939725c699b2001c4fc5919699871c",
+    "source_base": "f427e37876f77ab82a6ea4ef3f35285a0a23228f",
+    "source_revision": "36ffc63e446bfd8bda0d1f4ab9130aa689b60b4d",
+    "source_worktree": "/Users/joe/Developer/benchbox-site.wt-m-from-cert",
+    "verification": {
+      "clean": true,
+      "command": [
+        "node",
+        "--test",
+        "scripts/docs-pin.test.mjs"
+      ],
+      "review": {
+        "notes": "No Critical or Required. Optional: --from proves the commit was certified, not the directory's provenance; manifest field checks lack a table test.",
+        "outcome": "clear",
+        "range": "f427e37..36ffc63",
+        "reviewer": "independent reviewer subagent"
+      },
+      "revision": "36ffc63e446bfd8bda0d1f4ab9130aa689b60b4d",
+      "status": "passed",
+      "suite": "docs-pin unit tests"
+    }
+  },
   "sessions": [
     {
       "actor": "mcp:omp-coding-agent:joe@joe-mac-mini.local:9c85f43e97659072aa9dbbd3",
@@ -74,6 +110,15 @@
       "generation": "35233a444e3b41158737c58e9b36c4b4",
       "op": "take",
       "op_id": "57bbf09a65c245749c7177f0782ae58c",
+      "session_id": "99f297d0e01b4dd1ab38d39e880d17c4"
+    },
+    {
+      "actor": "mcp:omp-coding-agent:joe@joe-mac-mini.local:c5b9b54747851b1eaf3e61b4",
+      "at": "2026-11-14T14:11:04Z",
+      "client": "omp-coding-agent",
+      "generation": "35233a444e3b41158737c58e9b36c4b4",
+      "op": "prepare",
+      "op_id": "cfa7fcfd323545588f2936a165191109",
       "session_id": "99f297d0e01b4dd1ab38d39e880d17c4"
     }
   ]

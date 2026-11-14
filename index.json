@@ -108,20 +108,42 @@
       "terminal_outcome": "Squash-merged to main with ci green"
     },
     "pin-hardening-2": {
-      "accepted_members": {},
+      "accepted_members": {
+        "docs-pin-from-skips-certification": "36ffc63e446bfd8bda0d1f4ab9130aa689b60b4d"
+      },
       "batch_schema": 2,
       "delivery_boundary": "One pull request from feat/pin-hardening to main in BenchBox-dev/benchbox-site",
       "develop_ref": "refs/remotes/origin/main",
       "final_pr_history": [],
-      "integrated_members": {},
+      "integrated_members": {
+        "docs-pin-from-skips-certification": {
+          "accepted_head": "36ffc63e446bfd8bda0d1f4ab9130aa689b60b4d",
+          "changed_files": [
+            "AGENTS.md",
+            "scripts/docs-pin.mjs",
+            "scripts/docs-pin.test.mjs"
+          ],
+          "integration_head": "c6098835a1e45c331ebf37719f53cf3416d3df23",
+          "integration_seq": 1
+        }
+      },
       "integration_branch": "feat/pin-hardening",
-      "integration_head": "f427e37876f77ab82a6ea4ef3f35285a0a23228f",
+      "integration_head": "c6098835a1e45c331ebf37719f53cf3416d3df23",
       "integration_log": [
         {
           "at": "2026-11-14T14:09:52Z",
           "head": "f427e37876f77ab82a6ea4ef3f35285a0a23228f",
           "kind": "start",
           "seq": 0
+        },
+        {
+          "at": "2026-11-14T14:11:04Z",
+          "head": "c6098835a1e45c331ebf37719f53cf3416d3df23",
+          "kind": "prepare",
+          "member": "docs-pin-from-skips-certification",
+          "op_id": "cfa7fcfd323545588f2936a165191109",
+          "previous_head": "f427e37876f77ab82a6ea4ef3f35285a0a23228f",
+          "seq": 1
         }
       ],
       "integration_worktree": "/Users/joe/Developer/benchbox-site.wt-pin-hardening",
@@ -334,15 +356,10 @@
       "title": "Point the canonical link of every /docs/dev/ page at its /docs/ counterpart"
     },
     "docs-pin-from-skips-certification": {
-      "claim": {
-        "expires_at": "2026-11-15T14:11:01Z",
-        "generation": "35233a444e3b41158737c58e9b36c4b4",
-        "renewals": 0,
-        "worker": "mcp:omp-coding-agent:joe@joe-mac-mini.local:c5b9b54747851b1eaf3e61b4"
-      },
+      "claim": null,
       "needs": [],
       "priority": "medium",
-      "status": "active",
+      "status": "open",
       "title": "Make docs:pin --from refuse a bundle directory that was not certified"
     },
     "docs-release-cutover-rollout": {
