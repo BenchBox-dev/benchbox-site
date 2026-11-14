@@ -24,7 +24,7 @@ These operations support common warehouse workflows:
 
 | Aspect | Power/Throughput Tests | Standalone Maintenance Test |
 |--------|------------------------|------------------------------|
-| **Data Modification** | None by default; optional TPC-H RF1/RF2 | Permanent (INSERT/DELETE) |
+| **Data Modification** | None by default; optional TPC-H RF1/RF2 | Permanent (INSERT/UPDATE/DELETE) |
 | **Database State** | Unchanged by default; modified with TPC-H refresh | **Modified after test** |
 | **Repeatability** | Reuse clean data or advance update-set number | **Reload or use unused update sets** |
 | **Purpose** | Query performance; optionally concurrent refresh | Data modification performance |
@@ -76,77 +76,39 @@ throughput_result = adapter.run_benchmark(benchmark, test_execution_type="throug
 
 This example writes to the database in both phases. Use the next unused update set or reload the data before another run.
 
-### TPC-H Refresh Integrity
-
-RF1 uses DBGen's generated update rows and rejects any order key already present before inserting. RF2 reads the DBGen delete keys and verifies that every order exists before deleting LINEITEM children and then ORDERS parents. The function transaction rolls back if a validation or DML operation fails.
-
 ## TPC-DS Maintenance Test
 
 ### Overview
 
-TPC-DS data maintenance follows TPC-DS 4.0.0 clauses 5.2.3 to 5.3. BenchBox generates the refresh data with the kit's `dsdgen -update`, loads it into staging tables, and applies it with the 11 maintenance functions as set-based SQL. Each function reads staging tables and runs one or a few `INSERT ... SELECT` or `DELETE` statements against the warehouse tables. No rows are generated in Python.
+TPC-DS maintenance operations simulate ongoing retail data warehouse updates across multiple sales channels and inventory systems. Unlike TPC-H's two discrete refresh functions, TPC-DS executes a series of operations that rotate through INSERT, UPDATE, and DELETE across multiple tables.
 
-### What the Test Does
+### What TPC-DS Maintenance Does
 
-1. **Generate the refresh sets.** Before any timer starts, `dsdgen -update` writes one refresh set per refresh run into a temporary directory. `first_refresh_set` (default 1) selects the first set and `refresh_runs` (default 1) the number of consecutive sets.
-2. **Check the primary keys.** Maintenance refuses to start when a maintenance target table enforces a primary key (see [Enforced Primary Keys](#enforced-primary-keys)).
-3. **Run the functions for each set.** For every function, inside that function's timed interval, BenchBox creates the staging tables, loads the function's refresh files through the platform's generic loader, begins a transaction, runs the function's statements and commits. Staging tables are dropped after the interval.
-4. **Check the result.** A function fails on any rejected or missing staging row, and loading refresh data never truncates a warehouse table. After the last function, BenchBox runs the data-integrity checks when `validate_integrity` is on. They are outside the timed intervals.
+The test cycles through three operation types across seven tables:
 
-Dsdgen generation, the connection open and close, the row-count reads before and after each function, and the staging cleanup are outside each function's interval. The test's `total_time` runs from the earliest function start to the latest function end across all refresh runs, so it also covers the gaps between intervals.
+1. **INSERT**: New sales transactions, returns, and inventory receipts
+2. **UPDATE**: Corrections to existing records (prices, quantities, statuses)
+3. **DELETE**: Removal of old sales and returns
 
-### The 11 Functions
+Default configuration: **4 operations** that rotate through operation types and tables.
 
-| Function | Kind | Target tables | Staging tables |
-|----------|------|---------------|----------------|
-| `LF_CR` | Insert | `catalog_returns` | `s_catalog_returns` |
-| `LF_CS` | Insert | `catalog_sales` | `s_catalog_order`, `s_catalog_order_lineitem` |
-| `LF_I` | Insert | `inventory` | `s_inventory` |
-| `LF_SR` | Insert | `store_returns` | `s_store_returns` |
-| `LF_SS` | Insert | `store_sales` | `s_purchase`, `s_purchase_lineitem` |
-| `LF_WR` | Insert | `web_returns` | `s_web_returns` |
-| `LF_WS` | Insert | `web_sales` | `s_web_order`, `s_web_order_lineitem` |
-| `DF_CS` | Delete | `catalog_returns`, `catalog_sales` | `s_delete` |
-| `DF_SS` | Delete | `store_returns`, `store_sales` | `s_delete` |
-| `DF_WS` | Delete | `web_returns`, `web_sales` | `s_delete` |
-| `DF_I` | Delete | `inventory` | `s_inventory_delete` |
+### Affected Tables
 
-The delete functions remove sales whose sold date falls in the date ranges of the refresh set, and the returns that belong to them. Returns match sales on order or ticket number plus item, so returns of out-of-range orders that share a number survive.
+| Table | Purpose | Sales Channel |
+|-------|---------|---------------|
+| `catalog_sales` | Catalog orders | Catalog |
+| `catalog_returns` | Catalog returns | Catalog |
+| `web_sales` | Online orders | Web |
+| `web_returns` | Online returns | Web |
+| `store_sales` | In-store purchases | Store |
+| `store_returns` | In-store returns | Store |
+| `inventory` | Product stock levels | All channels |
 
-### Result Fields
+### Data Modified in TPC-DS
 
-Each result records `run.maintenance_method` as `dsdgen_refresh_sets`. Each function also records its refresh set, the staged row counts and the rows inserted or deleted per table.
-
-Maintenance timings from earlier BenchBox versions used a different method and are not comparable. `benchbox compare` and the analytics and platform comparison APIs refuse to compare results recorded with different maintenance methods.
-
-### Platform Support
-
-| Platform | Behaviour |
-|----------|-----------|
-| DuckDB, PostgreSQL, SQLite | Runs when no maintenance target table enforces a primary key; otherwise refuses |
-| Snowflake | Runs; primary keys are informational constraints that Snowflake does not enforce |
-| SingleStore | Reports the phase as skipped, because the refresh statements are not validated against its SQL |
-| Other platforms | Report the phase as skipped |
-
-### Enforced Primary Keys
-
-The kit's refresh keys start at 1 in every refresh set (`getUpdateBase` reads the row count of the wrong table), so the order and ticket numbers in a refresh set overlap the base data's keys. BenchBox keeps the kit's keys unchanged. An enforced primary key rejects those inserts as duplicates.
-
-> [!IMPORTANT]
-> TPC-DS maintenance refuses to run when a maintenance target table carries an enforced primary key. The error names those tables.
-
-Load the data without enforced primary keys and run the maintenance test again:
-
-```bash
-benchbox run \
-  --platform duckdb \
-  --benchmark tpcds \
-  --scale 1.0 \
-  --tuning notuning \
-  --phases generate,load,maintenance
-```
-
-`--tuning notuning` loads the tables without primary keys. You can also disable primary keys in the tuning configuration.
+Each operation modifies about 10 rows at every scale factor, so the default 4 operations (2× INSERT, 1× UPDATE,
+1× DELETE) modify about 40 rows whatever the scale factor. The DELETE operations remove sales or returns dated before
+a fixed cutoff date key (2450815), up to the operation's row count.
 
 ### TPC-DS Code Example
 
@@ -158,27 +120,70 @@ from pathlib import Path
 benchmark = TPCDS(scale_factor=1.0, output_dir=Path("./tpcds_data"))
 benchmark.generate_data()
 
+print("Step 1: Load fresh database...")
 adapter = DuckDBAdapter(database_path="tpcds.duckdb", force_recreate=True)
 
+print("Step 2: Running Power and Throughput tests...")
 power_result = adapter.run_benchmark(benchmark, test_execution_type="power")
 throughput_result = adapter.run_benchmark(benchmark, test_execution_type="throughput")
+
+print("Step 3: Running Maintenance test (can run immediately after Power/Throughput)...")
 maintenance_result = adapter.run_benchmark(benchmark, test_execution_type="maintenance")
+
+print("\n⚠️  Database modified - MUST reload before running Power/Throughput again!")
+print("To run more tests: adapter = DuckDBAdapter(database_path='tpcds.duckdb', force_recreate=True)")
 ```
 
-The maintenance run refuses when the target tables carry enforced primary keys, and it modifies the database when it runs. Load without primary keys, and reload the data before running Power or Throughput again or before repeating maintenance on the same refresh sets.
+### TPC-H Refresh Integrity
 
-### TPC-H Refresh Performance
+RF1 uses DBGen's generated update rows and rejects any order key already present before inserting. RF2 reads the DBGen delete keys and verifies that every order exists before deleting LINEITEM children and then ORDERS parents. The function transaction rolls back if a validation or DML operation fails.
+
+### TPC-DS Foreign Key Handling
+
+**Returns Must Reference Sales:**
+
+Per TPC-DS specification section 5.4, all return transactions must reference valid parent sales:
+
+- `STORE_RETURNS` → Must reference `STORE_SALES` (SS_TICKET_NUMBER, SS_ITEM_SK)
+- `CATALOG_RETURNS` → Must reference `CATALOG_SALES` (CS_ORDER_NUMBER, CS_ITEM_SK)
+- `WEB_RETURNS` → Must reference `WEB_SALES` (WS_ORDER_NUMBER, WS_ITEM_SK)
+
+BenchBox queries actual sales records before generating returns, ensuring all returns have valid parent transactions.
+
+**Dynamic Dimension Range Initialization:**
+
+Instead of hardcoded FK ranges, BenchBox queries dimension tables at runtime:
+
+```python
+cursor = connection.execute("SELECT MIN(D_DATE_SK), MAX(D_DATE_SK) FROM DATE_DIM")
+min_date, max_date = cursor.fetchone()
+
+date_sk = random.randint(min_date, max_date)
+```
+
+This approach works across any scale factor and ensures all generated FKs reference existing dimension records.
+
+**Retry Logic for FK Violations:**
+
+BenchBox includes automatic retry logic for transient FK violations:
+
+- Detects FK constraint errors across different database platforms
+- Automatically retries failed batches (up to 3 attempts)
+- Re-initializes dimension ranges on retry for fresh FK values
+- Logs warnings for FK issues while maintaining operation success
+
+### Performance Optimizations
 
 **Batched Multi-Row INSERTs:**
 
-TPC-H RF1 uses batched multi-row INSERT statements for ~100x performance improvement:
+All insert operations use batched multi-row INSERT statements for ~100x performance improvement:
 
 ```sql
-INSERT INTO LINEITEM (...) VALUES (?, ?, ?, ...)
-INSERT INTO LINEITEM (...) VALUES (?, ?, ?, ...)
-... (998 more times)
+INSERT INTO STORE_SALES (...) VALUES (?, ?, ?, ...)
+INSERT INTO STORE_SALES (...) VALUES (?, ?, ?, ...)
+... (99 more times)
 
-INSERT INTO LINEITEM (...) VALUES
+INSERT INTO STORE_SALES (...) VALUES
   (?, ?, ?, ...),
   (?, ?, ?, ...),
   ...
@@ -214,7 +219,7 @@ Understanding why you must reload after Maintenance tests is critical for valid 
 
 ### 1. Data Changes Are Permanent
 
-All INSERT and DELETE operations are **committed transactions**. The changes persist in the database permanently. There is no automatic rollback or cleanup.
+All INSERT, UPDATE, and DELETE operations are **committed transactions**. The changes persist in the database permanently. There is no automatic rollback or cleanup.
 
 **What this means:**
 
@@ -415,10 +420,6 @@ after = adapter.execute("SELECT COUNT(*) FROM orders")[0][0]
 
 print(f"Before: {before}, After: {after}, Difference: {after - before}")
 ```
-
-### "TPC-DS maintenance refused: primary keys are enforced"
-
-The dsdgen refresh sets reuse order and ticket numbers that already exist in the base data, so an enforced primary key on a maintenance target table rejects the inserts. DuckDB, PostgreSQL and SQLite enforce primary keys. Reload the data with `--tuning notuning` and run maintenance again. Snowflake does not enforce primary keys and runs without it. See [Enforced Primary Keys](#enforced-primary-keys).
 
 ### "Can I skip Maintenance tests?"
 

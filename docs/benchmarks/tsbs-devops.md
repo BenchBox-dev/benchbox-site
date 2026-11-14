@@ -391,9 +391,6 @@ This sets a custom host count, interval and start time.
 | 10.0 | 1,000 | 2 days | ~17.3M | ~100M | ~9.3 GB | Performance testing |
 | 100.0 | 10,000 | 2 days | ~173M | ~1B | ~93 GB | Large scale testing |
 
-The standard scale factors for TSBS DevOps are 0.01, 0.1, 1 and 10. The 100 row runs with a note that its results
-are not comparable with published results; see [Scale factors](index.md#scale-factors).
-
 > **Note:** Duration is fixed at 2 days; only host count scales with SF. If both
 > hosts *and* duration scaled, total rows would grow as SF² (quadratic) instead of SF (linear),
 > making large scale factors disproportionately expensive.

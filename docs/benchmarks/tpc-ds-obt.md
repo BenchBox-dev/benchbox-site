@@ -78,8 +78,6 @@ Measured on DuckDB. The size is the Parquet output on disk.
 
 | Scale Factor | Rows | Size (Parquet) |
 |--------------|------|----------------|
-| 0.01 | 50,335 | 14.5 MB |
-| 0.1 | 503,753 | 117 MB |
 | 1 | 5,041,336 | 1.38 GB |
 | 10 | 50,399,818 | 18.2 GB |
 
