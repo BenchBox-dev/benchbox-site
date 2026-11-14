@@ -32,6 +32,7 @@ jobs:
           RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
         run: |
           set -euo pipefail
+          git ls-remote --exit-code origin refs/heads/next > /dev/null || exit 0
           git fetch --no-tags origin '+refs/heads/main:refs/remotes/origin/main' '+refs/heads/next:refs/remotes/origin/next'
           BEHIND="$(git rev-list --count origin/next..origin/main)"
           NUMBER="$(gh issue list --repo "$REPO" --label next-behind-main --state open --json number --jq '.[0].number // empty')"
@@ -54,7 +55,7 @@ jobs:
             echo "git merge-tree failed with status $STATUS" >&2
             exit "$STATUS"
           fi
-          BODY="$(printf '`next` is %s commit(s) behind `main`.\n\n%s\n\nOpen a branch from `next`, merge `main` into it with a merge commit, and merge that pull request into `next` with a merge commit, not a squash.\n\nOldest commits on `main` that `next` lacks:\n\n```\n%s\n```\n\nRun: %s\n' "$BEHIND" "$OUTCOME" "$(git log --oneline --reverse origin/next..origin/main | head -n 20)" "$RUN_URL")"
+          BODY="$(printf '`next` is %s commit(s) behind `main`.\n\n%s\n\nOpen a branch from `next`, merge `main` into it with a merge commit, and merge that pull request into `next` with `gh pr merge --merge`, not a squash, so the commits of `main` stay in the history of `next`. Where released text from `main` conflicts with unreleased text on `next`, `next` keeps its text.\n\nOldest commits on `main` that `next` lacks:\n\n```\n%s\n```\n\nRun: %s\n' "$BEHIND" "$OUTCOME" "$(git log --oneline --reverse origin/next..origin/main | head -n 20)" "$RUN_URL")"
           if [ -n "$NUMBER" ]; then
             gh issue edit "$NUMBER" --repo "$REPO" --body "$BODY"
           else

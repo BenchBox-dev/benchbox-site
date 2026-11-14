@@ -46,3 +46,14 @@ test("the issue is opened, updated and closed by label", () => {
 test("conflicting files are named from a merge that writes no ref", () => {
   assert.ok(script.includes("git merge-tree --write-tree --name-only --no-messages origin/next origin/main"));
 });
+
+test("a repository without a next branch exits quietly before fetching", () => {
+  const probe = "git ls-remote --exit-code origin refs/heads/next > /dev/null || exit 0";
+  assert.ok(script.includes(probe));
+  assert.ok(script.indexOf(probe) < script.indexOf("git fetch"));
+});
+
+test("the issue tells a person to merge with gh pr merge --merge and next keeps its text", () => {
+  assert.ok(script.includes("`gh pr merge --merge`, not a squash"));
+  assert.ok(script.includes("`next` keeps its text"));
+});
