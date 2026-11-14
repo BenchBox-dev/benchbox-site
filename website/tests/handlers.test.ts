@@ -47,6 +47,21 @@ describe("front matter", () => {
     expect(docs.errors).toEqual([]);
   });
 
+  it("accepts requires_release on blog articles without writing it to the page", () => {
+    const result = build({
+      "blog/gated.md": "---\nblogpost: true\ndate: October 19, 2026\nrequires_release: 0.6.0\n---\n\n# Gated\n\nText.\n",
+    });
+    expect(result.errors).toEqual([]);
+    expect(frontMatterOf(result, "blog/gated.md")).not.toContain("requires_release");
+  });
+
+  it("rejects requires_release outside the blog collection", () => {
+    const docs = build({ "guide.md": "---\nrequires_release: 0.6.0\n---\n\n# Guide\n\nNotes.\n" });
+    expect(docs.errors).toHaveLength(1);
+    expect(docs.errors[0]).toMatchObject({ file: "guide.md", line: 2 });
+    expect(docs.errors[0].message).toContain("blog articles only");
+  });
+
   it.each(["published", undefined])("allows %s blog articles alongside draft documentation", (status) => {
     const result = build({
       "guide.md": "---\nstatus: draft\n---\n\n# Guide\n\nWork in progress.\n",

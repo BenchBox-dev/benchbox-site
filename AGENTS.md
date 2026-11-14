@@ -148,6 +148,16 @@ versioned core bundle; it reads nothing else from core.
   names the conflicting files, which a person resolves by hand in that pull
   request; where released text from `main` conflicts with unreleased text on
   `next`, `next` keeps its text.
+- A blog post about unreleased BenchBox behaviour waits on `next` and reaches
+  `main` with the release. Nothing mechanical can tell what a post describes,
+  so the author declares it with the front matter key `requires_release:
+  X.Y.Z`, the first release that contains what the post describes.
+  `npm run lint:blog` checks the value is well formed and, only when
+  `DOCS_INPUTS` is unset or empty, fails a post whose `requires_release` is
+  above `release-pin/manifest.json`'s `package_version`. When `DOCS_INPUTS`
+  is set, as on `next`, the release gate is skipped: the develop bundle's
+  version is the last release, not the upcoming one. A post that links a core path added after
+  the pinned release must link by commit SHA or carry `requires_release`.
 - A release is: the owner runs `npm run docs:pin -- vX.Y.Z` on `next` by pull
   request, then opens one pull request from `next` into `main`. After that
   squash merge, merge `main` into `next` by pull request with
@@ -300,7 +310,7 @@ Adaptations to keep:
 
 - Work on a named branch and open a pull request to `main` (fixes to released
   documentation and everything that is not unreleased documentation) or to
-  `next` (unreleased documentation), as described under "Release pin". `main`
+  `next` (unreleased documentation and blog posts), as described under "Release pin". `main`
   accepts squash merges only and requires the `ci` check.
 - Stage files by explicit path. Never run `git add -A` or `git add .`.
 - Commit identity: `Joe Harris <joeharris76@gmail.com>`. Add no agent or
