@@ -421,9 +421,6 @@ The categories are sorted by total time to identify bottlenecks.
 | 1.0 (large) | ~1 GB | 1-10s | Performance validation |
 | 10.0 (xlarge) | ~10 GB | 10s-60s | Stress testing |
 
-The standard scale factors for Read Primitives are 0.01 and 0.1. The 1.0 and 10.0 rows run with a note that their
-results are not comparable with published results; see [Scale factors](index.md#scale-factors).
-
 ## Configuration Options
 
 ### Basic Configuration

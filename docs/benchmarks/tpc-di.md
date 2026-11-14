@@ -46,13 +46,13 @@ The TPC-DI schema models a financial services data warehouse with dimension tabl
 | Table | Purpose | Rows (SF 1) |
 |-------|---------|-------------|
 | **FactTrade** | Trading transactions | 1,000,000 |
-| **FactCashBalances** | Account cash positions | 3,000,000 |
-| **FactHoldings** | Security holdings | 1,000,000 |
-| **FactMarketHistory** | Daily security prices | 2,520,000 |
-| **FactWatches** | Customer watch lists | 250,000 |
+| **FactCashBalances** | Account cash positions | 100,000 |
+| **FactHoldings** | Security holdings | 50,000 |
+| **FactMarketHistory** | Daily security prices | 100,000 |
+| **FactWatches** | Customer watch lists | 25,000 |
 
-The five fact tables and the customer, account, security and company dimensions grow linearly with the scale
-factor. DimBroker, DimDate and DimTime have the same size at every scale factor.
+FactCashBalances, FactHoldings, FactMarketHistory and FactWatches stop growing at fixed row caps of 100,000, 50,000,
+100,000 and 25,000 rows. DimBroker, DimDate and DimTime have the same size at every scale factor.
 
 ### Key Schema Features
 
@@ -412,17 +412,17 @@ This enables parallel ETL with 4 workers.
 
 ### Scale Factor Guidelines
 
-| Scale Factor | Generated Data Size | ETL Complexity | Use Case |
+| Scale Factor | Data Warehouse Size | ETL Complexity | Use Case |
 |-------------|---------------------|----------------|----------|
-| 0.01 | ~5 MB | Simple | Development, unit testing |
-| 0.1 | ~47 MB | Simple | Integration testing |
-| 1.0 | ~470 MB | Standard | Standard benchmark |
-| 10.0 | ~4.7 GB | Complex | Stress testing |
-| 30.0+ | ~14+ GB | Production-like | Enterprise simulation |
+| 0.1 | ~10 MB | Simple | Development, unit testing |
+| 1.0 | ~100 MB | Standard | Integration testing |
+| 3.0 | ~300 MB | Enhanced | Performance testing |
+| 10.0 | ~1 GB | Complex | Stress testing |
+| 30.0+ | ~3+ GB | Production-like | Enterprise simulation |
 
-The 0.1 size is measured from uncompressed generated files; the other sizes scale it in proportion. The standard
-scale factors for TPC-DI are 0.01, 0.1, 1 and 10. Other values, such as 30, run with a note that their results are
-not comparable with published results; see [Scale factors](index.md#scale-factors).
+Four fact tables stop growing at fixed row caps: FactCashBalances at 100,000 rows, FactHoldings at 50,000,
+FactMarketHistory at 100,000 and FactWatches at 25,000. At large scale factors the data size therefore grows
+more slowly than the table suggests.
 
 ### ETL Configuration
 
