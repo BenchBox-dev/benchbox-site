@@ -226,7 +226,12 @@ versioned core bundle; it reads nothing else from core.
   which covers the ten-minute `max-age` of the served pages while Pages and
   its CDN still answer with the previous generation. The final probe runs at
   the deadline, and a mismatch still present then fails the run.
-- A failed run opens or updates a site-local `site-deploy-failed` issue.
+- A failed run opens or updates a site-local `site-deploy-failed` issue, and a
+  later run that actually deploys successfully comments on it with the run URL
+  and the deployed core and site commits, then closes every open issue bearing
+  that label. A superseded run, a run with `SITE_DEPLOY_TARGET` unset and an
+  `expected_rejection` run neither open nor close it. A rollback does not close
+  it; the next successful deploy does.
   Core-dispatched failures also relay to core under `site-bundle-undeployed`,
   classified as producer-not-concluded, contract-version-mismatch,
   snapshot-digest, probe-mismatch or infrastructure (including unknown errors).
@@ -250,7 +255,6 @@ versioned core bundle; it reads nothing else from core.
   15 seconds. Only HTTP 5xx and network failures retry. Each attempt starts
   with an empty temporary download directory; digest, provenance and deploy
   gates remain outside the retry boundary. Retry delays add at most 20 seconds.
-- A failed run opens or updates an issue.
 - `.github/workflows/nightly-browser.yml` runs the Explorer `@smoke` suite on
   Firefox and WebKit daily and on dispatch. A failure opens or updates the one
   open issue labelled `t3:browser`.

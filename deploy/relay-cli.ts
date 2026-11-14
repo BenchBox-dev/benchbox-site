@@ -1,6 +1,6 @@
 import { execFileSync } from "node:child_process";
 import { pathToFileURL } from "node:url";
-import { type GhClient, reportRelayFailure, closeRelayOnSuccess } from "./lib/relay.ts";
+import { type GhClient, reportRelayFailure, closeRelayOnSuccess, closeSiteIssuesOnSuccess } from "./lib/relay.ts";
 
 export function execGhClient(env: Record<string, string | undefined> = process.env): GhClient {
   const token = env.GH_TOKEN || env.GITHUB_TOKEN;
@@ -67,6 +67,17 @@ export async function main(argv: string[] = process.argv.slice(2)): Promise<numb
       expectedRejection,
     });
     console.log(`relay success outcome: ${outcome.action}${outcome.issueNumber ? ` #${outcome.issueNumber}` : ""}`);
+    return 0;
+  }
+
+  if (mode === "site-success") {
+    const outcome = await closeSiteIssuesOnSuccess(client, process.env.REPO || "", {
+      coreSha,
+      siteSha: process.env.SITE_SHA || "",
+      runUrl,
+      expectedRejection,
+    });
+    console.log(`site success outcome: ${outcome.action}${outcome.issueNumber ? ` #${outcome.issueNumber}` : ""}`);
     return 0;
   }
 
