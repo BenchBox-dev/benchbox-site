@@ -24,6 +24,7 @@
     "verify:legacy-downloads": "node e2e/legacy-downloads.mjs",
     "verify:landing": "node e2e/landing.mjs",
     "verify:explorer": "node e2e/explorer.mjs",
+    "verify:permalink": "node e2e/permalink.mjs",
     "verify:results-embed": "node e2e/results-embed.mjs",
     "verify:parity": "node e2e/parity.mjs"
   },

@@ -169,6 +169,7 @@ jobs:
       - run: npm run verify:parity -w website
       - run: npm run verify:not-found -w website
       - run: npm run verify:explorer -w website
+      - run: npm run verify:permalink -w website
       - run: npm run verify:results-embed -w website
       - run: npm run verify:landing -w website
       - name: Check the Pages-shaped Explorer routes against the built site

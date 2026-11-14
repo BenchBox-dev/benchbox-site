@@ -2,7 +2,8 @@
 
 - Status: Accepted
 - Date: 2026-11-06
-- Constrains: `website/src/pages/result-summaries/`, `website/src/lib/results-summary.ts`,
+- Constrains: `website/src/pages/result-summaries/`, `website/src/pages/results/r/`,
+  `website/src/lib/results-summary.ts`, `website/src/lib/result-receipts.ts`,
   `website/scripts/pagefind-index.mjs`, the site search dialog, and any new
   route added to the Results Explorer under `/results/`.
 
@@ -73,6 +74,31 @@ result's own detail route, which remains the Explorer's concern.
 Search indexes the platform and benchmark pages in a Results section. The two
 index pages are excluded from the index so that a name search returns the page
 for that name.
+
+## Amendment: one static page at every result permalink
+
+A static page per published result is served at `/results/r/<public_result_id>`,
+the permalink that every run link and the Explorer's `/results/r/:resultId` route
+already use. GitHub Pages answers the extensionless path from
+`results/r/<id>.html` with status 200. Paths without a file, including
+`/results/r/<id>/passes`, still reach the site's 404 page, whose script hands the
+path to the Explorer. The permalink directory holds only these pages, so no
+Explorer route is shadowed, and the build refuses an Explorer build that ships its
+own `r` directory.
+
+Each page is the Explorer's own built `index.html` with the receipt rendered into
+`<main>`, so a client without JavaScript reads the receipt and a browser loads the
+Explorer, which replaces the content. The receipt fields come from the snapshot's
+`result_detail_metrics` through the Explorer's formatters; the receipt section has
+the id `run-receipt` that summary links target. One page exists per published result,
+cloud vendors included, and the build fails if a published result has no detail row.
+The pages are listed in the sitemap without the file extension and are not part of
+the search index. The mount digest check covers the Explorer's files and skips the
+`r` directory.
+
+On the platform and benchmark summary pages, runs whose ranking exclusion reason is
+set are listed in a separate section after the ranked runs. The section's heading and
+the reasons come before its table, and each row keeps its numbers and receipt link.
 
 ## Consequences
 
