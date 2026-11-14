@@ -146,9 +146,13 @@ versioned core bundle; it reads nothing else from core.
 - Never edit pinned members by hand; `npm run docs:pin` writes them.
 - `docs:pin` fetches and verifies the certified bundle of the tag's commit, so
   a tag whose commit has no such bundle cannot be pinned. Bundles expire after
-  90 days, so pin soon after a release. `--from <dir>` pins a bundle directory
-  that was verified elsewhere and skips the fetch and its certification check;
-  use it only for a release whose bundle the current verifier cannot read.
+  90 days, so pin soon after a release. `--from <dir>` pins a complete bundle
+  directory, for a release whose bundle the current verifier cannot read. It
+  checks the manifest fields and core commit, the digest of every member the
+  manifest lists, `attestations.json`, and online that `certified_by` is a core
+  trunk.yml push run on develop that succeeded for that commit; it fails closed
+  on an API error and refuses `candidate`. It skips only the member schema
+  validation.
 
 ## Deploys
 
