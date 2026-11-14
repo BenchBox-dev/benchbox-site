@@ -172,7 +172,8 @@ versioned core bundle; it reads nothing else from core.
 - Never edit pinned members by hand; `npm run docs:pin` writes them.
 - `docs:pin` fetches and verifies the certified bundle of the tag's commit, so
   a tag whose commit has no such bundle cannot be pinned. Bundles expire after
-  90 days, so pin soon after a release. `--from <dir>` pins a complete bundle
+  90 days; when one is missing, dispatch core's `site-inputs.yml` with
+  `core_sha` set to the tag to rebuild it. `--from <dir>` pins a complete bundle
   directory, for a release whose bundle the current verifier cannot read. It
   checks the manifest fields and core commit, the digest of every member the
   manifest lists, `attestations.json`, and online that `certified_by` is a core
@@ -334,7 +335,8 @@ Adaptations to keep:
   `.tractable/config.json` binds the `tractable` MCP server that `.mcp.json`
   starts to that branch. The server runs on the developer's machine as
   `tractable-mcp` and is not part of the site build.
-- Use tractable 1.0.0 or later. Before the first tracker write in a session,
+- Use tractable 1.1.1 or later: the store holds registered batches, which
+  older clients refuse. Before the first tracker write in a session,
   confirm the bound store by passing `BenchBox-dev/benchbox-site` as
   `expect_store`. A server bound to core's tracker refuses it.
 - Work that needs changes in both repositories is tracked in core, with
