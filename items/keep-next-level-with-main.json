@@ -19,6 +19,57 @@
     ".github/workflows/ci.yml",
     "https://github.com/BenchBox-dev/benchbox-site/pull/145"
   ],
+  "prepared": {
+    "accepted_head": "ec9e47973dd1bd40030a0dad40ca8ebbfc92fda3",
+    "batch_id": "pin-hardening-2",
+    "changed_files": [
+      ".github/workflows/sync-next.yml",
+      "AGENTS.md",
+      "scripts/sync-next-workflow.test.mjs"
+    ],
+    "integration_head": "0ebfbc7232da3c967ce8c1a5b5c03a2b90dab6cc",
+    "integration_seq": 3,
+    "member_id": "keep-next-level-with-main",
+    "overlaps": [
+      {
+        "kind": "member",
+        "member": "docs-pin-from-skips-certification",
+        "paths": [
+          "AGENTS.md"
+        ]
+      },
+      {
+        "kind": "member",
+        "member": "next-branch-ci-test-gaps",
+        "paths": [
+          "AGENTS.md"
+        ]
+      }
+    ],
+    "owner_epoch": 0,
+    "schema": "prepared_work_v2",
+    "scope_hash": "bfe6ad54185c489d87e2658c324184e1c7939725c699b2001c4fc5919699871c",
+    "source_base": "f427e37876f77ab82a6ea4ef3f35285a0a23228f",
+    "source_revision": "ec9e47973dd1bd40030a0dad40ca8ebbfc92fda3",
+    "source_worktree": "/Users/joe/Developer/benchbox-site.wt-m-sync-next",
+    "verification": {
+      "clean": true,
+      "command": [
+        "node",
+        "--test",
+        "scripts/sync-next-workflow.test.mjs"
+      ],
+      "review": {
+        "notes": "Review of 61a18fb found one Required (repository disallowed merge commits; setting since enabled, docs and issue text aligned) and two Optional (missing-next guard added; unverified app permission sentence removed).",
+        "outcome": "clear",
+        "range": "f427e37..ec9e479",
+        "reviewer": "independent reviewer subagent, then leader check of the fix commits"
+      },
+      "revision": "ec9e47973dd1bd40030a0dad40ca8ebbfc92fda3",
+      "status": "passed",
+      "suite": "sync-next workflow tests"
+    }
+  },
   "sessions": [
     {
       "actor": "mcp:omp-coding-agent:joe@joe-mac-mini.local:9c85f43e97659072aa9dbbd3",
@@ -67,6 +118,15 @@
       "generation": "89c512ecc1d3445da8857bf5a4d403af",
       "op": "take",
       "op_id": "e63ebd3fa81540f68e3d0f1b98cf5ef0",
+      "session_id": "99f297d0e01b4dd1ab38d39e880d17c4"
+    },
+    {
+      "actor": "mcp:omp-coding-agent:joe@joe-mac-mini.local:c5b9b54747851b1eaf3e61b4",
+      "at": "2026-11-14T14:12:40Z",
+      "client": "omp-coding-agent",
+      "generation": "89c512ecc1d3445da8857bf5a4d403af",
+      "op": "prepare",
+      "op_id": "9a34e5acef694dbd82ef091526e8a743",
       "session_id": "99f297d0e01b4dd1ab38d39e880d17c4"
     }
   ]

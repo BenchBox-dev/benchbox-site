@@ -110,6 +110,7 @@
     "pin-hardening-2": {
       "accepted_members": {
         "docs-pin-from-skips-certification": "36ffc63e446bfd8bda0d1f4ab9130aa689b60b4d",
+        "keep-next-level-with-main": "ec9e47973dd1bd40030a0dad40ca8ebbfc92fda3",
         "next-branch-ci-test-gaps": "757a2794879d8b247b842e8d2e0d5cd3fa92c3c4"
       },
       "batch_schema": 2,
@@ -127,6 +128,16 @@
           "integration_head": "c6098835a1e45c331ebf37719f53cf3416d3df23",
           "integration_seq": 1
         },
+        "keep-next-level-with-main": {
+          "accepted_head": "ec9e47973dd1bd40030a0dad40ca8ebbfc92fda3",
+          "changed_files": [
+            ".github/workflows/sync-next.yml",
+            "AGENTS.md",
+            "scripts/sync-next-workflow.test.mjs"
+          ],
+          "integration_head": "0ebfbc7232da3c967ce8c1a5b5c03a2b90dab6cc",
+          "integration_seq": 3
+        },
         "next-branch-ci-test-gaps": {
           "accepted_head": "757a2794879d8b247b842e8d2e0d5cd3fa92c3c4",
           "changed_files": [
@@ -141,7 +152,7 @@
         }
       },
       "integration_branch": "feat/pin-hardening",
-      "integration_head": "2430d54afbdaabae4b3efcb2db5f87348d2fa05b",
+      "integration_head": "0ebfbc7232da3c967ce8c1a5b5c03a2b90dab6cc",
       "integration_log": [
         {
           "at": "2026-11-14T14:09:52Z",
@@ -166,6 +177,15 @@
           "op_id": "9a9bccb3bceb43359ee1d4b454777182",
           "previous_head": "c6098835a1e45c331ebf37719f53cf3416d3df23",
           "seq": 2
+        },
+        {
+          "at": "2026-11-14T14:12:40Z",
+          "head": "0ebfbc7232da3c967ce8c1a5b5c03a2b90dab6cc",
+          "kind": "prepare",
+          "member": "keep-next-level-with-main",
+          "op_id": "9a34e5acef694dbd82ef091526e8a743",
+          "previous_head": "2430d54afbdaabae4b3efcb2db5f87348d2fa05b",
+          "seq": 3
         }
       ],
       "integration_worktree": "/Users/joe/Developer/benchbox-site.wt-pin-hardening",
@@ -410,15 +430,10 @@
       "title": "Pin the next core release through the default docs:pin path and confirm the status matrix corrects itself"
     },
     "keep-next-level-with-main": {
-      "claim": {
-        "expires_at": "2026-11-15T14:12:38Z",
-        "generation": "89c512ecc1d3445da8857bf5a4d403af",
-        "renewals": 0,
-        "worker": "mcp:omp-coding-agent:joe@joe-mac-mini.local:c5b9b54747851b1eaf3e61b4"
-      },
+      "claim": null,
       "needs": [],
       "priority": "medium",
-      "status": "active",
+      "status": "open",
       "title": "Keep next level with main after each merge to main"
     },
     "next-branch-ci-and-alert": {
