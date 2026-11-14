@@ -109,7 +109,8 @@
     },
     "pin-hardening-2": {
       "accepted_members": {
-        "docs-pin-from-skips-certification": "36ffc63e446bfd8bda0d1f4ab9130aa689b60b4d"
+        "docs-pin-from-skips-certification": "36ffc63e446bfd8bda0d1f4ab9130aa689b60b4d",
+        "next-branch-ci-test-gaps": "757a2794879d8b247b842e8d2e0d5cd3fa92c3c4"
       },
       "batch_schema": 2,
       "delivery_boundary": "One pull request from feat/pin-hardening to main in BenchBox-dev/benchbox-site",
@@ -125,10 +126,22 @@
           ],
           "integration_head": "c6098835a1e45c331ebf37719f53cf3416d3df23",
           "integration_seq": 1
+        },
+        "next-branch-ci-test-gaps": {
+          "accepted_head": "757a2794879d8b247b842e8d2e0d5cd3fa92c3c4",
+          "changed_files": [
+            ".github/workflows/ci.yml",
+            "AGENTS.md",
+            "scripts/docs-release-pin-workflow.test.mjs",
+            "website/package.json",
+            "website/scripts/assemble-docs.ts"
+          ],
+          "integration_head": "2430d54afbdaabae4b3efcb2db5f87348d2fa05b",
+          "integration_seq": 2
         }
       },
       "integration_branch": "feat/pin-hardening",
-      "integration_head": "c6098835a1e45c331ebf37719f53cf3416d3df23",
+      "integration_head": "2430d54afbdaabae4b3efcb2db5f87348d2fa05b",
       "integration_log": [
         {
           "at": "2026-11-14T14:09:52Z",
@@ -144,6 +157,15 @@
           "op_id": "cfa7fcfd323545588f2936a165191109",
           "previous_head": "f427e37876f77ab82a6ea4ef3f35285a0a23228f",
           "seq": 1
+        },
+        {
+          "at": "2026-11-14T14:12:08Z",
+          "head": "2430d54afbdaabae4b3efcb2db5f87348d2fa05b",
+          "kind": "prepare",
+          "member": "next-branch-ci-test-gaps",
+          "op_id": "9a9bccb3bceb43359ee1d4b454777182",
+          "previous_head": "c6098835a1e45c331ebf37719f53cf3416d3df23",
+          "seq": 2
         }
       ],
       "integration_worktree": "/Users/joe/Developer/benchbox-site.wt-pin-hardening",
@@ -404,15 +426,10 @@
       "title": "Check next against develop, verify the pin in CI, remind on an unpublished release and document the release flow"
     },
     "next-branch-ci-test-gaps": {
-      "claim": {
-        "expires_at": "2026-11-15T14:12:05Z",
-        "generation": "2ba1e0a0128f450c8e58f8326cdc6a34",
-        "renewals": 0,
-        "worker": "mcp:omp-coding-agent:joe@joe-mac-mini.local:c5b9b54747851b1eaf3e61b4"
-      },
+      "claim": null,
       "needs": [],
       "priority": "low",
-      "status": "active",
+      "status": "open",
       "title": "Close the test gaps in the next-branch CI rules"
     },
     "public-site-visual-regression-false-mismatch-20261014": {

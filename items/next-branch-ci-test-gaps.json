@@ -16,6 +16,52 @@
     ".github/workflows/visual.yml",
     "scripts/docs-release-pin-workflow.test.mjs"
   ],
+  "prepared": {
+    "accepted_head": "757a2794879d8b247b842e8d2e0d5cd3fa92c3c4",
+    "batch_id": "pin-hardening-2",
+    "changed_files": [
+      ".github/workflows/ci.yml",
+      "AGENTS.md",
+      "scripts/docs-release-pin-workflow.test.mjs",
+      "website/package.json",
+      "website/scripts/assemble-docs.ts"
+    ],
+    "integration_head": "2430d54afbdaabae4b3efcb2db5f87348d2fa05b",
+    "integration_seq": 2,
+    "member_id": "next-branch-ci-test-gaps",
+    "overlaps": [
+      {
+        "kind": "member",
+        "member": "docs-pin-from-skips-certification",
+        "paths": [
+          "AGENTS.md"
+        ]
+      }
+    ],
+    "owner_epoch": 0,
+    "schema": "prepared_work_v2",
+    "scope_hash": "bfe6ad54185c489d87e2658c324184e1c7939725c699b2001c4fc5919699871c",
+    "source_base": "f427e37876f77ab82a6ea4ef3f35285a0a23228f",
+    "source_revision": "757a2794879d8b247b842e8d2e0d5cd3fa92c3c4",
+    "source_worktree": "/Users/joe/Developer/benchbox-site.wt-m-next-ci",
+    "verification": {
+      "clean": true,
+      "command": [
+        "node",
+        "--test",
+        "scripts/docs-release-pin-workflow.test.mjs"
+      ],
+      "review": {
+        "notes": "Review of ac80065 found one Critical (step env made the if always false) and optional evaluator gaps; 757a279 applies the reviewer's prescribed fix (no step env, variable cleared on the command line, generate step dropped, evaluator hardened); leader read the workflow diff.",
+        "outcome": "clear",
+        "range": "f427e37..757a279",
+        "reviewer": "independent reviewer subagent, then leader check of the fix commit"
+      },
+      "revision": "757a2794879d8b247b842e8d2e0d5cd3fa92c3c4",
+      "status": "passed",
+      "suite": "release-pin workflow tests"
+    }
+  },
   "sessions": [
     {
       "actor": "mcp:omp-coding-agent:joe@joe-mac-mini.local:9c85f43e97659072aa9dbbd3",
@@ -72,6 +118,15 @@
       "generation": "2ba1e0a0128f450c8e58f8326cdc6a34",
       "op": "take",
       "op_id": "b94f5441efb848be80b5ef89078ad885",
+      "session_id": "99f297d0e01b4dd1ab38d39e880d17c4"
+    },
+    {
+      "actor": "mcp:omp-coding-agent:joe@joe-mac-mini.local:c5b9b54747851b1eaf3e61b4",
+      "at": "2026-11-14T14:12:08Z",
+      "client": "omp-coding-agent",
+      "generation": "2ba1e0a0128f450c8e58f8326cdc6a34",
+      "op": "prepare",
+      "op_id": "9a9bccb3bceb43359ee1d4b454777182",
       "session_id": "99f297d0e01b4dd1ab38d39e880d17c4"
     }
   ]
