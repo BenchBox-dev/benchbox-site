@@ -1,5 +1,72 @@
 {
-  "batches": {},
+  "batches": {
+    "pin-hardening": {
+      "accepted_members": {},
+      "batch_schema": 2,
+      "delivery_boundary": "One pull request from feat/pin-hardening to main in BenchBox-dev/benchbox-site",
+      "develop_ref": "refs/remotes/origin/main",
+      "final_pr_history": [],
+      "integrated_members": {},
+      "integration_branch": "feat/pin-hardening",
+      "integration_head": "f427e37876f77ab82a6ea4ef3f35285a0a23228f",
+      "integration_log": [
+        {
+          "at": "2026-11-14T14:03:58Z",
+          "head": "f427e37876f77ab82a6ea4ef3f35285a0a23228f",
+          "kind": "start",
+          "seq": 0
+        }
+      ],
+      "integration_worktree": "/Users/joe/Developer/benchbox-site.wt-pin-hardening",
+      "lifecycle": "active",
+      "members": [
+        "docs-pin-from-skips-certification",
+        "next-branch-ci-test-gaps",
+        "keep-next-level-with-main",
+        "deploy-resolve-failure-2026-11-12",
+        "blog-unreleased-content-decision"
+      ],
+      "owner": "mcp:omp-coding-agent:joe@joe-mac-mini.local:c5b9b54747851b1eaf3e61b4",
+      "owner_epoch": 0,
+      "owner_generation": "b9e65f89a90f6172f60f0a70f85264d0",
+      "project_id": "benchbox-site",
+      "recoveries": [],
+      "repository": "https://github.com/BenchBox-dev/benchbox-site.git",
+      "scope": {
+        "blog-unreleased-content-decision": [
+          "scripts/check-blog-publication.mjs",
+          "scripts/check-blog-publication.test.mjs",
+          "AGENTS.md",
+          "blog/**",
+          ".github/workflows/ci.yml",
+          "lefthook.yml"
+        ],
+        "deploy-resolve-failure-2026-11-12": [
+          ".github/workflows/deploy.yml",
+          "deploy/**",
+          "AGENTS.md"
+        ],
+        "docs-pin-from-skips-certification": [
+          "scripts/docs-pin.mjs",
+          "scripts/docs-pin.test.mjs",
+          "AGENTS.md"
+        ],
+        "keep-next-level-with-main": [
+          ".github/workflows/**",
+          "scripts/*.test.mjs",
+          "AGENTS.md"
+        ],
+        "next-branch-ci-test-gaps": [
+          ".github/workflows/ci.yml",
+          "scripts/docs-release-pin-workflow.test.mjs",
+          "AGENTS.md"
+        ]
+      },
+      "scope_hash": "5a60325403145522e7c039b4fcb8de0573549490f06314157d7b86c16cb7c3c0",
+      "start_head": "f427e37876f77ab82a6ea4ef3f35285a0a23228f",
+      "terminal_outcome": "Squash-merged to main with ci green"
+    }
+  },
   "items": {
     "astro-site-54-retire-sphinx-and-legacy-site": {
       "claim": null,
@@ -298,5 +365,5 @@
       "title": "Stop the generated tuning page rendering 'Aliases resolve to another platform's entry: .' when a platform has no aliases"
     }
   },
-  "schema_version": 3
+  "schema_version": 4
 }
