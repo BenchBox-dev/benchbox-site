@@ -14,6 +14,84 @@
   },
   "context": "Decision gate: classification needs judgement; do not revert on a guess, ask the owner. Guardrails: never edit release-pin/; do not weaken a check. Known inconsistency left on main until the next pin: docs/benchmarks/support-status.md states 17, 12 and 12 queries because the v0.5.0 contract exports those values, while the v0.5.0 query catalog holds 93, 112 and 23; that one is bound by docs:check and is not in scope here.\n\nReview 2026-11-13: the commit list in the description is a snapshot. Two documentation commits merged to main after the cutover (#149 per-vendor publishing checklist, #150 Databricks Beta or Preview refusal) and nothing checked whether they describe released behaviour, which shows the written rule alone does not route unreleased documentation to next. Decision gates, in order: (1) owner confirms inconclusive verdicts before any revert; (2) owner chooses guard or no guard. Guardrails: one pull request may revert several passages but each passage names its source commit; never revert a correction of something that was already wrong at v0.5.0; do not touch blog/ (see blog-unreleased-content-decision).\n\nOwner decision 2026-11-14: revert only passages with clear evidence at core v0.5.0; leave inconclusive ones on main and list them in the pull request. Standing guard: a pull request template line asking authors to choose main or next. Merge targets (owner, 2026-11-14): site code, workflows and corrections to released documentation go to main on green ci, then main is merged into next; only documentation of unreleased behaviour waits on next.\n\nDelivered in pull request #160. Audit set was 20 docs commits; seven had unreleased statements removed with evidence at core v0.5.0, verified by an independent review that also caught three restored statements false at v0.5.0 (fixed before merge). Inconclusive passages are listed in the pull request for the owner. Guard chosen: .github/pull_request_template.md base-branch checklist.",
   "description": "Problem: when main was cut over to the v0.5.0 release pin, only the four statements docs:check rejects were restored to v0.5.0 values. Other documentation merged after v0.5.0 was published is still live on benchbox.dev and may describe unreleased behaviour. Outcome: every statement on main is true for the pinned release, and each unreleased statement lives on next.\n\nScope to audit against core at tag v0.5.0 (commit dfe585e) and release-pin/: the remaining edits of #137 and #138 (catalog counts, scale-factor ranges, size tables, `measured at SF 0.01 to 10`); the accepted-versions list in docs/reference/public-contracts.md, which names 2.4 while the current version reads 2.3; and the other docs commits since the release: #118, #119, #121, #124, #125, #131, #139, #140, #142, #144. Statements that only correct an error that was already wrong at v0.5.0 stay on main.",
+  "final_evidence": {
+    "batch_id": "docs-audit",
+    "changed_files": [
+      ".github/pull_request_template.md",
+      "docs/benchmarks/amplab.md",
+      "docs/benchmarks/clickbench.md",
+      "docs/benchmarks/coffeeshop.md",
+      "docs/benchmarks/h2odb.md",
+      "docs/benchmarks/index.md",
+      "docs/benchmarks/read-primitives.md",
+      "docs/benchmarks/ssb.md",
+      "docs/benchmarks/support-status.md",
+      "docs/benchmarks/tpc-di.md",
+      "docs/benchmarks/tpc-ds-obt.md",
+      "docs/benchmarks/tpc-havoc.md",
+      "docs/benchmarks/tsbs-devops.md",
+      "docs/concepts/benchmark-methodology.md",
+      "docs/contributing-results.md",
+      "docs/development/adr/adr-client-link-locality-disclosure.md",
+      "docs/guides/tpc/maintenance-phase-guide.md",
+      "docs/nav.yml",
+      "docs/platforms/snowflake-gateways.md",
+      "docs/platforms/snowflake.md",
+      "docs/reference/python-api/base.md",
+      "docs/reference/python-api/benchmarks/amplab.md",
+      "docs/reference/python-api/benchmarks/tpcds-obt.md",
+      "docs/reference/python-api/benchmarks/tpcds.md",
+      "docs/vendor-publishing-checklist.md",
+      "inventory/core-linked-paths.json"
+    ],
+    "clean": true,
+    "current_acceptance": {
+      "audit-post-release-docs-on-main": {
+        "clean": true,
+        "command": [
+          "npm",
+          "run",
+          "-s",
+          "docs:check",
+          "--",
+          "--docs-mode",
+          "block"
+        ],
+        "revision": "a29925ae813b7047ef7da817191c27a04aaf07a4",
+        "status": "passed",
+        "suite": "docs contracts check against the release pin",
+        "worktree": "/Users/joe/Developer/benchbox-site.wt-docs-audit"
+      }
+    },
+    "final_pr": {
+      "head": "a29925ae813b7047ef7da817191c27a04aaf07a4",
+      "node_id": "PR_kwDOVAHdmM8AAAABPKMWZg",
+      "number": 160,
+      "repository": "https://github.com/BenchBox-dev/benchbox-site.git"
+    },
+    "integration_branch": "docs/audit-unreleased-on-main",
+    "integration_head": "a29925ae813b7047ef7da817191c27a04aaf07a4",
+    "member_heads": {
+      "audit-post-release-docs-on-main": "a29925ae813b7047ef7da817191c27a04aaf07a4"
+    },
+    "member_ranges": {
+      "audit-post-release-docs-on-main": {
+        "base": "f427e37876f77ab82a6ea4ef3f35285a0a23228f",
+        "head": "a29925ae813b7047ef7da817191c27a04aaf07a4"
+      }
+    },
+    "merged": {
+      "merge_commit": "f0a69354bfbb2e3efa4f74628855b7ad4f5b1cb1",
+      "method": "squash"
+    },
+    "project_id": "benchbox-site",
+    "repository": "https://github.com/BenchBox-dev/benchbox-site.git",
+    "scope_hash": "a4ca8f6b2538b45426d89ddebd3a565801a86aae1be8fdd9f4288b01b7eb085b",
+    "status": "passed",
+    "suite": "docs gate against the release pin: docs:check, lints, core-links inventory, website check, build and tests; ci green on pull request 160",
+    "tree_revision": "a29925ae813b7047ef7da817191c27a04aaf07a4",
+    "tree_worktree": "/Users/joe/Developer/benchbox-site.wt-docs-audit"
+  },
   "links": [
     "https://github.com/BenchBox-dev/benchbox-site/pull/145",
     "release-pin/doc-contracts.json",
@@ -156,6 +234,15 @@
       "generation": "4b647a9b74dc4c14be15ec9be660bb68",
       "op": "take",
       "op_id": "482e97dc90de41eb8be8a1ea9394b3cd",
+      "session_id": "99f297d0e01b4dd1ab38d39e880d17c4"
+    },
+    {
+      "actor": "mcp:omp-coding-agent:joe@joe-mac-mini.local:c5b9b54747851b1eaf3e61b4",
+      "at": "2026-11-14T14:46:05Z",
+      "client": "omp-coding-agent",
+      "generation": "4b647a9b74dc4c14be15ec9be660bb68",
+      "op": "finish",
+      "op_id": "b3d84a1dfdef40f4a5864e4f661091c8",
       "session_id": "99f297d0e01b4dd1ab38d39e880d17c4"
     }
   ]

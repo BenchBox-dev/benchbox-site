@@ -76,7 +76,7 @@
         }
       ],
       "integration_worktree": "/Users/joe/Developer/benchbox-site.wt-docs-audit",
-      "lifecycle": "active",
+      "lifecycle": "completed",
       "members": [
         "audit-post-release-docs-on-main"
       ],
@@ -402,15 +402,10 @@
       "title": "Generate static, searchable result summary pages for platforms and benchmarks"
     },
     "audit-post-release-docs-on-main": {
-      "claim": {
-        "expires_at": "2026-11-15T14:46:03Z",
-        "generation": "4b647a9b74dc4c14be15ec9be660bb68",
-        "renewals": 0,
-        "worker": "mcp:omp-coding-agent:joe@joe-mac-mini.local:c5b9b54747851b1eaf3e61b4"
-      },
+      "claim": null,
       "needs": [],
       "priority": "medium-high",
-      "status": "active",
+      "status": "done",
       "title": "Audit docs on main for statements about unreleased core and move them to next"
     },
     "blog-draft-byte-sha-of-snapshot-stale-20261029": {
