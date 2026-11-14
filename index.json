@@ -534,15 +534,10 @@
       "title": "Point the canonical link of every /docs/dev/ page at its /docs/ counterpart"
     },
     "docs-pin-from-skips-certification": {
-      "claim": {
-        "expires_at": "2026-11-15T14:30:21Z",
-        "generation": "fe5ee368308747928c9da35003350eaf",
-        "renewals": 0,
-        "worker": "mcp:omp-coding-agent:joe@joe-mac-mini.local:c5b9b54747851b1eaf3e61b4"
-      },
+      "claim": null,
       "needs": [],
       "priority": "medium",
-      "status": "active",
+      "status": "done",
       "title": "Make docs:pin --from refuse a bundle directory that was not certified"
     },
     "docs-release-cutover-rollout": {
