@@ -7,6 +7,11 @@
     "The current drift is cleared by a merge of main into next with ci green",
     "AGENTS.md describes the mechanism in place of the manual rule"
   ],
+  "batch": {
+    "batch_id": "pin-hardening",
+    "implementation_dependencies": [],
+    "member_id": "keep-next-level-with-main"
+  },
   "context": "Found at review on 2026-11-13: `git rev-list --left-right --count origin/main...origin/next` was 2 and 3. Guardrails: never push to next or main directly and never force-push; merges into next are merge commits, not squashes, so main's commits stay identifiable; do not change the main ruleset; the mechanism must not trigger a production deploy (deploys run only on main).\n\nOwner decision 2026-11-14: automatic. A workflow on push to main opens or updates a pull request merging main into next and merges it when ci is green; a conflict leaves the pull request open. Fall back to a reminder issue only if the default token cannot do this under the next ruleset. Merge targets (owner, 2026-11-14): site code, workflows and corrections to released documentation go to main on green ci, then main is merged into next; only documentation of unreleased behaviour waits on next.",
   "description": "Problem: AGENTS.md says whoever merges a fix to main then merges main into next, but nothing does it or reports when it is missed. One day after next was created, main already held two commits that next lacks (#149 and #150), while next held three of its own. The longer they drift, the more the release pull request from next into main conflicts, and a fix made on main can be lost from the next release's documentation review.\n\nOutcome: next always contains main shortly after main moves, without relying on memory.\n\nOptions: a workflow on push to main that opens (or updates) a pull request merging main into next and merges it when ci is green; or a nightly check that opens an issue when `git rev-list --count origin/next..origin/main` is above zero for more than a day. The next ruleset requires a pull request and ci and allows merge commits.",
   "links": [
@@ -29,6 +34,14 @@
       "client": "omp-coding-agent",
       "op": "update",
       "op_id": "2f71a3293a3e4a268a0261753c83ff72",
+      "session_id": "99f297d0e01b4dd1ab38d39e880d17c4"
+    },
+    {
+      "actor": "mcp:omp-coding-agent:joe@joe-mac-mini.local:c5b9b54747851b1eaf3e61b4",
+      "at": "2026-11-14T14:04:17Z",
+      "client": "omp-coding-agent",
+      "op": "update",
+      "op_id": "4f8f84962e1440d1a71062e682c3001c",
       "session_id": "99f297d0e01b4dd1ab38d39e880d17c4"
     }
   ]
