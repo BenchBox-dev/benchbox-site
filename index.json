@@ -287,10 +287,15 @@
       "title": "Add the SF1 basic row to the SCD2 blog scale table for balance"
     },
     "blog-unreleased-content-decision": {
-      "claim": null,
+      "claim": {
+        "expires_at": "2026-11-15T14:12:56Z",
+        "generation": "0bfb8396f97f4620905a89fb2993e6ab",
+        "renewals": 0,
+        "worker": "mcp:omp-coding-agent:joe@joe-mac-mini.local:c5b9b54747851b1eaf3e61b4"
+      },
       "needs": [],
       "priority": "medium",
-      "status": "open",
+      "status": "active",
       "title": "Decide whether blog posts wait for a release, and state how blog links to core resolve"
     },
     "canonical-snapshot-digest-looseness-20261029": {
