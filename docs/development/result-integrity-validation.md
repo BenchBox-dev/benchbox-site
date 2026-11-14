@@ -14,7 +14,7 @@ BenchBox includes a three-tier integrity validator for benchmark result JSON fil
 |----------|-------|
 | Module | `benchbox.core.results.integrity_validator` |
 | Specs | `benchbox.core.results.benchmark_specs` |
-| CLI script | `validate_results.py` maintainer script (source checkout only) |
+| CLI | `benchbox results validate` (see [Results Commands](../reference/cli/results.md#cli-results-validate)); also the `validate_results.py` maintainer script (source checkout only) |
 | MCP tool | `validate_results` (in `benchbox.mcp.tools.analytics`) |
 | Tests | `tests/unit/core/results/test_integrity_validator.py` |
 
@@ -23,7 +23,7 @@ BenchBox includes a three-tier integrity validator for benchmark result JSON fil
 - **Never raises exceptions on validation failure** - always returns a structured `IntegrityReport`
 - **Composes `SchemaV2Validator`** as the first structural gate - does not reimplement schema validation
 - **Specs are hardcoded** from DuckDB SF1 reference runs, not dynamically imported from benchmark modules (avoids transitive import issues)
-- **Two severity levels**: FAIL (mathematical impossibility / corruption) and WARN (suspicious but plausible)
+- **Three severity levels**: FAIL (mathematical impossibility, corruption or a missing required property), WARN (suspicious but plausible) and INFO (context that never changes the overall status)
 - **Skipped checks emit PASS** with a "skipped" message so check counts remain consistent across benchmarks
 - **Unchecked validation is not a pass**: `summary.validation` values of `not_run`, `not_validated`, `unknown`, or `uncertain` are non-clean publication/ranking states even when all queries succeeded
 
@@ -54,16 +54,16 @@ should fail closed. Public submission and publishing gates also reject
 
 ### Tier 1: Structural (8 checks)
 
-Validates that the result JSON is well-formed and internally consistent.
+Validates that the result JSON is well-formed and internally consistent. When `schema_v2` fails, the other seven structural checks do not run.
 
 | Check | Severity | Description |
 |-------|----------|-------------|
 | `schema_v2` | FAIL | Delegates to `SchemaV2Validator` for schema compliance |
-| `required_keys` | FAIL | Top-level keys present (`benchmark`, `platform`, `summary`, etc.) |
-| `query_count_math` | FAIL | `passed + failed = total` in summary |
+| `required_keys` | FAIL | Top-level keys present (`version`, `run`, `benchmark`, `platform`, `config`, `summary`, `phases`, `queries`, `execution`, `environment`, `export`) |
+| `query_count_math` | FAIL | `passed + failed + skipped = total` in summary |
 | `timing_non_negative` | FAIL | All timing fields >= 0 |
 | `percentile_ordering` | FAIL | p90 <= p95 <= p99 |
-| `phase_status_values` | WARN | Phase statuses are recognized values |
+| `phase_status_values` | FAIL | Phase statuses are recognized values |
 | `query_entry_fields` | FAIL | Each query has required fields (id, ms, status) |
 | `query_ms_non_negative` | FAIL | Per-query millisecond values >= 0 |
 
@@ -73,25 +73,28 @@ Validates that the result contains expected content for its benchmark type.
 
 | Check | Severity | Description |
 |-------|----------|-------------|
-| `expected_query_ids` | FAIL | Query IDs match benchmark spec (e.g., 22 for TPC-H) |
+| `expected_query_ids` | FAIL below 80% of the expected IDs found, WARN from 80% to 99% | Query IDs match benchmark spec (e.g., 22 for TPC-H). Benchmarks with a minimum unique-query count FAIL below it |
 | `measurement_queries_present` | FAIL | At least one measurement query (run_type='measurement' or iter > 0) |
-| `power_phase_completed` | WARN | Power test phase ran successfully |
+| `power_phase_completed` | WARN | Power test phase present and in a completed status |
 | `tables_object` | WARN | Tables object present when spec requires it |
-| `tpc_metrics` | WARN | TPC performance metrics present for TPC-H/DS/Havoc/Skew |
+| `tpc_metrics` | INFO | TPC performance metrics present for TPC-H/DS/Havoc/Skew; absence is informational because an unofficial run records no QphH or QthDS |
 
-### Tier 3: Believability (7 checks)
+### Tier 3: Believability (8 checks)
 
 Validates that reported metrics are statistically plausible.
 
 | Check | Severity | Description |
 |-------|----------|-------------|
-| `avg_in_range` | WARN | Average timing is between min and max |
-| `geomean_in_range` | WARN | Geometric mean is between min and max |
-| `success_rate` | WARN | Success rate meets benchmark spec floor (e.g., 100% for TPC-H) |
-| `sf1_row_counts` | WARN | Row counts within +/-1% of spec (SF1 only; warns on missing tables) |
+| `avg_between_min_max` | FAIL | Average timing is between min and max |
+| `geomean_plausible` | FAIL | Geometric mean is between min and max |
+| `success_rate` | FAIL | Success rate (skipped queries excluded) meets the benchmark spec floor (100% for TPC-H, 80% when the benchmark has no spec); FAIL also when no query was recorded or all were skipped |
+| `sf1_row_counts` | FAIL | Row counts within +/-1% of spec (SF1 only); expected tables missing from the tables metadata also FAIL |
 | `timing_outliers` | WARN | No individual query exceeds 30 minutes |
-| `no_duplicate_entries` | FAIL | No duplicate (id, iter, stream) tuples |
+| `no_duplicate_executions` | WARN | No duplicate (id, iter, stream) tuples |
 | `load_time_nonzero` | WARN | Data load time > 0 |
+| `host_load` | INFO | Host load average at the start and end of the run, from `environment.host_load`; "Host load not recorded" for bundles written before the field existed |
+
+The overall status is FAIL when any check FAILs, otherwise WARN when any check WARNs, otherwise PASS. INFO findings never change it.
 
 ## BenchmarkSpec System
 
@@ -169,7 +172,7 @@ The fields are:
 - `scale_factor`: the scale factor.
 - `overall_status`: the worst status across all checks.
 - `checks`: the individual check results.
-- `summary`: counts by status (PASS, WARN, FAIL).
+- `summary`: counts by status (PASS, INFO, WARN, FAIL).
 
 **Helper methods:**
 
@@ -192,7 +195,7 @@ The fields are:
 
 - `category`: STRUCTURAL, COMPLETENESS, or BELIEVABILITY.
 - `name`: the check identifier, for example `query_count_math`.
-- `status`: PASS, WARN, or FAIL.
+- `status`: PASS, INFO, WARN, or FAIL.
 - `message`: a human-readable description.
 - `details`: optional structured details.
 
@@ -216,11 +219,11 @@ Both functions handle invalid JSON gracefully - returning a FAIL report rather t
 
 | Interface | Usage |
 |-----------|-------|
-| **CLI script** | `validate_results.py <path> [options]` maintainer script, in a source checkout |
+| **CLI** | `benchbox results validate <path> [options]`, exiting 5 on a FAIL finding; the `validate_results.py` maintainer script wraps the same validator, in a source checkout |
 | **MCP tool** | `validate_results(result_file="...", verbose=True)` |
 | **Python API** | `from benchbox.core.results.integrity_validator import validate_file` |
 
-See the [CLI reference](../reference/cli/utilities.md#result-integrity-validation) and [MCP reference](../reference/mcp.md) for usage details.
+See the [CLI reference](../reference/cli/results.md#cli-results-validate) and [MCP reference](../reference/mcp.md) for usage details.
 
 ## Special Cases
 

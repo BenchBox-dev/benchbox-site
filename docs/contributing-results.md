@@ -19,10 +19,26 @@ Install the platform extra first in your project environment (for example,
 `uv add benchbox --extra duckdb`).
 
 ```bash
-uv run -- benchbox run --platform duckdb --benchmark tpch --scale 0.01
+uv run -- benchbox run --platform duckdb --benchmark tpch --official --scale 1 --seed 42 \
+  --phases power,throughput --streams 2 --benchmark-option tpch_refresh_functions=true
 ```
 
 The result JSON is written to `benchmark_runs/results/`.
+
+`benchbox submit` refuses a TPC-H or TPC-DS result whose `compliance_class` is not
+`official`, and a default `benchbox run` never records `official`:
+
+- A run below scale factor 1 is `unofficial_subscale`, so `--scale 0.01` produces a
+  result that `submit` refuses.
+- A run at scale factor 1 or above is `unofficial_nonstandard` unless it came from
+  `benchbox run --official`, which needs an official scale factor (1, 10, 30, 100
+  and so on) and a `--seed`. `--official` also refuses a partial run: it needs the
+  power and throughput phases, `--streams` of at least 2 at scale factor 1 and, for
+  TPC-H, the refresh functions.
+
+Benchmarks without a TPC compliance class, such as SSB, are not subject to that
+check. See the [TPC-H official guide](guides/tpc/tpc-h-official-guide.md) for
+official runs.
 
 One optional companion file may be written next to the result JSON. Add
 `--capture-plans` on supported platforms to create `<result>.plans.json`;
@@ -76,7 +92,7 @@ uv run -- benchbox submit --last --output ./submission
 
 uv run -- benchbox results --paths --limit 25
 
-uv run -- benchbox submit benchmark_runs/results/tpch_sf001_duckdb_20260401_120000.json --output ./submission
+uv run -- benchbox submit benchmark_runs/results/tpch_sf1_duckdb_sql_<timestamp>_<id>.json --output ./submission
 
 uv run -- benchbox submit --last --dry-run
 ```

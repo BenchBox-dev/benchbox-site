@@ -147,6 +147,52 @@ The commands, in order, show recent results, show more results, show the exact r
 
 ---
 
+<span id="cli-results-validate"></span>
+
+## `results validate` - Check Result Integrity
+
+Check one result JSON file, or every result file in a directory, for structural integrity, completeness and believability. It runs the same 21 checks as the `validate_results` MCP tool and reports PASS, INFO, WARN and FAIL findings; see [Result Integrity Validation](../../development/result-integrity-validation.md) for each check and its severity. This is not `benchbox validate`, which checks configuration files.
+
+### Basic Syntax
+
+```bash
+benchbox results validate PATH [OPTIONS]
+```
+
+### Options
+
+- `PATH`: A result JSON file, or a directory of result files. Companion files (`.plans.json`, `.tuning.json`, `.applied.json`, `.override.json` and `.manifest.json`) in a directory are skipped.
+- `--json`: Print the findings as JSON instead of a table
+- `--verbose`: Include PASS checks in the output (the JSON `checks` list otherwise holds only INFO, WARN and FAIL)
+- `--fail-on-warn`: Treat a WARN finding like a FAIL and exit 5
+- `--benchmark TEXT`: Only report files whose benchmark id or platform contains this text
+
+### JSON Output
+
+For one file, `--json` prints an object with `file`, `benchmark_id`, `platform`, `scale_factor`, `overall_status`, `summary` (a count per status) and `checks` (`category`, `name`, `status`, `message`, `details`). It is the object the MCP tool returns. For a directory it prints `total`, `pass`, `warn`, `fail`, `files` (`file`, `benchmark_id`, `platform`, `overall_status`) and a `reports` array with one file object per result file.
+
+### Exit Codes
+
+| Code | Meaning                                                                 |
+| ---- | ----------------------------------------------------------------------- |
+| `0`  | No file has a FAIL finding (WARN and INFO findings do not change the exit code) |
+| `1`  | Error: the path does not exist, or a file is not readable JSON          |
+| `5`  | A file has a FAIL finding, or a WARN finding with `--fail-on-warn`      |
+
+### Usage Examples
+
+```bash
+benchbox results validate benchmark_runs/results/tpch_sf1_duckdb_sql_<timestamp>_<id>.json
+
+benchbox results validate benchmark_runs/results --json
+
+benchbox results validate ./bundles --fail-on-warn --benchmark tpch
+```
+
+The commands, in order, check one result and print a table, check every result in a directory and print JSON, and check the TPC-H results in a directory while treating warnings as failures.
+
+---
+
 <span id="cli-compare"></span>
 
 ## `compare` - Compare Benchmark Results
@@ -162,14 +208,18 @@ benchbox compare BASELINE.json CURRENT.json [OPTIONS]
 ### Options
 
 - `RESULT_FILES`: Two or more result JSON files to compare (first file is baseline, required)
-- `--fail-on-regression THRESHOLD`: Exit with code 1 if any regression exceeds threshold
+- `--fail-on-regression THRESHOLD`: Exit with code 3 if any regression exceeds the threshold. Without this option a regression never changes the exit status.
   - Percentage format: `10%`, `5.5%`
   - Decimal format: `0.1`, `0.05`
 - `--min-regression-delta DURATION`: Count a query as regressed only when it exceeds the `--fail-on-regression` threshold and also slows by more than this duration. Requires `--fail-on-regression`; using it alone is a usage error (exit code 2).
   - Milliseconds: `5ms`, `2.5ms`
   - Seconds: `0.005s`
   - Not set by default, so queries are judged by percentage alone. Aggregate metrics such as total time are always judged by percentage alone.
-- `--format [text|json|html]`: Output format (default: text)
+- `--min-aggregate-regression-delta DURATION`: With `--fail-on-regression`, count an aggregate metric as regressed only when it also slows by more than this duration (for example `80ms`). Applies to aggregate metrics only.
+- `--allow-heterogeneous-comparison`: Allow comparing runs with different execution variants (deployment, engine, gateway).
+- `-p, --platform TEXT`: Run the benchmark on each named platform and compare, instead of reading result files. Repeatable. Run mode also takes `--benchmark`, `--scale`, `--queries`, `--warmup` (default 1), `--iterations` (default 3) and `--type`.
+- `--acknowledge-billable-platform`: Acknowledge that a run mode comparison on a billable platform may incur cost; see [Billable platforms](run.md#billable-platforms). Without it a non-interactive comparison of a billable platform exits 6.
+- `--format [text|json|markdown|html]`: Output format (default: text)
 - `--output FILE`: Save comparison output to file instead of stdout
 - `--show-all-queries`: Show all query comparisons (default: only regressions/improvements)
 
@@ -323,13 +373,22 @@ benchbox compare \
   --show-all-queries
 ```
 
+<span id="cli-compare-exit-codes"></span>
+
 ### Exit Codes
 
-| Code | Meaning                                                                       |
-| ---- | ----------------------------------------------------------------------------- |
-| `0`  | Comparison completed successfully (no regression above threshold)             |
-| `1`  | Regression detected above `--fail-on-regression` threshold, or error occurred |
-| `2`  | Invalid option combination, such as `--min-regression-delta` without `--fail-on-regression` |
+| Code | Meaning                                                                                      |
+| ---- | -------------------------------------------------------------------------------------------- |
+| `0`  | Comparison completed. Without `--fail-on-regression` a regression never changes the exit code |
+| `1`  | Error, including a result file that is missing or cannot be read                              |
+| `2`  | Usage error, such as `--min-regression-delta` without `--fail-on-regression`                  |
+| `3`  | A regression exceeded the `--fail-on-regression` threshold (result-file mode only; platform-run mode applies no threshold) |
+| `4`  | The results cannot be compared: different variants or different timing modes              |
+| `6`  | Platform-run mode: a billable platform was refused without an acknowledgement (see [Billable platforms](run.md#billable-platforms)) |
+
+A pipeline can therefore tell a slowdown (3) from non-comparable inputs (4) from a broken run (1). Exit code 5 belongs to [`results validate`](#cli-results-validate), and 75 to 79 belong to the heavy-work host lock. All codes are listed in [CLI exit codes](index.md#exit-codes).
+
+Before this table, exits 3 and 4 were reported as 1. A script that tested for exit 1 to detect a regression must now test for 3; a script that only checks for a non-zero status needs no change.
 
 ### Notes
 
