@@ -144,8 +144,8 @@ the candidate's and acts on the result:
   the run is superseded. It logs a notice naming both core commits, sets the
   build output `superseded=true`, skips the docs check, build, gates, artifact
   uploads and the `deploy` job, and concludes success. It opens no
-  site-deploy-failed comment and neither opens nor closes a core
-  site-bundle-undeployed issue.
+  site-deploy-failed comment, closes no site-deploy-failed issue, and neither
+  opens nor closes a core site-bundle-undeployed issue.
 - `behind` and this run's commit is not the deployed one: the run deploys
   this site commit with the deployed core bundle. It fetches the bundle by the
   receipt's `core_sha` and fails closed unless its digest equals the

@@ -4,8 +4,8 @@ import { cpSync, copyFileSync, existsSync, mkdirSync, mkdtempSync, readdirSync, 
 import { tmpdir } from "node:os";
 import path from "node:path";
 import { pathToFileURL } from "node:url";
-import { memberDigest, readJson } from "./bundle-lib.mjs";
-import { CORE_REPO, githubJson } from "./bundle-verify.mjs";
+import { checkAttestations, memberDigest, membersFor, readJson } from "./bundle-lib.mjs";
+import { CORE_REPO, certificationErrors, githubJson } from "./bundle-verify.mjs";
 
 export const PIN_DIR = path.resolve(import.meta.dirname, "..", "release-pin");
 export const PIN_MEMBERS = ["docs-data", "doc-contracts.json", "repo-files.json"];
@@ -70,6 +70,49 @@ export function memberErrors(root, manifest) {
   return errors;
 }
 
+export function directoryErrors(root, manifest) {
+  const errors = [];
+  for (const field of ["core_sha", "parent_core_sha", "corpus_sha", "package_version", "certified_by"]) {
+    if (!manifest[field]) errors.push(`manifest field ${field} is missing`);
+  }
+  for (const field of ["core_sha", "parent_core_sha"]) {
+    if (manifest[field] && !/^[0-9a-f]{40}$/.test(manifest[field])) errors.push(`${field} is not a full commit SHA`);
+  }
+  const expected = membersFor(manifest.schema);
+  if (!expected) return [...errors, `schema ${JSON.stringify(manifest.schema)} is not supported`];
+  const members = manifest.members ?? {};
+  if (JSON.stringify(Object.keys(members).sort()) !== JSON.stringify([...expected].sort())) {
+    errors.push(`member set mismatch: ${Object.keys(members).sort().join(", ")}`);
+    return errors;
+  }
+  for (const name of expected.filter((member) => !PIN_MEMBERS.includes(member))) {
+    if (!members[name]) {
+      errors.push(`empty digest for ${name}`);
+      continue;
+    }
+    try {
+      if (memberDigest(path.join(root, name)) !== members[name]) errors.push(`member ${name} does not match the manifest digest`);
+    } catch (error) {
+      errors.push(`member ${name}: ${error.message}`);
+    }
+  }
+  try {
+    errors.push(...checkAttestations(root, manifest));
+  } catch (error) {
+    errors.push(`attestations: ${error.message}`);
+  }
+  return errors;
+}
+
+export async function certifiedErrors(manifest, env = process.env) {
+  if (!/^\d+$/.test(String(manifest.certified_by))) return [`certified_by ${manifest.certified_by} is not a run id`];
+  try {
+    return certificationErrors(await githubJson(`repos/${CORE_REPO}/actions/runs/${manifest.certified_by}`, env), manifest);
+  } catch (error) {
+    return [`certification check failed closed: ${error.message}`];
+  }
+}
+
 export function fetchBundleDir(destination, commit, env = process.env) {
   execFileSync(process.execPath, [FETCH_SCRIPT], {
     stdio: "inherit",
@@ -106,6 +149,7 @@ export async function pinRelease(tag, { from, pinDir = PIN_DIR, env = process.en
     if (manifest.core_sha !== commit) problems.push(`manifest core_sha ${manifest.core_sha} is not the ${tag} commit ${commit}`);
     if (manifest.package_version !== versionOf(tag)) problems.push(`manifest package_version ${manifest.package_version} is not ${versionOf(tag)}`);
     problems.push(...memberErrors(bundle, manifest));
+    if (from) problems.push(...directoryErrors(bundle, manifest), ...(await certifiedErrors(manifest, env)));
     if (problems.length) throw new Error(problems.join("; "));
     writeFileSync(path.join(staged, "pin.json"), `${JSON.stringify({ tag, core_sha: commit }, null, 2)}\n`);
     copyFileSync(path.join(bundle, "manifest.json"), path.join(staged, "manifest.json"));

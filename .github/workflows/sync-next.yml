@@ -1,0 +1,64 @@
+name: Sync next
+
+on:
+  push:
+    branches: [main, next]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: sync-next
+  cancel-in-progress: false
+
+jobs:
+  next-behind-main:
+    name: next behind main
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      contents: read
+      issues: write
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - name: Open, update or close the next-behind-main issue
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: |
+          set -euo pipefail
+          git ls-remote --exit-code origin refs/heads/next > /dev/null || exit 0
+          git fetch --no-tags origin '+refs/heads/main:refs/remotes/origin/main' '+refs/heads/next:refs/remotes/origin/next'
+          BEHIND="$(git rev-list --count origin/next..origin/main)"
+          NUMBER="$(gh issue list --repo "$REPO" --label next-behind-main --state open --json number --jq '.[0].number // empty')"
+          if [ "$BEHIND" -eq 0 ]; then
+            if [ -n "$NUMBER" ]; then
+              gh issue close "$NUMBER" --repo "$REPO" --comment "next contains every commit on main. Run: $RUN_URL"
+            fi
+            exit 0
+          fi
+          set +e
+          MERGE="$(git merge-tree --write-tree --name-only --no-messages origin/next origin/main)"
+          STATUS=$?
+          set -e
+          if [ "$STATUS" -eq 0 ]; then
+            OUTCOME="The merge is clean."
+          elif [ "$STATUS" -eq 1 ]; then
+            FILES="$(printf '%s\n' "$MERGE" | tail -n +2 | sed 's/^/- `/; s/$/`/')"
+            OUTCOME="$(printf 'The merge conflicts. Resolve these files by hand:\n\n%s' "$FILES")"
+          else
+            echo "git merge-tree failed with status $STATUS" >&2
+            exit "$STATUS"
+          fi
+          BODY="$(printf '`next` is %s commit(s) behind `main`.\n\n%s\n\nOpen a branch from `next`, merge `main` into it with a merge commit, and merge that pull request into `next` with `gh pr merge --merge`, not a squash, so the commits of `main` stay in the history of `next`. Where released text from `main` conflicts with unreleased text on `next`, `next` keeps its text.\n\nOldest commits on `main` that `next` lacks:\n\n```\n%s\n```\n\nRun: %s\n' "$BEHIND" "$OUTCOME" "$(git log --oneline --reverse origin/next..origin/main | head -n 20)" "$RUN_URL")"
+          if [ -n "$NUMBER" ]; then
+            gh issue edit "$NUMBER" --repo "$REPO" --body "$BODY"
+          else
+            gh label create next-behind-main --repo "$REPO" --color FBCA04 --description "next lacks commits that are on main" --force
+            gh issue create --repo "$REPO" --title "next is behind main" --label next-behind-main --body "$BODY"
+          fi

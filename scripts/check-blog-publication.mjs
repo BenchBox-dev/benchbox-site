@@ -10,6 +10,7 @@ const POST_NAME = /^(\d{4})-(\d{2})-(\d{2})-[a-z0-9][a-z0-9-]*\.md$/;
 const DATE_FIELD = /^([A-Za-z]+)\.? (\d{1,2}), (\d{4})$/;
 const MARKDOWN_LINK = /\]\(([^)\s]+)\)/g;
 const PLAN_NOTE = "Time-sensitive figures";
+const RELEASE_VERSION = /^\d+\.\d+\.\d+$/;
 const FACTS_VERIFIED = /^(-|never|\d{4}-\d{2}-\d{2})$/;
 
 export function frontMatterOf(source) {
@@ -58,6 +59,45 @@ export function postFindings(posts) {
     if (!iso) findings.push(`${file}: date must read Month D, YYYY`);
     else if (iso !== `${nameMatch[1]}-${nameMatch[2]}-${nameMatch[3]}`) {
       findings.push(`${file}: date ${front.date} does not match the file name date`);
+    }
+  }
+  return findings;
+}
+
+function versionParts(version) {
+  return version.split(".").map(Number);
+}
+
+export function compareVersions(left, right) {
+  const a = versionParts(left);
+  const b = versionParts(right);
+  for (let index = 0; index < 3; index += 1) {
+    if (a[index] !== b[index]) return a[index] < b[index] ? -1 : 1;
+  }
+  return 0;
+}
+
+export function pinnedVersion(root, env = process.env) {
+  if (env.DOCS_INPUTS) return null;
+  const file = path.join(root, "release-pin", "manifest.json");
+  const manifest = JSON.parse(readFileSync(file, "utf8"));
+  if (typeof manifest.package_version !== "string" || !RELEASE_VERSION.test(manifest.package_version)) {
+    throw new Error(`${file}: package_version must read X.Y.Z`);
+  }
+  return manifest.package_version;
+}
+
+export function releaseFindings(posts, available) {
+  const findings = [];
+  for (const { name, source } of posts) {
+    const front = frontMatterOf(source);
+    if (!front || !Object.hasOwn(front, "requires_release")) continue;
+    const file = `blog/${name}`;
+    const required = front.requires_release;
+    if (typeof required !== "string" || !RELEASE_VERSION.test(required)) {
+      findings.push(`${file}: requires_release must read X.Y.Z`);
+    } else if (available !== null && compareVersions(required, available) > 0) {
+      findings.push(`${file}: requires_release ${required} is above the pinned release ${available}; merge this post to next, which reaches main with the release`);
     }
   }
   return findings;
@@ -165,7 +205,7 @@ function listPlans(root) {
     .filter((file) => existsSync(path.join(root, file)));
 }
 
-export function checkPublication(root, today = Date.now()) {
+export function checkPublication(root, today = Date.now(), available = null) {
   const read = (file) => (existsSync(path.join(root, file)) ? readFileSync(path.join(root, file), "utf8") : null);
   const exists = (file) => existsSync(path.join(root, file));
   const blogDir = path.join(root, "blog");
@@ -173,7 +213,7 @@ export function checkPublication(root, today = Date.now()) {
     .filter((name) => name.endsWith(".md") && name !== "index.md")
     .sort()
     .map((name) => ({ name, source: readFileSync(path.join(blogDir, name), "utf8") }));
-  const findings = postFindings(posts);
+  const findings = [...postFindings(posts), ...releaseFindings(posts, available)];
   const scheduleFile = "drafts/PUBLICATION_SCHEDULE.md";
   const scheduleSource = read(scheduleFile) ?? "";
   const queue = queueFindings({ scheduleSource, draftFiles: listDraftFiles(root), readDraft: read, today });
@@ -187,7 +227,7 @@ export function checkPublication(root, today = Date.now()) {
 
 function main() {
   const root = path.resolve(path.dirname(new URL(import.meta.url).pathname), "..");
-  const { findings, warnings } = checkPublication(root);
+  const { findings, warnings } = checkPublication(root, Date.now(), pinnedVersion(root));
   for (const warning of warnings) console.log(`warning: ${warning}`);
   for (const finding of findings) console.log(finding);
   console.log(`blog publication: ${findings.length} findings, ${warnings.length} warnings`);

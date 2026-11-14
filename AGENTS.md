@@ -129,15 +129,41 @@ versioned core bundle; it reads nothing else from core.
   still read the newest certified bundle.
 - `DOCS_INPUTS` names the directory the docs inputs are read from. Unset or
   empty means `release-pin/`. `ci` and the Visual workflow set it to the
-  fetched bundle for pushes to `next` and pull requests into `next`.
+  fetched bundle for pushes to `next` and pull requests into `next`. There
+  `ci` also assembles the docs against the pin, so site code
+  that stops reading the pinned release fails before the release pull
+  request. The Visual workflow builds pull requests into `next` from the
+  deployed bundle, not the newest one; that is accepted because it is
+  advisory.
 - `ci` checks the pin with `npm run docs:pin -- --check`: the pin must be
   well formed and its tag a published release.
 - Unreleased documentation merges to `next`, where CI checks it against the
   newest develop bundle. Fixes to released documentation merge to `main`;
-  whoever merges one then merges `main` into `next` with a merge commit.
+  the Sync next workflow then opens or updates the `next-behind-main` issue
+  while `next` lacks commits that are on `main`, and closes it once `next`
+  contains them. Site code, workflows and corrections to released
+  documentation go to `main`; only documentation of unreleased behaviour goes to
+  `next`. After a merge to `main`, merge `main` into `next` by pull request
+  with `gh pr merge --merge`. The issue says whether that merge is clean or
+  names the conflicting files, which a person resolves by hand in that pull
+  request; where released text from `main` conflicts with unreleased text on
+  `next`, `next` keeps its text.
+- A blog post about unreleased BenchBox behaviour waits on `next` and reaches
+  `main` with the release. Nothing mechanical can tell what a post describes,
+  so the author declares it with the front matter key `requires_release:
+  X.Y.Z`, the first release that contains what the post describes.
+  `npm run lint:blog` checks the value is well formed and, only when
+  `DOCS_INPUTS` is unset or empty, fails a post whose `requires_release` is
+  above `release-pin/manifest.json`'s `package_version`. When `DOCS_INPUTS`
+  is set, as on `next`, the release gate is skipped: the develop bundle's
+  version is the last release, not the upcoming one. A post that links a core path added after
+  the pinned release must link by commit SHA or carry `requires_release`.
 - A release is: the owner runs `npm run docs:pin -- vX.Y.Z` on `next` by pull
   request, then opens one pull request from `next` into `main`. After that
-  squash merge, merge `main` into `next` to bring it level.
+  squash merge, merge `main` into `next` by pull request with
+  `gh pr merge --merge` to bring it level; the `next-behind-main` issue tracks
+  it. The workflow uses the default token, which cannot start `ci` on a pull
+  request it opens, so it does not open that pull request itself.
 - The Nightly workflow opens or updates the `docs-release-pending` issue when
   core has published a release newer than the pin. The owner acts on it.
 - Compatibility window: site code on `main` must read the pinned release's
@@ -146,9 +172,14 @@ versioned core bundle; it reads nothing else from core.
 - Never edit pinned members by hand; `npm run docs:pin` writes them.
 - `docs:pin` fetches and verifies the certified bundle of the tag's commit, so
   a tag whose commit has no such bundle cannot be pinned. Bundles expire after
-  90 days, so pin soon after a release. `--from <dir>` pins a bundle directory
-  that was verified elsewhere and skips the fetch and its certification check;
-  use it only for a release whose bundle the current verifier cannot read.
+  90 days; when one is missing, dispatch core's `site-inputs.yml` with
+  `core_sha` set to the tag to rebuild it. `--from <dir>` pins a complete bundle
+  directory, for a release whose bundle the current verifier cannot read. It
+  checks the manifest fields and core commit, the digest of every member the
+  manifest lists, `attestations.json`, and online that `certified_by` is a core
+  trunk.yml push run on develop that succeeded for that commit; it fails closed
+  on an API error and refuses `candidate`. It skips only the member schema
+  validation.
 
 ## Deploys
 
@@ -196,7 +227,12 @@ versioned core bundle; it reads nothing else from core.
   which covers the ten-minute `max-age` of the served pages while Pages and
   its CDN still answer with the previous generation. The final probe runs at
   the deadline, and a mismatch still present then fails the run.
-- A failed run opens or updates a site-local `site-deploy-failed` issue.
+- A failed run opens or updates a site-local `site-deploy-failed` issue, and a
+  later run that actually deploys successfully comments on it with the run URL
+  and the deployed core and site commits, then closes every open issue bearing
+  that label. A superseded run, a run with `SITE_DEPLOY_TARGET` unset and an
+  `expected_rejection` run neither open nor close it. A rollback does not close
+  it; the next successful deploy does.
   Core-dispatched failures also relay to core under `site-bundle-undeployed`,
   classified as producer-not-concluded, contract-version-mismatch,
   snapshot-digest, probe-mismatch or infrastructure (including unknown errors).
@@ -220,7 +256,6 @@ versioned core bundle; it reads nothing else from core.
   15 seconds. Only HTTP 5xx and network failures retry. Each attempt starts
   with an empty temporary download directory; digest, provenance and deploy
   gates remain outside the retry boundary. Retry delays add at most 20 seconds.
-- A failed run opens or updates an issue.
 - `.github/workflows/nightly-browser.yml` runs the Explorer `@smoke` suite on
   Firefox and WebKit daily and on dispatch. A failure opens or updates the one
   open issue labelled `t3:browser`.
@@ -280,7 +315,7 @@ Adaptations to keep:
 
 - Work on a named branch and open a pull request to `main` (fixes to released
   documentation and everything that is not unreleased documentation) or to
-  `next` (unreleased documentation), as described under "Release pin". `main`
+  `next` (unreleased documentation and blog posts), as described under "Release pin". `main`
   accepts squash merges only and requires the `ci` check.
 - Stage files by explicit path. Never run `git add -A` or `git add .`.
 - Commit identity: `Joe Harris <joeharris76@gmail.com>`. Add no agent or
@@ -288,8 +323,11 @@ Adaptations to keep:
 - Commit messages, pull request text and committed files state the durable
   reason for a change. Leave out tracker ids, plan or handoff references and
   run-local state such as CI counts.
-- Merge with `gh pr merge --squash` once `ci` is green. Auto-merge is turned
-  off for this repository.
+- Merge with `gh pr merge --squash` once `ci` is green: pull requests into
+  `main` are squash-merged, and so are pull requests into `next`, except the
+  one that merges `main` into `next`. Merge that one with
+  `gh pr merge --merge` so main's commits stay in next's history. Auto-merge
+  is turned off for this repository.
 
 ## Tracker
 
@@ -297,7 +335,8 @@ Adaptations to keep:
   `.tractable/config.json` binds the `tractable` MCP server that `.mcp.json`
   starts to that branch. The server runs on the developer's machine as
   `tractable-mcp` and is not part of the site build.
-- Use tractable 1.0.0 or later. Before the first tracker write in a session,
+- Use tractable 1.1.1 or later: the store holds registered batches, which
+  older clients refuse. Before the first tracker write in a session,
   confirm the bound store by passing `BenchBox-dev/benchbox-site` as
   `expect_store`. A server bound to core's tracker refuses it.
 - Work that needs changes in both repositories is tracked in core, with
