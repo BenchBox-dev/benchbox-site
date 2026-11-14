@@ -3,7 +3,7 @@ import assert from "node:assert/strict";
 import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from "node:fs";
 import os from "node:os";
 import path from "node:path";
-import { checkPublication, isoFromPostDate, linkFindings, planFindings, postFindings } from "./check-blog-publication.mjs";
+import { checkPublication, compareVersions, docsInputsDir, docsInputsVersion, isoFromPostDate, linkFindings, planFindings, postFindings, releaseFindings } from "./check-blog-publication.mjs";
 
 const NOW = Date.parse("2026-10-20");
 
@@ -144,6 +144,74 @@ test("a consistent tree passes", () => {
   });
   try {
     assert.deepEqual(checkPublication(root, NOW), { findings: [], warnings: [] });
+  } finally {
+    rmSync(root, { recursive: true, force: true });
+  }
+});
+
+test("a post requiring a release above the docs inputs fails and names the file and both versions", () => {
+  const posts = [{ name: "2026-10-07-gated.md", source: post({ requires_release: "0.6.0" }) }];
+  assert.deepEqual(releaseFindings(posts, "0.5.0"), [
+    "blog/2026-10-07-gated.md: requires_release 0.6.0 is above the available release 0.5.0; merge this post to next, which reaches main with the release",
+  ]);
+});
+
+test("a post requiring the available release or lower passes, as does a post without the key", () => {
+  const posts = [
+    { name: "2026-10-07-equal.md", source: post({ requires_release: "0.5.0" }) },
+    { name: "2026-10-07-lower.md", source: post({ requires_release: "0.4.2" }) },
+    { name: "2026-10-07-plain.md", source: post() },
+  ];
+  assert.deepEqual(releaseFindings(posts, "0.5.0"), []);
+});
+
+test("a malformed requires_release fails with the file named", () => {
+  const posts = ["0.6", "soon", "v0.6.0", "0.6.0.1", "''"].map((value, index) => ({
+    name: `2026-10-07-bad-${index}.md`,
+    source: post({ requires_release: value }),
+  }));
+  assert.deepEqual(
+    releaseFindings(posts, "9.9.9"),
+    posts.map(({ name }) => `blog/${name}: requires_release must read X.Y.Z`),
+  );
+});
+
+test("versions compare numerically per component", () => {
+  assert.equal(compareVersions("0.10.0", "0.9.0"), 1);
+  assert.equal(compareVersions("0.9.0", "0.10.0"), -1);
+  assert.equal(compareVersions("1.0.0", "0.99.99"), 1);
+  assert.equal(compareVersions("0.5.1", "0.5.1"), 0);
+  const posts = [{ name: "2026-10-07-gated.md", source: post({ requires_release: "0.10.0" }) }];
+  assert.equal(releaseFindings(posts, "0.9.0").length, 1);
+  assert.deepEqual(releaseFindings([{ name: "2026-10-07-old.md", source: post({ requires_release: "0.9.0" }) }], "0.10.0"), []);
+});
+
+test("DOCS_INPUTS overrides the release pin and an empty value means the pin", () => {
+  const root = fixture({
+    "release-pin/manifest.json": JSON.stringify({ package_version: "0.5.0" }),
+    "bundle/manifest.json": JSON.stringify({ package_version: "0.6.0" }),
+  });
+  try {
+    const bundle = path.join(root, "bundle");
+    assert.equal(docsInputsDir(root, {}), path.join(root, "release-pin"));
+    assert.equal(docsInputsDir(root, { DOCS_INPUTS: "" }), path.join(root, "release-pin"));
+    assert.equal(docsInputsDir(root, { DOCS_INPUTS: bundle }), bundle);
+    assert.equal(docsInputsVersion(docsInputsDir(root, { DOCS_INPUTS: "" })), "0.5.0");
+    assert.equal(docsInputsVersion(docsInputsDir(root, { DOCS_INPUTS: bundle })), "0.6.0");
+  } finally {
+    rmSync(root, { recursive: true, force: true });
+  }
+});
+
+test("checkPublication applies the release gate to published posts", () => {
+  const root = fixture({
+    "blog/index.md": index(),
+    "blog/2026-10-07-gated.md": post({ requires_release: "0.6.0" }),
+    "drafts/PUBLICATION_SCHEDULE.md": schedule(),
+  });
+  try {
+    assert.equal(checkPublication(root, NOW, "0.5.0").findings.length, 1);
+    assert.deepEqual(checkPublication(root, NOW, "0.6.0").findings, []);
   } finally {
     rmSync(root, { recursive: true, force: true });
   }

@@ -135,6 +135,15 @@ versioned core bundle; it reads nothing else from core.
 - Unreleased documentation merges to `next`, where CI checks it against the
   newest develop bundle. Fixes to released documentation merge to `main`;
   whoever merges one then merges `main` into `next` with a merge commit.
+- A blog post about unreleased BenchBox behaviour waits on `next` and reaches
+  `main` with the release. Nothing mechanical can tell what a post describes,
+  so the author declares it with the front matter key `requires_release:
+  X.Y.Z`, the first release that contains what the post describes.
+  `npm run lint:blog` fails a post whose `requires_release` is above the
+  docs inputs' `package_version`. A post that links a core path added after
+  the pinned release must link by commit SHA or carry `requires_release`.
+  Site code, workflows and corrections to released documentation go to
+  `main`.
 - A release is: the owner runs `npm run docs:pin -- vX.Y.Z` on `next` by pull
   request, then opens one pull request from `next` into `main`. After that
   squash merge, merge `main` into `next` to bring it level.
@@ -280,7 +289,7 @@ Adaptations to keep:
 
 - Work on a named branch and open a pull request to `main` (fixes to released
   documentation and everything that is not unreleased documentation) or to
-  `next` (unreleased documentation), as described under "Release pin". `main`
+  `next` (unreleased documentation and blog posts), as described under "Release pin". `main`
   accepts squash merges only and requires the `ci` check.
 - Stage files by explicit path. Never run `git add -A` or `git add .`.
 - Commit identity: `Joe Harris <joeharris76@gmail.com>`. Add no agent or

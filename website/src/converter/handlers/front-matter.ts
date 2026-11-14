@@ -31,6 +31,12 @@ export const holdFrontMatter: FrontMatterHandler = {
   },
 };
 
+export const requiresReleaseFrontMatter: FrontMatterHandler = {
+  kind: "front-matter",
+  keys: ["requires_release"],
+  handle() {},
+};
+
 export const titleFrontMatter: FrontMatterHandler = {
   kind: "front-matter",
   keys: ["title"],
