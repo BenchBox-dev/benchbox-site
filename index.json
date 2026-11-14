@@ -118,7 +118,20 @@
       "batch_schema": 2,
       "delivery_boundary": "One pull request from feat/pin-hardening to main in BenchBox-dev/benchbox-site",
       "develop_ref": "refs/remotes/origin/main",
-      "final_pr_history": [],
+      "final_pr": {
+        "head": "000d1666893f245b1184ec2aebc979c67740c236",
+        "node_id": "PR_kwDOVAHdmM8AAAABPKFWfQ",
+        "number": 159,
+        "repository": "https://github.com/BenchBox-dev/benchbox-site.git"
+      },
+      "final_pr_history": [
+        {
+          "at": "2026-11-14T14:16:29Z",
+          "head": "000d1666893f245b1184ec2aebc979c67740c236",
+          "op_id": "e045b4d8df104dd098bb7e2a2f3d3fc9",
+          "previous_head": null
+        }
+      ],
       "integrated_members": {
         "blog-unreleased-content-decision": {
           "accepted_head": "735ed7bb0fb115b5d3c7b0d84a33e9a0d1c8381a",
