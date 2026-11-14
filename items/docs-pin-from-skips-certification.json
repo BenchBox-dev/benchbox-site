@@ -5,6 +5,11 @@
     "The v0.5.0 pin can still be reproduced, or `--from` is removed and AGENTS.md no longer describes it",
     "`node --test scripts/docs-pin.test.mjs` passes"
   ],
+  "batch": {
+    "batch_id": "pin-hardening",
+    "implementation_dependencies": [],
+    "member_id": "docs-pin-from-skips-certification"
+  },
   "context": "Found by the independent review of #145 (Optional). Guardrail: do not loosen bundle:fetch or bundle:verify for ordinary bundles.\n\nReview 2026-11-13. Decision gate: choose between (A) certify the --from directory now and (B) remove --from. Default is A, because it does not wait on anything; B is allowed only after first-default-docs-pin-run is done, since until then --from is the only way to reproduce the v0.5.0 pin. Record the choice and reason here before coding. Verification rubric for A: the three refusal tests in acceptance, plus a manual run of `npm run docs:pin -- v0.5.0 --from <v0.5.0 bundle dir>` that either reproduces release-pin/ byte for byte (`git status --short release-pin` empty) or is refused for a stated reason that the owner accepts. Guardrails: bundle:fetch and bundle:verify behaviour for ordinary bundles is unchanged (their test files pass unmodified); scripts/schemas is not loosened; no network call is added to `--check --offline`.\n\nOwner decision 2026-11-14: option A, certify the --from directory (manifest, attestations, online certification); skip only member schema validation. Merge targets (owner, 2026-11-14): site code, workflows and corrections to released documentation go to main on green ci, then main is merged into next; only documentation of unreleased behaviour waits on next.",
   "description": "Problem: `npm run docs:pin -- vX.Y.Z --from <dir>` accepts any directory whose manifest core_sha, package_version and three member digests agree with each other and with the tag. It runs no attestation or certification check, so a hand-assembled directory can be pinned, and the pin's `--check` cannot tell. It exists because the v0.5.0 bundle fails the current doc-contracts schema. Outcome: a pin can only come from a bundle that core certified.\n\nOptions to choose between: run the manifest, attestation and online certification checks on the `--from` directory while skipping only the member schema validation the old bundle fails; or remove `--from` once a release newer than v0.5.0 is pinned and no old bundle needs it.",
   "links": [
@@ -36,6 +41,14 @@
       "client": "omp-coding-agent",
       "op": "update",
       "op_id": "c0a8786eb204488f9560ffca8cfa6812",
+      "session_id": "99f297d0e01b4dd1ab38d39e880d17c4"
+    },
+    {
+      "actor": "mcp:omp-coding-agent:joe@joe-mac-mini.local:c5b9b54747851b1eaf3e61b4",
+      "at": "2026-11-14T14:04:13Z",
+      "client": "omp-coding-agent",
+      "op": "update",
+      "op_id": "7ae319e5383f4619ab4c6c6ed6a9c418",
       "session_id": "99f297d0e01b4dd1ab38d39e880d17c4"
     }
   ]
