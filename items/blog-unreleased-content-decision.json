@@ -4,6 +4,11 @@
     "AGENTS.md states the rule and how a blog link to a post-release core path must be written",
     "If posts must wait, a pull request to main that adds such a post fails a named check, with a test"
   ],
+  "batch": {
+    "batch_id": "pin-hardening-2",
+    "implementation_dependencies": [],
+    "member_id": "blog-unreleased-content-decision"
+  },
   "context": "Decision gate: owner decision first; no code before it. Evidence: at cutover no blog link broke against v0.5.0 (core-links inventory check was fresh).\n\nReview 2026-11-13: set to blocked on the owner decision; nothing can be implemented before it. Put the question to the owner with both options and their cost: (free) blog posts keep publishing from main and AGENTS.md says a post may describe unreleased behaviour only if it says so and links to core by commit SHA; (held) posts about unreleased behaviour merge to next, which needs a rule a check can apply, since nothing mechanical can tell what a post describes. Recommendation to offer: free, with the written rule, because release-overview posts are published with the release and the pin already fails the build on a link to a path missing at the pinned release. Verification rubric: AGENTS.md text merged; if a check is added, a seeded test fails for a violating post and passes for a compliant one. Guardrails: no published post is unpublished or rewritten as part of this item; the drafts/ tree is out of scope.\n\nOwner decision 2026-11-14: held. A post about unreleased behaviour waits on next. Implementation chosen so a check can apply it: a post declares the release it needs in front matter, and the blog publication check fails when the docs inputs' package_version is below it; on next the docs inputs are the develop bundle, so the post passes there. Merge targets (owner, 2026-11-14): site code, workflows and corrections to released documentation go to main on green ci, then main is merged into next; only documentation of unreleased behaviour waits on next.",
   "description": "Problem: the release pin holds back documentation only. Blog posts still publish from main as soon as they merge, so a post can describe unreleased core behaviour while the docs it links to describe the pinned release. Blog links to core files are also resolved against the pinned repo-files.json and core SHA, so a post that links a path added after the pinned release fails the build until the link is pinned to a SHA. Neither rule is written down. Outcome: an owner decision, recorded in AGENTS.md, and a check if the decision needs one.",
   "links": [
@@ -50,6 +55,14 @@
       "client": "omp-coding-agent",
       "op": "abort",
       "op_id": "75a567a5e33a472289e6605f22c0bd85",
+      "session_id": "99f297d0e01b4dd1ab38d39e880d17c4"
+    },
+    {
+      "actor": "mcp:omp-coding-agent:joe@joe-mac-mini.local:c5b9b54747851b1eaf3e61b4",
+      "at": "2026-11-14T14:10:02Z",
+      "client": "omp-coding-agent",
+      "op": "update",
+      "op_id": "9d54c7dd4e72460e897d1bf370fa880d",
       "session_id": "99f297d0e01b4dd1ab38d39e880d17c4"
     }
   ]
