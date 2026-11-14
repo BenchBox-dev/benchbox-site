@@ -106,6 +106,73 @@
       "scope_hash": "5a60325403145522e7c039b4fcb8de0573549490f06314157d7b86c16cb7c3c0",
       "start_head": "f427e37876f77ab82a6ea4ef3f35285a0a23228f",
       "terminal_outcome": "Squash-merged to main with ci green"
+    },
+    "pin-hardening-2": {
+      "accepted_members": {},
+      "batch_schema": 2,
+      "delivery_boundary": "One pull request from feat/pin-hardening to main in BenchBox-dev/benchbox-site",
+      "develop_ref": "refs/remotes/origin/main",
+      "final_pr_history": [],
+      "integrated_members": {},
+      "integration_branch": "feat/pin-hardening",
+      "integration_head": "f427e37876f77ab82a6ea4ef3f35285a0a23228f",
+      "integration_log": [
+        {
+          "at": "2026-11-14T14:09:52Z",
+          "head": "f427e37876f77ab82a6ea4ef3f35285a0a23228f",
+          "kind": "start",
+          "seq": 0
+        }
+      ],
+      "integration_worktree": "/Users/joe/Developer/benchbox-site.wt-pin-hardening",
+      "lifecycle": "active",
+      "members": [
+        "docs-pin-from-skips-certification",
+        "next-branch-ci-test-gaps",
+        "keep-next-level-with-main",
+        "deploy-resolve-failure-2026-11-12",
+        "blog-unreleased-content-decision"
+      ],
+      "owner": "mcp:omp-coding-agent:joe@joe-mac-mini.local:c5b9b54747851b1eaf3e61b4",
+      "owner_epoch": 0,
+      "owner_generation": "c59e2350621323a084d73ac625cd7189",
+      "project_id": "benchbox-site",
+      "recoveries": [],
+      "repository": "https://github.com/BenchBox-dev/benchbox-site.git",
+      "scope": {
+        "blog-unreleased-content-decision": [
+          "scripts/check-blog-publication.mjs",
+          "scripts/check-blog-publication.test.mjs",
+          "AGENTS.md",
+          "website/src/converter/*",
+          "website/tests/*"
+        ],
+        "deploy-resolve-failure-2026-11-12": [
+          ".github/workflows/deploy.yml",
+          "deploy/*",
+          "AGENTS.md"
+        ],
+        "docs-pin-from-skips-certification": [
+          "scripts/docs-pin.mjs",
+          "scripts/docs-pin.test.mjs",
+          "AGENTS.md"
+        ],
+        "keep-next-level-with-main": [
+          ".github/workflows/*",
+          "scripts/*.test.mjs",
+          "AGENTS.md"
+        ],
+        "next-branch-ci-test-gaps": [
+          ".github/workflows/ci.yml",
+          "scripts/docs-release-pin-workflow.test.mjs",
+          "AGENTS.md",
+          "website/package.json",
+          "website/scripts/*"
+        ]
+      },
+      "scope_hash": "bfe6ad54185c489d87e2658c324184e1c7939725c699b2001c4fc5919699871c",
+      "start_head": "f427e37876f77ab82a6ea4ef3f35285a0a23228f",
+      "terminal_outcome": "Squash-merged to main with ci green"
     }
   },
   "items": {
