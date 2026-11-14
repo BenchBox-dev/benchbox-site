@@ -181,7 +181,7 @@
         }
       },
       "integration_branch": "feat/pin-hardening",
-      "integration_head": "e9468bf9a1a86b22385fc295ce9563ee3ebe44e8",
+      "integration_head": "000d1666893f245b1184ec2aebc979c67740c236",
       "integration_log": [
         {
           "at": "2026-11-14T14:09:52Z",
@@ -233,6 +233,24 @@
           "op_id": "06ad779ff08540e6ae91c5f5ca6edb7c",
           "previous_head": "8ab538e6d0b4b5477daf48fe707c9321a9fc98d0",
           "seq": 5
+        },
+        {
+          "at": "2026-11-14T14:14:13Z",
+          "changed_files": [
+            "AGENTS.md"
+          ],
+          "head": "000d1666893f245b1184ec2aebc979c67740c236",
+          "kind": "fix",
+          "op_id": "19d276ad18f148e2acf0da38ca67bdd6",
+          "previous_head": "e9468bf9a1a86b22385fc295ce9563ee3ebe44e8",
+          "requires_acceptance": [
+            "blog-unreleased-content-decision",
+            "deploy-resolve-failure-2026-11-12",
+            "docs-pin-from-skips-certification",
+            "keep-next-level-with-main",
+            "next-branch-ci-test-gaps"
+          ],
+          "seq": 6
         }
       ],
       "integration_worktree": "/Users/joe/Developer/benchbox-site.wt-pin-hardening",
