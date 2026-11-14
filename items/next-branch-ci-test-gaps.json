@@ -4,6 +4,11 @@
     "Either visual.yml builds next pull requests from the newest develop docs inputs, or AGENTS.md states the difference",
     "ci for next also runs docs assembly and docs:generate against release-pin/, or the owner records that the release pull request is the accepted place to find such breaks"
   ],
+  "batch": {
+    "batch_id": "pin-hardening",
+    "implementation_dependencies": [],
+    "member_id": "next-branch-ci-test-gaps"
+  },
   "context": "Items 1 and 2 come from the independent review of #145 (Optional). Guardrail: keep the required check name `ci`; deploy.yml must not gain DOCS_INPUTS.\n\nReview 2026-11-13. Decision gates: for gap 2 choose fix or document; for gap 3 the owner chooses between running the pin checks on next and accepting discovery in the release pull request; record both before coding. Verification rubric: `node --test scripts/docs-release-pin-workflow.test.mjs` passes and, with the `||` in the ci.yml expression changed to `&&` locally, fails (state that you tried it); `node scripts/check-yaml.mjs .github/workflows/*.yml` passes; one pull request into next shows the chosen behaviour in its ci log. Guardrails: required check name stays `ci` and its `needs` stays complete; `.github/workflows/deploy.yml` gains no DOCS_INPUTS; no added job may make ci on main slower by more than the docs assembly step it adds.\n\nOwner decision 2026-11-14: on next, ci also assembles and generates docs against the pin. The Visual workflow difference is documented in AGENTS.md, not changed. Merge targets (owner, 2026-11-14): site code, workflows and corrections to released documentation go to main on green ci, then main is merged into next; only documentation of unreleased behaviour waits on next.",
   "description": "Problem: three gaps remain from the release-pin change. (1) `scripts/docs-release-pin-workflow.test.mjs` checks substrings of the DOCS_INPUTS expressions, so a wrong `&&`/`||` would pass. (2) `visual.yml` sets DOCS_INPUTS for pull requests into next to the bundle it fetches, which is the deployed bundle, not the newest develop bundle that ci uses; the advisory comparison can therefore build different docs from ci. (3) ci on next reads only the develop bundle, so nothing on next proves site code still reads the pin, which AGENTS.md requires until the next release is pinned; a break shows up only in the release pull request.",
   "links": [
@@ -34,6 +39,14 @@
       "client": "omp-coding-agent",
       "op": "update",
       "op_id": "86462720c25b401aa7c9a81374526ed4",
+      "session_id": "99f297d0e01b4dd1ab38d39e880d17c4"
+    },
+    {
+      "actor": "mcp:omp-coding-agent:joe@joe-mac-mini.local:c5b9b54747851b1eaf3e61b4",
+      "at": "2026-11-14T14:04:15Z",
+      "client": "omp-coding-agent",
+      "op": "update",
+      "op_id": "92585c534e7543f9babb27c336b4e69e",
       "session_id": "99f297d0e01b4dd1ab38d39e880d17c4"
     }
   ]
