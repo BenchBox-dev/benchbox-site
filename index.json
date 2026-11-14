@@ -59,7 +59,7 @@
         }
       ],
       "integration_worktree": "/Users/joe/Developer/benchbox-site.wt-pin-hardening",
-      "lifecycle": "active",
+      "lifecycle": "aborted",
       "members": [
         "docs-pin-from-skips-certification",
         "next-branch-ci-test-gaps",
