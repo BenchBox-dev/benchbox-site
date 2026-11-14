@@ -139,10 +139,21 @@ versioned core bundle; it reads nothing else from core.
   well formed and its tag a published release.
 - Unreleased documentation merges to `next`, where CI checks it against the
   newest develop bundle. Fixes to released documentation merge to `main`;
-  whoever merges one then merges `main` into `next` with a merge commit.
+  the Sync next workflow then opens or updates the `next-behind-main` issue
+  while `next` lacks commits that are on `main`, and closes it once `next`
+  contains them. Site code, workflows and corrections to released
+  documentation go to `main`; only documentation of unreleased behaviour goes to
+  `next`. After a merge to `main`, merge `main` into `next` by pull request
+  with `gh pr merge --merge`. The issue says whether that merge is clean or
+  names the conflicting files, which a person resolves by hand in that pull
+  request; where released text from `main` conflicts with unreleased text on
+  `next`, `next` keeps its text.
 - A release is: the owner runs `npm run docs:pin -- vX.Y.Z` on `next` by pull
   request, then opens one pull request from `next` into `main`. After that
-  squash merge, merge `main` into `next` to bring it level.
+  squash merge, merge `main` into `next` by pull request with
+  `gh pr merge --merge` to bring it level; the `next-behind-main` issue tracks
+  it. The workflow uses the default token, which cannot start `ci` on a pull
+  request it opens, so it does not open that pull request itself.
 - The Nightly workflow opens or updates the `docs-release-pending` issue when
   core has published a release newer than the pin. The owner acts on it.
 - Compatibility window: site code on `main` must read the pinned release's
@@ -297,8 +308,11 @@ Adaptations to keep:
 - Commit messages, pull request text and committed files state the durable
   reason for a change. Leave out tracker ids, plan or handoff references and
   run-local state such as CI counts.
-- Merge with `gh pr merge --squash` once `ci` is green. Auto-merge is turned
-  off for this repository.
+- Merge with `gh pr merge --squash` once `ci` is green: pull requests into
+  `main` are squash-merged, and so are pull requests into `next`, except the
+  one that merges `main` into `next`. Merge that one with
+  `gh pr merge --merge` so main's commits stay in next's history. Auto-merge
+  is turned off for this repository.
 
 ## Tracker
 
