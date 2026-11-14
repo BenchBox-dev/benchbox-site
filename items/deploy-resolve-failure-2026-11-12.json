@@ -13,6 +13,143 @@
   },
   "context": "Rewritten at review on 2026-11-13: the first version guessed a wait timeout or API failure; the log disproves that. Decision gate: classify site defect, core defect or expected before changing anything. Guardrails: do not set SITE_SNAPSHOT_APPROVED_CHANGE or any repository variable; do not dispatch core workflows; do not weaken the parity gate; investigation is read-only until the class is recorded.\n\nOwner decision 2026-11-14: a successful deploy comments on and closes the open site-deploy-failed issue, with a test; close #58 with the cause. A core-side cause is handed to the owner as a prompt for core's tracker. Merge targets (owner, 2026-11-14): site code, workflows and corrections to released documentation go to main on green ci, then main is merged into next; only documentation of unreleased behaviour waits on next.",
   "description": "Problem: Deploy run 43234165099 (repository_dispatch from core, site commit 802ac09, 2026-11-12 14:08 UTC) failed in `Resolve the bundle and the deployed generation`. The log line is: `deploy: corpus changed but validator_parity covers 21f6710..0eeec0d, not the deployed 01a1515; dispatch core site-inputs.yml with parent_core_sha=...`. So the cause is the snapshot-parity base check, not a fetch timeout: the candidate bundle's validator_parity attestation was computed against a parent that is not the deployed core commit. At least one later dispatch failed too (run 43298467532, core 953e997). Deploys have succeeded since 2026-11-12 23:47 UTC, yet the site-local `site-deploy-failed` issue #58 is still open, last updated 2026-11-12 20:19 UTC.\n\nOutcome: it is known why core produced bundles whose parity base skipped the deployed commit, whether the site or core should have recovered without a person, and whether #58 should have been closed by the successful deploys.",
+  "final_evidence": {
+    "batch_id": "pin-hardening-2",
+    "changed_files": [
+      ".github/workflows/ci.yml",
+      ".github/workflows/deploy.yml",
+      ".github/workflows/sync-next.yml",
+      "AGENTS.md",
+      "deploy/README.md",
+      "deploy/lib/relay.ts",
+      "deploy/relay-cli.ts",
+      "deploy/test/relay-process.test.ts",
+      "deploy/test/relay.test.ts",
+      "scripts/check-blog-publication.mjs",
+      "scripts/check-blog-publication.test.mjs",
+      "scripts/docs-pin.mjs",
+      "scripts/docs-pin.test.mjs",
+      "scripts/docs-release-pin-workflow.test.mjs",
+      "scripts/sync-next-workflow.test.mjs",
+      "website/package.json",
+      "website/scripts/assemble-docs.ts",
+      "website/src/converter/handlers/front-matter.ts",
+      "website/src/converter/handlers/index.ts",
+      "website/tests/handlers.test.ts"
+    ],
+    "clean": true,
+    "current_acceptance": {
+      "blog-unreleased-content-decision": {
+        "clean": true,
+        "command": [
+          "node",
+          "--test",
+          "scripts/check-blog-publication.test.mjs"
+        ],
+        "revision": "000d1666893f245b1184ec2aebc979c67740c236",
+        "status": "passed",
+        "suite": "blog publication check tests",
+        "worktree": "/Users/joe/Developer/benchbox-site.wt-pin-hardening"
+      },
+      "deploy-resolve-failure-2026-11-12": {
+        "clean": true,
+        "command": [
+          "npm",
+          "run",
+          "-s",
+          "test:deploy"
+        ],
+        "revision": "000d1666893f245b1184ec2aebc979c67740c236",
+        "status": "passed",
+        "suite": "deploy tests",
+        "worktree": "/Users/joe/Developer/benchbox-site.wt-pin-hardening"
+      },
+      "docs-pin-from-skips-certification": {
+        "clean": true,
+        "command": [
+          "node",
+          "--test",
+          "scripts/docs-pin.test.mjs"
+        ],
+        "revision": "000d1666893f245b1184ec2aebc979c67740c236",
+        "status": "passed",
+        "suite": "docs-pin unit tests",
+        "worktree": "/Users/joe/Developer/benchbox-site.wt-pin-hardening"
+      },
+      "keep-next-level-with-main": {
+        "clean": true,
+        "command": [
+          "node",
+          "--test",
+          "scripts/sync-next-workflow.test.mjs"
+        ],
+        "revision": "000d1666893f245b1184ec2aebc979c67740c236",
+        "status": "passed",
+        "suite": "sync-next workflow tests",
+        "worktree": "/Users/joe/Developer/benchbox-site.wt-pin-hardening"
+      },
+      "next-branch-ci-test-gaps": {
+        "clean": true,
+        "command": [
+          "node",
+          "--test",
+          "scripts/docs-release-pin-workflow.test.mjs"
+        ],
+        "revision": "000d1666893f245b1184ec2aebc979c67740c236",
+        "status": "passed",
+        "suite": "release-pin workflow tests",
+        "worktree": "/Users/joe/Developer/benchbox-site.wt-pin-hardening"
+      }
+    },
+    "final_pr": {
+      "head": "000d1666893f245b1184ec2aebc979c67740c236",
+      "node_id": "PR_kwDOVAHdmM8AAAABPKFWfQ",
+      "number": 159,
+      "repository": "https://github.com/BenchBox-dev/benchbox-site.git"
+    },
+    "integration_branch": "feat/pin-hardening",
+    "integration_head": "000d1666893f245b1184ec2aebc979c67740c236",
+    "member_heads": {
+      "blog-unreleased-content-decision": "735ed7bb0fb115b5d3c7b0d84a33e9a0d1c8381a",
+      "deploy-resolve-failure-2026-11-12": "27ef71f13842a2860010c1f598b7587cdee6fec1",
+      "docs-pin-from-skips-certification": "36ffc63e446bfd8bda0d1f4ab9130aa689b60b4d",
+      "keep-next-level-with-main": "ec9e47973dd1bd40030a0dad40ca8ebbfc92fda3",
+      "next-branch-ci-test-gaps": "757a2794879d8b247b842e8d2e0d5cd3fa92c3c4"
+    },
+    "member_ranges": {
+      "blog-unreleased-content-decision": {
+        "base": "f427e37876f77ab82a6ea4ef3f35285a0a23228f",
+        "head": "735ed7bb0fb115b5d3c7b0d84a33e9a0d1c8381a"
+      },
+      "deploy-resolve-failure-2026-11-12": {
+        "base": "f427e37876f77ab82a6ea4ef3f35285a0a23228f",
+        "head": "27ef71f13842a2860010c1f598b7587cdee6fec1"
+      },
+      "docs-pin-from-skips-certification": {
+        "base": "f427e37876f77ab82a6ea4ef3f35285a0a23228f",
+        "head": "36ffc63e446bfd8bda0d1f4ab9130aa689b60b4d"
+      },
+      "keep-next-level-with-main": {
+        "base": "f427e37876f77ab82a6ea4ef3f35285a0a23228f",
+        "head": "ec9e47973dd1bd40030a0dad40ca8ebbfc92fda3"
+      },
+      "next-branch-ci-test-gaps": {
+        "base": "f427e37876f77ab82a6ea4ef3f35285a0a23228f",
+        "head": "757a2794879d8b247b842e8d2e0d5cd3fa92c3c4"
+      }
+    },
+    "merged": {
+      "merge_commit": "72c7da5c5ea60654b3fbedfc94bedaad54582b22",
+      "method": "squash"
+    },
+    "project_id": "benchbox-site",
+    "repository": "https://github.com/BenchBox-dev/benchbox-site.git",
+    "scope_hash": "bfe6ad54185c489d87e2658c324184e1c7939725c699b2001c4fc5919699871c",
+    "status": "passed",
+    "suite": "combined gate: scripts, deploy, docs-contracts and website tests, lints, build; ci green on pull request 159",
+    "tree_revision": "000d1666893f245b1184ec2aebc979c67740c236",
+    "tree_worktree": "/Users/joe/Developer/benchbox-site.wt-pin-hardening"
+  },
   "links": [
     "https://github.com/BenchBox-dev/benchbox-site/actions/runs/43234165099",
     "https://github.com/BenchBox-dev/benchbox-site/actions/runs/43298467532",
@@ -164,6 +301,15 @@
       "generation": "126ed44fafc143f0b64bbe5d93b6df26",
       "op": "take",
       "op_id": "41338ec610ac43b58265dee75b9079b7",
+      "session_id": "99f297d0e01b4dd1ab38d39e880d17c4"
+    },
+    {
+      "actor": "mcp:omp-coding-agent:joe@joe-mac-mini.local:c5b9b54747851b1eaf3e61b4",
+      "at": "2026-11-14T14:30:37Z",
+      "client": "omp-coding-agent",
+      "generation": "126ed44fafc143f0b64bbe5d93b6df26",
+      "op": "finish",
+      "op_id": "520c37d7d6c3429a855b6ebae6a3c28c",
       "session_id": "99f297d0e01b4dd1ab38d39e880d17c4"
     }
   ]
