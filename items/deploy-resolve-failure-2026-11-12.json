@@ -6,6 +6,11 @@
     "#58 is closed or carries a comment saying what still fails",
     "If the cause lies in core, the core tracker item or issue is linked here and no site code is changed to mask it"
   ],
+  "batch": {
+    "batch_id": "pin-hardening-2",
+    "implementation_dependencies": [],
+    "member_id": "deploy-resolve-failure-2026-11-12"
+  },
   "context": "Rewritten at review on 2026-11-13: the first version guessed a wait timeout or API failure; the log disproves that. Decision gate: classify site defect, core defect or expected before changing anything. Guardrails: do not set SITE_SNAPSHOT_APPROVED_CHANGE or any repository variable; do not dispatch core workflows; do not weaken the parity gate; investigation is read-only until the class is recorded.\n\nOwner decision 2026-11-14: a successful deploy comments on and closes the open site-deploy-failed issue, with a test; close #58 with the cause. A core-side cause is handed to the owner as a prompt for core's tracker. Merge targets (owner, 2026-11-14): site code, workflows and corrections to released documentation go to main on green ci, then main is merged into next; only documentation of unreleased behaviour waits on next.",
   "description": "Problem: Deploy run 43234165099 (repository_dispatch from core, site commit 802ac09, 2026-11-12 14:08 UTC) failed in `Resolve the bundle and the deployed generation`. The log line is: `deploy: corpus changed but validator_parity covers 21f6710..0eeec0d, not the deployed 01a1515; dispatch core site-inputs.yml with parent_core_sha=...`. So the cause is the snapshot-parity base check, not a fetch timeout: the candidate bundle's validator_parity attestation was computed against a parent that is not the deployed core commit. At least one later dispatch failed too (run 43298467532, core 953e997). Deploys have succeeded since 2026-11-12 23:47 UTC, yet the site-local `site-deploy-failed` issue #58 is still open, last updated 2026-11-12 20:19 UTC.\n\nOutcome: it is known why core produced bundles whose parity base skipped the deployed commit, whether the site or core should have recovered without a person, and whether #58 should have been closed by the successful deploys.",
   "links": [
@@ -54,6 +59,14 @@
       "client": "omp-coding-agent",
       "op": "abort",
       "op_id": "75a567a5e33a472289e6605f22c0bd85",
+      "session_id": "99f297d0e01b4dd1ab38d39e880d17c4"
+    },
+    {
+      "actor": "mcp:omp-coding-agent:joe@joe-mac-mini.local:c5b9b54747851b1eaf3e61b4",
+      "at": "2026-11-14T14:10:00Z",
+      "client": "omp-coding-agent",
+      "op": "update",
+      "op_id": "8d089669a74f45db931fa3801232ae4d",
       "session_id": "99f297d0e01b4dd1ab38d39e880d17c4"
     }
   ]
