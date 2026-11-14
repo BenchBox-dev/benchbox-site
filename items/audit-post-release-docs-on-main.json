@@ -7,7 +7,7 @@
     "The owner has confirmed, in a recorded answer, the verdict for every passage where the evidence is not conclusive; no such passage is reverted without it",
     "Decision recorded: either a standing guard is added (for example a pull request checklist line or a named check) that makes authors choose main or next for documentation, or the owner records that the written rule in AGENTS.md is enough"
   ],
-  "context": "Decision gate: classification needs judgement; do not revert on a guess, ask the owner. Guardrails: never edit release-pin/; do not weaken a check. Known inconsistency left on main until the next pin: docs/benchmarks/support-status.md states 17, 12 and 12 queries because the v0.5.0 contract exports those values, while the v0.5.0 query catalog holds 93, 112 and 23; that one is bound by docs:check and is not in scope here.\n\nReview 2026-11-13: the commit list in the description is a snapshot. Two documentation commits merged to main after the cutover (#149 per-vendor publishing checklist, #150 Databricks Beta or Preview refusal) and nothing checked whether they describe released behaviour, which shows the written rule alone does not route unreleased documentation to next. Decision gates, in order: (1) owner confirms inconclusive verdicts before any revert; (2) owner chooses guard or no guard. Guardrails: one pull request may revert several passages but each passage names its source commit; never revert a correction of something that was already wrong at v0.5.0; do not touch blog/ (see blog-unreleased-content-decision).",
+  "context": "Decision gate: classification needs judgement; do not revert on a guess, ask the owner. Guardrails: never edit release-pin/; do not weaken a check. Known inconsistency left on main until the next pin: docs/benchmarks/support-status.md states 17, 12 and 12 queries because the v0.5.0 contract exports those values, while the v0.5.0 query catalog holds 93, 112 and 23; that one is bound by docs:check and is not in scope here.\n\nReview 2026-11-13: the commit list in the description is a snapshot. Two documentation commits merged to main after the cutover (#149 per-vendor publishing checklist, #150 Databricks Beta or Preview refusal) and nothing checked whether they describe released behaviour, which shows the written rule alone does not route unreleased documentation to next. Decision gates, in order: (1) owner confirms inconclusive verdicts before any revert; (2) owner chooses guard or no guard. Guardrails: one pull request may revert several passages but each passage names its source commit; never revert a correction of something that was already wrong at v0.5.0; do not touch blog/ (see blog-unreleased-content-decision).\n\nOwner decision 2026-11-14: revert only passages with clear evidence at core v0.5.0; leave inconclusive ones on main and list them in the pull request. Standing guard: a pull request template line asking authors to choose main or next. Merge targets (owner, 2026-11-14): site code, workflows and corrections to released documentation go to main on green ci, then main is merged into next; only documentation of unreleased behaviour waits on next.",
   "description": "Problem: when main was cut over to the v0.5.0 release pin, only the four statements docs:check rejects were restored to v0.5.0 values. Other documentation merged after v0.5.0 was published is still live on benchbox.dev and may describe unreleased behaviour. Outcome: every statement on main is true for the pinned release, and each unreleased statement lives on next.\n\nScope to audit against core at tag v0.5.0 (commit dfe585e) and release-pin/: the remaining edits of #137 and #138 (catalog counts, scale-factor ranges, size tables, `measured at SF 0.01 to 10`); the accepted-versions list in docs/reference/public-contracts.md, which names 2.4 while the current version reads 2.3; and the other docs commits since the release: #118, #119, #121, #124, #125, #131, #139, #140, #142, #144. Statements that only correct an error that was already wrong at v0.5.0 stay on main.",
   "links": [
     "https://github.com/BenchBox-dev/benchbox-site/pull/145",
@@ -38,6 +38,14 @@
       "op": "update",
       "op_id": "cd0f114d58884c01ba3c65f12e9ff067",
       "session_id": "524c11ecc7864e4f81039b54632b8c82"
+    },
+    {
+      "actor": "mcp:omp-coding-agent:joe@joe-mac-mini.local:c5b9b54747851b1eaf3e61b4",
+      "at": "2026-11-14T14:03:53Z",
+      "client": "omp-coding-agent",
+      "op": "update",
+      "op_id": "5609bc004a3a4f0faba2ec843d04e79b",
+      "session_id": "99f297d0e01b4dd1ab38d39e880d17c4"
     }
   ]
 }
