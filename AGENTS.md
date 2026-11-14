@@ -256,7 +256,10 @@ Adaptations to keep:
 - Result summary pages under `/result-summaries/` are generated at site build
   time from the bundle's `explorer/results.duckdb`, through the Explorer's own
   queries and formatters (`website/src/lib/results-summary.ts`). Keep them out
-  of `/results/`, which belongs to the Explorer's client routes. A withdrawn
+  of `/results/`, which belongs to the Explorer's client routes, with one exception:
+  `/results/r/<public_result_id>` is a static page per published result, generated
+  by `website/src/pages/results/r/[id].html.ts` from the Explorer's own `index.html`,
+  which the Explorer replaces in the browser. A withdrawn
   result disappears from the pages and the search index on the next build
   because it is gone from the snapshot. See
   `docs/design/adr-results-summary-pages.md`.

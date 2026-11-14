@@ -95,7 +95,7 @@ describe.skipIf(site === undefined)("built result summary pages", () => {
   it("renders the Explorer's values for every run of a platform", () => {
     const platform = summary.platforms.find((page) => page.id === "duckdb") ?? summary.platforms[0]!;
     const rows = tableRows(readFileSync(path.join(site!, "result-summaries", "platforms", `${platform.id}.html`), "utf-8"));
-    for (const run of platform.runs) {
+    for (const run of [...platform.ranked, ...platform.excluded]) {
       const row = rows.find((candidate) => candidate.receipt === run.receiptHref);
       expect(row?.cells, run.resultId).toEqual([run.benchmarkLabel, run.scale, run.phase, run.version ?? "—", run.runDate.slice(0, 10), run.score, run.geomean, run.rankingStatus]);
     }
@@ -105,7 +105,7 @@ describe.skipIf(site === undefined)("built result summary pages", () => {
     const benchmark = summary.benchmarks.find((page) => page.id === "tpch") ?? summary.benchmarks[0]!;
     const rows = tableRows(readFileSync(path.join(site!, "result-summaries", "benchmarks", `${benchmark.id}.html`), "utf-8"));
     const rendered = rows.filter((row) => row.receipt !== undefined && row.cells.length === 7).map((row) => row.receipt);
-    expect(rendered).toEqual(benchmark.cohorts.flatMap((cohort) => cohort.ranking.map((line) => line.receiptHref)));
+    expect(rendered).toEqual(benchmark.cohorts.flatMap((cohort) => cohort.ranked.map((line) => line.receiptHref)));
   });
 });
 

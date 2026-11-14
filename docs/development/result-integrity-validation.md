@@ -96,6 +96,8 @@ Validates that reported metrics are statistically plausible.
 
 The overall status is FAIL when any check FAILs, otherwise WARN when any check WARNs, otherwise PASS. INFO findings never change it.
 
+The overall status is FAIL when any check FAILs, otherwise WARN when any check WARNs, otherwise PASS. INFO findings never change it.
+
 ## BenchmarkSpec System
 
 Each benchmark has a `BenchmarkSpec` frozen dataclass defining its expected characteristics:

@@ -4,6 +4,7 @@ import { getBenchmarkRanking, listResults, type ResultRow } from "@/lib/duckdbQu
 import { formatScoreMetric } from "@/lib/metricFormatters";
 import { fmtGeomean } from "@/utils";
 import { closeResultsSnapshot, openResultsSnapshot, queryRows } from "../src/lib/results-db.ts";
+import { buildReceipts } from "../src/lib/result-receipts.ts";
 import { buildResultsSummary, snapshotFile, summaryHref, type ResultsSummary } from "../src/lib/results-summary.ts";
 
 const identity = { coreSha: "c".repeat(40), corpusSha: "d".repeat(40), packageVersion: "0.0.0", producedAt: null, snapshotSha256: "e".repeat(64), readModelVersion: 18 };
@@ -31,7 +32,42 @@ describe("summary pages and the Explorer for one snapshot", () => {
   it("counts every published run on both views of it", () => {
     expect(summary.platforms.reduce((total, page) => total + page.resultCount, 0)).toBe(rows.length);
     expect(summary.benchmarks.reduce((total, page) => total + page.resultCount, 0)).toBe(rows.length);
-    for (const page of summary.platforms) expect(page.runs).toHaveLength(page.resultCount);
+    for (const page of summary.platforms) expect(page.ranked.length + page.excluded.length).toBe(page.resultCount);
+  });
+
+  it("keeps only ranked runs in the ranked views and every other run in the excluded views", () => {
+    for (const page of summary.platforms) {
+      expect(page.ranked.every((run) => run.ranked && run.rankingStatus === "Ranked")).toBe(true);
+      expect(page.excluded.every((run) => !run.ranked && run.rankingStatus !== "Ranked")).toBe(true);
+    }
+    for (const page of summary.benchmarks) {
+      expect(page.cohorts.every((cohort) => cohort.ranked.every((line) => line.exclusion === null))).toBe(true);
+      expect(page.excluded.every((line) => line.exclusion !== null)).toBe(true);
+    }
+  });
+
+  it("loses no ranking line when a benchmark's excluded lines move to their own section", async () => {
+    const stored = await queryRows<{ benchmark: string; lines: number }>(
+      "SELECT r.benchmark AS benchmark, count(*)::INTEGER AS lines FROM bench.benchmark_rankings r JOIN bench.results s USING (result_id) WHERE s.visibility LIKE 'public-%' GROUP BY r.benchmark",
+    );
+    for (const page of summary.benchmarks) {
+      const expected = stored.filter((row) => canonicalBenchmarkSlug(row.benchmark) === page.id).reduce((total, row) => total + row.lines, 0);
+      const shown = page.cohorts.reduce((total, cohort) => total + cohort.ranked.length, 0) + page.excluded.length;
+      expect(shown, page.id).toBe(expected);
+    }
+  });
+
+  it("builds one receipt per published result, each stating the fields a reader needs", async () => {
+    const receipts = await buildReceipts(rows, { snapshotSha256: identity.snapshotSha256, snapshotDate: "2026-11-13" });
+    expect(receipts.map((receipt) => receipt.resultId).sort()).toEqual(rows.map((row) => row.result_id).sort());
+    for (const receipt of receipts) {
+      const labels = receipt.sections.flatMap((section) => section.rows.map((row) => row.label));
+      for (const label of ["Benchmark", "Platform", "Platform version", "Scale factor", "Phase", "Run date", "Geomean query time", "Ranking status", "Ranking reason", "Trust label", "Tuning mode", "Execution mode", "Bundle JSON"]) {
+        expect(labels, receipt.resultId).toContain(label);
+      }
+      expect(receipt.citeLine).toContain(identity.snapshotSha256);
+      expect(receipt.citeLine).toContain("2026-11-13");
+    }
   });
 
   it("shows the ranking values the Explorer's ranking table holds", async () => {
@@ -42,7 +78,7 @@ describe("summary pages and the Explorer for one snapshot", () => {
     for (const best of stored) {
       const page = summary.benchmarks.find((candidate) => candidate.id === canonicalBenchmarkSlug(best.benchmark));
       const cohort = page?.cohorts.find((candidate) => candidate.scale === `SF ${best.scale_factor}` && candidate.phase === "power");
-      const line = cohort?.ranking.find((candidate) => candidate.resultId === best.result_id);
+      const line = cohort?.ranked.find((candidate) => candidate.resultId === best.result_id);
       expect(line, `${best.benchmark} SF ${best.scale_factor} rank 1`).toBeDefined();
       expect(line?.rank).toBe(1);
       if (best.primary_metric === "power_score") expect(line?.score).toBe(formatScoreMetric("power_score", best.power_score));
@@ -57,7 +93,8 @@ describe("summary pages and the Explorer for one snapshot", () => {
       "SELECT result_id, platform_id, power_score, display_geomean_ms FROM bench.results WHERE test_type = 'power' AND power_score IS NOT NULL LIMIT 25",
     );
     for (const row of stored) {
-      const run = summary.platforms.find((page) => page.id === row.platform_id)?.runs.find((candidate) => candidate.resultId === row.result_id);
+      const page = summary.platforms.find((candidate) => candidate.id === row.platform_id);
+      const run = [...(page?.ranked ?? []), ...(page?.excluded ?? [])].find((candidate) => candidate.resultId === row.result_id);
       expect(run?.score).toBe(formatScoreMetric("power_score", row.power_score));
       expect(run?.geomean).toBe(fmtGeomean(row.display_geomean_ms));
     }
@@ -91,7 +128,8 @@ describe("withdrawn and unpublished results", () => {
       built.benchmarks.some(
         (page) =>
           page.platforms.some((neighbor) => neighbor.id === platformId) ||
-          page.cohorts.some((cohort) => cohort.ranking.some((line) => line.platformId === platformId || resultIds.has(line.resultId))),
+          page.cohorts.some((cohort) => cohort.ranked.some((line) => line.platformId === platformId || resultIds.has(line.resultId))) ||
+          page.excluded.some((line) => line.platformId === platformId || resultIds.has(line.resultId)),
       )
     );
   }

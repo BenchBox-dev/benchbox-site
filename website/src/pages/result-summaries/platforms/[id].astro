@@ -1,6 +1,6 @@
 ---
 import ResultSummary from "../../../layouts/ResultSummary.astro";
-import { loadResultsSummary, SUMMARY_ROOT } from "../../../lib/results-summary.ts";
+import { loadResultsSummary, reasonCounts, SUMMARY_ROOT } from "../../../lib/results-summary.ts";
 
 export async function getStaticPaths() {
   const { platforms } = await loadResultsSummary();
@@ -25,14 +25,16 @@ const description = `${page.label} on BenchBox: ${page.resultCount} published ${
     {page.benchmarks.map((benchmark) => <li><a href={benchmark.summaryHref}>{benchmark.label}</a>, {benchmark.runCount} {benchmark.runCount === 1 ? "run" : "runs"}</li>)}
   </ul>
 
-  <h2>Published runs</h2>
+  <h2>Ranked runs</h2>
+  {page.ranked.length === 0 && <p>None of this platform's published runs is ranked.</p>}
+  {page.ranked.length > 0 && (
   <div class="result-summary__table">
     <table>
       <thead>
         <tr><th scope="col">Benchmark</th><th scope="col">Scale</th><th scope="col">Phase</th><th scope="col">Version</th><th scope="col">Run date</th><th scope="col">Score</th><th scope="col">Geomean</th><th scope="col">Ranking</th></tr>
       </thead>
       <tbody>
-        {page.runs.map((run) => (
+        {page.ranked.map((run) => (
           <tr>
             <th scope="row"><a href={run.receiptHref}>{run.benchmarkLabel}</a></th>
             <td>{run.scale}</td>
@@ -47,4 +49,35 @@ const description = `${page.label} on BenchBox: ${page.resultCount} published ${
       </tbody>
     </table>
   </div>
+  )}
+
+  {page.excluded.length > 0 && (
+    <>
+      <h2 id="not-ranked">Runs not included in rankings</h2>
+      <p>
+        {page.excluded.length} {page.excluded.length === 1 ? "run is" : "runs are"} published with {page.excluded.length === 1 ? "its" : "their"} numbers and receipt but {page.excluded.length === 1 ? "is" : "are"} not ranked. Reason: {reasonCounts(page.excluded.map((run) => run.rankingStatus)).map((entry) => `${entry.reason} (${entry.count})`).join("; ")}
+      </p>
+      <div class="result-summary__table">
+        <table>
+      <thead>
+        <tr><th scope="col">Benchmark</th><th scope="col">Scale</th><th scope="col">Phase</th><th scope="col">Version</th><th scope="col">Run date</th><th scope="col">Score</th><th scope="col">Geomean</th><th scope="col">Reason not ranked</th></tr>
+      </thead>
+      <tbody>
+        {page.excluded.map((run) => (
+          <tr>
+            <th scope="row"><a href={run.receiptHref}>{run.benchmarkLabel}</a></th>
+            <td>{run.scale}</td>
+            <td>{run.phase}</td>
+            <td>{run.version ?? "—"}</td>
+            <td>{run.runDate.slice(0, 10)}</td>
+            <td title={run.metricLabel}>{run.score}</td>
+            <td>{run.geomean}</td>
+            <td>{run.rankingStatus}</td>
+          </tr>
+        ))}
+      </tbody>
+        </table>
+      </div>
+    </>
+  )}
 </ResultSummary>

@@ -116,6 +116,8 @@ The comparison shows:
 - Relative speedup/slowdown
 - Validation status alignment
 
+For the facts that must match before two results are comparable, see [Benchmark Methodology](../concepts/benchmark-methodology.md#when-two-results-are-comparable).
+
 ## Result File Locations
 
 BenchBox stores results in the runs root: `BENCHBOX_OUTPUT_DIR` when set, otherwise `benchmark_runs/` next to your checkout:

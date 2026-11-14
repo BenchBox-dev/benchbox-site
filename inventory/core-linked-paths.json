@@ -1,10 +1,31 @@
 {
   "paths": [
     {
+      "path": "DISCLAIMER.md",
+      "kind": "file",
+      "sources": [
+        "docs/concepts/benchmark-methodology.md:98"
+      ]
+    },
+    {
+      "path": "README.md",
+      "kind": "file",
+      "sources": [
+        "docs/concepts/benchmark-methodology.md:60"
+      ]
+    },
+    {
       "path": "_benchbox_pytest_xdist_safety.py",
       "kind": "file",
       "sources": [
         "docs/development/pytest-xdist-safety.md:62"
+      ]
+    },
+    {
+      "path": "_sources/tpc-h/EULA.txt",
+      "kind": "file",
+      "sources": [
+        "docs/concepts/benchmark-methodology.md:98"
       ]
     },
     {
