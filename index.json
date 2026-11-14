@@ -344,10 +344,15 @@
       "title": "Generate static, searchable result summary pages for platforms and benchmarks"
     },
     "audit-post-release-docs-on-main": {
-      "claim": null,
+      "claim": {
+        "expires_at": "2026-11-15T14:25:06Z",
+        "generation": "ba57b764ae134b9ba1ec975e2102ddeb",
+        "renewals": 0,
+        "worker": "mcp:omp-coding-agent:joe@joe-mac-mini.local:c5b9b54747851b1eaf3e61b4"
+      },
       "needs": [],
       "priority": "medium-high",
-      "status": "open",
+      "status": "active",
       "title": "Audit docs on main for statements about unreleased core and move them to next"
     },
     "blog-draft-byte-sha-of-snapshot-stale-20261029": {
