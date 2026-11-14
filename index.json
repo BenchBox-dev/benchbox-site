@@ -109,6 +109,7 @@
     },
     "pin-hardening-2": {
       "accepted_members": {
+        "blog-unreleased-content-decision": "735ed7bb0fb115b5d3c7b0d84a33e9a0d1c8381a",
         "docs-pin-from-skips-certification": "36ffc63e446bfd8bda0d1f4ab9130aa689b60b4d",
         "keep-next-level-with-main": "ec9e47973dd1bd40030a0dad40ca8ebbfc92fda3",
         "next-branch-ci-test-gaps": "757a2794879d8b247b842e8d2e0d5cd3fa92c3c4"
@@ -118,6 +119,19 @@
       "develop_ref": "refs/remotes/origin/main",
       "final_pr_history": [],
       "integrated_members": {
+        "blog-unreleased-content-decision": {
+          "accepted_head": "735ed7bb0fb115b5d3c7b0d84a33e9a0d1c8381a",
+          "changed_files": [
+            "AGENTS.md",
+            "scripts/check-blog-publication.mjs",
+            "scripts/check-blog-publication.test.mjs",
+            "website/src/converter/handlers/front-matter.ts",
+            "website/src/converter/handlers/index.ts",
+            "website/tests/handlers.test.ts"
+          ],
+          "integration_head": "8ab538e6d0b4b5477daf48fe707c9321a9fc98d0",
+          "integration_seq": 4
+        },
         "docs-pin-from-skips-certification": {
           "accepted_head": "36ffc63e446bfd8bda0d1f4ab9130aa689b60b4d",
           "changed_files": [
@@ -152,7 +166,7 @@
         }
       },
       "integration_branch": "feat/pin-hardening",
-      "integration_head": "0ebfbc7232da3c967ce8c1a5b5c03a2b90dab6cc",
+      "integration_head": "8ab538e6d0b4b5477daf48fe707c9321a9fc98d0",
       "integration_log": [
         {
           "at": "2026-11-14T14:09:52Z",
@@ -186,6 +200,15 @@
           "op_id": "9a34e5acef694dbd82ef091526e8a743",
           "previous_head": "2430d54afbdaabae4b3efcb2db5f87348d2fa05b",
           "seq": 3
+        },
+        {
+          "at": "2026-11-14T14:12:58Z",
+          "head": "8ab538e6d0b4b5477daf48fe707c9321a9fc98d0",
+          "kind": "prepare",
+          "member": "blog-unreleased-content-decision",
+          "op_id": "f1ddbcf470fd451db8c902a2b59bdbd6",
+          "previous_head": "0ebfbc7232da3c967ce8c1a5b5c03a2b90dab6cc",
+          "seq": 4
         }
       ],
       "integration_worktree": "/Users/joe/Developer/benchbox-site.wt-pin-hardening",
@@ -287,15 +310,10 @@
       "title": "Add the SF1 basic row to the SCD2 blog scale table for balance"
     },
     "blog-unreleased-content-decision": {
-      "claim": {
-        "expires_at": "2026-11-15T14:12:56Z",
-        "generation": "0bfb8396f97f4620905a89fb2993e6ab",
-        "renewals": 0,
-        "worker": "mcp:omp-coding-agent:joe@joe-mac-mini.local:c5b9b54747851b1eaf3e61b4"
-      },
+      "claim": null,
       "needs": [],
       "priority": "medium",
-      "status": "active",
+      "status": "open",
       "title": "Decide whether blog posts wait for a release, and state how blog links to core resolve"
     },
     "canonical-snapshot-digest-looseness-20261029": {

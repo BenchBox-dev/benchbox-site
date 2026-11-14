@@ -16,6 +16,67 @@
     "website/src/converter/handlers/links.ts",
     "AGENTS.md"
   ],
+  "prepared": {
+    "accepted_head": "735ed7bb0fb115b5d3c7b0d84a33e9a0d1c8381a",
+    "batch_id": "pin-hardening-2",
+    "changed_files": [
+      "AGENTS.md",
+      "scripts/check-blog-publication.mjs",
+      "scripts/check-blog-publication.test.mjs",
+      "website/src/converter/handlers/front-matter.ts",
+      "website/src/converter/handlers/index.ts",
+      "website/tests/handlers.test.ts"
+    ],
+    "integration_head": "8ab538e6d0b4b5477daf48fe707c9321a9fc98d0",
+    "integration_seq": 4,
+    "member_id": "blog-unreleased-content-decision",
+    "overlaps": [
+      {
+        "kind": "member",
+        "member": "docs-pin-from-skips-certification",
+        "paths": [
+          "AGENTS.md"
+        ]
+      },
+      {
+        "kind": "member",
+        "member": "keep-next-level-with-main",
+        "paths": [
+          "AGENTS.md"
+        ]
+      },
+      {
+        "kind": "member",
+        "member": "next-branch-ci-test-gaps",
+        "paths": [
+          "AGENTS.md"
+        ]
+      }
+    ],
+    "owner_epoch": 0,
+    "schema": "prepared_work_v2",
+    "scope_hash": "bfe6ad54185c489d87e2658c324184e1c7939725c699b2001c4fc5919699871c",
+    "source_base": "f427e37876f77ab82a6ea4ef3f35285a0a23228f",
+    "source_revision": "735ed7bb0fb115b5d3c7b0d84a33e9a0d1c8381a",
+    "source_worktree": "/Users/joe/Developer/benchbox-site.wt-m-blog-hold",
+    "verification": {
+      "clean": true,
+      "command": [
+        "node",
+        "--test",
+        "scripts/check-blog-publication.test.mjs"
+      ],
+      "review": {
+        "notes": "Review of 9fdfa88 found one Critical and one Required (gating against the develop bundle version failed on next and threw on rc versions); 735ed7b gates against the pin only and skips when DOCS_INPUTS is set; converter key limited to blog. AGENTS.md conflict with the sync-next member resolved by the leader at merge.",
+        "outcome": "clear",
+        "range": "f427e37..735ed7b",
+        "reviewer": "independent reviewer subagent, then leader check of the fix commit"
+      },
+      "revision": "735ed7bb0fb115b5d3c7b0d84a33e9a0d1c8381a",
+      "status": "passed",
+      "suite": "blog publication check tests"
+    }
+  },
   "sessions": [
     {
       "actor": "mcp:omp-coding-agent:joe@joe-mac-mini.local:9c85f43e97659072aa9dbbd3",
@@ -72,6 +133,15 @@
       "generation": "0bfb8396f97f4620905a89fb2993e6ab",
       "op": "take",
       "op_id": "dfd913202d30465db87131cd45f58ad4",
+      "session_id": "99f297d0e01b4dd1ab38d39e880d17c4"
+    },
+    {
+      "actor": "mcp:omp-coding-agent:joe@joe-mac-mini.local:c5b9b54747851b1eaf3e61b4",
+      "at": "2026-11-14T14:12:58Z",
+      "client": "omp-coding-agent",
+      "generation": "0bfb8396f97f4620905a89fb2993e6ab",
+      "op": "prepare",
+      "op_id": "f1ddbcf470fd451db8c902a2b59bdbd6",
       "session_id": "99f297d0e01b4dd1ab38d39e880d17c4"
     }
   ]
