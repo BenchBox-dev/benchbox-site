@@ -582,15 +582,10 @@
       "title": "Check next against develop, verify the pin in CI, remind on an unpublished release and document the release flow"
     },
     "next-branch-ci-test-gaps": {
-      "claim": {
-        "expires_at": "2026-11-15T14:30:26Z",
-        "generation": "bf6d1e0fca1847ce928c15de90685002",
-        "renewals": 0,
-        "worker": "mcp:omp-coding-agent:joe@joe-mac-mini.local:c5b9b54747851b1eaf3e61b4"
-      },
+      "claim": null,
       "needs": [],
       "priority": "low",
-      "status": "active",
+      "status": "done",
       "title": "Close the test gaps in the next-branch CI rules"
     },
     "public-site-visual-regression-false-mismatch-20261014": {
