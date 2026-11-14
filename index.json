@@ -325,7 +325,7 @@
         }
       ],
       "integration_worktree": "/Users/joe/Developer/benchbox-site.wt-pin-hardening",
-      "lifecycle": "active",
+      "lifecycle": "completed",
       "members": [
         "docs-pin-from-skips-certification",
         "next-branch-ci-test-gaps",
@@ -423,15 +423,10 @@
       "title": "Add the SF1 basic row to the SCD2 blog scale table for balance"
     },
     "blog-unreleased-content-decision": {
-      "claim": {
-        "expires_at": "2026-11-15T14:30:39Z",
-        "generation": "1e3e1bb6257e496bbf76914afc22d9c2",
-        "renewals": 0,
-        "worker": "mcp:omp-coding-agent:joe@joe-mac-mini.local:c5b9b54747851b1eaf3e61b4"
-      },
+      "claim": null,
       "needs": [],
       "priority": "medium",
-      "status": "active",
+      "status": "done",
       "title": "Decide whether blog posts wait for a release, and state how blog links to core resolve"
     },
     "canonical-snapshot-digest-looseness-20261029": {
