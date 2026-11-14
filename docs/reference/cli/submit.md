@@ -122,6 +122,15 @@ List them with:
 uv run -- benchbox results --submitted
 ```
 
+## Results that `submit` refuses
+
+Both destinations refuse a result whose `compliance_class` is `unofficial_subscale` or `unofficial_nonstandard`, with exit code 1 and the message `Submission refused: compliance_class=<class>`. For TPC-H and TPC-DS that means:
+
+- Any run below scale factor 1 (`--scale 0.01`, for example) is `unofficial_subscale`.
+- A run at scale factor 1 or above is `unofficial_nonstandard` unless `benchbox run --official` produced it, at an official scale factor with a `--seed`.
+
+Benchmarks that have no TPC compliance class, such as SSB, are not subject to this check. `--dry-run` applies it too, so a refusal shows before anything is packaged or uploaded.
+
 ## `submit` vs `publish`
 
 These commands serve different purposes:
@@ -141,7 +150,7 @@ uv run -- benchbox submit results/tpch_sf1_duckdb.json
 uv run -- benchbox submit --last
 
 uv run -- benchbox results --paths
-uv run -- benchbox submit benchmark_runs/results/tpch_sf001_duckdb_20260401_120000.json --output ./submission
+uv run -- benchbox submit benchmark_runs/results/tpch_sf1_duckdb_sql_<timestamp>_<id>.json --output ./submission
 
 uv run -- benchbox results --paths --limit 100 \
   | xargs -n1 -I{} uv run -- benchbox submit {} --output ./submissions
