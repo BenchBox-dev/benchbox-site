@@ -14,6 +14,143 @@
   },
   "context": "Found at review on 2026-11-13: `git rev-list --left-right --count origin/main...origin/next` was 2 and 3. Guardrails: never push to next or main directly and never force-push; merges into next are merge commits, not squashes, so main's commits stay identifiable; do not change the main ruleset; the mechanism must not trigger a production deploy (deploys run only on main).\n\nOwner decision 2026-11-14: automatic. A workflow on push to main opens or updates a pull request merging main into next and merges it when ci is green; a conflict leaves the pull request open. Fall back to a reminder issue only if the default token cannot do this under the next ruleset. Merge targets (owner, 2026-11-14): site code, workflows and corrections to released documentation go to main on green ci, then main is merged into next; only documentation of unreleased behaviour waits on next.",
   "description": "Problem: AGENTS.md says whoever merges a fix to main then merges main into next, but nothing does it or reports when it is missed. One day after next was created, main already held two commits that next lacks (#149 and #150), while next held three of its own. The longer they drift, the more the release pull request from next into main conflicts, and a fix made on main can be lost from the next release's documentation review.\n\nOutcome: next always contains main shortly after main moves, without relying on memory.\n\nOptions: a workflow on push to main that opens (or updates) a pull request merging main into next and merges it when ci is green; or a nightly check that opens an issue when `git rev-list --count origin/next..origin/main` is above zero for more than a day. The next ruleset requires a pull request and ci and allows merge commits.",
+  "final_evidence": {
+    "batch_id": "pin-hardening-2",
+    "changed_files": [
+      ".github/workflows/ci.yml",
+      ".github/workflows/deploy.yml",
+      ".github/workflows/sync-next.yml",
+      "AGENTS.md",
+      "deploy/README.md",
+      "deploy/lib/relay.ts",
+      "deploy/relay-cli.ts",
+      "deploy/test/relay-process.test.ts",
+      "deploy/test/relay.test.ts",
+      "scripts/check-blog-publication.mjs",
+      "scripts/check-blog-publication.test.mjs",
+      "scripts/docs-pin.mjs",
+      "scripts/docs-pin.test.mjs",
+      "scripts/docs-release-pin-workflow.test.mjs",
+      "scripts/sync-next-workflow.test.mjs",
+      "website/package.json",
+      "website/scripts/assemble-docs.ts",
+      "website/src/converter/handlers/front-matter.ts",
+      "website/src/converter/handlers/index.ts",
+      "website/tests/handlers.test.ts"
+    ],
+    "clean": true,
+    "current_acceptance": {
+      "blog-unreleased-content-decision": {
+        "clean": true,
+        "command": [
+          "node",
+          "--test",
+          "scripts/check-blog-publication.test.mjs"
+        ],
+        "revision": "000d1666893f245b1184ec2aebc979c67740c236",
+        "status": "passed",
+        "suite": "blog publication check tests",
+        "worktree": "/Users/joe/Developer/benchbox-site.wt-pin-hardening"
+      },
+      "deploy-resolve-failure-2026-11-12": {
+        "clean": true,
+        "command": [
+          "npm",
+          "run",
+          "-s",
+          "test:deploy"
+        ],
+        "revision": "000d1666893f245b1184ec2aebc979c67740c236",
+        "status": "passed",
+        "suite": "deploy tests",
+        "worktree": "/Users/joe/Developer/benchbox-site.wt-pin-hardening"
+      },
+      "docs-pin-from-skips-certification": {
+        "clean": true,
+        "command": [
+          "node",
+          "--test",
+          "scripts/docs-pin.test.mjs"
+        ],
+        "revision": "000d1666893f245b1184ec2aebc979c67740c236",
+        "status": "passed",
+        "suite": "docs-pin unit tests",
+        "worktree": "/Users/joe/Developer/benchbox-site.wt-pin-hardening"
+      },
+      "keep-next-level-with-main": {
+        "clean": true,
+        "command": [
+          "node",
+          "--test",
+          "scripts/sync-next-workflow.test.mjs"
+        ],
+        "revision": "000d1666893f245b1184ec2aebc979c67740c236",
+        "status": "passed",
+        "suite": "sync-next workflow tests",
+        "worktree": "/Users/joe/Developer/benchbox-site.wt-pin-hardening"
+      },
+      "next-branch-ci-test-gaps": {
+        "clean": true,
+        "command": [
+          "node",
+          "--test",
+          "scripts/docs-release-pin-workflow.test.mjs"
+        ],
+        "revision": "000d1666893f245b1184ec2aebc979c67740c236",
+        "status": "passed",
+        "suite": "release-pin workflow tests",
+        "worktree": "/Users/joe/Developer/benchbox-site.wt-pin-hardening"
+      }
+    },
+    "final_pr": {
+      "head": "000d1666893f245b1184ec2aebc979c67740c236",
+      "node_id": "PR_kwDOVAHdmM8AAAABPKFWfQ",
+      "number": 159,
+      "repository": "https://github.com/BenchBox-dev/benchbox-site.git"
+    },
+    "integration_branch": "feat/pin-hardening",
+    "integration_head": "000d1666893f245b1184ec2aebc979c67740c236",
+    "member_heads": {
+      "blog-unreleased-content-decision": "735ed7bb0fb115b5d3c7b0d84a33e9a0d1c8381a",
+      "deploy-resolve-failure-2026-11-12": "27ef71f13842a2860010c1f598b7587cdee6fec1",
+      "docs-pin-from-skips-certification": "36ffc63e446bfd8bda0d1f4ab9130aa689b60b4d",
+      "keep-next-level-with-main": "ec9e47973dd1bd40030a0dad40ca8ebbfc92fda3",
+      "next-branch-ci-test-gaps": "757a2794879d8b247b842e8d2e0d5cd3fa92c3c4"
+    },
+    "member_ranges": {
+      "blog-unreleased-content-decision": {
+        "base": "f427e37876f77ab82a6ea4ef3f35285a0a23228f",
+        "head": "735ed7bb0fb115b5d3c7b0d84a33e9a0d1c8381a"
+      },
+      "deploy-resolve-failure-2026-11-12": {
+        "base": "f427e37876f77ab82a6ea4ef3f35285a0a23228f",
+        "head": "27ef71f13842a2860010c1f598b7587cdee6fec1"
+      },
+      "docs-pin-from-skips-certification": {
+        "base": "f427e37876f77ab82a6ea4ef3f35285a0a23228f",
+        "head": "36ffc63e446bfd8bda0d1f4ab9130aa689b60b4d"
+      },
+      "keep-next-level-with-main": {
+        "base": "f427e37876f77ab82a6ea4ef3f35285a0a23228f",
+        "head": "ec9e47973dd1bd40030a0dad40ca8ebbfc92fda3"
+      },
+      "next-branch-ci-test-gaps": {
+        "base": "f427e37876f77ab82a6ea4ef3f35285a0a23228f",
+        "head": "757a2794879d8b247b842e8d2e0d5cd3fa92c3c4"
+      }
+    },
+    "merged": {
+      "merge_commit": "72c7da5c5ea60654b3fbedfc94bedaad54582b22",
+      "method": "squash"
+    },
+    "project_id": "benchbox-site",
+    "repository": "https://github.com/BenchBox-dev/benchbox-site.git",
+    "scope_hash": "bfe6ad54185c489d87e2658c324184e1c7939725c699b2001c4fc5919699871c",
+    "status": "passed",
+    "suite": "combined gate: scripts, deploy, docs-contracts and website tests, lints, build; ci green on pull request 159",
+    "tree_revision": "000d1666893f245b1184ec2aebc979c67740c236",
+    "tree_worktree": "/Users/joe/Developer/benchbox-site.wt-pin-hardening"
+  },
   "links": [
     "AGENTS.md",
     ".github/workflows/ci.yml",
@@ -136,6 +273,15 @@
       "generation": "ff737806207e4a02b7e1482644220406",
       "op": "take",
       "op_id": "5bc7e440b5d842b183366ecde13f8ade",
+      "session_id": "99f297d0e01b4dd1ab38d39e880d17c4"
+    },
+    {
+      "actor": "mcp:omp-coding-agent:joe@joe-mac-mini.local:c5b9b54747851b1eaf3e61b4",
+      "at": "2026-11-14T14:30:33Z",
+      "client": "omp-coding-agent",
+      "generation": "ff737806207e4a02b7e1482644220406",
+      "op": "finish",
+      "op_id": "451529caf7684aeeb3827276f319921e",
       "session_id": "99f297d0e01b4dd1ab38d39e880d17c4"
     }
   ]

@@ -566,15 +566,10 @@
       "title": "Pin the next core release through the default docs:pin path and confirm the status matrix corrects itself"
     },
     "keep-next-level-with-main": {
-      "claim": {
-        "expires_at": "2026-11-15T14:30:30Z",
-        "generation": "ff737806207e4a02b7e1482644220406",
-        "renewals": 0,
-        "worker": "mcp:omp-coding-agent:joe@joe-mac-mini.local:c5b9b54747851b1eaf3e61b4"
-      },
+      "claim": null,
       "needs": [],
       "priority": "medium",
-      "status": "active",
+      "status": "done",
       "title": "Keep next level with main after each merge to main"
     },
     "next-branch-ci-and-alert": {
