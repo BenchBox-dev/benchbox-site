@@ -11,7 +11,7 @@
     "After the squash merge, main is merged into next and `git rev-list --count origin/next..origin/main` is 0",
     "Each step of the AGENTS.md procedure that did not work as written is corrected in AGENTS.md"
   ],
-  "context": "Blocked on core publishing a release newer than v0.5.0; the nightly docs-release-pending issue announces it. Guardrails: owner decides when to publish a release in the docs; if the tag's commit has no certified bundle, stop and report rather than using --from on an unverified directory. Open question to settle during this run: nothing closes the docs-release-pending issue automatically.\n\nReview 2026-11-13: set to blocked because the work cannot start until core publishes a release above v0.5.0; newest published release today is v0.5.0. Unblock when `docs:pin -- --pending` exits 1. Decision gates: owner go-ahead to publish the release in the docs; merge to main only on green ci (this deploys production). Guardrails: if the tag commit has no certified bundle, stop and report, and see the core tracker item for bundles of release tags; do not use --from on a directory the current verifier has not accepted; do not edit release-pin/ by hand. Observation to check: the last Nightly run listed on 2026-11-13 was 43246451958 from 2026-11-12T15:18Z, before the reminder job merged, so the job has not yet been seen running.",
+  "context": "Blocked on core publishing a release newer than v0.5.0; the nightly docs-release-pending issue announces it. Guardrails: owner decides when to publish a release in the docs; if the tag's commit has no certified bundle, stop and report rather than using --from on an unverified directory. Open question to settle during this run: nothing closes the docs-release-pending issue automatically.\n\nReview 2026-11-13: set to blocked because the work cannot start until core publishes a release above v0.5.0; newest published release today is v0.5.0. Unblock when `docs:pin -- --pending` exits 1. Decision gates: owner go-ahead to publish the release in the docs; merge to main only on green ci (this deploys production). Guardrails: if the tag commit has no certified bundle, stop and report, and see the core tracker item for bundles of release tags; do not use --from on a directory the current verifier has not accepted; do not edit release-pin/ by hand. Observation to check: the last Nightly run listed on 2026-11-13 was 43246451958 from 2026-11-12T15:18Z, before the reminder job merged, so the job has not yet been seen running.\n\n2026-11-14: still blocked, newest core release is v0.5.0. Changes since this item was written that the run must use: the main-into-next pull request is merged with `gh pr merge --merge` (repository now allows merge commits); the next-behind-main issue tracks drift; an expired bundle can be rebuilt by dispatching core site-inputs.yml with core_sha (bundle-fetch may hand back a newer production of the same commit); `--from` now needs a complete certified bundle directory; blog posts carrying requires_release pass on main only once the pin reaches that version; the Nightly reminder job has run successfully once (2026-11-14 13:34 UTC, exit 0). At the release, restore on next nothing: next already holds the unreleased text the audit removed from main.",
   "description": "Problem: v0.5.0 was pinned with `--from` after verification by an older verifier, because the current verifier rejects that bundle. The default path of `npm run docs:pin -- vX.Y.Z` (child bundle-fetch with full verification, then the pin swap) has only been exercised up to the expected verification failure and through an injected fetch in tests. Outcome: the first release after v0.5.0 is pinned by the default path, and the release procedure in AGENTS.md is proven end to end.\n\nAt the next published core release: run `npm run docs:pin -- <tag>` on next by pull request, open the next into main pull request, merge on green ci, then merge main into next.",
   "links": [
     "scripts/docs-pin.mjs",
@@ -34,6 +34,14 @@
       "op": "update",
       "op_id": "e3328987e71d48f487a01a7654dbc558",
       "session_id": "524c11ecc7864e4f81039b54632b8c82"
+    },
+    {
+      "actor": "mcp:omp-coding-agent:joe@joe-mac-mini.local:c5b9b54747851b1eaf3e61b4",
+      "at": "2026-11-14T14:47:07Z",
+      "client": "omp-coding-agent",
+      "op": "update",
+      "op_id": "cccd4ca7011c4f25885c09cc9548d554",
+      "session_id": "99f297d0e01b4dd1ab38d39e880d17c4"
     }
   ]
 }
