@@ -812,7 +812,18 @@ This prompt provides:
 
 ## Resources
 
-Resources provide read-only access to BenchBox data. Currently, resources are accessed indirectly through tools.
+Resources provide read-only access to BenchBox data through the MCP `resources/list`, `resources/templates/list` and `resources/read` methods, in addition to the tools that return the same information. Each resource returns JSON text.
+
+| URI | Content |
+|---|---|
+| `benchbox://benchmarks` | The available benchmarks |
+| `benchbox://benchmarks/{name}` | Details and query IDs of one benchmark (resource template) |
+| `benchbox://platforms` | The available database platforms |
+| `benchbox://platforms/{name}` | Details of one platform (resource template) |
+| `benchbox://results/recent` | The most recent benchmark results |
+| `benchbox://system/profile` | The current system profile |
+
+The four URIs without a placeholder are the static resources; the two with `{name}` are the resource templates.
 
 ## Error Handling
 

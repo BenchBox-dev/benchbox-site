@@ -108,7 +108,7 @@ revert a manually-installed version and how to work around it.
 ### Gateway Endpoint
 
 `--gateway espresso|greybeam|custom` routes the connection through a gateway endpoint. A gateway run is recorded as
-non-comparable and non-compliant, and BenchBox reports its cost as not comparable. Options, security, caching, cost and
+non-comparable and non-compliant. Options, security, caching, cost and
 the Greybeam lifecycle guardrails are on the [Snowflake Gateways](snowflake-gateways.md) page.
 
 ## Authentication Methods
@@ -253,8 +253,8 @@ ALTER SESSION SET QUERY_TAG = 'benchbox:tpch:power:Q1';
 A gateway-routed run appends a run-level suffix, `_gw-<8 hex characters>`, to the per-query tag
 (for example `BenchBox_Q1_gw-3fa9c2d1`). The suffix is generated once per adapter instance, so every query in one run
 shares it and a gateway vendor can join its logs to the run. The statistics lookup against `QUERY_HISTORY` uses the
-statement id the connector returns, never the tag, so execution time, compilation time, bytes scanned and credits are
-still recorded when a gateway rewrites the tag. Native runs keep the unsuffixed tag.
+same tag, so execution time, compilation time, bytes scanned and credits are still recorded. Native runs keep the
+unsuffixed tag.
 
 ## Data Loading
 

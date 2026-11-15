@@ -1,23 +1,26 @@
 import { test, afterEach } from "node:test";
 import assert from "node:assert/strict";
-import { cpSync, existsSync, mkdirSync, mkdtempSync, readFileSync, writeFileSync } from "node:fs";
+import { cpSync, existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import path from "node:path";
-import { memberDigest } from "./bundle-lib.mjs";
+import { memberDigest, membersFor } from "./bundle-lib.mjs";
 import { checkPin, checkPinOffline, pendingStatus, pinArguments, pinRelease } from "./docs-pin.mjs";
 
 const COMMIT = "d".repeat(40);
 const OTHER = "e".repeat(40);
+const RUN_ID = "4242";
+const PASSING = ["privacy", "explorer_compat", "snapshot_invariants", "corpus_bijection", "validator_parity"].map((name) => ({ name, result: "pass", inputs: { a: 1 } }));
 const realFetch = globalThis.fetch;
 
 afterEach(() => {
   globalThis.fetch = realFetch;
 });
 
-function stubApi({ release = { draft: false, prerelease: false, tag_name: "v1.2.3" }, commit = COMMIT, releases = [{ tag_name: "v1.2.3" }], fail = false } = {}) {
+function stubApi({ release = { draft: false, prerelease: false, tag_name: "v1.2.3" }, commit = COMMIT, releases = [{ tag_name: "v1.2.3" }], fail = false, run = { path: ".github/workflows/trunk.yml", event: "push", head_branch: "develop", conclusion: "success", head_sha: COMMIT }, runFails = false } = {}) {
   globalThis.fetch = async (url) => {
     const route = String(url).replace("https://api.github.com/", "");
     if (fail) return { ok: false, status: 500, json: async () => ({}) };
+    if (route.includes("/actions/runs/")) return runFails ? { ok: false, status: 500, json: async () => ({}) } : { ok: true, json: async () => run };
     if (route.includes("/releases/tags/")) {
       return release ? { ok: true, json: async () => release } : { ok: false, status: 404, json: async () => ({}) };
     }
@@ -27,16 +30,26 @@ function stubApi({ release = { draft: false, prerelease: false, tag_name: "v1.2.
   };
 }
 
-function fixtureDir(prefix, { coreSha = COMMIT, version = "1.2.3", docsData = "{}\n" } = {}) {
+function fixtureDir(prefix, { coreSha = COMMIT, version = "1.2.3", docsData = "{}\n", certifiedBy = RUN_ID, attestations = PASSING } = {}) {
   const root = mkdtempSync(path.join(tmpdir(), prefix));
-  mkdirSync(path.join(root, "docs-data"));
-  writeFileSync(path.join(root, "docs-data", "docs-data.json"), docsData);
-  writeFileSync(path.join(root, "doc-contracts.json"), '{"c":1}\n');
-  writeFileSync(path.join(root, "repo-files.json"), '{"r":1}\n');
-  const members = Object.fromEntries(
-    ["docs-data", "doc-contracts.json", "repo-files.json"].map((member) => [member, memberDigest(path.join(root, member))]),
-  );
-  writeFileSync(path.join(root, "manifest.json"), JSON.stringify({ core_sha: coreSha, package_version: version, members }));
+  for (const member of membersFor(5)) {
+    const target = path.join(root, member);
+    mkdirSync(path.dirname(target), { recursive: true });
+    if (member === "docs-data") {
+      mkdirSync(target);
+      writeFileSync(path.join(target, "docs-data.json"), docsData);
+    } else if (member === "attestations.json") writeFileSync(target, JSON.stringify(attestations));
+    else if (member === "doc-contracts.json") writeFileSync(target, '{"c":1}\n');
+    else if (member === "repo-files.json") writeFileSync(target, '{"r":1}\n');
+    else if (member.endsWith(".json") || member.endsWith(".duckdb")) writeFileSync(target, `${member}\n`);
+    else {
+      mkdirSync(target);
+      writeFileSync(path.join(target, "f.txt"), `${member}\n`);
+    }
+  }
+  const members = Object.fromEntries(membersFor(5).map((member) => [member, memberDigest(path.join(root, member))]));
+  const manifest = { schema: 5, core_sha: coreSha, parent_core_sha: OTHER, corpus_sha: "c", package_version: version, certified_by: certifiedBy, members };
+  writeFileSync(path.join(root, "manifest.json"), JSON.stringify(manifest));
   return root;
 }
 
@@ -115,7 +128,7 @@ test("a member digest mismatch is refused and leaves the existing pin intact", a
 
 test("repinning replaces the pin", async () => {
   const pinDir = await pinned();
-  stubApi({ commit: OTHER });
+  stubApi({ commit: OTHER, run: { path: ".github/workflows/trunk.yml", event: "push", head_branch: "develop", conclusion: "success", head_sha: OTHER } });
   await pinRelease("v1.2.3", { from: fixtureDir("bundle-", { coreSha: OTHER }), pinDir });
   assert.equal(JSON.parse(readFileSync(path.join(pinDir, "pin.json"), "utf8")).core_sha, OTHER);
 });
@@ -224,4 +237,65 @@ test("--pending ignores drafts, prereleases, data releases and releases older th
   assert.equal((await pendingStatus(pinDir)).code, 0);
   stubApi({ releases: [{ tag_name: "v1.2.2" }] });
   assert.equal((await pendingStatus(pinDir)).code, 0);
+});
+
+test("--from refuses a candidate bundle", async () => {
+  stubApi();
+  await assert.rejects(pinRelease("v1.2.3", { from: fixtureDir("bundle-", { certifiedBy: "candidate" }), pinDir: newPinDir() }), /not a run id/);
+});
+
+test("--from refuses a run that is not a successful trunk push on develop for the commit", async () => {
+  const good = { path: ".github/workflows/trunk.yml", event: "push", head_branch: "develop", conclusion: "success", head_sha: COMMIT };
+  for (const [run, pattern] of [
+    [{ ...good, path: ".github/workflows/other.yml" }, /not trunk\.yml/],
+    [{ ...good, event: "pull_request" }, /not push/],
+    [{ ...good, head_branch: "main" }, /not develop/],
+    [{ ...good, conclusion: "failure" }, /concluded failure/],
+    [{ ...good, head_sha: OTHER }, /different commit/],
+    [null, /not found/],
+  ]) {
+    stubApi({ run });
+    await assert.rejects(pinRelease("v1.2.3", { from: fixtureDir("bundle-"), pinDir: newPinDir() }), pattern);
+  }
+});
+
+test("--from refuses a failed, skipped or missing required attestation", async () => {
+  stubApi();
+  const failed = PASSING.map((entry) => (entry.name === "privacy" ? { ...entry, result: "fail" } : entry));
+  await assert.rejects(pinRelease("v1.2.3", { from: fixtureDir("bundle-", { attestations: failed }), pinDir: newPinDir() }), /privacy failed/);
+  const skipped = PASSING.map((entry) => (entry.name === "corpus_bijection" ? { name: entry.name, result: "skip", reason: "x" } : entry));
+  await assert.rejects(pinRelease("v1.2.3", { from: fixtureDir("bundle-", { attestations: skipped }), pinDir: newPinDir() }), /corpus_bijection was skipped/);
+  const missing = PASSING.filter((entry) => entry.name !== "explorer_compat");
+  await assert.rejects(pinRelease("v1.2.3", { from: fixtureDir("bundle-", { attestations: missing }), pinDir: newPinDir() }), /explorer_compat is missing/);
+  const bundle = fixtureDir("bundle-");
+  rmSync(path.join(bundle, "attestations.json"));
+  await assert.rejects(pinRelease("v1.2.3", { from: bundle, pinDir: newPinDir() }), /attestations\.json/);
+});
+
+test("--from refuses a wrong digest on a member that is not pinned", async () => {
+  stubApi();
+  const bundle = fixtureDir("bundle-");
+  writeFileSync(path.join(bundle, "explorer", "contract.json"), "tampered\n");
+  await assert.rejects(pinRelease("v1.2.3", { from: bundle, pinDir: newPinDir() }), /explorer\/contract\.json does not match/);
+});
+
+test("--from refuses a directory without the full member set", async () => {
+  stubApi();
+  const bundle = fixtureDir("bundle-");
+  const manifest = JSON.parse(readFileSync(path.join(bundle, "manifest.json"), "utf8"));
+  delete manifest.members["explorer/fixtures"];
+  writeFileSync(path.join(bundle, "manifest.json"), JSON.stringify(manifest));
+  await assert.rejects(pinRelease("v1.2.3", { from: bundle, pinDir: newPinDir() }), /member set mismatch/);
+});
+
+test("--from fails closed when the certification lookup errors", async () => {
+  stubApi({ runFails: true });
+  await assert.rejects(pinRelease("v1.2.3", { from: fixtureDir("bundle-"), pinDir: newPinDir() }), /failed closed/);
+});
+
+test("--from accepts a certified complete directory whose doc-contracts would fail schema validation", async () => {
+  stubApi();
+  const pinDir = newPinDir();
+  const pin = await pinRelease("v1.2.3", { from: fixtureDir("bundle-"), pinDir });
+  assert.deepEqual(pin, { tag: "v1.2.3", core_sha: COMMIT });
 });

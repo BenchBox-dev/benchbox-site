@@ -92,7 +92,7 @@ Output on 0.4.1:
 SELECT pageURL, pageRank
 FROM rankings
 WHERE pageRank > 1500;
-Scale factors >= 1 must be whole integers. Got: 1.5. Use values like 1, 2, 10, etc. for large scale factors. Use values like 0.1, 0.01, etc. for small scale factors.
+Scale factors >= 1 must be whole integers. Got: 1.5. Use values like 1, 2, 10, etc. for large scale factors. Use values like 0.1, 0.01, 0.001, etc. for small scale factors.
 ```
 
 ##### Compatibility

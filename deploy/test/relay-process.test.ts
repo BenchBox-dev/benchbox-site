@@ -78,6 +78,64 @@ test("gh process smoke preserves creation body through A B B A, closes only rela
   }
 });
 
+test("a successful deploy comments on and closes only open site-deploy-failed issues and respects markers", () => {
+  const dir = mkdtempSync(join(tmpdir(), "site-local-"));
+  try {
+    writeFileSync(join(dir, "gh"), stub);
+    chmodSync(join(dir, "gh"), 0o755);
+    const statePath = join(dir, "state.json");
+    const issue = (number: number, label: string, open = true) => ({ number, label, body: "x", comments: [], open });
+    const reset = (issues: object[]) => writeFileSync(statePath, JSON.stringify({ calls: [], issues }));
+    const env = { ...process.env, PATH: `${dir}:${process.env.PATH}`, GH_STATE: statePath, GH_TOKEN: "stub", REPO: "BenchBox-dev/benchbox-site", RUN_URL: "https://example.test/runs/9", CORE_SHA: "core111", SITE_SHA: "site222", EXPECTED_REJECTION: "" };
+    const run = (extra = {}) => spawnSync(process.execPath, ["--experimental-strip-types", join(root, "deploy/relay-cli.ts"), "site-success"], { env: { ...env, ...extra }, encoding: "utf8" });
+    const read = () => JSON.parse(readFileSync(statePath, "utf8"));
+    const writes = (calls: string[][]) => calls.filter((args) => args[1] !== "list");
+
+    reset([issue(7, "site-deploy-failed"), issue(8, "site-deploy-failed"), issue(9, "site-bundle-undeployed"), issue(10, "unlabelled"), issue(11, "site-deploy-failed", false)]);
+    const closed = run();
+    assert.equal(closed.status, 0, closed.stderr);
+    assert.match(closed.stdout, /closed #7/);
+    let state = read();
+    assert.deepEqual(state.issues.map((item: { open: boolean }) => item.open), [false, false, true, true, false]);
+    for (const number of [7, 8]) {
+      const comment = state.issues.find((item: { number: number }) => item.number === number).comments.at(-1).body;
+      assert.match(comment, /https:\/\/example.test\/runs\/9/);
+      assert.match(comment, /core111/);
+      assert.match(comment, /site222/);
+    }
+    assert.equal(state.issues[2].comments.length, 0);
+    assert.equal(state.issues[3].comments.length, 0);
+    assert.ok(state.calls.every((args: string[]) => args.includes("BenchBox-dev/benchbox-site")));
+
+    reset([issue(9, "site-bundle-undeployed"), issue(10, "unlabelled")]);
+    const none = run();
+    assert.equal(none.status, 0, none.stderr);
+    assert.match(none.stdout, /none_open/);
+    assert.deepEqual(writes(read().calls), []);
+
+    reset([issue(7, "site-deploy-failed")]);
+    assert.equal(run({ EXPECTED_REJECTION: "true" }).status, 0);
+    state = read();
+    assert.equal(state.issues[0].open, true);
+    assert.deepEqual(state.calls, []);
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+test("the site-local close runs only after a deploy that succeeded and holds issue write on its own job", () => {
+  const job = workflow.jobs["close-site-issues"];
+  assert.deepEqual(job.permissions, { contents: "read", issues: "write" });
+  assert.deepEqual(job.needs, ["build", "deploy"]);
+  assert.equal(job.if, "success() && needs.deploy.result == 'success' && inputs.mode != 'rollback'");
+  const reporter = job.steps.find((step: { run?: string }) => step.run?.includes("relay-cli.ts site-success"));
+  assert.match(reporter.env.EXPECTED_REJECTION, /inputs.expected_rejection.*client_payload.expected_rejection/);
+  assert.equal(reporter.env.GH_TOKEN, "${{ github.token }}");
+  assert.equal(reporter.env.CORE_SHA, "${{ needs.build.outputs.core_sha }}");
+  assert.equal(workflow.jobs.deploy.permissions.issues, undefined);
+  assert.equal(workflow.jobs["report-success"].permissions, undefined);
+});
+
 test("failure capture propagates actual failing signatures without passing gate contamination", () => {
   const dir = mkdtempSync(join(tmpdir(), "site-step-"));
   try {

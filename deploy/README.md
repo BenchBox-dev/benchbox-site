@@ -155,8 +155,8 @@ the candidate's and acts on the result:
   the run is superseded. It logs a notice naming both core commits, sets the
   build output `superseded=true`, skips the docs check, build, gates, artifact
   uploads and the `deploy` job, and concludes success. It opens no
-  site-deploy-failed comment and neither opens nor closes a core
-  site-bundle-undeployed issue.
+  site-deploy-failed comment, closes no site-deploy-failed issue, and neither
+  opens nor closes a core site-bundle-undeployed issue.
 - `behind` and this run's commit is not the deployed one: the run deploys
   this site commit with the deployed core bundle. It fetches the bundle by the
   receipt's `core_sha` and fails closed unless its digest equals the
@@ -197,7 +197,12 @@ receipt.
 
 ## Failure reports
 
-A failed run opens or updates a site-local `site-deploy-failed` issue.
+A failed run opens or updates a site-local `site-deploy-failed` issue, and a
+later run that actually deploys successfully comments on it with the run URL
+and the deployed core and site commits, then closes every open issue bearing
+that label. A superseded run, a run with `SITE_DEPLOY_TARGET` unset and an
+`expected_rejection` run neither open nor close it. A rollback does not close
+it; the next successful deploy does.
 Core-dispatched failures also relay to core under `site-bundle-undeployed`,
 classified as producer-not-concluded, contract-version-mismatch,
 snapshot-digest, probe-mismatch or infrastructure (including unknown errors).

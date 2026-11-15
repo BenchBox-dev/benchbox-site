@@ -12,7 +12,7 @@ This page gathers policy that is already written down elsewhere in the documenta
 
 ## What a scale factor supports
 
-BenchBox accepts scale factors from 0.01 to 100000, and each benchmark has a short set of standard scale factors, typically 0.01, 0.1, 1 and 10. A scale factor outside the benchmark's standard set runs with a one-line note that its results are not comparable with published results ([Benchmarks overview](../benchmarks/index.md)).
+Each benchmark has a short set of standard scale factors, typically 0.01, 0.1, 1 and 10, and `benchbox run` rejects a scale factor outside the benchmark's list. TPC-DS and ClickBench accept a range instead ([Benchmarks overview](../benchmarks/index.md)).
 
 | Purpose | What the existing guidance says | Source |
 |---|---|---|
@@ -66,7 +66,7 @@ Comparisons are meaningful only when the workload, scale, phase, configuration, 
 | Tuning mode | `tuning_mode` is the comparability facet and matches exactly; an unrecorded tuning mode never matches `notuning`. | [Tuning mode vocabulary](../development/tuning-adr-002-mode-vocabulary-fallback-facets.md) |
 | Execution mode | Exact timing values must not be compared across SQL and DataFrame modes. | [Public contracts](../reference/public-contracts.md) |
 | Execution variant | Comparison refuses incomparable deployment, requested engine and gateway combinations and names the parts that differ. | [Execution variants](../development/adr/adr-core-execution-variants.md) |
-| Timing mode | Runs are compared and ranked within one timing method; maintenance timings from different methods are not comparable. | [Client link locality disclosure](../development/adr/adr-client-link-locality-disclosure.md), [Maintenance phase guide](../guides/tpc/maintenance-phase-guide.md) |
+| Timing mode | Runs are compared and ranked within one timing method. | [Client link locality disclosure](../development/adr/adr-client-link-locality-disclosure.md) |
 | Hardware and environment | Compare results with matching `environment` values. | [Data model](data-model.md) |
 | Subscale TPC runs | Power@Size for a run below scale factor 1 is for comparison within its subscale cohort only and is not a TPC result. | [Subscale ranking policy](../development/adr/adr-subscale-tpc-ranking-policy.md) |
 | TPC-derived results | They must not be compared with official TPC results. | [TPC trademarks](../benchmarks/tpc-trademarks.md) |
@@ -111,4 +111,4 @@ TPC-H and TPC-DS runs below scale factor 1 are recorded as `unofficial_subscale`
 
 ## Open questions
 
-Some questions have no written policy yet, so this page does not answer them. Vendor terms on publishing benchmark results are one of them: the page asserts nothing about what any vendor's terms allow. For the conditions that `benchbox submit` records and enforces today, see the [vendor publishing checklist](../vendor-publishing-checklist.md).
+Some questions have no written policy yet, so this page does not answer them. Vendor terms on publishing benchmark results are one of them: the page asserts nothing about what any vendor's terms allow.

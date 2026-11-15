@@ -304,7 +304,7 @@ An `ExecutionConfigHelper` with the provider in `config_manager`. Its methods re
 
 | Method | Returns |
 | --- | --- |
-| `get_power_run_settings()` | A `PowerRunSettings` dataclass with `iterations` (default 4), `warm_up_iterations` (0), `timeout_per_iteration_minutes` (60), `fail_fast` (`False`) and `collect_metrics` (`True`). |
+| `get_power_run_settings()` | A `PowerRunSettings` dataclass with `iterations`, `warm_up_iterations`, `timeout_per_iteration_minutes` (60), `fail_fast` (`False`) and `collect_metrics` (`True`). With no provider registered, `iterations` is 4 and `warm_up_iterations` is 0. Under the `benchbox` CLI's provider they are 3 and 1. |
 | `get_concurrent_queries_settings()` | A `ConcurrentQueriesSettings` dataclass with `enabled` (`False`), `max_concurrent` (2), `query_timeout_seconds` (300), `stream_timeout_seconds` (`None`, not set), `retry_failed_queries` (`True`), `max_retries` (3) and `cancel_on_timeout` (`False`). |
 | `update_power_run_settings(settings)` and `update_concurrent_queries_settings(settings)` | `None`. Write every field of the settings object to the provider, except a `stream_timeout_seconds` of `None`, which is left unwritten so the benchmark default applies. |
 | `enable_power_run_iterations(iterations: int = 3, warm_up_iterations: int = 1)` | `None`. Sets the two counts. |
@@ -2131,7 +2131,7 @@ A `SimpleConfigProvider`. Keys are flat dotted strings, not nested-path lookups.
 <span id="benchbox.utils.config_interface.SimpleConfigProvider.update"></span>
 `update(config_dict)` stores several values without validation or persistence.
 
-The built-in `execution.power_run` defaults are `iterations=4`, `warm_up_iterations=0`, `timeout_per_iteration_minutes=60` and `concurrent_streams=1`. The `execution.throughput_test` defaults are `duration_minutes=60`, `concurrent_streams=4` and `warm_up_minutes=5`. The other execution defaults are `timeout_minutes=120`, `memory_limit_gb=8` and `enable_profiling=False`.
+The built-in `execution.power_run` defaults are `iterations=4`, `warm_up_iterations=0`, `timeout_per_iteration_minutes=60` and `concurrent_streams=1`. They apply only to a plain Python process that has registered no provider. The `benchbox` CLI registers its own provider at start-up, and under it `iterations` is 3 and `warm_up_iterations` is 1, the values that [`execution.power_run`](../cli/configuration.md) documents. The `execution.throughput_test` defaults are `duration_minutes=60`, `concurrent_streams=4` and `warm_up_minutes=5`. The other execution defaults are `timeout_minutes=120`, `memory_limit_gb=8` and `enable_profiling=False`.
 
 #### Raises
 

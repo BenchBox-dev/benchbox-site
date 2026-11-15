@@ -42,6 +42,7 @@ benchbox run [OPTIONS]
     alias). The deprecated `run-official` command also spells the setting
     `--streams` — see [Deprecated: `run-official`](#deprecated-run-official)
     below.
+- `--iterations INTEGER`: Number of measured power test iterations (default: 3, minimum 1). Each power test also runs one warm-up pass first. Power phase only; a warning is printed when no power phase is selected. An advanced option listed by `benchbox run --help-topic all`.
 - `--force [MODE]`: Force regeneration of data (modes: `all`, `datagen`, `upload`, or `datagen,upload`)
 - `--non-interactive`: Use defaults for all prompts (useful for automation)
 
@@ -93,7 +94,7 @@ benchbox run [OPTIONS]
 
 - `--validation TEXT`: Validation mode
   - `exact`: Exact row count validation (default)
-  - `loose`: Loose validation (±5% tolerance)
+  - `loose`: Loose validation (±50% row-count tolerance, applied to each query's expected row count)
   - `range`: Min/max bounds validation
   - `disabled`: No validation
   - `full`: All validation checks enabled (preflight, postgen, postload, platform check)

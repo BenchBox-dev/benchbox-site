@@ -1,4 +1,5 @@
 export const RELAY_LABEL = "site-bundle-undeployed";
+export const SITE_LABEL = "site-deploy-failed";
 export const RELAY_TITLE = "Site could not deploy a core bundle";
 export const FAILURE_CLASSES = [
   "producer-not-concluded",
@@ -134,6 +135,34 @@ export async function closeRelayOnSuccess(
 
   for (const issue of openIssues) {
     await client.closeIssue(coreRepo, issue.number, comment);
+  }
+
+  return { action: "closed", issueNumber: openIssues[0].number };
+}
+
+export async function closeSiteIssuesOnSuccess(
+  client: GhClient,
+  siteRepo: string,
+  details: {
+    coreSha?: string;
+    siteSha?: string;
+    runUrl?: string;
+    expectedRejection?: boolean;
+  } = {},
+): Promise<{ action: "skipped" | "closed" | "none_open"; issueNumber?: number }> {
+  if (details.expectedRejection) {
+    return { action: "skipped" };
+  }
+
+  const openIssues = await client.listOpenIssues(siteRepo, SITE_LABEL);
+  if (openIssues.length === 0) {
+    return { action: "none_open" };
+  }
+
+  const comment = `A deploy succeeded, so this incident is closed.\n\nRun: ${details.runUrl || "unknown"}\n\nDeployed core commit: ${details.coreSha || "unknown"}\nDeployed site commit: ${details.siteSha || "unknown"}\n`;
+
+  for (const issue of openIssues) {
+    await client.closeIssue(siteRepo, issue.number, comment);
   }
 
   return { action: "closed", issueNumber: openIssues[0].number };

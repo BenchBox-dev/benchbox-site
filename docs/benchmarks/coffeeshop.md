@@ -246,9 +246,6 @@ ORDER BY revenue DESC;
 | 1.0 | ~8.5M | ~13.3M | ~1 GB |
 | 10.0 | ~85M | ~133M | ~10 GB |
 
-The standard scale factors for CoffeeShop are 0.01, 0.1 and 1. The 10 row runs with a note that its results are not
-comparable with published results; see [Scale factors](index.md#scale-factors).
-
 ## API Reference
 
 ### CoffeeShop Class
