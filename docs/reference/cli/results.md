@@ -226,8 +226,6 @@ benchbox compare baseline.json current.json --fail-on-regression 10% --min-regre
 
 A query now fails the gate only when it is more than 10% slower and more than 7 ms slower. A 10 ms query that becomes 12 ms passes. A 5 s query that becomes 5.6 s still fails.
 
-To choose these values from measured spread and to run the check in CI, see [Gate performance in CI with benchbox compare](../../guides/ci-performance-regression.md).
-
 **Export Comparison Reports:**
 
 ```bash
