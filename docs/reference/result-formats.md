@@ -542,7 +542,7 @@ Records the load on the machine that ran the benchmark client at two points, so 
 | `<sample>.swap_percent` | number \| null | Swap in use as a percentage of swap. |
 | `<sample>.sampled_at` | string | Wall-clock time of the sample. For audit only. |
 
-A value that is unavailable is an explicit `null`, and every value is `null` when no snapshot exists, for example for DataFrame platforms, which take none. The field is optional and was added without a schema version change; bundles with and without it are both valid, and the integrity validator reports an INFO finding, "Host load not recorded", for those without it.
+A value that is unavailable is an explicit `null`, and every value is `null` when no snapshot exists. DataFrame runs take both samples the same way SQL runs do: the start sample before data load and the end sample after the query phase, both outside every timed interval, and both are recorded when the load fails. Bundles from earlier releases have all-`null` samples for DataFrame platforms. The field is optional and was added without a schema version change; bundles with and without it are both valid, and the integrity validator reports an INFO finding, "Host load not recorded", for those without it.
 
 ```json
 {

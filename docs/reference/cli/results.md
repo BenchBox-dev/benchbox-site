@@ -22,7 +22,7 @@ Re-export existing benchmark results in different formats without re-running ben
 - `--last`: Export most recent result file
 - `--benchmark TEXT`: Filter by benchmark name when using --last
 - `--platform TEXT`: Filter by platform name when using --last
-- `--force`: Overwrite existing files without prompting
+- `--force`: Overwrite existing files without prompting. Without it, a session with no terminal exits 6 when an export would overwrite a file
 
 ### Supported Export Formats
 

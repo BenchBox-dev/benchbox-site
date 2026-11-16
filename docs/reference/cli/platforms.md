@@ -78,7 +78,7 @@ benchbox platforms disable sqlite
 
 ### `platforms install` - Installation Guide
 
-Get step-by-step installation guidance for platform dependencies.
+Print installation instructions for a platform's dependencies. The command prints instructions only and never installs anything, and `--dry-run` behaves the same way.
 
 **Options:**
 
@@ -206,7 +206,7 @@ You can manually edit this file, but it's recommended to use the `platforms enab
 ## Notes
 
 - **Credentials vs. Availability**: The `platforms` commands manage platform *availability* (dependencies installed). For cloud platforms, you also need to configure *credentials* using `benchbox setup --platform <name>`.
-- **Dependency Management**: Platform dependencies are installed via `pip` or `uv`. The `platforms install` command provides guidance but doesn't execute installations automatically.
+- **Dependency Management**: Platform dependencies are installed via `pip` or `uv`. The `platforms install` command prints instructions only; it never installs.
 - **Enabled by Default**: Most platforms are enabled by default if their dependencies are detected. You only need to explicitly enable platforms if you've previously disabled them.
 
 ## Related

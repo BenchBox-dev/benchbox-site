@@ -112,7 +112,7 @@ only possible when a resolver service exists and is explicitly configured.
 Common flags:
 
 - `--target <path-or-uri>` - destination directory or cloud URI prefix
-- `--label <maintainer-run|community-submission|ci|local>` - provenance label
+- `--label <maintainer-run|community-submission|vendor-supplied|ci|local|unofficial-research>` - provenance label. `maintainer-run` is the default and is refused with exit 6 unless `BENCHBOX_ALLOW_MAINTAINER_LABEL=1` is set, so a plain `publish run` needs either that variable or an explicit `--label`. The same rule applies to `run --publish` (label `--publish-label`), which is checked before the run starts. Other labels are unaffected
 - `--dry-run` - preview without publishing
 - `--last` - publish the last exported result
 
@@ -142,7 +142,7 @@ benchbox publish list
 benchbox publish show abc123def456
 
 # Remove a publication record (does not delete artifact files)
-benchbox publish remove abc123def456
+benchbox publish remove abc123def456 --yes
 ```
 
 ### `benchbox submit`
@@ -155,6 +155,7 @@ Common flags:
 - `--last` - use the most recent result file
 - `--output <dir>` - create a PR-ready local submission package
 - `--service [url]` - upload to the hosted ingest API
+- `--acknowledge-hosted-submission` - acknowledge a hosted upload; a non-interactive `--service` submission exits 6 without it or `BENCHBOX_ACKNOWLEDGE_HOSTED_SUBMISSION=1`
 - `--visibility <public|unlisted|private>` - hosted visibility
 - `--idempotency-key <key>` - override the stable hosted retry key
 - `--wait / --no-wait` - poll or return after hosted acceptance
