@@ -36,6 +36,16 @@ test("the probe manifest covers every route class and samples more files", () =>
   assert.throws(() => checksumManifest(site({ "index.html": "home" })), /required probe paths/);
 });
 
+test("the probe manifest always carries the published result schema when the artifact has it", () => {
+  const without = checksumManifest(site({ ...REQUIRED }));
+  assert.ok(!("/schemas/result-bundle-2.schema.json" in without));
+  const files: Record<string, string> = { ...REQUIRED };
+  for (let index = 0; index < 60; index += 1) files[`assets/f${index}.css`] = `c${index}`;
+  files["schemas/result-bundle-2.schema.json"] = "{}";
+  const manifest = checksumManifest(site(files));
+  assert.equal(manifest["/schemas/result-bundle-2.schema.json"], sha("{}"));
+});
+
 test("the probe manifest samples one legacy download per extension under its dotted URL", () => {
   const legacy = {
     "docs/_downloads/0123456789abcdef0123456789abcdef/run.py/index.html": "py",
@@ -186,5 +196,23 @@ test("persistent byte mismatches retain hashes and cache headers in the receipt"
   } finally {
     server.closeAllConnections();
     await new Promise<void>((resolve, reject) => server.close((error) => error ? reject(error) : resolve()));
+  }
+});
+
+test("the probe manifest includes llms.txt when the artifact has it and tolerates its absence", () => {
+  const withLlms = checksumManifest(site({ ...REQUIRED, "llms.txt": "# BenchBox\n" }));
+  assert.equal(withLlms["/llms.txt"], sha("# BenchBox\n"));
+  assert.equal("/llms.txt" in checksumManifest(site(REQUIRED)), false);
+});
+
+test("llms.txt and Markdown pages must be served as text", async () => {
+  const serve = (contentType: string) => async () => ({ status: 200, body: new TextEncoder().encode("text"), headers: { "content-type": contentType } });
+  for (const url of ["/llms.txt", "/docs/usage/installation.md"]) {
+    const manifest = { [url]: sha("text") };
+    for (const accepted of ["text/plain; charset=utf-8", "text/markdown; charset=utf-8"]) {
+      assert.deepEqual((await probeOnce("https://site.test", manifest, serve(accepted))).errors, []);
+    }
+    const html = await probeOnce("https://site.test", manifest, serve("text/html; charset=utf-8"));
+    assert.deepEqual(html.errors, [`${url}: content type text/html; charset=utf-8 is not text/plain or text/markdown`]);
   }
 });

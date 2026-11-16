@@ -111,7 +111,7 @@ describe.skipIf(site === undefined)("built result permalink pages", () => {
         const structure = summaryStructure(readFileSync(path.join(directory, name), "utf-8"));
         const statusColumn = kind === "platforms" ? 7 : 6;
         for (const cells of structure.mainRows) expect(cells[statusColumn], `${kind}/${name}`).toBe("Ranked");
-        for (const cells of structure.excludedRows) expect(cells.at(-1), `${kind}/${name}`).not.toBe("Ranked");
+        for (const cells of structure.excludedRows) expect(cells[7], `${kind}/${name}`).not.toBe("Ranked");
         expect(structure.excludedHeadingBeforeTable, `${kind}/${name}`).toBe(true);
         if (structure.excludedRows.length > 0) excludedPages += 1;
       }

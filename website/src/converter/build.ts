@@ -11,8 +11,11 @@ import { NAV_FILE, parseNav } from "./nav.ts";
 import { generateTagSources, tagCounts, type TaggedDocument } from "./tag-pages.ts";
 import { buildSidebar, type SidebarManifest } from "./sidebar.ts";
 import { listDocSources } from "./sources.ts";
+import { docRoutesOf, exportMarkdown, linkedPages, markdownPath, markdownUrl } from "./markdown-export.ts";
+import { plainText } from "./text.ts";
+import { renderLlms, LlmsError, type LlmsPage } from "../lib/llms.ts";
 
-export type BuildOptions = { docsRoot: string; registry?: HandlerRegistry; knownBrokenLinks?: ReadonlySet<string> };
+export type BuildOptions = { docsRoot: string; registry?: HandlerRegistry; knownBrokenLinks?: ReadonlySet<string>; origin?: string };
 
 export type BuildSummary = { pages: number; md: number; mdx: number; mdxPages: string[] };
 
@@ -44,6 +47,25 @@ function sidebarFor(docsRoot: string, index: DocsIndex, tagged: readonly TaggedD
     if (!(error instanceof ConverterError)) throw error;
     errors.push(error);
     return { groups: [], order: {} };
+  }
+}
+
+function emitMarkdown(documents: readonly ConvertedDocument[], sidebar: SidebarManifest, origin: string, files: Map<string, string>, errors: ConverterError[]): void {
+  const routes = { origin, docRoutes: docRoutesOf(documents) };
+  const docs = documents.filter((document) => document.collection === "docs");
+  for (const document of docs) files.set(markdownPath(document.path), exportMarkdown(document, routes));
+  const landing = docs.find((document) => document.path === "index.md")?.root.children.find((node) => node.type === "paragraph");
+  const pages: LlmsPage[] = docs.map((document) => {
+    const page: LlmsPage = { path: document.path, route: document.info.route, title: document.info.title, links: linkedPages(document, routes.docRoutes) };
+    if (typeof document.data.description === "string") page.description = document.data.description;
+    return page;
+  });
+  try {
+    if (landing === undefined) throw new LlmsError(["index.md has no introductory paragraph to use as the summary"]);
+    files.set("manifest/llms.txt", renderLlms({ origin, summary: plainText(landing).replace(/\s+/g, " ").trim(), sidebar, pages, markdownUrl: (relative) => markdownUrl(origin, relative) }));
+  } catch (error) {
+    if (!(error instanceof LlmsError)) throw error;
+    errors.push(new ConverterError("nav.yml", 1, error.message));
   }
 }
 
@@ -89,6 +111,7 @@ export function buildSite(options: BuildOptions): BuildResult {
       tags.set(tag, pages);
     }
   }
+  if (options.origin !== undefined) emitMarkdown(documents, sidebar, options.origin, files, errors);
   files.set("manifest/sidebar.json", json(sidebar));
   files.set("manifest/tags.json", json(Object.fromEntries([...tags.entries()].sort((a, b) => (a[0] < b[0] ? -1 : 1)))));
   files.set("manifest/summary.json", json(summary));

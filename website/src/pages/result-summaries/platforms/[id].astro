@@ -25,13 +25,23 @@ const description = `${page.label} on BenchBox: ${page.resultCount} published ${
     {page.benchmarks.map((benchmark) => <li><a href={benchmark.summaryHref}>{benchmark.label}</a>, {benchmark.runCount} {benchmark.runCount === 1 ? "run" : "runs"}</li>)}
   </ul>
 
+  <h2 id="score-definitions">Score definitions</h2>
+  <dl>
+    {page.scoreDefinitions.map((definition) => (
+      <>
+        <dt>{definition.label}</dt>
+        <dd>{definition.meaning} Unit: {definition.unit}; {definition.direction}. <a href={definition.href}>Definition in the benchmark methodology</a>.</dd>
+      </>
+    ))}
+  </dl>
+
   <h2>Ranked runs</h2>
   {page.ranked.length === 0 && <p>None of this platform's published runs is ranked.</p>}
   {page.ranked.length > 0 && (
   <div class="result-summary__table">
     <table>
       <thead>
-        <tr><th scope="col">Benchmark</th><th scope="col">Scale</th><th scope="col">Phase</th><th scope="col">Version</th><th scope="col">Run date</th><th scope="col">Score</th><th scope="col">Geomean</th><th scope="col">Ranking</th></tr>
+        <tr><th scope="col">Benchmark</th><th scope="col">Scale</th><th scope="col">Phase</th><th scope="col">Version</th><th scope="col">Run date</th><th scope="col">Score</th><th scope="col">Geomean</th><th scope="col">Ranking</th><th scope="col">Execution environment</th><th scope="col">Tuning mode</th><th scope="col">Trust label</th></tr>
       </thead>
       <tbody>
         {page.ranked.map((run) => (
@@ -44,6 +54,7 @@ const description = `${page.label} on BenchBox: ${page.resultCount} published ${
             <td title={run.metricLabel}>{run.score}</td>
             <td>{run.geomean}</td>
             <td>{run.rankingStatus}</td>
+            <td>{run.environment}</td><td>{run.tuningMode}</td><td>{run.trustLabel}</td>
           </tr>
         ))}
       </tbody>
@@ -60,7 +71,7 @@ const description = `${page.label} on BenchBox: ${page.resultCount} published ${
       <div class="result-summary__table">
         <table>
       <thead>
-        <tr><th scope="col">Benchmark</th><th scope="col">Scale</th><th scope="col">Phase</th><th scope="col">Version</th><th scope="col">Run date</th><th scope="col">Score</th><th scope="col">Geomean</th><th scope="col">Reason not ranked</th></tr>
+        <tr><th scope="col">Benchmark</th><th scope="col">Scale</th><th scope="col">Phase</th><th scope="col">Version</th><th scope="col">Run date</th><th scope="col">Score</th><th scope="col">Geomean</th><th scope="col">Reason not ranked</th><th scope="col">Execution environment</th><th scope="col">Tuning mode</th><th scope="col">Trust label</th></tr>
       </thead>
       <tbody>
         {page.excluded.map((run) => (
@@ -73,6 +84,7 @@ const description = `${page.label} on BenchBox: ${page.resultCount} published ${
             <td title={run.metricLabel}>{run.score}</td>
             <td>{run.geomean}</td>
             <td>{run.rankingStatus}</td>
+            <td>{run.environment}</td><td>{run.tuningMode}</td><td>{run.trustLabel}</td>
           </tr>
         ))}
       </tbody>

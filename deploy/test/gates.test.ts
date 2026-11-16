@@ -1,6 +1,8 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { createHash } from "node:crypto";
+import { readFileSync } from "node:fs";
+import path from "node:path";
 import { explorerCompatGate, requiredPairs, uiVersionFromSource } from "../gates/explorer-compat.ts";
 import { runGates } from "../gates/index.ts";
 import { findBrokenLinks, linksGate, routedAllowance, type BrokenLink } from "../gates/links.ts";
@@ -120,6 +122,13 @@ test("origin: rehearsal artifacts carry no production origin outside the allowli
   assert.equal(result.status, "fail");
   assert.deepEqual(result.findings, ["docs/a.html"]);
   assert.equal(originGate({ siteDir: site({ "blog/post.html": "https://benchbox.dev" }), target: "rehearsal", allowlist }).status, "pass");
+});
+
+test("origin: the published result schema keeps its production id in a rehearsal artifact", () => {
+  const allowlist = JSON.parse(readFileSync(path.join(import.meta.dirname, "..", "origin-allowlist.json"), "utf8")).map((pattern: string) => new RegExp(pattern));
+  const schema = '{"$id":"https://benchbox.dev/schemas/result-bundle-2.schema.json"}';
+  assert.equal(originGate({ siteDir: site({ "schemas/result-bundle-2.schema.json": schema }), target: "rehearsal", allowlist }).status, "pass");
+  assert.equal(originGate({ siteDir: site({ "schemas/other.json": schema }), target: "rehearsal", allowlist }).status, "fail");
 });
 
 const LINKED = {

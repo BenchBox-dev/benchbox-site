@@ -3,7 +3,12 @@ import { readFileSync, readdirSync, statSync, existsSync } from "node:fs";
 import path from "node:path";
 import Ajv2020 from "ajv/dist/2020.js";
 
-export const SUPPORTED_SCHEMAS = [4, 5];
+export const SUPPORTED_SCHEMAS = [4, 5, 6];
+export const RESULT_SCHEMA_MEMBER = "result-bundle.schema.json";
+export const RESULT_SCHEMA_ID = "https://benchbox.dev/schemas/result-bundle-2.schema.json";
+export const RESULT_SCHEMA_DIALECT = "https://json-schema.org/draft/2020-12/schema";
+export const RESULT_SCHEMA_VERSION = /^2\.\d+$/;
+export const PUBLISHED_RESULT_SCHEMA = "schemas/result-bundle-2.schema.json";
 export const CANDIDATE_CERTIFIER = "candidate";
 export const DOCS_DATA_FILE = "docs-data.json";
 export const SCHEMA_DIR = path.join(import.meta.dirname, "schemas");
@@ -20,9 +25,11 @@ const BASE_MEMBERS = [
 ];
 const CONTRACT_MEMBERS = ["docs-data", "doc-contracts.json"];
 const SCHEMA_4_MEMBERS = [...BASE_MEMBERS, "downloads", "explorer/bundles", ...CONTRACT_MEMBERS];
+const SCHEMA_5_MEMBERS = SCHEMA_4_MEMBERS.filter((name) => name !== "docs" && name !== "downloads");
 const MEMBERS_BY_SCHEMA = {
   4: SCHEMA_4_MEMBERS,
-  5: SCHEMA_4_MEMBERS.filter((name) => name !== "docs" && name !== "downloads"),
+  5: SCHEMA_5_MEMBERS,
+  6: [...SCHEMA_5_MEMBERS, RESULT_SCHEMA_MEMBER],
 };
 
 export function membersFor(schema) {
@@ -94,6 +101,35 @@ function schemaErrors(label, file, schemaName) {
   return validate.errors.slice(0, 5).map((error) => `${label} ${error.instancePath || "<root>"}: ${error.message}`);
 }
 
+export function resultSchemaErrors(file) {
+  let schema;
+  try {
+    schema = readJson(file);
+  } catch (error) {
+    return [`${RESULT_SCHEMA_MEMBER} is not readable JSON: ${error.message}`];
+  }
+  const errors = [];
+  if (schema === null || typeof schema !== "object" || Array.isArray(schema)) {
+    return [`${RESULT_SCHEMA_MEMBER} is not a JSON object`];
+  }
+  if (schema.$schema !== RESULT_SCHEMA_DIALECT) {
+    errors.push(`${RESULT_SCHEMA_MEMBER} $schema is ${JSON.stringify(schema.$schema)}, not ${RESULT_SCHEMA_DIALECT}`);
+  }
+  if (schema.$id !== RESULT_SCHEMA_ID) {
+    errors.push(`${RESULT_SCHEMA_MEMBER} $id is ${JSON.stringify(schema.$id)}, not ${RESULT_SCHEMA_ID}`);
+  }
+  if (typeof schema.result_schema_version !== "string" || !RESULT_SCHEMA_VERSION.test(schema.result_schema_version)) {
+    errors.push(`${RESULT_SCHEMA_MEMBER} result_schema_version is ${JSON.stringify(schema.result_schema_version)}, not a 2.x version`);
+  }
+  if (errors.length > 0) return errors;
+  try {
+    new Ajv2020({ strict: false, validateFormats: false }).compile(schema);
+  } catch (error) {
+    errors.push(`${RESULT_SCHEMA_MEMBER} is not a valid JSON Schema: ${error.message}`);
+  }
+  return errors;
+}
+
 const RUN_ID = /^\d+$/;
 function certifierAccepted(manifest) {
   if (manifest.certified_by === CANDIDATE_CERTIFIER) return true;
@@ -122,6 +158,11 @@ export function checkCandidate(dir, manifest) {
     errors.push(...schemaErrors("doc-contracts", contracts, "doc-contracts"));
   } else {
     errors.push("doc-contracts.json is not a file");
+  }
+  if (manifest.schema === 6) {
+    const schemaFile = path.join(dir, RESULT_SCHEMA_MEMBER);
+    if (existsSync(schemaFile) && statSync(schemaFile).isFile()) errors.push(...resultSchemaErrors(schemaFile));
+    else errors.push(`${RESULT_SCHEMA_MEMBER} is not a file`);
   }
   return errors;
 }
