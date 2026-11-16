@@ -198,3 +198,21 @@ test("persistent byte mismatches retain hashes and cache headers in the receipt"
     await new Promise<void>((resolve, reject) => server.close((error) => error ? reject(error) : resolve()));
   }
 });
+
+test("the probe manifest includes llms.txt when the artifact has it and tolerates its absence", () => {
+  const withLlms = checksumManifest(site({ ...REQUIRED, "llms.txt": "# BenchBox\n" }));
+  assert.equal(withLlms["/llms.txt"], sha("# BenchBox\n"));
+  assert.equal("/llms.txt" in checksumManifest(site(REQUIRED)), false);
+});
+
+test("llms.txt and Markdown pages must be served as text", async () => {
+  const serve = (contentType: string) => async () => ({ status: 200, body: new TextEncoder().encode("text"), headers: { "content-type": contentType } });
+  for (const url of ["/llms.txt", "/docs/usage/installation.md"]) {
+    const manifest = { [url]: sha("text") };
+    for (const accepted of ["text/plain; charset=utf-8", "text/markdown; charset=utf-8"]) {
+      assert.deepEqual((await probeOnce("https://site.test", manifest, serve(accepted))).errors, []);
+    }
+    const html = await probeOnce("https://site.test", manifest, serve("text/html; charset=utf-8"));
+    assert.deepEqual(html.errors, [`${url}: content type text/html; charset=utf-8 is not text/plain or text/markdown`]);
+  }
+});

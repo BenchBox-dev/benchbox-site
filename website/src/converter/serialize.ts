@@ -11,7 +11,7 @@ import type { SourcePosition } from "./model.ts";
 
 export type SerializedDocument = { outputPath: string; content: string; format: "md" | "mdx" };
 
-const STRINGIFY_OPTIONS = {
+export const STRINGIFY_OPTIONS = {
   bullet: "-",
   bulletOther: "*",
   emphasis: "*",

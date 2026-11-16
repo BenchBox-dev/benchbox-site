@@ -157,6 +157,7 @@ groups:
       - guides/ci-performance-regression.md
       - guides/cloud-storage.md
       - guides/compression.md
+      - guides/agent-readable-docs.md
       - page: advanced/index.md
         items:
           - advanced/power-run-concurrent-queries.md

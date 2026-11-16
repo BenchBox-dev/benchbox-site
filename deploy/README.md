@@ -195,6 +195,13 @@ deadline, and a mismatch still present then fails the run. If the probes fail
 after a deploy, the run dispatches at most one rollback to the last known good
 receipt.
 
+The probe also covers `/llms.txt` and the Markdown copies of the documentation
+pages under `/docs/`: `/llms.txt` joins the manifest when the artifact has it
+(an older artifact restored by a rollback has none), `.md` files are among the
+sampled files, and both must be served as `text/plain` or `text/markdown`.
+`scripts/probe-routes.mjs`, which the nightly availability check runs, requires
+`/llms.txt` and `/docs/usage/installation.md` to answer 200 with those types.
+
 ## Failure reports
 
 A failed run opens or updates a site-local `site-deploy-failed` issue, and a
