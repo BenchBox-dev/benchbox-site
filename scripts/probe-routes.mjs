@@ -8,6 +8,8 @@ export const ROUTE_CLASSES = [
   { name: "blog", path: "/blog/" },
   { name: "results", path: "/results/" },
   { name: "not-found", path: "/404.html" },
+  { name: "llms", path: "/llms.txt", contentType: /^text\/(plain|markdown)/i },
+  { name: "docs-markdown", path: "/docs/usage/installation.md", contentType: /^text\/(markdown|plain)/i },
 ];
 
 export async function probeRoutes(origin, fetchImpl = fetch) {
@@ -16,7 +18,9 @@ export async function probeRoutes(origin, fetchImpl = fetch) {
     const url = new URL(route.path, origin).href;
     try {
       const response = await fetchImpl(url, { redirect: "follow" });
-      results.push({ ...route, url, status: response.status, ok: response.status === 200 });
+      const type = response.headers?.get("content-type") ?? "";
+      const typed = route.contentType === undefined || route.contentType.test(type);
+      results.push({ ...route, url, status: response.status, ok: response.status === 200 && typed, ...(typed ? {} : { error: `content type ${type || "missing"} does not match ${route.contentType}` }) });
     } catch (error) {
       results.push({ ...route, url, status: 0, ok: false, error: String(error) });
     }

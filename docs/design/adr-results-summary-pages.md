@@ -100,6 +100,12 @@ On the platform and benchmark summary pages, runs whose ranking exclusion reason
 set are listed in a separate section after the ranked runs. The section's heading and
 the reasons come before its table, and each row keeps its numbers and receipt link.
 
+## Amendment: execution environment, tuning mode and trust label
+
+Every row of the platform and benchmark summary tables carries an execution environment, a tuning mode and a trust label, read from the snapshot's `results` table (deployment class, cloud provider and region, instance or warehouse, and for local runs architecture, CPU family and memory; `tuning_mode`; `trust_label`) and formatted by the Explorer's own label functions. A run for which the snapshot holds no value shows "Not recorded"; a missing tuning mode is never shown as no tuning. The ranking status and exclusion wording are unchanged and no run moves between the ranked and excluded sections.
+
+Each page also defines the scores it shows, with unit and direction, and links each definition to the benchmark methodology page.
+
 ## Consequences
 
 - Nothing in `/results/` changes, the Explorer mount digest check is unaffected,

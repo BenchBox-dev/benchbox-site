@@ -1,9 +1,13 @@
+import { readFileSync } from "node:fs";
+import path from "node:path";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
-import { canonicalBenchmarkSlug } from "@/lib/displayLabels";
+import { canonicalBenchmarkSlug, formatTrustLabel, formatTuningMode } from "@/lib/displayLabels";
 import { getBenchmarkRanking, listResults, type ResultRow } from "@/lib/duckdbQueries";
 import { formatScoreMetric } from "@/lib/metricFormatters";
 import { fmtGeomean } from "@/utils";
 import { closeResultsSnapshot, openResultsSnapshot, queryRows } from "../src/lib/results-db.ts";
+import { docutilsMakeId } from "../src/lib/docutils-slug.ts";
+import { executionEnvironment, METHODOLOGY_PATH, NOT_RECORDED, runContext, tuningModeText } from "../src/lib/result-context.ts";
 import { buildReceipts } from "../src/lib/result-receipts.ts";
 import { buildResultsSummary, snapshotFile, summaryHref, type ResultsSummary } from "../src/lib/results-summary.ts";
 
@@ -14,7 +18,7 @@ let summary: ResultsSummary;
 
 beforeAll(async () => {
   await openResultsSnapshot(snapshotFile());
-  rows = await listResults();
+  rows = await listResults(undefined, { includeHardware: true });
   summary = await buildResultsSummary(rows, getBenchmarkRanking, identity);
 });
 
@@ -156,5 +160,67 @@ describe("withdrawn and unpublished results", () => {
       identity,
     );
     expect(mentions(rebuilt, platformId, hidden)).toBe(false);
+  });
+});
+
+describe("execution environment, tuning mode and trust label", () => {
+  const everyLine = () => [
+    ...summary.platforms.flatMap((page) => [...page.ranked, ...page.excluded]),
+    ...summary.benchmarks.flatMap((page) => [...page.cohorts.flatMap((cohort) => cohort.ranked), ...page.excluded]),
+  ];
+
+  it("fills all three columns for every run on both views, with Not recorded when the snapshot has no value", () => {
+    const lines = everyLine();
+    expect(lines.length).toBeGreaterThan(0);
+    for (const line of lines) {
+      expect(line.environment.trim(), line.resultId).not.toBe("");
+      expect(line.tuningMode.trim(), line.resultId).not.toBe("");
+      expect(line.trustLabel.trim(), line.resultId).not.toBe("");
+    }
+  });
+
+  it("shows the tuning mode and trust label the snapshot stores for each result", () => {
+    for (const row of rows) {
+      const page = summary.platforms.find((candidate) => candidate.id === row.platform_id);
+      const run = [...(page?.ranked ?? []), ...(page?.excluded ?? [])].find((candidate) => candidate.resultId === row.result_id);
+      expect(run?.tuningMode, row.result_id).toBe(row.tuning_mode ? formatTuningMode(row.tuning_mode) : NOT_RECORDED);
+      expect(run?.trustLabel, row.result_id).toBe(row.trust_label ? formatTrustLabel(row.trust_label) : NOT_RECORDED);
+    }
+  });
+
+  it("agrees between the platform page and the benchmark page for the same run", () => {
+    const byResult = new Map(summary.platforms.flatMap((page) => [...page.ranked, ...page.excluded]).map((run) => [run.resultId, run]));
+    for (const line of everyLine().filter((candidate) => "rank" in candidate)) {
+      const run = byResult.get(line.resultId);
+      expect(run, line.resultId).toBeDefined();
+      expect([line.environment, line.tuningMode, line.trustLabel]).toEqual([run!.environment, run!.tuningMode, run!.trustLabel]);
+    }
+  });
+
+  it("says Not recorded for a row with no environment, tuning or trust values and never turns a missing tuning mode into no tuning", () => {
+    expect(runContext({})).toEqual({ environment: NOT_RECORDED, tuningMode: NOT_RECORDED, trustLabel: NOT_RECORDED });
+    expect(runContext({ tuning_mode: "", trust_label: "", deployment_class: "unavailable" })).toEqual({ environment: NOT_RECORDED, tuningMode: NOT_RECORDED, trustLabel: NOT_RECORDED });
+    expect(tuningModeText({ tuning_mode: null })).not.toBe(formatTuningMode("notuning"));
+  });
+
+  it("describes a cloud run by provider, region and warehouse and a local run by its hardware", () => {
+    expect(executionEnvironment({ deployment_class: "cloud", cloud_provider: "aws", cloud_region: "us-east-1", instance_or_warehouse: "ra3.xlplus", arch: "x86_64", memory_gb: 16 })).toBe("Cloud, AWS us-east-1, ra3.xlplus");
+    expect(executionEnvironment({ deployment_class: "local", arch: "arm64", cpu_family: "apple_silicon", memory_gb: 64 })).toBe("Local, Arm64, Apple silicon, 64 GB");
+    expect(executionEnvironment({ cloud_provider: "gcp" })).toBe("Cloud, GCP");
+  });
+
+  it("defines every score on a page with its unit and a link to a methodology anchor that exists", () => {
+    const methodology = readFileSync(path.join(process.cwd(), "..", "docs", "concepts", "benchmark-methodology.md"), "utf-8");
+    const anchors = new Set([...methodology.matchAll(/^#{2,6} (.+)$/gm)].map((match) => docutilsMakeId(match[1]!)));
+    for (const page of [...summary.platforms, ...summary.benchmarks]) {
+      expect(page.scoreDefinitions.length, page.id).toBeGreaterThan(0);
+      expect(page.scoreDefinitions.map((definition) => definition.metric), page.id).toContain("display_geomean_ms");
+      for (const definition of page.scoreDefinitions) {
+        expect(definition.unit, definition.label).not.toBe("");
+        const [pagePath, fragment] = definition.href.split("#");
+        expect(pagePath).toBe(METHODOLOGY_PATH);
+        expect(anchors.has(fragment!), `${definition.label} -> #${fragment}`).toBe(true);
+      }
+    }
   });
 });

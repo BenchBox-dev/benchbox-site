@@ -1,4 +1,5 @@
 [
   "^blog/[^/]+\\.html$",
-  "^blog/atom\\.xml$"
+  "^blog/atom\\.xml$",
+  "^schemas/result-bundle-2\\.schema\\.json$"
 ]
