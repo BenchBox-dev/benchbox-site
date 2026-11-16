@@ -28,11 +28,23 @@ versioned core bundle; it reads nothing else from core.
 - The bundle schema is an integer major version. A schema change lands in
   core first, then the site adds support, then core may drop the older
   schema. `scripts/bundle-verify.mjs` and `scripts/schemas/` define the
-  accepted schemas.
+  accepted schemas. The verifier accepts exact schemas 4, 5 and 6, each with
+  its exact member set. Schema 6 is schema 5 plus the top-level member
+  `result-bundle.schema.json`: a JSON Schema draft 2020-12 document whose
+  `$id` is `https://benchbox.dev/schemas/result-bundle-2.schema.json` and
+  whose top-level `result_schema_version` is a `2.x` string. The verifier
+  checks that it parses, compiles and carries those markers; it does not
+  compare its bytes with core's copy.
+- When the bundle has `result-bundle.schema.json`, the build publishes it at
+  `/schemas/result-bundle-2.schema.json` (the URL carries the result
+  bundle's major version) from `website/src/lib/result-schema.ts`, and the
+  deploy probe checksums it. The privacy gate scans it like every other JSON
+  file in the artifact, and `deploy/origin-allowlist.json` lets its production
+  `$id` pass the rehearsal origin gate.
 - `certified_by` is the numeric id of the core `trunk.yml` push run on
   `develop` for the bundle commit. Online certification requires that run
-  id for schemas 4 and 5, with the same attestations. The value
-  `candidate` is valid for schemas 4 and 5 under `--offline` verification
+  id for schemas 4, 5 and 6, with the same attestations. The value
+  `candidate` is valid for schemas 4, 5 and 6 under `--offline` verification
   only, and never passes online certification.
 - `npm run docs:check` (`docs-contracts/`, TypeScript) checks the site's
   documentation against the `doc-contracts.json` facts of the docs inputs (the release pin, or the newest bundle when `DOCS_INPUTS` names it): registry

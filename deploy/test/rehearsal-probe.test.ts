@@ -36,6 +36,16 @@ test("the probe manifest covers every route class and samples more files", () =>
   assert.throws(() => checksumManifest(site({ "index.html": "home" })), /required probe paths/);
 });
 
+test("the probe manifest always carries the published result schema when the artifact has it", () => {
+  const without = checksumManifest(site({ ...REQUIRED }));
+  assert.ok(!("/schemas/result-bundle-2.schema.json" in without));
+  const files: Record<string, string> = { ...REQUIRED };
+  for (let index = 0; index < 60; index += 1) files[`assets/f${index}.css`] = `c${index}`;
+  files["schemas/result-bundle-2.schema.json"] = "{}";
+  const manifest = checksumManifest(site(files));
+  assert.equal(manifest["/schemas/result-bundle-2.schema.json"], sha("{}"));
+});
+
 test("the probe manifest samples one legacy download per extension under its dotted URL", () => {
   const legacy = {
     "docs/_downloads/0123456789abcdef0123456789abcdef/run.py/index.html": "py",

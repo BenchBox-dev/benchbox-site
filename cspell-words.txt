@@ -208,6 +208,7 @@ emailext
 emphasised
 endscript
 enginename
+esac
 espressocomputing
 estimand
 exasol

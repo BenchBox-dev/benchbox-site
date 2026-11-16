@@ -64,7 +64,7 @@ when it was first deployed. The links allowance file is not read.
 ## Rolling back past the docs removal
 
 Core no longer ships `docs` or `downloads` bundle members, and this site
-verifies only bundle schemas 4 and 5. To return to pages from before the
+verifies only bundle schemas 4, 5 and 6. To return to pages from before the
 removal, dispatch a rollback with the `receipt_run_id` of a deploy from before
 it: the run restores that built artifact and needs no bundle. A rebuild from an
 older core revision does not restore them, because the site no longer reads
