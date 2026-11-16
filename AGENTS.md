@@ -83,6 +83,22 @@ versioned core bundle; it reads nothing else from core.
   fails with the line in `nav.yml` for an unknown key, an empty group, a page
   that does not exist or a page listed twice under one parent. A page that is
   not listed still builds; add it to `docs/nav.yml` to put it in the sidebar.
+- The build publishes `/llms.txt` and a Markdown copy of every page under
+  `docs/` at `/docs/<page>.md`, next to `/docs/<page>.html`. The converter
+  writes both to `website/.generated/` (`markdown/`, `manifest/llms.txt`)
+  from the same converted pages, and `scripts/publish-markdown.ts` copies them
+  into `dist` after the dev-docs mount. `llms.txt` is generated, never edited:
+  the fixed sections in `website/src/lib/llms.ts` (`FEATURED_SECTIONS`: install
+  and first run, CLI, MCP, methodology, result summaries) come first, then the
+  `docs/nav.yml` groups, then an Optional section for every page that
+  `docs/nav.yml` does not list. Only generated-scope pages that a listed index
+  links to (the per-query and compatibility pages) are left out of the file,
+  and tag pages are never listed. A featured page that does not exist fails the
+  conversion. `npm run check:llms -w website` and the build fail when a link
+  in `llms.txt` or in a Markdown page points at a file that is not in `dist`.
+  The blog, result summaries, search and the Explorer have no Markdown copy.
+  The deploy probe compares `/llms.txt` and sampled `.md` files with the
+  artifact and requires a `text/plain` or `text/markdown` content type.
 - Tags are the `tags` list in front matter, which must be the first thing in
   the file. The tag pages under `/docs/_tags/` are generated from them.
 - Cross-references are relative `.md` links, for example
