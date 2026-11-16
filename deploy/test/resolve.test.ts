@@ -57,7 +57,7 @@ test("an unverifiable bundle is refused", () => {
 });
 
 test("candidate schema bundles verify offline and an unsupported schema is refused", () => {
-  for (const schema of [4, 5]) assert.deepEqual(verifyBundle(fixtureBundle({ schema })).errors, []);
+  for (const schema of [4, 5, 6]) assert.deepEqual(verifyBundle(fixtureBundle({ schema })).errors, []);
   assert.ok(verifyBundle(fixtureBundle({ schema: 2 })).errors.some((error: string) => error.startsWith("schema 2")));
 });
 

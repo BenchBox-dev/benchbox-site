@@ -154,8 +154,10 @@ groups:
           - guides/table-formats/iceberg-guide.md
           - guides/table-formats/vortex-guide.md
       - guides/platform-comparison.md
+      - guides/ci-performance-regression.md
       - guides/cloud-storage.md
       - guides/compression.md
+      - guides/agent-readable-docs.md
       - page: advanced/index.md
         items:
           - advanced/power-run-concurrent-queries.md
@@ -267,6 +269,7 @@ groups:
           - reference/python-api/tuning.md
       - reference/mcp.md
       - reference/result-formats.md
+      - reference/result-schema.md
       - reference/result-schema-v1.md
       - api.md
   - label: Development

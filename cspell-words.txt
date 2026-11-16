@@ -208,6 +208,7 @@ emailext
 emphasised
 endscript
 enginename
+esac
 espressocomputing
 estimand
 exasol
@@ -842,3 +843,4 @@ zstd
 Æther
 Ørsted
 Łódź
+llms

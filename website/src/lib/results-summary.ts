@@ -3,13 +3,14 @@ import { readFileSync } from "node:fs";
 import { buildSectionEntries, indexedResults, sectionEntryHref, type SectionEntry } from "@/lib/corpusSummary";
 import { formatScaleFactor, formatScoreMetric } from "@/lib/metricFormatters";
 import { canonicalBenchmarkSlug, canonicalPhase, formatBenchmarkLabel, formatPhaseWithStreams } from "@/lib/displayLabels";
-import { formatTimingExclusion, normalizePrimaryMetric, phaseScoreValue, primaryMetricLabel, primaryMetricValue } from "@/lib/displayEligibility";
+import { formatTimingExclusion, normalizePrimaryMetric, phaseScoreValue, primaryMetricLabel, primaryMetricValue, type PrimaryMetric } from "@/lib/displayEligibility";
 import { getBenchmarkRanking, listResults, type BenchmarkRankingRow, type ResultRow } from "@/lib/duckdbQueries";
 import { resultReceiptHref } from "@/lib/resultLinks";
 import { buildReceipts, type ResultReceipt } from "./result-receipts.ts";
 import { platformVersionDisplay } from "@/lib/versionLabel";
 import { fmtGeomean } from "@/utils";
 import { closeResultsSnapshot, openResultsSnapshot, queryRows } from "./results-db.ts";
+import { runContext, scoreDefinitions, type RunContext, type ScoreDefinition } from "./result-context.ts";
 import { bundleManifest, siteInputsPath } from "./site-inputs.ts";
 
 export const SUMMARY_ROOT = "/result-summaries";
@@ -26,7 +27,8 @@ export interface SnapshotIdentity {
   resultCount: number;
 }
 
-export interface RunLine {
+export interface RunLine extends RunContext {
+  metric: PrimaryMetric;
   resultId: string;
   benchmarkId: string;
   benchmarkLabel: string;
@@ -42,7 +44,8 @@ export interface RunLine {
   receiptHref: string;
 }
 
-export interface RankingLine {
+export interface RankingLine extends RunContext {
+  metric: PrimaryMetric;
   rank: number | null;
   platformId: string;
   platformLabel: string;
@@ -84,6 +87,7 @@ export interface PlatformPage {
   benchmarks: Neighbor[];
   ranked: RunLine[];
   excluded: RunLine[];
+  scoreDefinitions: ScoreDefinition[];
 }
 
 export interface BenchmarkPage {
@@ -96,6 +100,7 @@ export interface BenchmarkPage {
   platforms: Neighbor[];
   cohorts: BenchmarkCohort[];
   excluded: ExcludedRankingLine[];
+  scoreDefinitions: ScoreDefinition[];
 }
 
 export interface ResultsSummary {
@@ -126,6 +131,8 @@ function runLine(row: ResultRow): RunLine {
   const metric = phase === "throughput" ? "throughput_at_size" : "power_score";
   const benchmarkId = canonicalBenchmarkSlug(row.benchmark);
   return {
+    ...runContext(row),
+    metric,
     resultId: row.result_id,
     benchmarkId,
     benchmarkLabel: formatBenchmarkLabel(benchmarkId),
@@ -142,10 +149,12 @@ function runLine(row: ResultRow): RunLine {
   };
 }
 
-function rankingLine(row: BenchmarkRankingRow): RankingLine {
+function rankingLine(row: BenchmarkRankingRow, context: ResultRow | undefined): RankingLine {
   const metric = normalizePrimaryMetric(row.primary_metric);
   const value = primaryMetricValue(row, metric);
   return {
+    ...runContext({ ...row, ...context, trust_label: row.trust_label, tuning_mode: row.tuning_mode }),
+    metric,
     rank: row.rank,
     platformId: row.platform_id,
     platformLabel: row.platform,
@@ -207,13 +216,14 @@ export async function buildResultsSummary(
       benchmarks: neighbors(own, "benchmarks", (row) => canonicalBenchmarkSlug(row.benchmark), (row) => formatBenchmarkLabel(canonicalBenchmarkSlug(row.benchmark))),
       ranked: runs.filter((run) => run.ranked),
       excluded: runs.filter((run) => !run.ranked),
+      scoreDefinitions: scoreDefinitions(runs.map((run) => run.metric)),
     };
   });
 
   const benchmarks: BenchmarkPage[] = [];
   for (const entry of benchmarkEntries) {
     const own = rows.filter((row) => canonicalBenchmarkSlug(row.benchmark) === entry.id);
-    const admitted = new Set(own.map((row) => row.result_id));
+    const admitted = new Map(own.map((row) => [row.result_id, row]));
     const cohorts: BenchmarkCohort[] = [];
     const excluded: ExcludedRankingLine[] = [];
     for (const cohort of cohortsOf(own)) {
@@ -221,7 +231,7 @@ export async function buildResultsSummary(
       if (lines.length === 0) continue;
       const scale = formatScaleFactor(cohort.scaleFactor);
       const phase = formatPhaseWithStreams(cohort.phase, cohort.streamCount);
-      const rendered = lines.map(rankingLine);
+      const rendered = lines.map((line) => rankingLine(line, admitted.get(line.result_id)));
       excluded.push(...rendered.filter((line) => line.exclusion !== null).map((line) => ({ ...line, scale, phase })));
       const ranked = rendered.filter((line) => line.exclusion === null);
       if (ranked.length === 0) continue;
@@ -238,6 +248,7 @@ export async function buildResultsSummary(
       platforms: neighbors(own, "platforms", (row) => row.platform_id, (row) => row.platform),
       cohorts,
       excluded,
+      scoreDefinitions: scoreDefinitions([...cohorts.flatMap((cohort) => cohort.ranked), ...excluded].map((line) => line.metric)),
     });
   }
 
@@ -267,7 +278,7 @@ export function loadResultsSummary(): Promise<PublishedResults> {
       const [{ read_model_version: readModelVersion }] = await queryRows<{ read_model_version: number }>("SELECT read_model_version FROM bench.metadata");
       const snapshotSha256 = fileSha256(file);
       if (!manifest.produced_at) throw new Error("The core bundle manifest has no produced_at, so the result pages cannot state a snapshot date.");
-      const results = await listResults();
+      const results = await listResults(undefined, { includeHardware: true });
       const summary = await buildResultsSummary(results, getBenchmarkRanking, {
         coreSha: manifest.core_sha,
         corpusSha: manifest.corpus_sha,

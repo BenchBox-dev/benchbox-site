@@ -64,7 +64,7 @@ when it was first deployed. The links allowance file is not read.
 ## Rolling back past the docs removal
 
 Core no longer ships `docs` or `downloads` bundle members, and this site
-verifies only bundle schemas 4 and 5. To return to pages from before the
+verifies only bundle schemas 4, 5 and 6. To return to pages from before the
 removal, dispatch a rollback with the `receipt_run_id` of a deploy from before
 it: the run restores that built artifact and needs no bundle. A rebuild from an
 older core revision does not restore them, because the site no longer reads
@@ -194,6 +194,13 @@ still answer with the previous generation. The final probe runs at the
 deadline, and a mismatch still present then fails the run. If the probes fail
 after a deploy, the run dispatches at most one rollback to the last known good
 receipt.
+
+The probe also covers `/llms.txt` and the Markdown copies of the documentation
+pages under `/docs/`: `/llms.txt` joins the manifest when the artifact has it
+(an older artifact restored by a rollback has none), `.md` files are among the
+sampled files, and both must be served as `text/plain` or `text/markdown`.
+`scripts/probe-routes.mjs`, which the nightly availability check runs, requires
+`/llms.txt` and `/docs/usage/installation.md` to answer 200 with those types.
 
 ## Failure reports
 

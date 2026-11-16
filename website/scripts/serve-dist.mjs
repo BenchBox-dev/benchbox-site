@@ -16,6 +16,8 @@ const types = {
   ".svg": "image/svg+xml",
   ".png": "image/png",
   ".xml": "application/xml",
+  ".txt": "text/plain; charset=utf-8",
+  ".md": "text/markdown; charset=utf-8",
   ".duckdb": "application/octet-stream",
   ".pf_meta": "application/octet-stream",
   ".pf_fragment": "application/octet-stream",
