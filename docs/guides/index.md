@@ -28,6 +28,7 @@ Guides for getting the best performance from your benchmarks:
 - [Power Run & Concurrent Queries](../advanced/power-run-concurrent-queries.md) - Multi-stream execution
 - [Optimizer Test Suites](../advanced/optimizer-tests.md) - Testing query optimizers
 - [Performance Monitoring](../advanced/performance.md) - Tracking and profiling
+- [Gate Performance in CI](ci-performance-regression.md) - Fail a build on a regression with `benchbox compare`
 
 ## Data Formats & Storage
 
