@@ -4,9 +4,6 @@ tags: [reference, validation]
 
 # Benchmark Result Schema (v1.1, Legacy)
 
-> [!WARNING]
-> This page is legacy. It describes the v1.1 result shape that BenchBox no longer writes. Current bundles use schema 2.4, documented in [Result Bundle Schema (2.4)](result-schema.md), which also links the published JSON Schema.
-
 This page documents the legacy v1.1 result shape. Current benchmark exports use schema v2 (see [Result Formats](result-formats.md)); v1.x bundles are only read through the normalizer's best-effort compatibility path. Keep this page for interpreting old files, not for new readers.
 
 ## Top-Level Structure
