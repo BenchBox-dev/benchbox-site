@@ -197,6 +197,26 @@ benchbox run --platform snowflake --benchmark tpch \
 The Snowflake account, user, and password come from
 `benchbox setup --platform snowflake`; they are not `--platform-option` keys.
 
+### Saved Credentials File
+
+`benchbox setup` saves platform credentials in `~/.benchbox/credentials.yaml`. The file is plain YAML and is not encrypted. It holds secrets such as Snowflake, Redshift, SingleStore and Athena passwords, AWS keys and the Databricks token, and any process you run can read it. Only the hosted-submission token (`benchbox auth login`) is kept in the operating system keyring.
+
+- **Modes:** `~/.benchbox` is created with mode `0700`. The file is written through a temporary file with mode `0600` in the same directory and renamed into place, so no other local user can read it at any point. If BenchBox cannot create the file privately, the save fails.
+- **Wider existing files:** a file that is readable by group or others is tightened to `0600` on the next save, with a one-line warning.
+- **References:** a value written as `${VAR}` is read from the environment when `benchbox run` loads the file, and the reference is kept as written when the file is saved again. The secret is not written back to the file.
+
+```yaml
+snowflake:
+  account: ${SNOWFLAKE_ACCOUNT}
+  user: ${SNOWFLAKE_USERNAME}
+  password: ${SNOWFLAKE_PASSWORD}
+  warehouse: ${SNOWFLAKE_WAREHOUSE}
+```
+
+`benchbox run` reads Snowflake settings only from this file. The `SNOWFLAKE_*` variables are read only by `benchbox setup`; `${SNOWFLAKE_*}` references in the file are how `run` picks them up from the environment.
+
+In a session with no terminal, `benchbox setup --remove` needs `--yes`, and a credential prompt that nothing can answer is declined; `benchbox run --non-interactive` no longer offers credential setup after a credential failure.
+
 ### Compute Settings
 
 On platforms that run on a named compute resource, `compute_resource` names

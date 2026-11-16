@@ -43,7 +43,7 @@ benchbox run [OPTIONS]
     `--streams` — see [Deprecated: `run-official`](#deprecated-run-official)
     below.
 - `--iterations INTEGER`: Number of measured power test iterations (default: 3, minimum 1). Each power test also runs one warm-up pass first. Power phase only; a warning is printed when no power phase is selected. An advanced option listed by `benchbox run --help-topic all`.
-- `--force [MODE]`: Force regeneration of data (modes: `all`, `datagen`, `upload`, or `datagen,upload`)
+- `--force [MODE]`: Force a rerun (modes: `all`, `datagen`, `upload`, or `datagen,upload`; a bare `--force` means `all`). What each value deletes is in [Forced Reruns](#forced-reruns)
 - `--non-interactive`: Use defaults for all prompts (useful for automation)
 
 **Output and Paths:**
@@ -372,18 +372,51 @@ The first command exits 6 with the refusal message. The second acknowledges with
 - **Non-interactive** means `--non-interactive`, `BENCHBOX_NON_INTERACTIVE` set to a true value, or a standard input or output that is not a terminal. On a terminal the usual prompt applies.
 - **`benchbox compare -p`** applies the same rule and takes the same flag.
 - **Billable by default:** `athena`, `athena-spark`, `bigquery`, `clickhouse-cloud`, `databend`, `databricks`, `databricks-df`, `dataproc`, `dataproc-serverless`, `emr-serverless`, `fabric-lakehouse`, `fabric-spark`, `fabric_dw`, `firebolt`, `glue`, `influxdb`, `motherduck`, `quanton`, `redshift`, `snowflake`, `snowpark-connect`, `starburst`, `synapse`, `synapse-spark`. `timescaledb` (`cloud` mode) and `pg-duckdb` (`motherduck` mode) are billable only in a managed mode.
-- **`run-official`** has no flag; only the environment variable acknowledges it.
+- **`run-official`** takes the same `--acknowledge-billable-platform` flag and forwards it to `run`; the environment variable works there too.
 
 > [!WARNING]
 > The acknowledgement is a statement of intent, not an access control.
 >
 > - Any caller that can start the command can set the flag or the variable itself.
-> - `--dry-run` is exempt, but it still reads saved credentials, may install a driver when `driver_auto_install` is set, and for some platforms (Databricks, for example) builds a client that makes a network call.
+> - `--dry-run` is exempt. It reads saved credentials but installs no package and makes no Databricks network call.
 > - `databend` and `firebolt` stay billable when you run them self-hosted or in core mode, and a billable service reached through a self-hosted mode is not detected.
-> - `setup --validate-only`, `setup --diagnose` and `shell` are not guarded.
+> - The paths in [Paths the guard does not cover](#paths-the-guard-does-not-cover) are not guarded.
 > - Platform credentials saved in `~/.benchbox/credentials.yaml` are stored in plain text, readable by any process you run. The operating system keyring holds only the hosted-submission token.
 
+### Paths the guard does not cover
+
+| Path | Why it is not guarded |
+|---|---|
+| `run --dry-run` | It previews configuration. It reads `~/.benchbox/credentials.yaml`, installs no package and makes no Databricks network call. |
+| `setup --validate-only`, `setup --diagnose` | Connecting is their purpose. A Snowflake check can resume a suspended warehouse. |
+| Remote `start_benchmark` | Gated only by the operator allow-list; the acknowledgement is not passed through it. |
+| `shell` with an `md:` MotherDuck path | You asked for that connection. |
+
+The local MCP `run_benchmark` tool is guarded.
+
 The MCP server applies the same rule: it allows no billable platform unless the operator started the server with `BENCHBOX_ACKNOWLEDGE_BILLABLE_PLATFORM=1`, and no tool argument can grant it. See [MCP](../mcp.md).
+
+## Driver Auto-Install
+
+`--platform-option driver_version=X` selects an exact driver version. The value must be a valid package version such as `1.2.3`; anything else is refused before it reaches an installer, and `run` exits 2.
+
+When the installed driver differs from the requested version and no isolated runtime matches, BenchBox can install the requested version with `uv pip install` or `pip install`. That happens only when `driver_auto_install=true` is passed as a platform option or `BENCHBOX_DRIVER_AUTO_INSTALL=1` is set. BenchBox prints the exact `package==version` and the target interpreter to stderr before it installs.
+
+- **Terminal session:** the platform option alone installs, after the printed notice.
+- **Non-interactive session** (standard input or output is not a terminal, or `BENCHBOX_NON_INTERACTIVE` is set): the platform option alone is refused with exit 6. Set `BENCHBOX_DRIVER_AUTO_INSTALL=1` to allow the install.
+- **Dry run:** a `--dry-run` never installs a package. A missing or mismatched driver is reported and the preview continues.
+
+`benchbox run-official` follows the same rule. `benchbox platforms install` prints installation instructions only and never installs ([platforms](platforms.md#platforms-install-installation-guide)).
+
+## Forced Reruns
+
+| Value | Local data | Target database |
+|---|---|---|
+| `datagen` | Regenerated, overwriting existing files | Deleted before the run, the same as `--platform-option force_recreate=true` |
+| `upload` | Untouched | Untouched; data is re-uploaded to remote storage even if a valid copy exists |
+| `all` or `datagen,upload` | As `datagen` | As `datagen`, plus the re-upload |
+
+Deleting the target database means a local database file or directory is deleted. On a remote platform the database is dropped, except Snowflake (drops this benchmark's tables and its tuning metadata and keeps the database) and Databricks (truncates every table in the schema). A platform that cannot drop a database refuses the run instead.
 
 ## Execution Control Options
 
