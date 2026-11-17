@@ -1,1 +1,9 @@
-[]
+[
+  {
+    "id": "GHSA-fc5q-39xc-vjpf",
+    "package": "picomatch",
+    "reason": "Dev and build-time tooling only (vite, vitest, tailwindcss, @preact/preset-vite); not in the production dependency tree and not shipped in the static site. No fixed picomatch release exists; the dependents need major upgrades of vitest, tailwindcss and @preact/preset-vite, tracked separately.",
+    "review_by": "2026-12-17",
+    "link": "https://github.com/advisories/GHSA-fc5q-39xc-vjpf"
+  }
+]
