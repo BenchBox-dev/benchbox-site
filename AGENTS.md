@@ -186,12 +186,16 @@ versioned core bundle; it reads nothing else from core.
   dispatch) runs `docs:pin -- --pending` against `next`'s pin. For a newer
   release it creates the branch `release-pin/<tag>` from `next`, runs
   `npm run docs:pin -- <tag>`, and opens a pull request into `next`; the
-  owner squash-merges it. A tag that already has that branch or an open pull
-  request is skipped. A pin that fails, for example because no certified bundle
+  owner squash-merges it. A tag that already has a pull request in any state
+  is skipped, and a branch without one gets a pull request opened. A pin that fails, for example because no certified bundle
   exists, creates no branch and comments the error on the open
   `docs-release-pending` issue. The same workflow, on each push to `next`,
-  opens `Release documentation for <tag>` from `next` into `main` when `next`'s
-  pin tag is above `main`'s and no such pull request is open. It uses the
+  opens `Release documentation for <tag>` from `next` into `main` when
+  `next`'s pin tag is above `main`'s and no pull request into `main` has that
+  title in any state or names the tag while open. Its body lists the files whose
+  content differs between `main` and `next` and the documentation commits on
+  `next` since the previous pin; releases squash into `main`, so a plain
+  `main..next` log would list every commit ever made on `next`. It uses the
   `SITE_BRIDGE_APP_ID` GitHub App, whose pushes and pull requests start `ci`
   where the default token's would not; the app needs contents and pull-requests
   write on this repository.
@@ -199,11 +203,12 @@ versioned core bundle; it reads nothing else from core.
   request. `next` documents core `develop`, which runs ahead of the release, so
   `docs:check` against the new pin fails `ci` on any passage that is not true at
   the release. Automation never edits those passages. The owner branches from
-  `next`, restores the released text for each such passage, points the release pull
-  request at that branch or replaces it with a pull request from that branch,
-  squash-merges it into
-  `main`, then merges `main` into `next` by pull request with
-  `gh pr merge --merge` and confirms the held-back text is still on `next`.
+  `next`, restores the released text for each such passage, closes the release
+  pull request and opens one from that branch into `main` with the same title,
+  squash-merges it once `ci` is green, then merges `main` into `next` by pull
+  request with `gh pr merge --merge` and confirms the held-back text is still
+  on `next`. A pull request's head cannot change, hence the replacement; the
+  workflow opens no further release pull request while one exists in any state.
 - The Nightly workflow opens or updates the `docs-release-pending` issue when
   core has published a release newer than the pin. It remains the backstop when the Release docs workflow cannot
   open the pin pull request, and the owner then acts on it by hand with

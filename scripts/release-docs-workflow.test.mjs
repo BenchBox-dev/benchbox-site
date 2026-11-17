@@ -30,8 +30,8 @@ test("permissions are read-only by default and per job as narrow as the job allo
   assert.deepEqual(release.permissions, { contents: "read", "pull-requests": "read" });
 });
 
-test("runs are serialised in one concurrency group that never cancels", () => {
-  assert.equal(workflow.concurrency.group, "release-docs");
+test("each stage is serialised in its own concurrency group that never cancels", () => {
+  assert.equal(workflow.concurrency.group, "release-docs-${{ github.event_name == 'push' && 'release' || 'pin' }}");
   assert.equal(workflow.concurrency["cancel-in-progress"], false);
 });
 
@@ -58,10 +58,10 @@ test("app tokens are minted for named repositories with the permissions the step
 
 test("an app token reaches only the steps that need it", () => {
   const holders = (job) => job.steps.filter((step) => JSON.stringify(step.env ?? {}).includes("steps.core.outputs.token") || JSON.stringify(step.env ?? {}).includes("steps.site.outputs.token")).map((step) => step.name);
-  assert.deepEqual(holders(pin), ["Pin the release", "Commit the pin, push its branch and open the pull request"]);
+  assert.deepEqual(holders(pin), ["Pin the release", "Commit the pin and push its branch", "Open the pin pull request"]);
   assert.deepEqual(holders(release), ["Open the release pull request"]);
   const text = JSON.stringify(workflow);
-  assert.equal(text.match(/steps\.(core|site)\.outputs\.token/g).length, 3);
+  assert.equal(text.match(/steps\.(core|site)\.outputs\.token/g).length, 4);
 });
 
 test("the pin step uses the default docs:pin path", () => {
@@ -73,7 +73,7 @@ test("the pin step uses the default docs:pin path", () => {
 test("a failed pin leaves no branch and reports on the docs-release-pending issue", () => {
   const names = pin.steps.map((step) => step.name);
   const pinned = names.indexOf("Pin the release");
-  const commit = names.indexOf("Commit the pin, push its branch and open the pull request");
+  const commit = names.indexOf("Commit the pin and push its branch");
   assert.ok(pinned < names.indexOf("Report a failed pin on the docs-release-pending issue"));
   assert.ok(names.indexOf("Fail the run when the pin failed") < commit);
   assert.equal(pin.steps[commit].if, "steps.pin.outputs.pinned == 'true'");
@@ -91,13 +91,26 @@ test("the pending exit codes decide what happens: 2 fails, 1 pins, 0 does nothin
   assert.ok(step.run.includes('exit "$code"'));
   const existing = pin.steps.find((candidate) => candidate.id === "existing");
   assert.equal(existing.if, "steps.pending.outputs.code == '1'");
-  for (const id of ["core", "pin"]) assert.equal(pin.steps.find((candidate) => candidate.id === id).if, "steps.existing.outputs.skip == 'false'");
+  for (const id of ["core", "pin"]) assert.equal(pin.steps.find((candidate) => candidate.id === id).if, "steps.existing.outputs.action == 'pin'");
 });
 
-test("an existing branch or open pull request for the tag is skipped", () => {
+test("a pull request in any state skips the tag and a branch without one gets a pull request", () => {
   const existing = pin.steps.find((candidate) => candidate.id === "existing");
   assert.ok(existing.run.includes('git/ref/heads/release-pin/$TAG'));
-  assert.ok(existing.run.includes('--head "release-pin/$TAG" --state open'));
+  assert.ok(existing.run.includes('--head "release-pin/$TAG" --state all'));
+  assert.ok(existing.run.includes('echo "action=none"'));
+  assert.ok(existing.run.includes('echo "action=open"'));
+  const open = pin.steps.find((step) => step.name === "Open the pin pull request");
+  assert.equal(open.if, "steps.existing.outputs.action == 'open' || steps.pin.outputs.pinned == 'true'");
+  const site = pin.steps.find((step) => step.id === "site");
+  assert.equal(site.if, open.if);
+});
+
+test("the failure comment is deduplicated on the final docs:pin error line only", () => {
+  const report = pin.steps.find((step) => step.name?.startsWith("Report a failed pin"));
+  assert.ok(report.run.includes("grep '^docs:pin:'"));
+  assert.ok(report.run.includes("printf '%s' \"$ERROR_LINE\" | sha256sum"));
+  assert.ok(!report.run.includes('sha256sum "$RUNNER_TEMP/pin.txt"'));
 });
 
 test("the pin commit is authored by the app bot and stages explicit paths", () => {
@@ -110,7 +123,7 @@ test("the pin commit is authored by the app bot and stages explicit paths", () =
 });
 
 test("the pull request into next is titled for the tag and says what merging does", () => {
-  const run = pin.steps.find((step) => step.name?.startsWith("Commit the pin")).run;
+  const run = pin.steps.find((step) => step.name === "Open the pin pull request").run;
   assert.ok(run.includes('--base next --head "$BRANCH" --title "Pin the documentation to core $TAG"'));
   assert.ok(run.includes("opens the `next` into `main` release pull request"));
 });
@@ -120,7 +133,9 @@ test("stage 2 acts only when next's pin tag is above main's and no pull request 
   assert.ok(compare.run.includes("git show origin/next:release-pin/pin.json"));
   assert.ok(compare.run.includes("git show origin/main:release-pin/pin.json"));
   assert.ok(compare.run.includes("sort -V"));
-  assert.ok(compare.run.includes("--base main --head next --state open"));
+  assert.ok(compare.run.includes('--base main --state all --search "\\"$TITLE\\" in:title"'));
+  assert.ok(compare.run.includes('TITLE="Release documentation for $NEXT_TAG"'));
+  assert.ok(compare.run.includes("--base main --state open --json number,title,body"));
   for (const name of ["Mint a token for this repository", "Open the release pull request"]) {
     assert.equal(release.steps.find((step) => step.name === name).if, "steps.pins.outputs.release == 'true'");
   }
@@ -128,10 +143,13 @@ test("stage 2 acts only when next's pin tag is above main's and no pull request 
 
 test("the release pull request lists the documentation commits and gives the hold-back steps", () => {
   const run = release.steps.find((step) => step.name === "Open the release pull request").run;
-  assert.ok(run.includes("git log --oneline origin/main..origin/next -- docs blog"));
+  assert.ok(run.includes("git diff --stat=100 origin/main origin/next -- docs blog"));
+  assert.ok(run.includes('git log --no-merges --oneline "$PIN_COMMIT..origin/next" -- docs blog'));
+  assert.ok(!run.includes("origin/main..origin/next"));
+  assert.ok(!/retarget/i.test(run));
   assert.ok(run.includes('--title "Release documentation for $TAG"'));
   assert.ok(run.includes("\\`ci\\` runs \\`docs:check\\` against the new pin and fails if any passage is not true at the release"));
-  for (const phrase of ["Branch from \\`next\\`", "restore the text released on \\`main\\`", "Retarget this pull request", "Squash-merge it into \\`main\\`", "gh pr merge --merge"]) {
+  for (const phrase of ["Branch from \\`next\\`", "restore the text released on \\`main\\`", "Close this pull request and open one from the hold-back branch", "Squash-merge it into \\`main\\`", "gh pr merge --merge"]) {
     assert.ok(run.includes(phrase), phrase);
   }
 });
@@ -144,6 +162,20 @@ test("no step merges, pushes to main or next, or force-pushes", () => {
   assert.ok(allScripts.includes('BRANCH="release-pin/$TAG"'));
   assert.ok(!/refs\/heads\/(main|next)"/.test(allScripts.replace(/'\+refs\/heads\/(main|next):refs\/remotes\/origin\/(main|next)'/g, "")));
   assert.ok(!allScripts.includes("gh api -X") && !/--method\s+(PUT|PATCH|DELETE)/.test(allScripts));
+});
+
+test("gh api is used only for the two known read calls", () => {
+  const calls = commands.split("\n").filter((line) => /gh api\b/.test(line)).map((line) => line.trim().replace(/^.*?(gh api)/, "$1"));
+  assert.deepEqual(calls.sort(), ['gh api "repos/$REPO/git/ref/heads/release-pin/$TAG" --jq .ref 2>&1)"; then', 'gh api "users/${BOT}" --jq .id)"'].sort());
+});
+
+test("only the known pinned actions are used", () => {
+  const uses = [...pin.steps, ...release.steps].filter((step) => step.uses).map((step) => step.uses);
+  assert.deepEqual([...new Set(uses)].sort(), [
+    "actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09",
+    "actions/create-github-app-token@bcd2ba49218906704ab6c1aa796996da409d3eb1",
+    "actions/setup-node@a0853c24544627f65ddf259abe73b1d18a591444",
+  ]);
 });
 
 test("actions are pinned to the SHAs the other workflows use", () => {
