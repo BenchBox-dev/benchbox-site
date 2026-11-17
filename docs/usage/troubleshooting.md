@@ -175,7 +175,7 @@ Access Denied
 
 Cloud platforms authenticate with the credentials saved by `benchbox setup --platform <name>`. Re-run setup, or `benchbox setup --platform <name> --validate-only`, to fix or check them. The commands below test the same values from your shell, using the variable names setup reads.
 
-`~/.benchbox/credentials.yaml` is plain YAML, not encrypted. BenchBox keeps it at mode `0600` in a `0700` directory and tightens a wider file on the next save with a one-line warning. `${VAR}` references in the file are read from the environment and kept as written when the file is saved, which is also how `benchbox run` picks up `SNOWFLAKE_*` values: `run` does not read those variables itself. See [Saved Credentials File](../reference/cli/configuration.md#saved-credentials-file).
+`~/.benchbox/credentials.yaml` is plain YAML, not encrypted. `${VAR}` references in the file are read from the environment, which is also how `benchbox run` picks up `SNOWFLAKE_*` values: `run` does not read those variables itself. See [Saved Credentials File](../reference/cli/configuration.md#saved-credentials-file).
 
 **Platform-Specific Solutions:**
 

@@ -355,18 +355,6 @@ benchbox run --platform databricks --benchmark tpch --scale 1 \
 
 The commands, in order, run Databricks with Z-order clustering, with liquid clustering on specific columns, and with automatic liquid clustering.
 
-## Driver Auto-Install
-
-`--platform-option driver_version=X` selects an exact driver version. The value must be a valid package version such as `1.2.3`; anything else is refused before it reaches an installer, and `run` exits 2.
-
-When the installed driver differs from the requested version and no isolated runtime matches, BenchBox can install the requested version with `uv pip install` or `pip install`. That happens only when `driver_auto_install=true` is passed as a platform option or `BENCHBOX_DRIVER_AUTO_INSTALL=1` is set. BenchBox prints the exact `package==version` and the target interpreter to stderr before it installs.
-
-- **Terminal session:** the platform option alone installs, after the printed notice.
-- **Non-interactive session** (standard input or output is not a terminal, or `BENCHBOX_NON_INTERACTIVE` is set): the platform option alone is refused with exit 6. Set `BENCHBOX_DRIVER_AUTO_INSTALL=1` to allow the install.
-- **Dry run:** a `--dry-run` never installs a package. A missing or mismatched driver is reported and the preview continues.
-
-`benchbox run-official` follows the same rule. `benchbox platforms install` prints installation instructions only and never installs ([platforms](platforms.md#platforms-install-installation-guide)).
-
 ## Forced Reruns
 
 | Value | Local data | Target database |
