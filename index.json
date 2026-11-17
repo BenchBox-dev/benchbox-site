@@ -408,6 +408,13 @@
       "status": "done",
       "title": "Audit docs on main for statements about unreleased core and move them to next"
     },
+    "automate-release-docs-pull-request": {
+      "claim": null,
+      "needs": [],
+      "priority": "medium-high",
+      "status": "open",
+      "title": "Turn a core release into a ready docs release pull request without waiting for a person to notice"
+    },
     "blog-draft-byte-sha-of-snapshot-stale-20261029": {
       "claim": null,
       "needs": [],
