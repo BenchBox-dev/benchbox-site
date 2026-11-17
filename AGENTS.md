@@ -200,15 +200,22 @@ versioned core bundle; it reads nothing else from core.
   where the default token's would not; the app needs contents and pull-requests
   write on this repository.
 - Hold back what is not true at the release before merging the release pull
-  request. `next` documents core `develop`, which runs ahead of the release, so
-  `docs:check` against the new pin fails `ci` on any passage that is not true at
-  the release. Automation never edits those passages. The owner branches from
-  `next`, restores the released text for each such passage, closes the release
-  pull request and opens one from that branch into `main` with the same title,
-  squash-merges it once `ci` is green, then merges `main` into `next` by pull
-  request with `gh pr merge --merge` and confirms the held-back text is still
-  on `next`. A pull request's head cannot change, hence the replacement; the
-  workflow opens no further release pull request while one exists in any state.
+  request. `next` documents core `develop`, which runs ahead of the release.
+  `docs:check` against the new pin fails `ci` only on the facts core exports in
+  `doc-contracts.json`; every other passage on `next` that is not true at the
+  release passes `ci`, so review each documentation change on `next` since the
+  previous pin against the release tag's source. Automation never edits those
+  passages. The owner branches from `next`, restores the released text for each
+  such passage, and corrects passages that are false at the release on both
+  branches. The owner then closes the release pull request, opens one from that
+  branch into `main` with the same title and squash-merges it once `ci` is
+  green. Last, `main` is merged into `next` by pull request with
+  `gh pr merge --merge`. Before that merge, apply to `next` the corrections
+  that are also true on `develop`; in the conflicts, `next` keeps its text, so
+  a correction applied only on `main` would be lost there. Confirm the
+  held-back text is still on `next`. A pull request's head branch cannot
+  change, hence the replacement; the workflow opens no further release pull
+  request while one exists in any state.
 - The Nightly workflow opens or updates the `docs-release-pending` issue when
   core has published a release newer than the pin. It remains the backstop when the Release docs workflow cannot
   open the pin pull request, and the owner then acts on it by hand with
