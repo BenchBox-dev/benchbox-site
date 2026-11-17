@@ -616,6 +616,13 @@
       "status": "dropped",
       "title": "Public-site visual regression reported every /results/ page changed for a PR that cannot affect rendering"
     },
+    "release-pin-hardening-leftovers": {
+      "claim": null,
+      "needs": [],
+      "priority": "low",
+      "status": "open",
+      "title": "Close the small verification gaps left in docs:pin and the next-branch workflows"
+    },
     "release-pin-tooling": {
       "claim": null,
       "needs": [],

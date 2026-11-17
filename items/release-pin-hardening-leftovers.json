@@ -1,0 +1,28 @@
+{
+  "acceptance": [
+    "(1) Decision recorded: either --from requires the directory's manifest.json to equal byte for byte the manifest of core's site-inputs-<core_sha> artifact when that artifact still exists (and refuses otherwise unless an explicit flag names the run), or AGENTS.md states that --from proves certification of the commit only and the directory must come from core's artifact",
+    "(2) A table-driven test removes or corrupts each manifest field and asserts the matching refusal; removing any one check makes it fail",
+    "(3) A test passes an expression with an unsupported character and asserts the evaluator throws",
+    "(4) The sync workflow distinguishes 'next does not exist' (exit 0) from a failed ls-remote (fail the job), with a shape test",
+    "`node --test scripts/*.test.mjs`, `node scripts/check-yaml.mjs .github/workflows/*.yml` and `npm run lint:comments` pass; each new test is shown to fail against a deliberately broken check (state that it was tried)"
+  ],
+  "context": "Decision gate: item (1) only. Guardrails: no change to bundle-fetch, bundle-verify or scripts/schemas; the sync workflow stays read-only on branches; goes to main. Merge targets: site code, workflows and corrections to released documentation go to main, then main is merged into next with `gh pr merge --merge`; only documentation of unreleased behaviour goes to next.",
+  "description": "Problem: independent reviews of pull request #159 left four optional gaps. (1) `docs:pin --from` proves core certified the commit, not that core produced the directory: a candidate bundle with recomputed digests and a real certified_by run id passes. (2) No test covers the new manifest field checks on --from (missing parent_core_sha, corpus_sha or certified_by, a short SHA, an unsupported schema); deleting them fails nothing. (3) The DOCS_INPUTS expression evaluator in scripts/docs-release-pin-workflow.test.mjs now fails on unrecognised characters, but no test feeds it one. (4) .github/workflows/sync-next.yml exits 0 silently when `git ls-remote` for next fails, which would also hide a private-repository or authentication failure.\n\nOutcome: each check fails when it should, with a test.",
+  "links": [
+    "scripts/docs-pin.mjs",
+    "scripts/docs-pin.test.mjs",
+    "scripts/docs-release-pin-workflow.test.mjs",
+    ".github/workflows/sync-next.yml",
+    "https://github.com/BenchBox-dev/benchbox-site/pull/159"
+  ],
+  "sessions": [
+    {
+      "actor": "mcp:omp-coding-agent:joe@joe-mac-mini.local:4f989261ea761824918fb61e",
+      "at": "2026-11-17T13:51:51Z",
+      "client": "omp-coding-agent",
+      "op": "create",
+      "op_id": "08431c77ad8740a390122601da0bb42d",
+      "session_id": "c8eea21eea3644c89311c25d48789197"
+    }
+  ]
+}
