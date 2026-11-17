@@ -166,6 +166,24 @@ the candidate's and acts on the result:
 
 A `rollback` run does not compare and behaves as before.
 
+## Validator parity chain
+
+When the corpus differs from the deployed one, the bundle's `validator_parity`
+attestation must cover the change since the deployed core commit. `resolve`
+accepts a parity `base` equal to the deployed `core_sha`, and also a `base`
+that is a strict ancestor of it, provided the bundle's core commit is the
+deployed one or a descendant of it. The parity range `base..core` then contains
+`deployed..core`, so every bundle changed since the deployed commit was
+validated. A producer that read an older deployed commit because the previous
+site deploy had not started yet therefore no longer blocks the chain.
+
+Both ancestry facts come from the core compare API with the run's token
+(`base...deployed` must be `ahead`; `deployed...core` must be `ahead` or
+`identical`). A base that is not an ancestor, a bundle core that is not a
+descendant, a failed compare or an unreadable status refuses the run, and the
+message names the recovery: dispatch core `site-inputs.yml` with
+`parent_core_sha` set to the deployed `core_sha`.
+
 ## Deploy triggers
 
 `.github/workflows/deploy.yml` runs on a push to `main`, on a `core-bundle`

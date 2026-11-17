@@ -11,7 +11,7 @@ import { checksumManifest, probe } from "./lib/probe.ts";
 import { latencySeconds, receiptBytes, receiptSha, RECEIPT_SCHEMA, statusDescription, type Receipt, type ProbeSummary } from "./lib/receipt.ts";
 import { recheckErrors } from "./lib/recheck.ts";
 import { markRehearsal } from "./lib/rehearsal.ts";
-import { chainErrors, deployedBundleErrors, freshness, redeployErrors, type Deployed } from "./lib/resolve.ts";
+import { chainErrors, deployedBundleErrors, freshness, parityNeedsAncestry, redeployErrors, type Candidate, type Deployed, type ParityAncestry } from "./lib/resolve.ts";
 import { automaticRollback, rollbackTargetErrors } from "./lib/rollback.ts";
 import { treeDigest } from "../website/src/lib/tree-digest.ts";
 
@@ -54,6 +54,15 @@ type Resolution = {
 
 function siteSha(): string {
   return process.env.GITHUB_SHA ?? execFileSync("git", ["rev-parse", "HEAD"], { encoding: "utf8" }).trim();
+}
+
+async function compareCommits(api: ReturnType<typeof githubApi>, from: string, to: string): Promise<{ status: number; body?: { status?: "ahead" } }> {
+  try {
+    const result = await api(`repos/${CORE_REPO}/compare/${from}...${to}`);
+    return { status: result.status, body: result.body as { status?: "ahead" } };
+  } catch {
+    return { status: 0 };
+  }
 }
 
 function notice(message: string): void {
@@ -163,7 +172,15 @@ async function resolve(): Promise<void> {
   const attestations = readJson<{ name: string; result: string; compared?: { base?: string } }[]>(path.join(SITE_INPUTS, "attestations.json"));
   const parity = attestations.find((entry) => entry.name === "validator_parity");
   const contract = readJson<{ read_model_version: number }>(path.join(SITE_INPUTS, "explorer", "contract.json"));
-  const errors = chainErrors(deployed, { core_sha: manifest.core_sha, corpus_sha: manifest.corpus_sha, validator_parity: parity && { result: parity.result, base: parity.compared?.base } });
+  const candidate: Candidate = { core_sha: manifest.core_sha, corpus_sha: manifest.corpus_sha, validator_parity: parity && { result: parity.result, base: parity.compared?.base } };
+  const ancestry: ParityAncestry = {};
+  if (deployed && parityNeedsAncestry(deployed, candidate)) {
+    const api = githubApi();
+    const base = candidate.validator_parity?.base ?? "";
+    ancestry.baseToDeployed = await compareCommits(api, base, deployed.core_sha);
+    ancestry.deployedToCandidate = await compareCommits(api, deployed.core_sha, candidate.core_sha);
+  }
+  const errors = chainErrors(deployed, candidate, ancestry);
   if (errors.length > 0) failWith(errors);
   writeWork("resolve.json", {
     mode,
