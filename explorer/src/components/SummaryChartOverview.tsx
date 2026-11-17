@@ -30,10 +30,16 @@ import {
   normalizePrimaryMetric,
   platformTimingValue,
   primaryMetricHigherIsBetter,
+  primaryMetricLabel,
   primaryMetricValue,
+  rankingScoreMetric,
+  secondaryScoreLabel,
+  secondaryScoreMetrics,
   summarizeChartDatasetExclusions,
   validPrimaryMetricValue,
+  type PrimaryMetric,
 } from "@/lib/displayEligibility";
+import { combinedDisclosures, hasNonTransactionalSteps } from "@/lib/combinedDisclosure";
 import { formatRunIdentitiesForCohort, formatRunIdentityLabelsForCohort } from "@/lib/runIdentity";
 import { fmtGeomean, fmtScore } from "@/utils";
 import { AnalysisCard, AnalysisCardGrid } from "@/components/AnalysisCardGrid";
@@ -139,13 +145,13 @@ export function SummaryMetricTable({
   const displayRows = summary.platforms.filter(
     (platform) => isTimingDisplayable(platform) && validPrimaryMetricValue(platform, "display_geomean_ms") !== null,
   );
-  const scoreMetric = normalizePrimaryMetric(summary.ranking?.primary_metric) === "throughput_at_size"
-    ? "throughput_at_size"
-    : "power_score";
+  const primaryMetric = normalizePrimaryMetric(summary.ranking?.primary_metric);
+  const scoreMetric = rankingScoreMetric(primaryMetric);
   const scoreName =
-    scoreMetric === "throughput_at_size"
-      ? "Throughput@Size"
-      : powerScoreTitle(isSubscaleTpc(summary.benchmark, summary.scale_factor));
+    scoreMetric === "power_score"
+      ? powerScoreTitle(isSubscaleTpc(summary.benchmark, summary.scale_factor))
+      : primaryMetricLabel(scoreMetric);
+  const secondaryMetrics = secondaryScoreMetrics(primaryMetric);
   const powerRows = summary.platforms.filter(
     (platform) => isRankable(platform) && validPrimaryMetricValue(platform, scoreMetric) !== null,
   );
@@ -158,6 +164,11 @@ export function SummaryMetricTable({
   const rows = orderByDisplayGeomean(summary.platforms);
   const rowIndexByResultId = new Map(summary.platforms.map((platform, index) => [platform.result_id, index]));
   const total = summary.platforms.length;
+  const disclosureNotes = rows.flatMap((platform) => {
+    const index = rowIndexByResultId.get(platform.result_id) ?? 0;
+    const label = displayLabels[index] ?? platform.platform;
+    return combinedDisclosures(platform).map((text) => `${label}: ${text}`);
+  });
   const noun = scope === "compare" ? "selected" : "submitted";
   const showScoreColumn = powerRows.length > 0;
   const heading = showScoreColumn ? `Geomean and ${scoreName}` : "Geomean";
@@ -207,6 +218,13 @@ export function SummaryMetricTable({
                   <span class="font-normal text-[var(--bb-data-fg-subtle)]">higher is better</span>
                 </th>
               )}
+              {showScoreColumn &&
+                secondaryMetrics.map((metric) => (
+                  <th key={metric} scope="col" class="px-2 py-2 text-left text-xs font-medium text-[var(--bb-data-fg-muted)]">
+                    <span class="block">{secondaryScoreLabel(metric)}</span>
+                    <span class="font-normal text-[var(--bb-data-fg-subtle)]">secondary</span>
+                  </th>
+                ))}
             </tr>
           </thead>
           <tbody>
@@ -235,6 +253,14 @@ export function SummaryMetricTable({
                       />
                       <span class="min-w-0 truncate" title={labels[sourceIndex]?.full ?? platform.platform}>
                         {displayLabels[sourceIndex] ?? platform.platform}
+                        {hasNonTransactionalSteps(platform) && (
+                          <span
+                            class="ml-1 text-xs font-normal text-[var(--bb-data-fg-subtle)]"
+                            title="Refresh ran without transactions"
+                          >
+                            non-transactional
+                          </span>
+                        )}
                       </span>
                     </span>
                   </th>
@@ -266,6 +292,19 @@ export function SummaryMetricTable({
                       }
                     />
                   )}
+                  {showScoreColumn &&
+                    secondaryMetrics.map((metric) => {
+                      const value = isRankable(platform) ? validPrimaryMetricValue(platform, metric) : null;
+                      return (
+                        <td
+                          key={metric}
+                          class="px-2 py-1.5 text-sm tabular-nums text-[var(--bb-data-fg-primary)]"
+                          title={value === null ? `${secondaryScoreLabel(metric)} unavailable` : `${fmtScore(value)} ${secondaryScoreLabel(metric)}`}
+                        >
+                          {value === null ? "—" : fmtScore(value)}
+                        </td>
+                      );
+                    })}
                 </tr>
               );
             })}
@@ -283,6 +322,13 @@ export function SummaryMetricTable({
         </p>
         {rankingNote !== null && <p>{rankingNote}</p>}
         {displayNote !== null && <p class="sm:col-span-2 text-xs text-[var(--bb-data-fg-subtle)]">{displayNote}</p>}
+        {disclosureNotes.length > 0 && (
+          <ul class="sm:col-span-2 list-disc pl-5 text-xs text-[var(--bb-data-fg-subtle)]">
+            {disclosureNotes.map((note) => (
+              <li key={note}>{note}</li>
+            ))}
+          </ul>
+        )}
       </div>
     </section>
   );
@@ -912,10 +958,8 @@ function MiniTrend({ summary, historical }: { summary: BenchmarkSummary; histori
   );
 }
 
-function trendEntryValue(entry: ChartHistoricalEntry, metric: ReturnType<typeof normalizePrimaryMetric>): number | null {
-  if (metric === "power_score") return entry.power_score;
-  if (metric === "throughput_at_size") return entry.throughput_at_size ?? null;
-  return entry.display_geomean_ms;
+function trendEntryValue(entry: ChartHistoricalEntry, metric: PrimaryMetric): number | null {
+  return primaryMetricValue(entry, metric);
 }
 
 function MiniRanks({ summary }: { summary: BenchmarkSummary }) {

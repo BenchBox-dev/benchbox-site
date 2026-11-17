@@ -3,6 +3,7 @@ import type { BenchmarkSummary, DetailResult, PlatformRow } from "@/types";
 import { assignRunColorSlots } from "@/lib/chartTheme";
 import { canonicalPhase } from "@/lib/displayLabels";
 import {
+  isScoreMetric,
   isTimingDisplayable,
   isValidTimingValue,
   type ChartDatasetEligibilityClass,
@@ -18,6 +19,8 @@ export interface ChartHistoricalEntry {
   run_date: string;
   power_score: number | null;
   throughput_at_size?: number | null;
+  qphh_at_size?: number | null;
+  qphds_at_size?: number | null;
   display_geomean_ms: number | null;
 }
 
@@ -306,7 +309,7 @@ interface ChartCapabilities {
 function rankingFromPrimaryMetric(
   primaryMetric: PrimaryMetric | undefined,
 ): { primary_metric: string; primary_order: "asc" | "desc" } {
-  return primaryMetric === "power_score" || primaryMetric === "throughput_at_size"
+  return primaryMetric !== undefined && isScoreMetric(primaryMetric)
     ? { primary_metric: primaryMetric, primary_order: "desc" }
     : { primary_metric: "display_geomean_ms", primary_order: "asc" };
 }
@@ -378,6 +381,10 @@ function detailToPlatformRow(detail: DetailResult): PlatformRow {
     ranking_exclusion_reason: detail.ranking_exclusion_reason,
     power_score: detail.power_score,
     throughput_at_size: detail.throughput_at_size ?? null,
+    qphh_at_size: detail.qphh_at_size ?? null,
+    qphds_at_size: detail.qphds_at_size ?? null,
+    load_scope: detail.load_scope ?? null,
+    transactional_steps: detail.transactional_steps ?? null,
     display_geomean_ms: detail.display_geomean_ms,
     sample_geomean_ms: detail.geomean_ms,
     cost_usd: detail.cost_usd,
@@ -451,7 +458,13 @@ function getChartCapabilities(context: ChartContext): ChartCapabilities {
         (platform) =>
           (platform.cost_status === "normalized" && platform.normalized_cost_usd != null) || hasCostEstimate(platform),
       ) ?? false,
-    hasPowerScore: summary?.platforms.some((platform) => isValidTimingValue(platform.power_score)) ?? false,
+    hasPowerScore:
+      summary?.platforms.some(
+        (platform) =>
+          isValidTimingValue(platform.power_score) ||
+          isValidTimingValue(platform.qphh_at_size) ||
+          isValidTimingValue(platform.qphds_at_size),
+      ) ?? false,
     hasPhaseDurations:
       summary?.platforms.some(
         (platform) =>

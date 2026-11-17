@@ -106,7 +106,8 @@ export function formatThroughputScore(value: number | null | undefined, options:
 }
 
 export function formatScoreMetric(metric: string, value: number | null | undefined): string {
-  return (metric === "throughput_at_size" ? formatThroughputScore(value) : formatPowerScore(value)).valueText;
+  const throughputLike = metric === "throughput_at_size" || metric === "qphh_at_size" || metric === "qphds_at_size";
+  return (throughputLike ? formatThroughputScore(value) : formatPowerScore(value)).valueText;
 }
 
 export function formatPowerScoreExact(value: number | null | undefined, missingText = MISSING_VALUE_GLYPH): MetricFormatResult {

@@ -160,6 +160,8 @@ function buildChartSummary(
       sample_geomean_ms: geomean,
       power_score: null,
       throughput_at_size: null,
+      qphh_at_size: null,
+      qphds_at_size: null,
       normalized_cost_usd: null,
       cost_status: "unavailable" as const,
     };
@@ -1285,7 +1287,9 @@ function SummaryBoxPanel({
               ? "Best power"
               : primaryMetric === "throughput_at_size"
                 ? "Best throughput"
-                : "Best geomean"
+                : primaryMetric === "display_geomean_ms"
+                  ? "Best geomean"
+                  : `Best ${primaryMetricLabel(primaryMetric)}`
         }
         value={
           suppressWinnerClaims ? (

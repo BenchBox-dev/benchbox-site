@@ -2,7 +2,7 @@ import type { ChartHistoricalEntry } from "@/lib/chartRegistry";
 import { useElementSize } from "@/lib/useElementSize";
 import { axisLabelAnchor, chartFrame } from "@/lib/chartFrame";
 import { assignRunColorSlots, paletteColor } from "@/lib/chartTheme";
-import { primaryMetricHigherIsBetter, type PrimaryMetric } from "@/lib/displayEligibility";
+import { primaryMetricHigherIsBetter, primaryMetricLabel, primaryMetricValue, type PrimaryMetric } from "@/lib/displayEligibility";
 import { formatLatencyMs, formatScoreMetric, formatLatencyAxisLabels } from "@/lib/metricFormatters";
 import { formatRunDateWithAge } from "@/lib/runAge";
 import {
@@ -298,19 +298,15 @@ function runIdentitySourceForEntry(entry: ChartHistoricalEntry): RunIdentitySour
 }
 
 function trendMetricLabel(metric: Props["primaryMetric"]): string {
-  if (metric === "power_score") return "Power score";
-  if (metric === "throughput_at_size") return "Throughput@Size";
-  return "Geomean latency";
+  return metric === undefined || metric === "display_geomean_ms" ? "Geomean latency" : primaryMetricLabel(metric);
 }
 
 function trendValue(entry: ChartHistoricalEntry, metric: Props["primaryMetric"]): number | null {
-  if (metric === "power_score") return entry.power_score;
-  if (metric === "throughput_at_size") return entry.throughput_at_size ?? null;
-  return entry.display_geomean_ms;
+  return primaryMetricValue(entry, metric ?? "display_geomean_ms");
 }
 
 function formatMetricValue(value: number, metric: Props["primaryMetric"]): string {
-  return metric === "power_score" || metric === "throughput_at_size"
+  return metric !== undefined && metric !== "display_geomean_ms"
     ? formatScoreMetric(metric, value)
     : formatLatencyMs(value).valueText;
 }

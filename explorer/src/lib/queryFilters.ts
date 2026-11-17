@@ -51,6 +51,8 @@ const ALLOWED_COLUMNS = new Set([
   "run_date",
   "power_score",
   "throughput_at_size",
+  "qphh_at_size",
+  "qphds_at_size",
   "stream_count",
   "total_duration_s",
   "geomean_ms",
