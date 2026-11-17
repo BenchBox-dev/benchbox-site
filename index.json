@@ -602,6 +602,13 @@
       "status": "done",
       "title": "Close the test gaps in the next-branch CI rules"
     },
+    "pin-bundle-production-choice": {
+      "claim": null,
+      "needs": [],
+      "priority": "medium",
+      "status": "open",
+      "title": "Decide which production of a release commit's bundle the docs pin, and why their docs inputs differ"
+    },
     "public-site-visual-regression-false-mismatch-20261014": {
       "claim": null,
       "needs": [],

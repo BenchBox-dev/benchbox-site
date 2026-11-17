@@ -1,0 +1,27 @@
+{
+  "acceptance": [
+    "The member-level differences between the two v0.5.0 productions are listed (which files, which fields), with the cause: parent-dependent content, timestamps, ordering, or exporter change",
+    "Decision recorded: which production docs:pin takes (for example the earliest certified production of the tag commit, or the one whose producing run is the tag's own Trunk-certified build), with the reason",
+    "docs:pin implements the rule, records the chosen site-inputs run id in release-pin/pin.json, and `docs:pin -- --check` online confirms that run still holds the pinned manifest or reports it expired",
+    "A test shows two productions of one commit in the artifact list and asserts the rule picks the same one regardless of listing order",
+    "If the members differ because core's exporters are not deterministic, a core-tracker prompt is written for the owner and linked here; no site code works around it"
+  ],
+  "context": "Found 2026-11-14 while reproducing the v0.5.0 pin. Decision gate: the selection rule, after the diff is understood. Guardrails: do not change bundle-fetch selection for deploys (Explorer and deploy gates); do not re-pin v0.5.0; never edit release-pin/ by hand. If first-default-docs-pin-run lands first, check which v0.5.1 production it pinned and record it here.",
+  "description": "Problem: core can now build a bundle for a given commit (site-inputs.yml dispatch with core_sha), so one release commit can have several certified bundles. v0.5.0 (commit dfe585e) has two: site-inputs run 42114319044 (2026-11-05, the one pinned) and run 43498628032 (2026-11-13). Pinning from the second changed release-pin/manifest.json: parent_source, produced_at and three member digests differ. `npm run docs:pin -- <tag>` fetches through bundle-fetch with SITE_INPUTS_CORE_SHA, which takes the first unexpired develop artifact of that name, so which production is pinned depends on listing order, and re-running the pin can change the published docs inputs without any core change.\n\nOutcome: the pin is reproducible, and it is known whether two productions of the same commit can differ in docs-data, doc-contracts.json or repo-files.json, which would mean the exporters are not deterministic or depend on the parent.",
+  "links": [
+    "scripts/docs-pin.mjs",
+    "scripts/bundle-fetch.mjs",
+    "release-pin/pin.json",
+    "AGENTS.md"
+  ],
+  "sessions": [
+    {
+      "actor": "mcp:omp-coding-agent:joe@joe-mac-mini.local:4f989261ea761824918fb61e",
+      "at": "2026-11-17T13:51:46Z",
+      "client": "omp-coding-agent",
+      "op": "create",
+      "op_id": "0471d7d8909e401286f6254e46f91d45",
+      "session_id": "c8eea21eea3644c89311c25d48789197"
+    }
+  ]
+}
