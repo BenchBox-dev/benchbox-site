@@ -569,7 +569,7 @@
       "claim": null,
       "needs": [],
       "priority": "medium",
-      "status": "blocked",
+      "status": "open",
       "title": "Pin the next core release through the default docs:pin path and confirm the status matrix corrects itself"
     },
     "keep-next-level-with-main": {
