@@ -343,7 +343,9 @@ queries above, so don't compare those queries one for one with newer results.
 > Derived from TPC-DS. These results do not comply with the TPC-DS Specification and must not be compared with official TPC-DS results.
 
 BenchBox exports Power@Size and Throughput@Size when the `power` and `throughput`
-phases run successfully. Values are surfaced in the JSON results.
+phases run successfully. At scale factor 1 and above only an official run
+(`--official`) exports them; a non-official run records `summary.tpc_metrics` as
+suppressed. Values are surfaced in the JSON results.
 
 | Metric | Meaning | Source |
 |--------|---------|--------|

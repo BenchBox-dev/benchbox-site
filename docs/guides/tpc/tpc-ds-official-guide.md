@@ -183,7 +183,7 @@ The Power Test measures single-stream query processing power by executing all 99
 benchbox run --platform duckdb --benchmark tpcds --scale 1 --seed 42 --phases power --output ./official_data
 ```
 
-Read `Power@Size` from the result file's `summary.tpc_metrics` (see [Understanding Results](../../tutorials/understanding-results.md)).
+This run is not official, so `summary.tpc_metrics` is suppressed at scale factor 1 and above and carries no `Power@Size`. For the metrics, run the full official command from the [Quick Start](#quick-start).
 
 **Characteristics:**
 
@@ -200,7 +200,7 @@ The Throughput Test measures concurrent query processing capability by executing
 benchbox run --platform duckdb --benchmark tpcds --scale 1 --seed 42 --phases throughput --streams 2 --output ./official_data
 ```
 
-Read `Throughput@Size` from the result file's `summary.tpc_metrics`.
+This run is not official, so `summary.tpc_metrics` is suppressed at scale factor 1 and above and carries no `Throughput@Size`. For the metrics, run the full official command from the [Quick Start](#quick-start).
 
 **Characteristics:**
 
@@ -506,7 +506,7 @@ Custom databases connect through platform adapters, not subclasses. Pick the ada
 
 ### Performance Tuning
 
-For large scale factors, add streams for throughput. Skip the Maintenance Test if you do not need it:
+For large scale factors, add streams for throughput. `--official` requires the Maintenance Test, so an official run cannot skip it:
 
 ```bash
 benchbox run --official --platform duckdb --benchmark tpcds --scale 100 --seed 42 \
@@ -515,12 +515,12 @@ benchbox run --official --platform duckdb --benchmark tpcds --scale 100 --seed 4
 
 ### Integration with CI/CD
 
-Fail the job when Throughput@Size drops below a minimum threshold (100 here is an example). `jq -e` exits non-zero when the check is false or the metric is missing:
+Fail the job when Throughput@Size drops below a minimum threshold (100 here is an example). Only an official run exports `tpc_metrics`, so the job runs the full official command. `jq -e` exits non-zero when the check is false or the metric is missing:
 
 ```bash
 export BENCHBOX_OUTPUT_DIR=./ci_data
-benchbox run --platform duckdb --benchmark tpcds --scale 1 --seed 42 \
-  --phases throughput --streams 2 --output ./ci_data
+benchbox run --official --platform duckdb --benchmark tpcds --scale 1 --seed 42 \
+  --phases load,power,throughput,maintenance --streams 4 --output ./ci_data
 
 jq -e '.summary.tpc_metrics.throughput_at_size > 100' ./ci_data/results/*.json
 ```
@@ -670,13 +670,13 @@ with open(f"benchmark_archive_{datetime.now().strftime('%Y%m%d_%H%M%S')}.json", 
 ### 5. Continuous Benchmarking
 
 The loop runs every hour (`sleep 3600`) against your own baseline power number, and alerts when the result falls
-more than 5% below it:
+more than 5% below it. It uses the full official command, because only an official run exports `tpc_metrics`:
 
 ```bash
 while true; do
   export BENCHBOX_OUTPUT_DIR=./ci_data
-  benchbox run --platform duckdb --benchmark tpcds --scale 1 --seed 42 \
-    --phases power --output ./ci_data
+  benchbox run --official --platform duckdb --benchmark tpcds --scale 1 --seed 42 \
+    --phases load,power,throughput,maintenance --streams 4 --output ./ci_data
   jq -e '.summary.tpc_metrics.power_at_size > 250000.0 * 0.95' ./ci_data/results/*.json \
     || echo "ALERT: Power@Size regressed"
   sleep 3600

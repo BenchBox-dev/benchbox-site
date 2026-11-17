@@ -188,26 +188,17 @@ See: [Testing Guide](../development/testing.md)
 
 ## Compliance Workflow (Official TPC Benchmarks)
 
-Running power and throughput tests separately for composite metrics. `--official` refuses a single-phase run, so these commands are not official; an official TPC-H run needs the power and throughput phases together with the refresh functions and enough streams (see [Contributing Benchmark Results](../contributing-results.md)):
+Run the official TPC-H benchmark. `--official` refuses a single-phase run, and only an official run exports `Power@Size`, `Throughput@Size` and `QphH@Size` in `summary.tpc_metrics` at scale factor 1 and above. It needs the power and throughput phases together, the refresh functions and at least the minimum streams for the scale (5 at scale factor 100); see [Contributing Benchmark Results](../contributing-results.md):
 
 ```bash
-benchbox run --benchmark tpch --platform snowflake --scale 100 \
-  --phases power \
+benchbox run --official --benchmark tpch --platform snowflake --scale 100 \
+  --phases power,throughput --streams 5 \
+  --benchmark-option tpch_refresh_functions=true \
   --seed 42 \
-  --output results/power/
-
-benchbox run --benchmark tpch --platform snowflake --scale 100 \
-  --phases throughput \
-  --concurrency 4 \
-  --seed 42 \
-  --output results/throughput/
-
-benchbox metrics qphh \
-  --power-results results/power/results.json \
-  --throughput-results results/throughput/results.json
+  --output results/official/
 ```
 
-The first command is the Power Test (a single query stream), the second is the Throughput Test (concurrent streams), and `benchbox metrics qphh` calculates the composite metric from both.
+Running the phases in separate unofficial runs records no metrics at scale factor 1 and above, and `benchbox metrics qphh` refuses those results.
 
 `run-official` is deprecated (kept for backward compatibility) in favor of
 `benchbox run --official`; see
