@@ -10,7 +10,9 @@ BenchBox results platform.
 ## 1. Run A Benchmark
 
 ```bash
-uv run -- benchbox run --platform duckdb --benchmark tpch --official --scale 1 --seed 42 --non-interactive
+uv run -- benchbox run --platform duckdb --benchmark tpch --official --scale 1 --seed 42 \
+  --phases power,throughput --streams 2 --benchmark-option tpch_refresh_functions=true \
+  --non-interactive
 ```
 
 BenchBox writes the result JSON under `benchmark_runs/results/`. If query plans

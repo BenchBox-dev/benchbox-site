@@ -116,7 +116,8 @@ platform and scale.
 
 > Derived from TPC-H. These results do not comply with the TPC-H Specification and must not be compared with official TPC-H results.
 
-BenchBox reports Power@Size and Throughput@Size. TPC-H refresh functions are
+BenchBox reports Power@Size and Throughput@Size; at scale factor 1 and above only an
+official run (`--official`) exports them. TPC-H refresh functions are
 opt-in, so existing runs remain query-only:
 
 ```text
@@ -146,7 +147,7 @@ After a run using Power set F and throughput sets F+1..F+S, pass
 restart at set 1. For a power-only run, the next set is F+1.
 
 Refresh support is declared per adapter. It is enabled for DuckDB, SQLite,
-PostgreSQL, Snowflake, and SingleStore. The PostgreSQL derivatives (CedarDB,
+PostgreSQL, DuckLake (inherited from DuckDB), Snowflake, and SingleStore. The PostgreSQL derivatives (CedarDB,
 Citus, ParadeDB, pg_duckdb, pg_mooncake and TimescaleDB), Redshift, and other
 adapters do not declare it. Snowflake runs routed through the Greybeam gateway
 do not support it either. Power or throughput with refresh

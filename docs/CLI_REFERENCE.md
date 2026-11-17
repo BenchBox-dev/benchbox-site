@@ -33,6 +33,7 @@ Common flags:
 - `--dry-run <output-dir>`
 - `--compression <none|gzip|zstd|bzip2|xz>`
 - `--seed <int>`
+- `--iterations <int>` (advanced; default 3)
 
 Examples:
 
@@ -108,7 +109,7 @@ only possible when a resolver service exists and is explicitly configured.
 Common flags:
 
 - `--target <path-or-uri>` - destination directory or cloud URI prefix
-- `--label <maintainer-run|community-submission|ci|local>` - provenance label
+- `--label <maintainer-run|community-submission|vendor-supplied|ci|local|unofficial-research>` - provenance label (default `maintainer-run`)
 - `--dry-run` - preview without publishing
 - `--last` - publish the last exported result
 
@@ -138,7 +139,7 @@ benchbox publish list
 benchbox publish show abc123def456
 
 # Remove a publication record (does not delete artifact files)
-benchbox publish remove abc123def456
+benchbox publish remove abc123def456 --yes
 ```
 
 ### `benchbox submit`
@@ -190,10 +191,10 @@ slowdowns), `import` (load results into database), `stats`, and `list`.
 
 ### `benchbox metrics qphh`
 
-Calculates Power@Size and Throughput@Size from TPC-H power and throughput
-results. It exports QphH@Size only when official-run metadata and complete
+Calculates Power@Size and Throughput@Size from TPC power and throughput
+results (TPC-H or TPC-DS). It exports QphH@Size, for TPC-H only, when official-run metadata and complete
 refresh evidence pass the shared gate; otherwise it reports
-`qphh_unavailable` reasons. It does not compute QphDS@Size. Scale factor is
+`qphh_unavailable` reasons. It does not compute QphDS@Size; a full official TPC-DS run reports it in its own results. Scale factor is
 auto-detected from the result files.
 
 ### `benchbox aggregate`

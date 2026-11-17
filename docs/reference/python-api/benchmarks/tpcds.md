@@ -17,7 +17,7 @@ The TPC-DS benchmark models a retail product supplier with 99 complex decision s
 - Advanced SQL features (window functions, CTEs, complex joins)
 - Query variants for different data distributions
 - Data and queries generated with the TPC-DS `dsdgen` and `dsqgen` tools
-- Scale factors from 0.001 up to 100000
+- Scale factors from 0.01 up to 100000
 
 ## Quick Start
 
@@ -52,7 +52,7 @@ Creates a TPC-DS benchmark that generates the 25 TPC-DS tables with `dsdgen` and
 
 | Name | Type | Default | Meaning |
 | --- | --- | --- | --- |
-| `scale_factor` | `float` | `1.0` | Data size multiplier. Must be a number from 0.001 up to 100000. Values of 1 or more must be whole numbers. |
+| `scale_factor` | `float` | `1.0` | Data size multiplier. Must be a number from 0.01 up to 100000. Values of 1 or more must be whole numbers. |
 | `output_dir` | `str`, `Path` or `None` | `None` | Directory for generated data files. When `None`, the directory is `benchmark_runs/datagen/tpcds_<sf token>` under the current directory (for example `tpcds_sf001` for 0.01), or under `$BENCHBOX_OUTPUT_DIR/datagen` when that variable is set. |
 | `**kwargs` | keyword arguments | none | See the list below. |
 
@@ -75,7 +75,7 @@ A `TPCDS` instance. It subclasses `BaseBenchmark`; see [Base Benchmark API](../b
 ##### Raises
 
 - `TypeError` when `scale_factor` is not a number, or `parallel` is not an integer.
-- `ValueError` when `scale_factor` is zero or negative, is below 0.001 or above 100000, or is 1 or more and not a whole number; or when `parallel` is below 1.
+- `ValueError` when `scale_factor` is zero or negative, is below 0.01 or above 100000, or is 1 or more and not a whole number; or when `parallel` is below 1.
 
 ##### Example
 

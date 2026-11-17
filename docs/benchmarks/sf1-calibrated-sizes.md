@@ -30,7 +30,7 @@ where available; otherwise the generator baseline.
 |-----------|----------------|--------------|-----------|--------|
 | tpch | 1,092,043,700 | 1.017 | ~1.1 GB | generated |
 | tpcds | 1,235,064,003 | 1.150 | ~1.2 GB | generated |
-| tpcdi | 160,094,804 | 0.149 | ~0.2 GB | generated |
+| tpcdi | 76,020,843 | 0.071 | ~0.1 GB | generated |
 | ssb | 609,810,151 | 0.568 | ~0.6 GB | generated |
 | tpch_skew | 1,072,122,706 | 0.998 | ~1.1 GB | generated |
 | tpchavoc | 1,092,043,700 | 1.017 | ~1.1 GB | generated (TPC-H data) |

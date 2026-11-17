@@ -521,6 +521,9 @@ The example loads the data into pandas to simulate ML preprocessing, then times 
 | 100.0 | ~1B | ~100 GB | < 100 GB | Large-scale testing |
 | 1000.0 | ~10B | ~1 TB | < 500 GB | Production simulation |
 
+The standard scale factors for H2O DB are 0.01, 0.1 and 1. The 10, 100 and 1000 rows run with a note that their
+results are not comparable with published results; see [Scale factors](index.md#scale-factors).
+
 ### Advanced-level Configuration
 
 ```python

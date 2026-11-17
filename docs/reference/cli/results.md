@@ -169,7 +169,10 @@ benchbox compare BASELINE.json CURRENT.json [OPTIONS]
   - Milliseconds: `5ms`, `2.5ms`
   - Seconds: `0.005s`
   - Not set by default, so queries are judged by percentage alone. Aggregate metrics such as total time are always judged by percentage alone.
-- `--format [text|json|html]`: Output format (default: text)
+- `--min-aggregate-regression-delta DURATION`: With `--fail-on-regression`, count an aggregate metric as regressed only when it also slows by more than this duration (for example `80ms`). Applies to aggregate metrics only.
+- `--allow-heterogeneous-comparison`: Allow comparing runs with different execution variants (deployment, engine, gateway).
+- `-p, --platform TEXT`: Run the benchmark on each named platform and compare, instead of reading result files. Repeatable. Run mode also takes `--benchmark`, `--scale`, `--queries`, `--warmup` (default 1), `--iterations` (default 3) and `--type`.
+- `--format [text|json|markdown|html]`: Output format (default: text)
 - `--output FILE`: Save comparison output to file instead of stdout
 - `--show-all-queries`: Show all query comparisons (default: only regressions/improvements)
 

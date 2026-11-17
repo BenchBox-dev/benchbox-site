@@ -114,14 +114,14 @@
       "ssb": 13,
       "tpcdi": 38,
       "tpcds": 99,
-      "tpcds_obt": 17,
+      "tpcds_obt": 90,
       "tpch": 22,
       "tpch_skew": 22,
       "tpchavoc": 220,
-      "transaction_primitives": 12,
+      "transaction_primitives": 23,
       "tsbs_devops": 18,
       "vector_search": 6,
-      "write_primitives": 12
+      "write_primitives": 112
     },
     "public_ids": [
       "ai_primitives",
@@ -566,6 +566,19 @@
             "multiple": false,
             "names": [
               "--fail-on-regression"
+            ],
+            "required": false
+          },
+          {
+            "choices": [
+              "arrow",
+              "rows"
+            ],
+            "hidden": false,
+            "is_flag": false,
+            "multiple": false,
+            "names": [
+              "--fetch-mode"
             ],
             "required": false
           },
@@ -1851,6 +1864,19 @@
             "required": false
           },
           {
+            "choices": [
+              "arrow",
+              "rows"
+            ],
+            "hidden": false,
+            "is_flag": false,
+            "multiple": false,
+            "names": [
+              "--fetch-mode"
+            ],
+            "required": false
+          },
+          {
             "choices": null,
             "hidden": false,
             "is_flag": false,
@@ -1895,6 +1921,16 @@
               "-s"
             ],
             "required": true
+          },
+          {
+            "choices": null,
+            "hidden": false,
+            "is_flag": false,
+            "multiple": false,
+            "names": [
+              "--timing-method"
+            ],
+            "required": false
           }
         ],
         "path": "benchbox report rankings"
@@ -3111,12 +3147,47 @@
             "required": false
           },
           {
+            "choices": [
+              "free",
+              "paid",
+              "trial",
+              "unspecified"
+            ],
+            "hidden": false,
+            "is_flag": false,
+            "multiple": false,
+            "names": [
+              "--plan-tier"
+            ],
+            "required": false
+          },
+          {
             "choices": null,
             "hidden": false,
             "is_flag": false,
             "multiple": false,
             "names": [
               "--platform"
+            ],
+            "required": false
+          },
+          {
+            "choices": null,
+            "hidden": false,
+            "is_flag": false,
+            "multiple": true,
+            "names": [
+              "--preview-feature"
+            ],
+            "required": false
+          },
+          {
+            "choices": null,
+            "hidden": false,
+            "is_flag": true,
+            "multiple": false,
+            "names": [
+              "--self-run"
             ],
             "required": false
           },
@@ -3137,6 +3208,36 @@
             "multiple": false,
             "names": [
               "--submitted-by"
+            ],
+            "required": false
+          },
+          {
+            "choices": null,
+            "hidden": false,
+            "is_flag": false,
+            "multiple": false,
+            "names": [
+              "--vendor-notice-date"
+            ],
+            "required": false
+          },
+          {
+            "choices": null,
+            "hidden": false,
+            "is_flag": false,
+            "multiple": false,
+            "names": [
+              "--vendor-notice-ref"
+            ],
+            "required": false
+          },
+          {
+            "choices": null,
+            "hidden": false,
+            "is_flag": false,
+            "multiple": false,
+            "names": [
+              "--vendor-permission"
             ],
             "required": false
           },
@@ -4576,7 +4677,7 @@
     ],
     "counts": {
       "core-generated": 3,
-      "core-only": 99,
+      "core-only": 103,
       "site-owned": 334
     },
     "site_owned": [
@@ -5049,7 +5150,206 @@
       "pattern": "(?P<prefix>Current\\s+release\\s*:?\\s*)(?P<marker>`?)v?(?P<version>\\d+\\.\\d+\\.\\d+(?:-[\\w\\.]+|(?:a|b|rc)\\d+)?)(?P=marker)(?P<suffix>[\\.]?)",
       "version_group": "version"
     },
-    "version": "0.5.0"
+    "version": "0.5.1"
+  },
+  "path_privacy": {
+    "cases": [
+      {
+        "home": false,
+        "id": "known-root-users",
+        "leak": true,
+        "roots": [],
+        "text": "/Users/example-user/run/results.json"
+      },
+      {
+        "home": false,
+        "id": "known-root-tmp-in-sentence",
+        "leak": true,
+        "roots": [],
+        "text": "wrote plan to /tmp/example-run/plan.txt"
+      },
+      {
+        "home": false,
+        "id": "known-root-tilde",
+        "leak": true,
+        "roots": [],
+        "text": "~/example/plan.json"
+      },
+      {
+        "home": false,
+        "id": "known-root-opt",
+        "leak": true,
+        "roots": [],
+        "text": "/opt/example/bin"
+      },
+      {
+        "home": false,
+        "id": "drive-letter-backslash",
+        "leak": true,
+        "roots": [],
+        "text": "C:\\Example\\run\\plan.json"
+      },
+      {
+        "home": false,
+        "id": "drive-letter-forward-slash",
+        "leak": true,
+        "roots": [],
+        "text": "D:/example/run/plan.json"
+      },
+      {
+        "home": false,
+        "id": "unc-backslash",
+        "leak": true,
+        "roots": [],
+        "text": "\\\\example-host\\share\\run"
+      },
+      {
+        "home": false,
+        "id": "unc-forward-slash",
+        "leak": true,
+        "roots": [],
+        "text": "//example-host/share/run"
+      },
+      {
+        "home": false,
+        "id": "placeholder-data",
+        "leak": false,
+        "roots": [],
+        "text": "/data"
+      },
+      {
+        "home": false,
+        "id": "placeholder-output-slash",
+        "leak": false,
+        "roots": [],
+        "text": "/output/"
+      },
+      {
+        "home": false,
+        "id": "placeholder-redacted",
+        "leak": false,
+        "roots": [],
+        "text": "<redacted>"
+      },
+      {
+        "home": false,
+        "id": "relative-path",
+        "leak": false,
+        "roots": [],
+        "text": "results/example/plan.json"
+      },
+      {
+        "home": false,
+        "id": "url-with-known-root-segment",
+        "leak": false,
+        "roots": [],
+        "text": "https://example.com/Users/profile"
+      },
+      {
+        "home": false,
+        "id": "unknown-absolute-root",
+        "leak": false,
+        "roots": [],
+        "text": "/srv/example-service/data"
+      },
+      {
+        "home": false,
+        "id": "no-path",
+        "leak": false,
+        "roots": [],
+        "text": "scan on lineitem uses index"
+      },
+      {
+        "home": false,
+        "id": "data-root-match",
+        "leak": true,
+        "roots": [
+          "/srv/example-data"
+        ],
+        "text": "/srv/example-data/run/plan.json"
+      },
+      {
+        "home": false,
+        "id": "data-root-boundary",
+        "leak": false,
+        "roots": [
+          "/srv/example-data"
+        ],
+        "text": "/srv/example-database/plan.json"
+      },
+      {
+        "home": false,
+        "id": "neutral-placeholder-never-a-root",
+        "leak": false,
+        "roots": [
+          "/data"
+        ],
+        "text": "/data/run/plan.json"
+      },
+      {
+        "home": true,
+        "id": "home-root-match",
+        "leak": true,
+        "roots": [],
+        "text": "/srv/example-home/run/plan.json"
+      },
+      {
+        "home": true,
+        "id": "home-root-exact",
+        "leak": true,
+        "roots": [],
+        "text": "/srv/example-home"
+      },
+      {
+        "home": true,
+        "id": "home-ancestor-configured-root-still-scanned",
+        "leak": true,
+        "roots": [
+          "/srv"
+        ],
+        "text": "/srv/other-service/run"
+      }
+    ],
+    "drive_letter": {
+      "double_slash_excluded_for_forward": true,
+      "separators": [
+        "\\",
+        "/"
+      ]
+    },
+    "home_root": {
+      "scanned_as_root": true,
+      "synthetic_home": "/srv/example-home"
+    },
+    "known_roots": [
+      "/Users",
+      "/Volumes",
+      "/home",
+      "/mnt",
+      "/opt",
+      "/private",
+      "/root",
+      "/tmp",
+      "/var/folders",
+      "/var/run",
+      "~"
+    ],
+    "pattern": {
+      "flags": 34,
+      "source": "(?<![A-Za-z0-9_])(?:(?:~|/Users|/home|/root|/private|/var/folders|/var/run|/Volumes|/tmp|/mnt|/opt)/[^\\s'\\\",;)]*|[A-Za-z]:\\\\[^\\s'\\\",;)]*|[A-Za-z]:/(?!/)[^\\s'\\\",;)]*)|(?<![A-Za-z0-9_\\\\])\\\\{2,}[A-Za-z0-9_.$-]+\\\\+[^\\s'\\\",;)]*|(?<![A-Za-z0-9_:/\\\\])//[A-Za-z0-9_.$-]+/[A-Za-z0-9_.$-]+[^\\s'\\\",;)]*"
+    },
+    "placeholder_allowlist": [
+      "/data",
+      "/output"
+    ],
+    "redacted_placeholder": "<redacted>",
+    "schema_version": 1,
+    "unc": {
+      "prefixes": [
+        "\\\\",
+        "//"
+      ]
+    }
   },
   "platform_manifest": {
     "aliases": {
@@ -5978,7 +6278,10 @@
         "firebolt_mode": "deployment_mode"
       },
       "gizmosql": {},
-      "glue": {},
+      "glue": {
+        "aws_region": "region",
+        "iam_role": "job_role"
+      },
       "influxdb": {
         "mode": "deployment_mode"
       },
@@ -6456,6 +6759,15 @@
           "default": null,
           "value_kind": "string"
         },
+        "fetch_mode": {
+          "aliases": [],
+          "choices": [
+            "arrow",
+            "rows"
+          ],
+          "default": null,
+          "value_kind": "string"
+        },
         "force_recreate": {
           "aliases": [],
           "choices": null,
@@ -6467,6 +6779,12 @@
           "choices": null,
           "default": "localhost",
           "value_kind": "string"
+        },
+        "http_port": {
+          "aliases": [],
+          "choices": null,
+          "default": null,
+          "value_kind": "integer"
         },
         "password": {
           "aliases": [],
@@ -6650,6 +6968,15 @@
           "default": null,
           "value_kind": "string"
         },
+        "fetch_mode": {
+          "aliases": [],
+          "choices": [
+            "arrow",
+            "rows"
+          ],
+          "default": null,
+          "value_kind": "string"
+        },
         "force_recreate": {
           "aliases": [],
           "choices": null,
@@ -6699,6 +7026,12 @@
           "choices": null,
           "default": "localhost",
           "value_kind": "string"
+        },
+        "http_port": {
+          "aliases": [],
+          "choices": null,
+          "default": null,
+          "value_kind": "integer"
         },
         "optimize_after_load": {
           "aliases": [],
@@ -7139,6 +7472,15 @@
           "default": null,
           "value_kind": "string"
         },
+        "fetch_mode": {
+          "aliases": [],
+          "choices": [
+            "arrow",
+            "rows"
+          ],
+          "default": null,
+          "value_kind": "string"
+        },
         "force_recreate": {
           "aliases": [],
           "choices": null,
@@ -7229,6 +7571,12 @@
         }
       },
       "dataproc-serverless": {
+        "database": {
+          "aliases": [],
+          "choices": null,
+          "default": null,
+          "value_kind": "string"
+        },
         "driver_auto_install": {
           "aliases": [],
           "choices": null,
@@ -7247,6 +7595,18 @@
           "default": null,
           "value_kind": "boolean"
         },
+        "gcs_staging_dir": {
+          "aliases": [],
+          "choices": null,
+          "default": null,
+          "value_kind": "string"
+        },
+        "network_uri": {
+          "aliases": [],
+          "choices": null,
+          "default": null,
+          "value_kind": "string"
+        },
         "plan_capture_timeout_seconds": {
           "aliases": [],
           "choices": null,
@@ -7254,6 +7614,48 @@
           "value_kind": "integer"
         },
         "plan_max_depth": {
+          "aliases": [],
+          "choices": null,
+          "default": null,
+          "value_kind": "integer"
+        },
+        "project_id": {
+          "aliases": [],
+          "choices": null,
+          "default": null,
+          "value_kind": "string"
+        },
+        "region": {
+          "aliases": [],
+          "choices": null,
+          "default": null,
+          "value_kind": "string"
+        },
+        "runtime_version": {
+          "aliases": [],
+          "choices": null,
+          "default": null,
+          "value_kind": "string"
+        },
+        "service_account": {
+          "aliases": [],
+          "choices": null,
+          "default": null,
+          "value_kind": "string"
+        },
+        "subnetwork_uri": {
+          "aliases": [],
+          "choices": null,
+          "default": null,
+          "value_kind": "string"
+        },
+        "table_format": {
+          "aliases": [],
+          "choices": null,
+          "default": null,
+          "value_kind": "string"
+        },
+        "timeout_minutes": {
           "aliases": [],
           "choices": null,
           "default": null,
@@ -7285,6 +7687,12 @@
           "default": null,
           "value_kind": "string"
         },
+        "exec_mem_limit": {
+          "aliases": [],
+          "choices": null,
+          "default": null,
+          "value_kind": "integer"
+        },
         "force_recreate": {
           "aliases": [],
           "choices": null,
@@ -7301,6 +7709,12 @@
           "aliases": [],
           "choices": null,
           "default": 8030,
+          "value_kind": "integer"
+        },
+        "parallel_pipeline_task_num": {
+          "aliases": [],
+          "choices": null,
+          "default": null,
           "value_kind": "integer"
         },
         "password": {
@@ -7327,6 +7741,12 @@
           "default": 9030,
           "value_kind": "integer"
         },
+        "stream_load_chunk_size": {
+          "aliases": [],
+          "choices": null,
+          "default": null,
+          "value_kind": "integer"
+        },
         "username": {
           "aliases": [],
           "choices": null,
@@ -7335,6 +7755,12 @@
         }
       },
       "duckdb": {
+        "allow_third_party_extensions": {
+          "aliases": [],
+          "choices": null,
+          "default": false,
+          "value_kind": "boolean"
+        },
         "driver_auto_install": {
           "aliases": [],
           "choices": null,
@@ -7344,6 +7770,15 @@
         "driver_version": {
           "aliases": [],
           "choices": null,
+          "default": null,
+          "value_kind": "string"
+        },
+        "fetch_mode": {
+          "aliases": [],
+          "choices": [
+            "arrow",
+            "rows"
+          ],
           "default": null,
           "value_kind": "string"
         },
@@ -7385,6 +7820,12 @@
         }
       },
       "ducklake": {
+        "allow_third_party_extensions": {
+          "aliases": [],
+          "choices": null,
+          "default": false,
+          "value_kind": "boolean"
+        },
         "azure_account_name": {
           "aliases": [],
           "choices": null,
@@ -7903,6 +8344,15 @@
           "default": null,
           "value_kind": "string"
         },
+        "fetch_mode": {
+          "aliases": [],
+          "choices": [
+            "arrow",
+            "rows"
+          ],
+          "default": null,
+          "value_kind": "string"
+        },
         "force_recreate": {
           "aliases": [],
           "choices": null,
@@ -7989,6 +8439,18 @@
         }
       },
       "glue": {
+        "aws_profile": {
+          "aliases": [],
+          "choices": null,
+          "default": null,
+          "value_kind": "string"
+        },
+        "database": {
+          "aliases": [],
+          "choices": null,
+          "default": null,
+          "value_kind": "string"
+        },
         "driver_auto_install": {
           "aliases": [],
           "choices": null,
@@ -8007,6 +8469,35 @@
           "default": null,
           "value_kind": "boolean"
         },
+        "glue_version": {
+          "aliases": [],
+          "choices": [
+            "3.0",
+            "4.0"
+          ],
+          "default": null,
+          "value_kind": "string"
+        },
+        "job_role": {
+          "aliases": [
+            "iam_role"
+          ],
+          "choices": null,
+          "default": null,
+          "value_kind": "string"
+        },
+        "job_timeout": {
+          "aliases": [],
+          "choices": null,
+          "default": null,
+          "value_kind": "integer"
+        },
+        "number_of_workers": {
+          "aliases": [],
+          "choices": null,
+          "default": null,
+          "value_kind": "integer"
+        },
         "plan_capture_timeout_seconds": {
           "aliases": [],
           "choices": null,
@@ -8018,6 +8509,33 @@
           "choices": null,
           "default": null,
           "value_kind": "integer"
+        },
+        "region": {
+          "aliases": [
+            "aws_region"
+          ],
+          "choices": null,
+          "default": null,
+          "value_kind": "string"
+        },
+        "s3_staging_dir": {
+          "aliases": [],
+          "choices": null,
+          "default": null,
+          "value_kind": "string"
+        },
+        "worker_type": {
+          "aliases": [],
+          "choices": [
+            "G.025X",
+            "G.1X",
+            "G.2X",
+            "G.4X",
+            "G.8X",
+            "Z.2X"
+          ],
+          "default": null,
+          "value_kind": "string"
         }
       },
       "influxdb": {
@@ -8047,6 +8565,15 @@
         "driver_version": {
           "aliases": [],
           "choices": null,
+          "default": null,
+          "value_kind": "string"
+        },
+        "fetch_mode": {
+          "aliases": [],
+          "choices": [
+            "arrow",
+            "rows"
+          ],
           "default": null,
           "value_kind": "string"
         },
@@ -8083,7 +8610,7 @@
         "port": {
           "aliases": [],
           "choices": null,
-          "default": 8086,
+          "default": null,
           "value_kind": "integer"
         },
         "ssl": {
@@ -8133,6 +8660,15 @@
           "aliases": [],
           "choices": null,
           "default": "sc://localhost:50051",
+          "value_kind": "string"
+        },
+        "fetch_mode": {
+          "aliases": [],
+          "choices": [
+            "arrow",
+            "rows"
+          ],
+          "default": null,
           "value_kind": "string"
         },
         "force_recreate": {
@@ -8817,6 +9353,15 @@
           "default": null,
           "value_kind": "string"
         },
+        "fetch_mode": {
+          "aliases": [],
+          "choices": [
+            "arrow",
+            "rows"
+          ],
+          "default": null,
+          "value_kind": "string"
+        },
         "force_recreate": {
           "aliases": [],
           "choices": null,
@@ -9294,6 +9839,15 @@
           "default": null,
           "value_kind": "string"
         },
+        "fetch_mode": {
+          "aliases": [],
+          "choices": [
+            "arrow",
+            "rows"
+          ],
+          "default": null,
+          "value_kind": "string"
+        },
         "force_recreate": {
           "aliases": [],
           "choices": null,
@@ -9725,6 +10279,12 @@
           "default": "public",
           "value_kind": "string"
         },
+        "service_url": {
+          "aliases": [],
+          "choices": null,
+          "default": null,
+          "value_kind": "string"
+        },
         "sslmode": {
           "aliases": [],
           "choices": null,
@@ -9850,6 +10410,15 @@
           "aliases": [],
           "choices": null,
           "default": "sc://localhost:50051",
+          "value_kind": "string"
+        },
+        "fetch_mode": {
+          "aliases": [],
+          "choices": [
+            "arrow",
+            "rows"
+          ],
+          "default": null,
           "value_kind": "string"
         },
         "force_recreate": {
@@ -11099,7 +11668,7 @@
       "operations"
     ]
   },
-  "result_schema_version": "2.3",
+  "result_schema_version": "2.4",
   "schema_version": 1,
   "sf1_calibrated_sizes": {
     "compression": "none",
@@ -11144,7 +11713,7 @@
       "nyctaxi": 863567123,
       "read_primitives": 1092043700,
       "ssb": 609810151,
-      "tpcdi": 160094804,
+      "tpcdi": 76020843,
       "tpcds": 1235064003,
       "tpcds_obt": 2406484046,
       "tpch": 1092043700,

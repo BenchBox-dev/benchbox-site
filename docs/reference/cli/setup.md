@@ -53,7 +53,7 @@ The commands, in order, run interactive credential setup, list all platforms and
 
 ## Notes
 
-- Credentials are stored securely via the `CredentialManager`. The `--status` command shows when credentials were last updated and validated.
+- Credentials are saved in `~/.benchbox/credentials.yaml` as unencrypted plain YAML; see [Saved Credentials File](configuration.md#saved-credentials-file). The `--status` command shows when credentials were last updated and validated.
 - Platform dependencies are checked before setup. If required packages are missing, the command provides installation instructions.
 - The `--diagnose` flag is currently only supported for Redshift, where it tests TCP connectivity and checks AWS API-level cluster accessibility.
 
