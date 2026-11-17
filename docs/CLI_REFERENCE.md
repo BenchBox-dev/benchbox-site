@@ -194,7 +194,7 @@ slowdowns), `import` (load results into database), `stats`, and `list`.
 Calculates Power@Size and Throughput@Size from TPC-H power and throughput
 results. It exports QphH@Size only when official-run metadata and complete
 refresh evidence pass the shared gate; otherwise it reports
-`qphh_unavailable` reasons. It does not compute QphDS@Size. Scale factor is
+`qphh_unavailable` reasons. It does not compute QphDS@Size; a full official TPC-DS run reports it in its own results. Scale factor is
 auto-detected from the result files.
 
 ### `benchbox aggregate`

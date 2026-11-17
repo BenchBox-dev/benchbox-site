@@ -6,25 +6,25 @@ tags: [advanced, guide, tpc-ds, validation]
 
 # TPC-DS Official Benchmark Guide
 
-This guide provides systematic documentation for the TPC-DS official benchmark implementation in BenchBox, including Power@Size and Throughput@Size. BenchBox does not export the composite QphDS@Size; see [QphDS@Size (not exported)](tpc-ds-official-guide.md#qphds-size-not-exported).
+This guide provides systematic documentation for the TPC-DS official benchmark implementation in BenchBox, including Power@Size, Throughput@Size and the composite QphDS@Size; see [QphDS@Size](tpc-ds-official-guide.md#qphds-size).
 
 > **Derived results.** Derived from TPC-DS. Results produced by BenchBox do not comply with the TPC-DS Specification and must not be compared with official TPC-DS results. The TPC publishes official TPC-DS results only after an audit.
 
 ## Overview
 
-The TPC-DS official benchmark implementation coordinates all three test phases and reports Power@Size and Throughput@Size. It does not export the composite QphDS@Size (see below). It includes:
+The TPC-DS official benchmark implementation coordinates all three test phases and reports Power@Size and Throughput@Size. An official run that meets the conditions under [QphDS@Size](tpc-ds-official-guide.md#qphds-size) also exports the composite QphDS@Size. It includes:
 
 - **Complete benchmark execution** with all three phases
-- **Power@Size and Throughput@Size** (no composite QphDS@Size; see below)
+- **Power@Size, Throughput@Size and QphDS@Size** (QphDS@Size only for a complete official run; see below)
 - **Comprehensive reporting** and validation
 - **Validation framework** integration
 - **Audit trail functionality** recording run evidence
 
 ### Key Features
 
-- **TPC-DS Metrics**: Reports Power@Size and Throughput@Size (see the deviation note above)
+- **TPC-DS Metrics**: Reports Power@Size and Throughput@Size, and QphDS@Size for a complete official run
 - **Complete Implementation**: Power, Throughput, and Maintenance Tests
-- **Metrics**: Power@Size and Throughput@Size (`Q = 99 × S`)
+- **Metrics**: Power@Size and Throughput@Size (`Q = 99 × S`), and QphDS@Size
 - **Multi-format Reporting**: Text, JSON, CSV, HTML reports
 - **Validation Framework**: Comprehensive result validation
 - **Error Handling**: Robust error handling and recovery
@@ -65,7 +65,7 @@ The TPC-DS benchmark is the official Transaction Processing Performance Council 
 - **Multi-Stream**: Concurrent execution capability
 - **Refresh Functions**: Data maintenance operations
 
-### QphDS@Size (not exported)
+### QphDS@Size
 
 The **QphDS@Size** (Queries per Hour at Scale Factor) is the TPC-DS primary composite metric. The specification defines it as:
 
@@ -75,9 +75,21 @@ QphDS@Size = SF × Q / (T_PT × T_TT × T_DM × T_LD)^(1/4)
 
 Where `Q = 99 × S` (S is the number of throughput streams), `T_PT` is the power test time, `T_TT = TT1 + TT2` is the total throughput test time, `T_DM = DM1 + DM2` is the data maintenance time, and `T_LD = 0.01 × S × T_load` is the weighted load time. TPC-DS has no Power@Size metric.
 
-**Deviation from the specification.** BenchBox does not export QphDS@Size. Earlier releases exported the geometric mean of Power@Size and Throughput@Size under that name. That value is not the specification metric, because it omits the data maintenance and load times and uses a different combination, so results carrying it are not comparable with published TPC-DS results. BenchBox runs a single throughput test with no data maintenance between throughput tests, so the specification formula is not yet implemented. Implementing it is tracked as follow-up work.
+**What BenchBox exports.** A run with `--official` and the load, power, throughput and maintenance phases runs the tests in the specification's order: power, throughput, maintenance, throughput, maintenance. When the run meets every condition below, `summary.tpc_metrics` carries `qphds_at_size`, the formula's value rounded down to a whole number, and `qphds_terms`. The terms are `q` (`99 × S`), `t_pt_hours` (power time × S, in hours), `t_tt_hours` (the two throughput times), `t_dm_hours` (the two maintenance times), and `t_ld_hours` (`0.01 × S × load time`).
 
-BenchBox exports two metrics instead:
+The conditions are:
+
+- the result is `official`, with no failed queries and no query subset;
+- `S` (`--streams`) is an even number of at least 4, and both throughput tests run all 99 queries on S streams each, the second on the stream numbers that follow the first's;
+- the power test completed all 99 queries;
+- both data maintenance tests completed S/2 refresh runs, the second on the refresh sets that follow the first's;
+- the database load ran in this run and was timed, not reused.
+
+When a condition fails, `qphds_at_size` is absent and `summary.tpc_metrics.qphds_unavailable` lists the reasons. A run that is not official, or that is not a combined run of all the phases, carries none. `benchbox metrics qphh` is TPC-H only and does not compute QphDS@Size; it points to the run's own results.
+
+Earlier releases exported the geometric mean of Power@Size and Throughput@Size under the QphDS@Size name. That value is not the specification metric, and results carrying it are not comparable with the metric described here.
+
+BenchBox also exports two component metrics:
 
 - `Power@Size = 3600 × Scale_Factor / geometric_mean(power query times)`
 - `Throughput@Size = Q × 3600 × Scale_Factor / Throughput_Test_Time`, with `Q = 99 × S`. Template variants 14a/14b, 23a/23b, 24a/24b and 39a/39b count once, so a stream executes 103 statements but is scored as 99 queries. `Throughput_Test_Time` is the wall-clock interval from the first stream's first query to the last stream's last query; connection setup is excluded.
@@ -348,7 +360,7 @@ Maintenance results use the same result-file shape as power and throughput runs:
 
 ### TPC-DS Derived Metrics
 
-The implementation calculates Power@Size and Throughput@Size. It does not calculate the composite QphDS@Size (see [QphDS@Size (not exported)](tpc-ds-official-guide.md#qphds-size-not-exported)):
+The implementation calculates Power@Size and Throughput@Size, and QphDS@Size for a complete official run (see [QphDS@Size](tpc-ds-official-guide.md#qphds-size)):
 
 ```python
 from benchbox.core.results.loader import load_result_file
@@ -685,7 +697,7 @@ done
 
 ## Conclusion
 
-The TPC-DS official benchmark implementation coordinates the power, throughput, and maintenance phases with Power@Size and Throughput@Size reporting. It does not export the composite QphDS@Size. Results are derived from TPC-DS and carry the derived-results disclaimer above.
+The TPC-DS official benchmark implementation coordinates the power, throughput, and maintenance phases with Power@Size and Throughput@Size reporting, and exports the composite QphDS@Size for a complete official run. Results are derived from TPC-DS and carry the derived-results disclaimer above.
 
 For additional support:
 
