@@ -26,7 +26,7 @@ Creates a TPC-H benchmark whose generated data follows a chosen skew preset.
 
 | Name | Type | Default | Meaning |
 | --- | --- | --- | --- |
-| `scale_factor` | `float` | `1.0` | Data size multiplier. Must be positive. Values of 1 or more must be whole numbers. |
+| `scale_factor` | `float` | `1.0` | Data size multiplier. Must be a number from 0.01 up to 100000. Values of 1 or more must be whole numbers. The range that applies when the benchmark is run is in [Scale factors](../../../benchmarks/index.md#scale-factors). |
 | `output_dir` | `str`, `Path` or `None` | `None` | Directory for generated data files. When `None`, the directory is `benchmark_runs/datagen/tpch_skew_<sf token>` under the current directory (for example `tpch_skew_sf001` for 0.01), or under `$BENCHBOX_OUTPUT_DIR/datagen` when that variable is set. |
 | `skew_preset` | `str` or `None` | `None` | One of `none`, `light`, `moderate`, `heavy`, `extreme`, `realistic`, case-insensitive. `None` selects `moderate`. |
 | `skew_config` | `SkewConfiguration` or `None` | `None` | A custom configuration, imported from `benchbox.core.tpch_skew`. When given it wins over `skew_preset`, and `skew_preset` reads `"custom"`. |
@@ -40,7 +40,7 @@ A `TPCHSkew` instance. It subclasses `BaseBenchmark`; see [Base Benchmark API](.
 
 ### Raises
 
-- `ValueError` when `scale_factor` is zero or negative, or is 1 or more and not a whole number (`Scale factor must be positive`).
+- `ValueError` when `scale_factor` is zero or negative (`Scale factor must be positive`), is below 0.01 or above 100000, or is 1 or more and not a whole number.
 - `ValueError` for an unknown `skew_preset`: `Invalid skew preset: bogus. Valid: ['none', 'light', 'moderate', 'heavy', 'extreme', 'realistic']`.
 - `TypeError` when `scale_factor` is not a number.
 

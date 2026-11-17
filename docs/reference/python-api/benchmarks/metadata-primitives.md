@@ -18,7 +18,7 @@ Creates a Metadata Primitives benchmark that runs catalog queries against a conn
 
 | Name | Type | Default | Meaning |
 | --- | --- | --- | --- |
-| `scale_factor` | `float` | `1.0` | Has no effect on the queries or the schema. It is validated like every benchmark's: it must be positive, and values of 1 or more must be whole numbers. |
+| `scale_factor` | `float` | `1.0` | Has no effect on the queries or the schema. It is validated like every benchmark's: it must be positive, and values of 1 or more must be whole numbers. The constructor checks nothing else, but when the benchmark is run only 1 is accepted; see [Scale factors](../../../benchmarks/index.md#scale-factors). |
 | `output_dir` | `str`, `Path` or `None` | `None` | Has no effect: nothing is written, and the directory is not created. |
 | `**kwargs` | keyword arguments | none | `quiet` (`bool`) and `verbose` (`bool` or `int`) set the log level. Other keywords are stored as attributes and are not validated. |
 

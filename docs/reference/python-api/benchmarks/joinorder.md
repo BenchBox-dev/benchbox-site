@@ -59,7 +59,7 @@ Creates a Join Order Benchmark instance that fetches the canonical IMDb 2013 Par
 
 | Name | Type | Default | Meaning |
 | --- | --- | --- | --- |
-| `scale_factor` | `float` | `1.0` | Must be `1.0`. Any other value, including `0.5` and `2`, raises `ValueError`. |
+| `scale_factor` | `float` | `1.0` | Must be `1.0`. Any other value, including `0.5` and `2`, raises `ValueError`. Every supported run path also fixes it at 1; see [Scale factors](../../../benchmarks/index.md#scale-factors). |
 | `output_dir` | `str`, `Path` or `None` | `None` | Directory for the downloaded archive and the verified Parquet files. When `None`, it is `benchmark_runs/datagen/joinorder_sf1` under the current directory, or under `$BENCHBOX_OUTPUT_DIR/datagen` when that variable is set. |
 | `queries_dir` | `str` or `None` | `None` | Directory of custom `*.sql` query files, one query per file, with the file stem as the query id. When it exists, only these files are served (empty files are skipped). When it is `None` or does not exist, the 113 embedded queries are used and no error is raised. |
 | `parallel` | `int` | `1` | Accepted for interface compatibility; it does not change how the data is fetched. Must be a positive integer, otherwise `ValueError`. |

@@ -24,7 +24,7 @@ Creates a TPC-Havoc benchmark that generates TPC-H data and serves the base quer
 
 | Name | Type | Default | Meaning |
 | --- | --- | --- | --- |
-| `scale_factor` | `float` | `1.0` | Data size multiplier. Must be positive. Values of 1 or more must be whole numbers. |
+| `scale_factor` | `float` | `1.0` | Data size multiplier. Must be a number from 0.01 up to 100000. Values of 1 or more must be whole numbers. The range that applies when the benchmark is run is in [Scale factors](../../../benchmarks/index.md#scale-factors). |
 | `output_dir` | `str`, `Path` or `None` | `None` | Directory for generated data files. When `None`, the directory is `benchmark_runs/datagen/tpchavoc_<sf token>` under the current directory (for example `tpchavoc_sf001` for 0.01), or under `$BENCHBOX_OUTPUT_DIR/datagen` when that variable is set. |
 | `**kwargs` | keyword arguments | none | `verbose` (`bool` or `int`) and `quiet` (`bool`) set the log level. Other keywords are forwarded to the underlying TPC-H benchmark. |
 
@@ -36,7 +36,7 @@ A `TPCHavoc` instance. It subclasses `BaseBenchmark`; see [Base Benchmark API](.
 
 ### Raises
 
-- `ValueError` when `scale_factor` is zero or negative (`scale_factor must be positive, got 0`), or is 1 or more and not a whole number.
+- `ValueError` when `scale_factor` is zero or negative (`scale_factor must be positive, got 0`), is below 0.01 or above 100000, or is 1 or more and not a whole number.
 - `TypeError` when `scale_factor` is not a number.
 
 ### Example

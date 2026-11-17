@@ -20,7 +20,7 @@ Creates a FlightData benchmark that provides flight data in CSV files and serves
 
 | Name | Type | Default | Meaning |
 | --- | --- | --- | --- |
-| `scale_factor` | `float` | `1.0` | Selects how many months of data to use: `max(1, round(scale_factor * 41))`, newest first. 0.01 gives 1 month and 0.1 gives 4 months. Must be positive. Values of 1 or more must be whole numbers. |
+| `scale_factor` | `float` | `1.0` | Selects how many months of data to use: `max(1, round(scale_factor * 41))`, newest first. 0.01 gives 1 month and 0.1 gives 4 months. Must be positive. Values of 1 or more must be whole numbers. The constructor checks nothing else. The range that applies when the benchmark is run is in [Scale factors](../../../benchmarks/index.md#scale-factors). |
 | `output_dir` | `str`, `Path` or `None` | `None` | Directory for generated data files. When `None`, the directory is `benchmark_runs/datagen/flightdata_<sf token>` under the current directory (for example `flightdata_sf001` for 0.01), or under `$BENCHBOX_OUTPUT_DIR/datagen` when that variable is set. |
 | `end_year` | `int` | `2024` | Stored and reported by `get_benchmark_info()` as `end_year`. On 0.4.1 it does not move the data window: with `end_year=2020`, scale factor 0.01 still selects December 2024 and the query dates stay `2024-12-01` to `2025-01-01`. |
 | `**kwargs` | keyword arguments | none | `seed` (`int`) seeds the synthetic data; the same seed gives an identical `flights.csv` and a different seed gives a different one. `force_regenerate` (`bool`) rewrites the files; without it, files from an earlier run in `output_dir` are reused. `verbose` (`bool` or `int`) and `quiet` (`bool`) set the log level. Other keywords are stored as attributes and are not validated. |

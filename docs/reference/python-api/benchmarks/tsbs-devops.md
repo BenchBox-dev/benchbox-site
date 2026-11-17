@@ -24,7 +24,7 @@ Creates a TSBS DevOps benchmark that generates five monitoring tables and serves
 
 | Name | Type | Default | Meaning |
 | --- | --- | --- | --- |
-| `scale_factor` | `float` | `1.0` | Sets the number of hosts: `max(10, int(100 * scale_factor))`, so 0.01 and 0.1 give 10, 1 gives 100 and 10 gives 1,000. Must be positive. Values of 1 or more must be whole numbers. |
+| `scale_factor` | `float` | `1.0` | Sets the number of hosts: `max(10, int(100 * scale_factor))`, so 0.01 and 0.1 give 10, 1 gives 100 and 10 gives 1,000. Must be positive. Values of 1 or more must be whole numbers. The constructor checks nothing else. The range that applies when the benchmark is run is in [Scale factors](../../../benchmarks/index.md#scale-factors). |
 | `output_dir` | `str`, `Path` or `None` | `None` | Directory for generated data files. When `None`, the directory is `benchmark_runs/datagen/tsbs_devops_<sf token>` under the current directory (for example `tsbs_devops_sf001` for 0.01), or under `$BENCHBOX_OUTPUT_DIR/datagen` when that variable is set. |
 | `num_hosts` | `int` or `None` | `None` | Number of hosts, instead of the value derived from `scale_factor`. `None` and `0` both mean "derive from the scale factor". |
 | `duration_days` | `int` or `None` | `None` | Length of the generated series in days. `None` and `0` both give 2 days, at every scale factor. |

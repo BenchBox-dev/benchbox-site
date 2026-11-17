@@ -60,7 +60,7 @@ Creates a TPC-DI benchmark that generates the 16 warehouse tables, generates ETL
 
 | Name | Type | Default | Meaning |
 | --- | --- | --- | --- |
-| `scale_factor` | `float` | `1.0` | Data size multiplier. Must be positive. Values of 1 or more must be whole numbers. At 0.01 the 16 tables hold 56,211 rows, including 10,000 `FactTrade` rows. |
+| `scale_factor` | `float` | `1.0` | Data size multiplier. Must be positive. Values of 1 or more must be whole numbers. The constructor checks nothing else. The range that applies when the benchmark is run is in [Scale factors](../../../benchmarks/index.md#scale-factors). At 0.01 the 16 tables hold 56,211 rows, including 10,000 `FactTrade` rows. |
 | `output_dir` | `str`, `Path` or `None` | `None` | Directory for generated data, source files, staging and warehouse files. When `None`, the directory is `benchmark_runs/datagen/tpcdi_<sf token>` under the current directory (for example `tpcdi_sf001` for 0.01), or under `$BENCHBOX_OUTPUT_DIR/datagen` when that variable is set. |
 | `**kwargs` | keyword arguments | none | See the list below. |
 
@@ -953,7 +953,7 @@ The TPC-DI benchmark implementation: it generates the 16 warehouse tables, serve
 
 | Name | Type | Default | Meaning |
 | --- | --- | --- | --- |
-| `scale_factor` | `float` | `1.0` | Data size multiplier. Must be positive; values of 1 or more must be whole numbers. |
+| `scale_factor` | `float` | `1.0` | Data size multiplier. Must be positive; values of 1 or more must be whole numbers. The constructor checks nothing else. The range that applies when the benchmark is run is in [Scale factors](../../../benchmarks/index.md#scale-factors). |
 | `output_dir` | `str`, `Path` or `None` | `None` | Output root; `None` uses the default of `TPCDIConfig`. |
 | `enable_parallel` | `bool` | `False` | Turns on parallel processing. |
 | `max_workers` | `int` or `None` | `None` | Worker count, as for `TPCDIConfig`. |

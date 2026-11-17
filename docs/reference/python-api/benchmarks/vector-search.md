@@ -33,7 +33,7 @@ Creates a Vector Search benchmark that generates synthetic embedding data and se
 
 | Name | Type | Default | Meaning |
 | --- | --- | --- | --- |
-| `scale_factor` | `float` | `1.0` | Corpus size: `1_000_000 * scale_factor` vectors, so 0.01 gives 10,000 and 0.1 gives 100,000. Must be positive. Values of 1 or more must be whole numbers. |
+| `scale_factor` | `float` | `1.0` | Corpus size: `1_000_000 * scale_factor` vectors, so 0.01 gives 10,000 and 0.1 gives 100,000. Must be positive. Values of 1 or more must be whole numbers. The constructor checks nothing else. The range that applies when the benchmark is run is in [Scale factors](../../../benchmarks/index.md#scale-factors). |
 | `output_dir` | `str`, `Path` or `None` | `None` | Directory for generated data files. When `None`, the directory is `benchmark_runs/datagen/vector_search_<sf token>` under the current directory (for example `vector_search_sf001` for 0.01), or under `$BENCHBOX_OUTPUT_DIR/datagen` when that variable is set. |
 | `dimensions` | `int` | `128` | Length of each embedding. Keyword-only, at least 1. |
 | `**kwargs` | keyword arguments | none | `verbose` (`bool` or `int`) and `quiet` (`bool`) set the log level. |
