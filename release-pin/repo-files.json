@@ -1,5 +1,5 @@
 {
-  "core_sha": "dfe585e0944ee7a4b0e52da4994f1e1fee6669f1",
+  "core_sha": "91d357a1a2e4a6f327e7f14717c98470e3aa2f79",
   "files": [
     {
       "path": ".claude/commands/blind-spot.md",
@@ -310,11 +310,19 @@
       "kind": "file"
     },
     {
+      "path": ".codex/hooks.json",
+      "kind": "file"
+    },
+    {
       "path": ".dockerignore",
       "kind": "file"
     },
     {
       "path": ".env.example",
+      "kind": "file"
+    },
+    {
+      "path": ".gemini/settings.json",
       "kind": "file"
     },
     {
@@ -342,10 +350,6 @@
       "kind": "file"
     },
     {
-      "path": ".github/RELEASE_PR_TEMPLATE.md",
-      "kind": "file"
-    },
-    {
       "path": ".github/actions/release-uat-env/action.yml",
       "kind": "file"
     },
@@ -362,15 +366,23 @@
       "kind": "file"
     },
     {
-      "path": ".github/oracle-omp-config.yml",
-      "kind": "file"
-    },
-    {
-      "path": ".github/oracle-reviewers.yml",
-      "kind": "file"
-    },
-    {
       "path": ".github/path-filters.yml",
+      "kind": "file"
+    },
+    {
+      "path": ".github/preflight-known-failures.json",
+      "kind": "file"
+    },
+    {
+      "path": ".github/review-guidance.md",
+      "kind": "file"
+    },
+    {
+      "path": ".github/review-omp-config.yml",
+      "kind": "file"
+    },
+    {
+      "path": ".github/review.yml",
       "kind": "file"
     },
     {
@@ -378,7 +390,15 @@
       "kind": "file"
     },
     {
+      "path": ".github/sqlglot-delivery.json",
+      "kind": "file"
+    },
+    {
       "path": ".github/theseus-lock.json",
+      "kind": "file"
+    },
+    {
+      "path": ".github/workflows/batch-loop-e2e.yml",
       "kind": "file"
     },
     {
@@ -430,10 +450,6 @@
       "kind": "file"
     },
     {
-      "path": ".github/workflows/lint.yml",
-      "kind": "file"
-    },
-    {
       "path": ".github/workflows/mirror-ci-images.yml",
       "kind": "file"
     },
@@ -450,22 +466,6 @@
       "kind": "file"
     },
     {
-      "path": ".github/workflows/oracle-gate.yml",
-      "kind": "file"
-    },
-    {
-      "path": ".github/workflows/oracle-review.yml",
-      "kind": "file"
-    },
-    {
-      "path": ".github/workflows/oracle-verdict.yml",
-      "kind": "file"
-    },
-    {
-      "path": ".github/workflows/perf-smoke.yml",
-      "kind": "file"
-    },
-    {
       "path": ".github/workflows/pr-hold.yml",
       "kind": "file"
     },
@@ -478,11 +478,23 @@
       "kind": "file"
     },
     {
+      "path": ".github/workflows/release-v2-probe.yml",
+      "kind": "file"
+    },
+    {
       "path": ".github/workflows/release-v2.yml",
       "kind": "file"
     },
     {
-      "path": ".github/workflows/release.yml",
+      "path": ".github/workflows/review-gate.yml",
+      "kind": "file"
+    },
+    {
+      "path": ".github/workflows/review-request.yml",
+      "kind": "file"
+    },
+    {
+      "path": ".github/workflows/review-verdict.yml",
       "kind": "file"
     },
     {
@@ -498,7 +510,7 @@
       "kind": "file"
     },
     {
-      "path": ".github/workflows/sqlglot-fork-refresh.yml",
+      "path": ".github/workflows/sqlglot-delivery.yml",
       "kind": "file"
     },
     {
@@ -507,10 +519,6 @@
     },
     {
       "path": ".github/workflows/sync-results-data-to-published.yml",
-      "kind": "file"
-    },
-    {
-      "path": ".github/workflows/test.yml",
       "kind": "file"
     },
     {
@@ -542,15 +550,15 @@
       "kind": "file"
     },
     {
+      "path": ".github/workflows/trunk-uat.yml",
+      "kind": "file"
+    },
+    {
       "path": ".github/workflows/trunk.yml",
       "kind": "file"
     },
     {
       "path": ".github/workflows/upload-answers.yml",
-      "kind": "file"
-    },
-    {
-      "path": ".github/workflows/validate-release-pr.yml",
       "kind": "file"
     },
     {
@@ -578,11 +586,15 @@
       "kind": "file"
     },
     {
+      "path": ".omp/hooks/pre/primary-clone-write-guard.ts",
+      "kind": "file"
+    },
+    {
       "path": ".pre-commit-config.yaml",
       "kind": "file"
     },
     {
-      "path": ".todo-db/config.json",
+      "path": ".tractable/config.json",
       "kind": "file"
     },
     {
@@ -3526,6 +3538,142 @@
       "kind": "file"
     },
     {
+      "path": "_project/analysis/clickhouse-tuning-evidence-sf1/cells/ssb-sf1-15rounds-summary.md",
+      "kind": "file"
+    },
+    {
+      "path": "_project/analysis/clickhouse-tuning-evidence-sf1/cells/ssb-sf1-9rounds-uncalibrated-summary.md",
+      "kind": "file"
+    },
+    {
+      "path": "_project/analysis/clickhouse-tuning-evidence-sf1/cells/tpch-sf1-9rounds-summary.md",
+      "kind": "file"
+    },
+    {
+      "path": "_project/analysis/clickhouse-tuning-evidence-sf1/findings.md",
+      "kind": "file"
+    },
+    {
+      "path": "_project/analysis/clickhouse-tuning-evidence-sf1/tpch-plans/explain-n-q18-indexes.txt",
+      "kind": "file"
+    },
+    {
+      "path": "_project/analysis/clickhouse-tuning-evidence-sf1/tpch-plans/explain-n-q18-pipeline.txt",
+      "kind": "file"
+    },
+    {
+      "path": "_project/analysis/clickhouse-tuning-evidence-sf1/tpch-plans/explain-n-q18-plan.txt",
+      "kind": "file"
+    },
+    {
+      "path": "_project/analysis/clickhouse-tuning-evidence-sf1/tpch-plans/explain-n-q3-indexes.txt",
+      "kind": "file"
+    },
+    {
+      "path": "_project/analysis/clickhouse-tuning-evidence-sf1/tpch-plans/explain-n-q3-pipeline.txt",
+      "kind": "file"
+    },
+    {
+      "path": "_project/analysis/clickhouse-tuning-evidence-sf1/tpch-plans/explain-n-q3-plan.txt",
+      "kind": "file"
+    },
+    {
+      "path": "_project/analysis/clickhouse-tuning-evidence-sf1/tpch-plans/explain-n-q5-indexes.txt",
+      "kind": "file"
+    },
+    {
+      "path": "_project/analysis/clickhouse-tuning-evidence-sf1/tpch-plans/explain-n-q5-pipeline.txt",
+      "kind": "file"
+    },
+    {
+      "path": "_project/analysis/clickhouse-tuning-evidence-sf1/tpch-plans/explain-n-q5-plan.txt",
+      "kind": "file"
+    },
+    {
+      "path": "_project/analysis/clickhouse-tuning-evidence-sf1/tpch-plans/explain-s-q18-indexes.txt",
+      "kind": "file"
+    },
+    {
+      "path": "_project/analysis/clickhouse-tuning-evidence-sf1/tpch-plans/explain-s-q18-pipeline.txt",
+      "kind": "file"
+    },
+    {
+      "path": "_project/analysis/clickhouse-tuning-evidence-sf1/tpch-plans/explain-s-q18-plan.txt",
+      "kind": "file"
+    },
+    {
+      "path": "_project/analysis/clickhouse-tuning-evidence-sf1/tpch-plans/explain-s-q3-indexes.txt",
+      "kind": "file"
+    },
+    {
+      "path": "_project/analysis/clickhouse-tuning-evidence-sf1/tpch-plans/explain-s-q3-pipeline.txt",
+      "kind": "file"
+    },
+    {
+      "path": "_project/analysis/clickhouse-tuning-evidence-sf1/tpch-plans/explain-s-q3-plan.txt",
+      "kind": "file"
+    },
+    {
+      "path": "_project/analysis/clickhouse-tuning-evidence-sf1/tpch-plans/explain-s-q5-indexes.txt",
+      "kind": "file"
+    },
+    {
+      "path": "_project/analysis/clickhouse-tuning-evidence-sf1/tpch-plans/explain-s-q5-pipeline.txt",
+      "kind": "file"
+    },
+    {
+      "path": "_project/analysis/clickhouse-tuning-evidence-sf1/tpch-plans/explain-s-q5-plan.txt",
+      "kind": "file"
+    },
+    {
+      "path": "_project/analysis/clickhouse-tuning-evidence-sf1/tpch-plans/explain-t-q18-indexes.txt",
+      "kind": "file"
+    },
+    {
+      "path": "_project/analysis/clickhouse-tuning-evidence-sf1/tpch-plans/explain-t-q18-pipeline.txt",
+      "kind": "file"
+    },
+    {
+      "path": "_project/analysis/clickhouse-tuning-evidence-sf1/tpch-plans/explain-t-q18-plan.txt",
+      "kind": "file"
+    },
+    {
+      "path": "_project/analysis/clickhouse-tuning-evidence-sf1/tpch-plans/explain-t-q3-indexes.txt",
+      "kind": "file"
+    },
+    {
+      "path": "_project/analysis/clickhouse-tuning-evidence-sf1/tpch-plans/explain-t-q3-pipeline.txt",
+      "kind": "file"
+    },
+    {
+      "path": "_project/analysis/clickhouse-tuning-evidence-sf1/tpch-plans/explain-t-q3-plan.txt",
+      "kind": "file"
+    },
+    {
+      "path": "_project/analysis/clickhouse-tuning-evidence-sf1/tpch-plans/explain-t-q5-indexes.txt",
+      "kind": "file"
+    },
+    {
+      "path": "_project/analysis/clickhouse-tuning-evidence-sf1/tpch-plans/explain-t-q5-pipeline.txt",
+      "kind": "file"
+    },
+    {
+      "path": "_project/analysis/clickhouse-tuning-evidence-sf1/tpch-plans/explain-t-q5-plan.txt",
+      "kind": "file"
+    },
+    {
+      "path": "_project/analysis/clickhouse-tuning-evidence-sf1/tpch-plans/harness-summary.md",
+      "kind": "file"
+    },
+    {
+      "path": "_project/analysis/clickhouse-tuning-evidence-sf1/tpch-plans/probe.json",
+      "kind": "file"
+    },
+    {
+      "path": "_project/analysis/clickhouse-tuning-evidence-sf1/tpch-plans/probe.md",
+      "kind": "file"
+    },
+    {
       "path": "_project/analysis/cross-surface-applicability.md",
       "kind": "file"
     },
@@ -4015,6 +4163,10 @@
     },
     {
       "path": "_project/audits/todo-db-hosted-live-measurement-2026-07-18.md",
+      "kind": "file"
+    },
+    {
+      "path": "_project/audits/tpchavoc-1v8-qualify-order-2026-11-11.md",
       "kind": "file"
     },
     {
@@ -4514,6 +4666,10 @@
       "kind": "file"
     },
     {
+      "path": "_project/decisions/oracle-gate-relaxation-muse-login-loss-2026-11-06.md",
+      "kind": "file"
+    },
+    {
       "path": "_project/decisions/oracle-gate-required-check-2026-10-21.md",
       "kind": "file"
     },
@@ -4559,6 +4715,10 @@
     },
     {
       "path": "_project/decisions/public-site-visual-required-check-2026-09-24.md",
+      "kind": "file"
+    },
+    {
+      "path": "_project/decisions/review-depth-and-capacity-2026-11-05.md",
       "kind": "file"
     },
     {
@@ -5470,14 +5630,6 @@
       "kind": "file"
     },
     {
-      "path": "_project/scripts/oracle_gateway_host.sh",
-      "kind": "file"
-    },
-    {
-      "path": "_project/scripts/oracle_mutation.py",
-      "kind": "file"
-    },
-    {
       "path": "_project/scripts/platform_manifest.py",
       "kind": "file"
     },
@@ -5527,6 +5679,14 @@
     },
     {
       "path": "_project/scripts/results_explorer_snapshot_invariants.py",
+      "kind": "file"
+    },
+    {
+      "path": "_project/scripts/review_gateway_host.sh",
+      "kind": "file"
+    },
+    {
+      "path": "_project/scripts/review_mutation.py",
       "kind": "file"
     },
     {
@@ -5610,7 +5770,7 @@
       "kind": "file"
     },
     {
-      "path": "_project/scripts/vendor/todo_db-0.15.0-py3-none-any.whl",
+      "path": "_project/scripts/vendor/tractable-1.1.1-py3-none-any.whl",
       "kind": "file"
     },
     {
@@ -43294,7 +43454,7 @@
       "kind": "file"
     },
     {
-      "path": "benchbox/_vendor/benchbox_sqlglot-30.29.0.1-py3-none-any.whl.zip",
+      "path": "benchbox/_vendor/benchbox_sqlglot-30.31.0.1-py3-none-any.whl.zip",
       "kind": "file"
     },
     {
@@ -44822,6 +44982,10 @@
       "kind": "file"
     },
     {
+      "path": "benchbox/core/result_receipt.py",
+      "kind": "file"
+    },
+    {
       "path": "benchbox/core/results/__init__.py",
       "kind": "file"
     },
@@ -44854,6 +45018,10 @@
       "kind": "file"
     },
     {
+      "path": "benchbox/core/results/comparison_modes.py",
+      "kind": "file"
+    },
+    {
       "path": "benchbox/core/results/database.py",
       "kind": "file"
     },
@@ -44878,6 +45046,10 @@
       "kind": "file"
     },
     {
+      "path": "benchbox/core/results/fetch_mode.py",
+      "kind": "file"
+    },
+    {
       "path": "benchbox/core/results/filenames.py",
       "kind": "file"
     },
@@ -44891,6 +45063,10 @@
     },
     {
       "path": "benchbox/core/results/loader.py",
+      "kind": "file"
+    },
+    {
+      "path": "benchbox/core/results/maintenance_method.py",
       "kind": "file"
     },
     {
@@ -44914,11 +45090,19 @@
       "kind": "file"
     },
     {
+      "path": "benchbox/core/results/platform_timing.py",
+      "kind": "file"
+    },
+    {
       "path": "benchbox/core/results/power_stream_policy.py",
       "kind": "file"
     },
     {
       "path": "benchbox/core/results/provenance.py",
+      "kind": "file"
+    },
+    {
+      "path": "benchbox/core/results/qphds.py",
       "kind": "file"
     },
     {
@@ -44975,6 +45159,10 @@
     },
     {
       "path": "benchbox/core/results/subscale_policy.py",
+      "kind": "file"
+    },
+    {
+      "path": "benchbox/core/results/timer_scope.py",
       "kind": "file"
     },
     {
@@ -45118,6 +45306,10 @@
       "kind": "file"
     },
     {
+      "path": "benchbox/core/tpc_spec.py",
+      "kind": "file"
+    },
+    {
       "path": "benchbox/core/tpc_validation.py",
       "kind": "file"
     },
@@ -45222,6 +45414,10 @@
       "kind": "file"
     },
     {
+      "path": "benchbox/core/tpcdi/generator_specs.yaml",
+      "kind": "file"
+    },
+    {
       "path": "benchbox/core/tpcdi/loader.py",
       "kind": "file"
     },
@@ -45243,6 +45439,10 @@
     },
     {
       "path": "benchbox/core/tpcdi/query_validation.py",
+      "kind": "file"
+    },
+    {
+      "path": "benchbox/core/tpcdi/scaling.py",
       "kind": "file"
     },
     {
@@ -45382,7 +45582,7 @@
       "kind": "file"
     },
     {
-      "path": "benchbox/core/tpcds/maintenance_operations.py",
+      "path": "benchbox/core/tpcds/maintenance_functions.py",
       "kind": "file"
     },
     {
@@ -45431,6 +45631,10 @@
     },
     {
       "path": "benchbox/core/tpcds/queries.py",
+      "kind": "file"
+    },
+    {
+      "path": "benchbox/core/tpcds/refresh_data.py",
       "kind": "file"
     },
     {
@@ -46950,6 +47154,10 @@
       "kind": "file"
     },
     {
+      "path": "benchbox/platforms/base/arrow_result.py",
+      "kind": "file"
+    },
+    {
       "path": "benchbox/platforms/base/client_region.py",
       "kind": "file"
     },
@@ -47066,6 +47274,10 @@
       "kind": "file"
     },
     {
+      "path": "benchbox/platforms/base/timing_contract.py",
+      "kind": "file"
+    },
+    {
       "path": "benchbox/platforms/base/tuning.py",
       "kind": "file"
     },
@@ -47130,6 +47342,10 @@
       "kind": "file"
     },
     {
+      "path": "benchbox/platforms/clickhouse/http_insert.py",
+      "kind": "file"
+    },
+    {
       "path": "benchbox/platforms/clickhouse/introspection.py",
       "kind": "file"
     },
@@ -47150,7 +47366,15 @@
       "kind": "file"
     },
     {
+      "path": "benchbox/platforms/clickhouse/statement_settings.py",
+      "kind": "file"
+    },
+    {
       "path": "benchbox/platforms/clickhouse/statements.py",
+      "kind": "file"
+    },
+    {
+      "path": "benchbox/platforms/clickhouse/timing.py",
       "kind": "file"
     },
     {
@@ -47506,6 +47730,10 @@
       "kind": "file"
     },
     {
+      "path": "benchbox/platforms/presto_trino_bulk.py",
+      "kind": "file"
+    },
+    {
       "path": "benchbox/platforms/presto_trino_utils.py",
       "kind": "file"
     },
@@ -47723,6 +47951,10 @@
     },
     {
       "path": "benchbox/platforms/starrocks/setup.py",
+      "kind": "file"
+    },
+    {
+      "path": "benchbox/platforms/starrocks/stream_load.py",
       "kind": "file"
     },
     {
@@ -47978,10 +48210,6 @@
       "kind": "file"
     },
     {
-      "path": "benchbox/sql_compat/rules/execution_filter/duckdb_write_primitives.py",
-      "kind": "file"
-    },
-    {
       "path": "benchbox/sql_compat/rules/execution_filter/lakesail_read_primitives.py",
       "kind": "file"
     },
@@ -48206,6 +48434,10 @@
       "kind": "file"
     },
     {
+      "path": "benchbox/utils/arrow_rows.py",
+      "kind": "file"
+    },
+    {
       "path": "benchbox/utils/binary_manifest.py",
       "kind": "file"
     },
@@ -48282,6 +48514,10 @@
       "kind": "file"
     },
     {
+      "path": "benchbox/utils/duckdb_extensions.py",
+      "kind": "file"
+    },
+    {
       "path": "benchbox/utils/environment.py",
       "kind": "file"
     },
@@ -48335,6 +48571,14 @@
     },
     {
       "path": "benchbox/utils/git_flood.py",
+      "kind": "file"
+    },
+    {
+      "path": "benchbox/utils/heavy_preflight_scope.py",
+      "kind": "file"
+    },
+    {
+      "path": "benchbox/utils/heavy_run_events.py",
       "kind": "file"
     },
     {
@@ -48558,6 +48802,10 @@
       "kind": "file"
     },
     {
+      "path": "docker/presto/catalog/hive.properties",
+      "kind": "file"
+    },
+    {
       "path": "docker/presto/catalog/memory.properties",
       "kind": "file"
     },
@@ -48583,6 +48831,10 @@
     },
     {
       "path": "docker/starrocks/docker-compose.yml",
+      "kind": "file"
+    },
+    {
+      "path": "docker/trino/catalog/hive.properties",
       "kind": "file"
     },
     {
@@ -48671,6 +48923,10 @@
     },
     {
       "path": "docs/agent/pr-review-evidence.md",
+      "kind": "file"
+    },
+    {
+      "path": "docs/agent/preflight-receipt.md",
       "kind": "file"
     },
     {
@@ -48778,7 +49034,7 @@
       "kind": "file"
     },
     {
-      "path": "docs/internal/branch-rename-runbook.md",
+      "path": "docs/internal/ci-checkout-depth.md",
       "kind": "file"
     },
     {
@@ -48810,15 +49066,15 @@
       "kind": "file"
     },
     {
+      "path": "docs/internal/dev-loop-retirement-audit.md",
+      "kind": "file"
+    },
+    {
       "path": "docs/internal/dev-loop-worktrees.md",
       "kind": "file"
     },
     {
       "path": "docs/internal/develop-post-merge-gaps.md",
-      "kind": "file"
-    },
-    {
-      "path": "docs/internal/develop-push-drop-inventory.md",
       "kind": "file"
     },
     {
@@ -48834,6 +49090,10 @@
       "kind": "file"
     },
     {
+      "path": "docs/internal/gateway-uat-runbook.md",
+      "kind": "file"
+    },
+    {
       "path": "docs/internal/github-org-transfer.md",
       "kind": "file"
     },
@@ -48843,6 +49103,10 @@
     },
     {
       "path": "docs/internal/hosted-results-planning.md",
+      "kind": "file"
+    },
+    {
+      "path": "docs/internal/hudi-spark-support.md",
       "kind": "file"
     },
     {
@@ -48878,10 +49142,6 @@
       "kind": "file"
     },
     {
-      "path": "docs/internal/merge-queue-canary-runbook.md",
-      "kind": "file"
-    },
-    {
       "path": "docs/internal/merge-queue-governance.md",
       "kind": "file"
     },
@@ -48891,14 +49151,6 @@
     },
     {
       "path": "docs/internal/nightly-t3.md",
-      "kind": "file"
-    },
-    {
-      "path": "docs/internal/oracle-gateway-host.md",
-      "kind": "file"
-    },
-    {
-      "path": "docs/internal/oracle-review-v2.md",
       "kind": "file"
     },
     {
@@ -48946,11 +49198,23 @@
       "kind": "file"
     },
     {
+      "path": "docs/internal/review-gateway-host.md",
+      "kind": "file"
+    },
+    {
+      "path": "docs/internal/review-v2.md",
+      "kind": "file"
+    },
+    {
       "path": "docs/internal/site-deploy.md",
       "kind": "file"
     },
     {
       "path": "docs/internal/soundness-drain.md",
+      "kind": "file"
+    },
+    {
+      "path": "docs/internal/spark-arrow-collect.md",
       "kind": "file"
     },
     {
@@ -48971,6 +49235,10 @@
     },
     {
       "path": "docs/internal/tpc-binary-release.md",
+      "kind": "file"
+    },
+    {
+      "path": "docs/internal/tpc-measured-intervals.md",
       "kind": "file"
     },
     {
@@ -49618,7 +49886,7 @@
       "kind": "file"
     },
     {
-      "path": "make/check_makefile_inventory.py",
+      "path": "make/build.mk",
       "kind": "file"
     },
     {
@@ -49630,10 +49898,6 @@
       "kind": "file"
     },
     {
-      "path": "make/interface_summary.py",
-      "kind": "file"
-    },
-    {
       "path": "make/migration-proof.json",
       "kind": "file"
     },
@@ -49642,11 +49906,39 @@
       "kind": "file"
     },
     {
+      "path": "make/oracle.mk",
+      "kind": "file"
+    },
+    {
       "path": "make/platform-tests.mk",
       "kind": "file"
     },
     {
+      "path": "make/pr-landing.mk",
+      "kind": "file"
+    },
+    {
+      "path": "make/quality.mk",
+      "kind": "file"
+    },
+    {
+      "path": "make/reports.mk",
+      "kind": "file"
+    },
+    {
+      "path": "make/review.mk",
+      "kind": "file"
+    },
+    {
       "path": "make/site-inputs.mk",
+      "kind": "file"
+    },
+    {
+      "path": "make/tests.mk",
+      "kind": "file"
+    },
+    {
+      "path": "make/uat.mk",
       "kind": "file"
     },
     {
@@ -49727,6 +50019,10 @@
     },
     {
       "path": "quality/mcp-run-surface.json",
+      "kind": "file"
+    },
+    {
+      "path": "quality/path-privacy-contract.json",
       "kind": "file"
     },
     {
@@ -51350,6 +51646,14 @@
       "kind": "file"
     },
     {
+      "path": "results-data/bundles/read_primitives_sf001_clickhouse_local_sql_20261112_160015_8c2401a3.json",
+      "kind": "file"
+    },
+    {
+      "path": "results-data/bundles/read_primitives_sf001_clickhouse_local_sql_20261112_160015_8c2401a3.manifest.json",
+      "kind": "file"
+    },
+    {
       "path": "results-data/bundles/read_primitives_sf001_databricks_sql_20261001_152239_14b1d8d2.json",
       "kind": "file"
     },
@@ -51443,6 +51747,14 @@
     },
     {
       "path": "results-data/bundles/read_primitives_sf01_clickhouse_local_sql_20261026_174637_3f5c94e9.manifest.json",
+      "kind": "file"
+    },
+    {
+      "path": "results-data/bundles/read_primitives_sf01_clickhouse_local_sql_20261112_160115_f3180de4.json",
+      "kind": "file"
+    },
+    {
+      "path": "results-data/bundles/read_primitives_sf01_clickhouse_local_sql_20261112_160115_f3180de4.manifest.json",
       "kind": "file"
     },
     {
@@ -52014,6 +52326,62 @@
       "kind": "file"
     },
     {
+      "path": "results-data/bundles/tpcds_obt_sf001_datafusion_sql_20261111_110035_78695483.json",
+      "kind": "file"
+    },
+    {
+      "path": "results-data/bundles/tpcds_obt_sf001_datafusion_sql_20261111_110035_78695483.manifest.json",
+      "kind": "file"
+    },
+    {
+      "path": "results-data/bundles/tpcds_obt_sf001_doris_sql_20261111_110147_93ab6464.json",
+      "kind": "file"
+    },
+    {
+      "path": "results-data/bundles/tpcds_obt_sf001_doris_sql_20261111_110147_93ab6464.manifest.json",
+      "kind": "file"
+    },
+    {
+      "path": "results-data/bundles/tpcds_obt_sf001_duckdb_sql_20261111_105936_37e7cc9b.json",
+      "kind": "file"
+    },
+    {
+      "path": "results-data/bundles/tpcds_obt_sf001_duckdb_sql_20261111_105936_37e7cc9b.manifest.json",
+      "kind": "file"
+    },
+    {
+      "path": "results-data/bundles/tpcds_obt_sf001_lakesail_sql_20261111_110322_a1896614.json",
+      "kind": "file"
+    },
+    {
+      "path": "results-data/bundles/tpcds_obt_sf001_lakesail_sql_20261111_110322_a1896614.manifest.json",
+      "kind": "file"
+    },
+    {
+      "path": "results-data/bundles/tpcds_obt_sf01_datafusion_sql_20261111_110045_4a0d3139.json",
+      "kind": "file"
+    },
+    {
+      "path": "results-data/bundles/tpcds_obt_sf01_datafusion_sql_20261111_110045_4a0d3139.manifest.json",
+      "kind": "file"
+    },
+    {
+      "path": "results-data/bundles/tpcds_obt_sf01_doris_sql_20261111_110240_9315b4c2.json",
+      "kind": "file"
+    },
+    {
+      "path": "results-data/bundles/tpcds_obt_sf01_doris_sql_20261111_110240_9315b4c2.manifest.json",
+      "kind": "file"
+    },
+    {
+      "path": "results-data/bundles/tpcds_obt_sf01_duckdb_sql_20261111_110025_688df8f3.json",
+      "kind": "file"
+    },
+    {
+      "path": "results-data/bundles/tpcds_obt_sf01_duckdb_sql_20261111_110025_688df8f3.manifest.json",
+      "kind": "file"
+    },
+    {
       "path": "results-data/bundles/tpcds_obt_sf1_bigquery_sql_20260923_152357_480ffcea.json",
       "kind": "file"
     },
@@ -52538,6 +52906,18 @@
       "kind": "file"
     },
     {
+      "path": "results-data/bundles/tpch_sf01_duckdb_sql_20261111_213030_d24969ea.json",
+      "kind": "file"
+    },
+    {
+      "path": "results-data/bundles/tpch_sf01_duckdb_sql_20261111_213030_d24969ea.manifest.json",
+      "kind": "file"
+    },
+    {
+      "path": "results-data/bundles/tpch_sf01_duckdb_sql_20261111_213030_d24969ea.plans.json",
+      "kind": "file"
+    },
+    {
       "path": "results-data/bundles/tpch_sf01_pandas_df_20260826_210239_77598616.json",
       "kind": "file"
     },
@@ -52551,6 +52931,18 @@
     },
     {
       "path": "results-data/bundles/tpch_sf01_polars_df_20260826_204211_f659fcbf.manifest.json",
+      "kind": "file"
+    },
+    {
+      "path": "results-data/bundles/tpch_sf01_polars_df_20261111_154204_3d7d3e84.json",
+      "kind": "file"
+    },
+    {
+      "path": "results-data/bundles/tpch_sf01_polars_df_20261111_154204_3d7d3e84.manifest.json",
+      "kind": "file"
+    },
+    {
+      "path": "results-data/bundles/tpch_sf01_polars_df_20261111_154204_3d7d3e84.plans.json",
       "kind": "file"
     },
     {
@@ -53594,6 +53986,10 @@
       "kind": "file"
     },
     {
+      "path": "scripts/check_make_targets.py",
+      "kind": "file"
+    },
+    {
       "path": "scripts/check_patch_safety.py",
       "kind": "file"
     },
@@ -53607,10 +54003,6 @@
     },
     {
       "path": "scripts/check_public_contract_drift.py",
-      "kind": "file"
-    },
-    {
-      "path": "scripts/check_release_curation.py",
       "kind": "file"
     },
     {
@@ -53651,6 +54043,10 @@
     },
     {
       "path": "scripts/check_windows_antipatterns.py",
+      "kind": "file"
+    },
+    {
+      "path": "scripts/ci_failures.py",
       "kind": "file"
     },
     {
@@ -53786,6 +54182,10 @@
       "kind": "file"
     },
     {
+      "path": "scripts/local_review.py",
+      "kind": "file"
+    },
+    {
       "path": "scripts/make_timing.py",
       "kind": "file"
     },
@@ -53799,10 +54199,6 @@
     },
     {
       "path": "scripts/new_platform_scaffold.py",
-      "kind": "file"
-    },
-    {
-      "path": "scripts/oracle_local_review.py",
       "kind": "file"
     },
     {
@@ -53835,6 +54231,18 @@
     },
     {
       "path": "scripts/pr_rerun.py",
+      "kind": "file"
+    },
+    {
+      "path": "scripts/pr_stale_base.py",
+      "kind": "file"
+    },
+    {
+      "path": "scripts/preflight_receipt.py",
+      "kind": "file"
+    },
+    {
+      "path": "scripts/primary_clone_write_guard.py",
       "kind": "file"
     },
     {
@@ -53886,6 +54294,10 @@
       "kind": "file"
     },
     {
+      "path": "scripts/release_canary_freshness.py",
+      "kind": "file"
+    },
+    {
       "path": "scripts/release_canary_incident.py",
       "kind": "file"
     },
@@ -53894,27 +54306,31 @@
       "kind": "file"
     },
     {
-      "path": "scripts/release_curation_dry_run.py",
-      "kind": "file"
-    },
-    {
-      "path": "scripts/release_cut_abort.sh",
-      "kind": "file"
-    },
-    {
-      "path": "scripts/release_cut_start.sh",
-      "kind": "file"
-    },
-    {
-      "path": "scripts/release_finalize.py",
-      "kind": "file"
-    },
-    {
       "path": "scripts/release_flow.py",
       "kind": "file"
     },
     {
-      "path": "scripts/release_readiness_check.py",
+      "path": "scripts/release_line_create.py",
+      "kind": "file"
+    },
+    {
+      "path": "scripts/release_probe.py",
+      "kind": "file"
+    },
+    {
+      "path": "scripts/release_probe_graph.py",
+      "kind": "file"
+    },
+    {
+      "path": "scripts/release_probe_launch.py",
+      "kind": "file"
+    },
+    {
+      "path": "scripts/release_probe_uat.py",
+      "kind": "file"
+    },
+    {
+      "path": "scripts/release_releasable.py",
       "kind": "file"
     },
     {
@@ -53927,6 +54343,10 @@
     },
     {
       "path": "scripts/release_tag_recheck.py",
+      "kind": "file"
+    },
+    {
+      "path": "scripts/release_uat_evidence_check.py",
       "kind": "file"
     },
     {
@@ -54034,11 +54454,7 @@
       "kind": "file"
     },
     {
-      "path": "scripts/sqlglot_fork_diff.py",
-      "kind": "file"
-    },
-    {
-      "path": "scripts/sqlglot_fork_refresh.py",
+      "path": "scripts/sqlglot_delivery.py",
       "kind": "file"
     },
     {
@@ -54086,6 +54502,10 @@
       "kind": "file"
     },
     {
+      "path": "scripts/trunk_uat.py",
+      "kind": "file"
+    },
+    {
       "path": "scripts/tuning_evidence/__init__.py",
       "kind": "file"
     },
@@ -54114,6 +54534,10 @@
       "kind": "file"
     },
     {
+      "path": "scripts/uat_rubric.py",
+      "kind": "file"
+    },
+    {
       "path": "scripts/update_version.py",
       "kind": "file"
     },
@@ -54127,6 +54551,10 @@
     },
     {
       "path": "scripts/validate_todo_indexes.py",
+      "kind": "file"
+    },
+    {
+      "path": "scripts/verify_chdb_engine.py",
       "kind": "file"
     },
     {
@@ -54583,54 +55011,6 @@
     },
     {
       "path": "tests/fixtures/medium_shard_durations.json",
-      "kind": "file"
-    },
-    {
-      "path": "tests/fixtures/oracle_reviewers/omp_candidate/build_api_latest.json",
-      "kind": "file"
-    },
-    {
-      "path": "tests/fixtures/oracle_reviewers/omp_candidate/chain_review.jsonl",
-      "kind": "file"
-    },
-    {
-      "path": "tests/fixtures/oracle_reviewers/omp_candidate/elided_read.jsonl",
-      "kind": "file"
-    },
-    {
-      "path": "tests/fixtures/oracle_reviewers/omp_candidate/gateway_rejection.jsonl",
-      "kind": "file"
-    },
-    {
-      "path": "tests/fixtures/oracle_reviewers/omp_candidate/manifest.json",
-      "kind": "file"
-    },
-    {
-      "path": "tests/fixtures/oracle_reviewers/omp_candidate/omp_multi_turn_review.jsonl",
-      "kind": "file"
-    },
-    {
-      "path": "tests/fixtures/oracle_reviewers/omp_candidate/quota_terminal.jsonl",
-      "kind": "file"
-    },
-    {
-      "path": "tests/fixtures/oracle_reviewers/omp_candidate/quota_walk.jsonl",
-      "kind": "file"
-    },
-    {
-      "path": "tests/fixtures/oracle_reviewers/omp_candidate/roster_breach.jsonl",
-      "kind": "file"
-    },
-    {
-      "path": "tests/fixtures/oracle_reviewers/omp_candidate/static_outputs.json",
-      "kind": "file"
-    },
-    {
-      "path": "tests/fixtures/oracle_reviewers/omp_candidate/upstream_auth.jsonl",
-      "kind": "file"
-    },
-    {
-      "path": "tests/fixtures/oracle_reviewers/provenance.json",
       "kind": "file"
     },
     {
@@ -55226,6 +55606,58 @@
       "kind": "file"
     },
     {
+      "path": "tests/fixtures/review_candidates/omp_candidate/build_api_latest.json",
+      "kind": "file"
+    },
+    {
+      "path": "tests/fixtures/review_candidates/omp_candidate/chain_review.jsonl",
+      "kind": "file"
+    },
+    {
+      "path": "tests/fixtures/review_candidates/omp_candidate/elided_read.jsonl",
+      "kind": "file"
+    },
+    {
+      "path": "tests/fixtures/review_candidates/omp_candidate/gateway_rejection.jsonl",
+      "kind": "file"
+    },
+    {
+      "path": "tests/fixtures/review_candidates/omp_candidate/manifest.json",
+      "kind": "file"
+    },
+    {
+      "path": "tests/fixtures/review_candidates/omp_candidate/omp_multi_turn_review.jsonl",
+      "kind": "file"
+    },
+    {
+      "path": "tests/fixtures/review_candidates/omp_candidate/quota_terminal.jsonl",
+      "kind": "file"
+    },
+    {
+      "path": "tests/fixtures/review_candidates/omp_candidate/quota_walk.jsonl",
+      "kind": "file"
+    },
+    {
+      "path": "tests/fixtures/review_candidates/omp_candidate/roster_breach.jsonl",
+      "kind": "file"
+    },
+    {
+      "path": "tests/fixtures/review_candidates/omp_candidate/static_outputs.json",
+      "kind": "file"
+    },
+    {
+      "path": "tests/fixtures/review_candidates/omp_candidate/upstream_auth.jsonl",
+      "kind": "file"
+    },
+    {
+      "path": "tests/fixtures/review_candidates/provenance.json",
+      "kind": "file"
+    },
+    {
+      "path": "tests/fixtures/review_provider_diversity/omp_catalog_windows.json",
+      "kind": "file"
+    },
+    {
       "path": "tests/fixtures/ruleset-develop-squash-only.json",
       "kind": "file"
     },
@@ -55366,14 +55798,6 @@
       "kind": "file"
     },
     {
-      "path": "tests/integration/oracle/__init__.py",
-      "kind": "file"
-    },
-    {
-      "path": "tests/integration/oracle/test_curated_capture_fixtures.py",
-      "kind": "file"
-    },
-    {
       "path": "tests/integration/platforms/__init__.py",
       "kind": "file"
     },
@@ -55407,6 +55831,10 @@
     },
     {
       "path": "tests/integration/platforms/test_cedardb_live.py",
+      "kind": "file"
+    },
+    {
+      "path": "tests/integration/platforms/test_chdb_engine_load.py",
       "kind": "file"
     },
     {
@@ -55467,6 +55895,10 @@
     },
     {
       "path": "tests/integration/platforms/test_firebolt_core_live.py",
+      "kind": "file"
+    },
+    {
+      "path": "tests/integration/platforms/test_firebolt_core_native_load_live.py",
       "kind": "file"
     },
     {
@@ -55550,6 +55982,10 @@
       "kind": "file"
     },
     {
+      "path": "tests/integration/platforms/test_questdb_invalid_value_import.py",
+      "kind": "file"
+    },
+    {
       "path": "tests/integration/platforms/test_questdb_parquet_load.py",
       "kind": "file"
     },
@@ -55562,7 +55998,15 @@
       "kind": "file"
     },
     {
+      "path": "tests/integration/platforms/test_singlestore_decimal_load_live.py",
+      "kind": "file"
+    },
+    {
       "path": "tests/integration/platforms/test_singlestore_live.py",
+      "kind": "file"
+    },
+    {
+      "path": "tests/integration/platforms/test_singlestore_tpcds_maintenance_live.py",
       "kind": "file"
     },
     {
@@ -55623,6 +56067,14 @@
     },
     {
       "path": "tests/integration/platforms/test_write_primitives_scd2_postgresql_live.py",
+      "kind": "file"
+    },
+    {
+      "path": "tests/integration/review/__init__.py",
+      "kind": "file"
+    },
+    {
+      "path": "tests/integration/review/test_curated_capture_fixtures.py",
       "kind": "file"
     },
     {
@@ -56003,6 +56455,10 @@
     },
     {
       "path": "tests/integration/test_tpcds_query_generation.py",
+      "kind": "file"
+    },
+    {
+      "path": "tests/integration/test_tpcds_refresh_functions_duckdb.py",
       "kind": "file"
     },
     {
@@ -56426,6 +56882,10 @@
       "kind": "file"
     },
     {
+      "path": "tests/uat/config_guard.py",
+      "kind": "file"
+    },
+    {
       "path": "tests/uat/configs/generated-rerun-shards/README.md",
       "kind": "file"
     },
@@ -56590,6 +57050,10 @@
       "kind": "file"
     },
     {
+      "path": "tests/uat/failure_signature.py",
+      "kind": "file"
+    },
+    {
       "path": "tests/uat/fixtures/report-accounting-skipped-unreachable-cells.jsonl",
       "kind": "file"
     },
@@ -56606,6 +57070,14 @@
       "kind": "file"
     },
     {
+      "path": "tests/uat/image_pins.py",
+      "kind": "file"
+    },
+    {
+      "path": "tests/uat/infrastructure_retry.py",
+      "kind": "file"
+    },
+    {
       "path": "tests/uat/ladder.py",
       "kind": "file"
     },
@@ -56615,6 +57087,10 @@
     },
     {
       "path": "tests/uat/matrix.py",
+      "kind": "file"
+    },
+    {
+      "path": "tests/uat/mocker_launch.py",
       "kind": "file"
     },
     {
@@ -56654,7 +57130,19 @@
       "kind": "file"
     },
     {
+      "path": "tests/uat/rubric.py",
+      "kind": "file"
+    },
+    {
+      "path": "tests/uat/rubric_fixtures.py",
+      "kind": "file"
+    },
+    {
       "path": "tests/uat/runner.py",
+      "kind": "file"
+    },
+    {
+      "path": "tests/uat/test_cedardb_trunk_uat_prunes.py",
       "kind": "file"
     },
     {
@@ -56678,6 +57166,10 @@
       "kind": "file"
     },
     {
+      "path": "tests/uat/test_config_guard.py",
+      "kind": "file"
+    },
+    {
       "path": "tests/uat/test_connection_registry_drift.py",
       "kind": "file"
     },
@@ -56687,6 +57179,10 @@
     },
     {
       "path": "tests/uat/test_dask_cluster_failure.py",
+      "kind": "file"
+    },
+    {
+      "path": "tests/uat/test_declared_settings.py",
       "kind": "file"
     },
     {
@@ -56706,11 +57202,23 @@
       "kind": "file"
     },
     {
+      "path": "tests/uat/test_image_pins.py",
+      "kind": "file"
+    },
+    {
+      "path": "tests/uat/test_infrastructure_retry.py",
+      "kind": "file"
+    },
+    {
       "path": "tests/uat/test_ladder.py",
       "kind": "file"
     },
     {
       "path": "tests/uat/test_matrix.py",
+      "kind": "file"
+    },
+    {
+      "path": "tests/uat/test_mocker_launch.py",
       "kind": "file"
     },
     {
@@ -56762,11 +57270,19 @@
       "kind": "file"
     },
     {
+      "path": "tests/uat/test_rubric.py",
+      "kind": "file"
+    },
+    {
       "path": "tests/uat/test_runner.py",
       "kind": "file"
     },
     {
       "path": "tests/uat/test_runner_timeout_process_group.py",
+      "kind": "file"
+    },
+    {
+      "path": "tests/uat/test_singlestore_joinorder_prune.py",
       "kind": "file"
     },
     {
@@ -56783,6 +57299,10 @@
     },
     {
       "path": "tests/uat/test_timeouts.py",
+      "kind": "file"
+    },
+    {
+      "path": "tests/uat/test_tpcds_obt_subscale_prunes.py",
       "kind": "file"
     },
     {
@@ -56911,6 +57431,10 @@
     },
     {
       "path": "tests/unit/cli/commands/test_publish.py",
+      "kind": "file"
+    },
+    {
+      "path": "tests/unit/cli/commands/test_publish_plans_boundary.py",
       "kind": "file"
     },
     {
@@ -57099,6 +57623,10 @@
     },
     {
       "path": "tests/unit/cli/test_dryrun_preview_redaction.py",
+      "kind": "file"
+    },
+    {
+      "path": "tests/unit/cli/test_duckdb_third_party_extension_option.py",
       "kind": "file"
     },
     {
@@ -57614,11 +58142,19 @@
       "kind": "file"
     },
     {
+      "path": "tests/unit/core/dataframe/test_local_path_detector.py",
+      "kind": "file"
+    },
+    {
       "path": "tests/unit/core/dataframe/test_maintenance_interface.py",
       "kind": "file"
     },
     {
       "path": "tests/unit/core/dataframe/test_pandas_ops.py",
+      "kind": "file"
+    },
+    {
+      "path": "tests/unit/core/dataframe/test_plan_path_redaction.py",
       "kind": "file"
     },
     {
@@ -57722,6 +58258,10 @@
       "kind": "file"
     },
     {
+      "path": "tests/unit/core/datavault/test_datavault_q21_multi_supplier_semantics.py",
+      "kind": "file"
+    },
+    {
       "path": "tests/unit/core/datavault/test_datavault_queries.py",
       "kind": "file"
     },
@@ -57803,6 +58343,10 @@
     },
     {
       "path": "tests/unit/core/expected_results/test_expected_results_models.py",
+      "kind": "file"
+    },
+    {
+      "path": "tests/unit/core/expected_results/test_missing_expected_count.py",
       "kind": "file"
     },
     {
@@ -58318,6 +58862,14 @@
       "kind": "file"
     },
     {
+      "path": "tests/unit/core/results/test_compare_maintenance_methods.py",
+      "kind": "file"
+    },
+    {
+      "path": "tests/unit/core/results/test_comparison_modes.py",
+      "kind": "file"
+    },
+    {
       "path": "tests/unit/core/results/test_cost_round_trip.py",
       "kind": "file"
     },
@@ -58370,7 +58922,15 @@
       "kind": "file"
     },
     {
+      "path": "tests/unit/core/results/test_export_power_precision.py",
+      "kind": "file"
+    },
+    {
       "path": "tests/unit/core/results/test_exporter_timing_contract.py",
+      "kind": "file"
+    },
+    {
+      "path": "tests/unit/core/results/test_fetch_mode.py",
       "kind": "file"
     },
     {
@@ -58390,6 +58950,10 @@
       "kind": "file"
     },
     {
+      "path": "tests/unit/core/results/test_maintenance_method_round_trip.py",
+      "kind": "file"
+    },
+    {
       "path": "tests/unit/core/results/test_metrics.py",
       "kind": "file"
     },
@@ -58402,7 +58966,15 @@
       "kind": "file"
     },
     {
+      "path": "tests/unit/core/results/test_plan_companion_key_shape.py",
+      "kind": "file"
+    },
+    {
       "path": "tests/unit/core/results/test_plan_validation.py",
+      "kind": "file"
+    },
+    {
+      "path": "tests/unit/core/results/test_plans_export_text_fields.py",
       "kind": "file"
     },
     {
@@ -58419,6 +58991,10 @@
     },
     {
       "path": "tests/unit/core/results/test_platform_options_capture.py",
+      "kind": "file"
+    },
+    {
+      "path": "tests/unit/core/results/test_platform_timing.py",
       "kind": "file"
     },
     {
@@ -58443,6 +59019,10 @@
     },
     {
       "path": "tests/unit/core/results/test_public_pseudonym_salt.py",
+      "kind": "file"
+    },
+    {
+      "path": "tests/unit/core/results/test_qphds.py",
       "kind": "file"
     },
     {
@@ -58543,6 +59123,10 @@
     },
     {
       "path": "tests/unit/core/results/test_tuning_provenance_export.py",
+      "kind": "file"
+    },
+    {
+      "path": "tests/unit/core/results/test_unvalidated_row_counts.py",
       "kind": "file"
     },
     {
@@ -58878,6 +59462,10 @@
       "kind": "file"
     },
     {
+      "path": "tests/unit/core/test_primitives_registry_query_counts.py",
+      "kind": "file"
+    },
+    {
       "path": "tests/unit/core/test_query_catalog.py",
       "kind": "file"
     },
@@ -58966,15 +59554,11 @@
       "kind": "file"
     },
     {
+      "path": "tests/unit/core/test_tpc_spec.py",
+      "kind": "file"
+    },
+    {
       "path": "tests/unit/core/test_tpcds_benchmark_fakes.py",
-      "kind": "file"
-    },
-    {
-      "path": "tests/unit/core/test_tpcds_maintenance_delete_portability.py",
-      "kind": "file"
-    },
-    {
-      "path": "tests/unit/core/test_tpcds_maintenance_operations.py",
       "kind": "file"
     },
     {
@@ -59086,6 +59670,10 @@
       "kind": "file"
     },
     {
+      "path": "tests/unit/core/throughput/test_translation_context.py",
+      "kind": "file"
+    },
+    {
       "path": "tests/unit/core/tpcdi/conftest.py",
       "kind": "file"
     },
@@ -59167,6 +59755,10 @@
     },
     {
       "path": "tests/unit/core/tpcdi/test_tpcdi_boolean_flag_dialects.py",
+      "kind": "file"
+    },
+    {
+      "path": "tests/unit/core/tpcdi/test_tpcdi_bulk_load_parity.py",
       "kind": "file"
     },
     {
@@ -59294,7 +59886,19 @@
       "kind": "file"
     },
     {
-      "path": "tests/unit/core/tpcds/test_maintenance_returns_composite_key.py",
+      "path": "tests/unit/core/tpcds/test_maintenance_functions.py",
+      "kind": "file"
+    },
+    {
+      "path": "tests/unit/core/tpcds/test_maintenance_singlestore_dialect.py",
+      "kind": "file"
+    },
+    {
+      "path": "tests/unit/core/tpcds/test_maintenance_timer_boundaries.py",
+      "kind": "file"
+    },
+    {
+      "path": "tests/unit/core/tpcds/test_multi_warehouse_orders.py",
       "kind": "file"
     },
     {
@@ -59426,6 +60030,10 @@
       "kind": "file"
     },
     {
+      "path": "tests/unit/core/tpcds/test_refresh_data.py",
+      "kind": "file"
+    },
+    {
       "path": "tests/unit/core/tpcds/test_rollup_helper.py",
       "kind": "file"
     },
@@ -59455,6 +60063,10 @@
     },
     {
       "path": "tests/unit/core/tpcds/test_tpcds_maintenance_coverage.py",
+      "kind": "file"
+    },
+    {
+      "path": "tests/unit/core/tpcds/test_tpcds_power_test_query_generation_boundary.py",
       "kind": "file"
     },
     {
@@ -59534,7 +60146,15 @@
       "kind": "file"
     },
     {
+      "path": "tests/unit/core/tpch/test_power_test_query_generation_boundary.py",
+      "kind": "file"
+    },
+    {
       "path": "tests/unit/core/tpch/test_power_test_query_subset.py",
+      "kind": "file"
+    },
+    {
+      "path": "tests/unit/core/tpch/test_power_validation_after_refresh.py",
       "kind": "file"
     },
     {
@@ -59543,6 +60163,10 @@
     },
     {
       "path": "tests/unit/core/tpch/test_q17_spark_execution.py",
+      "kind": "file"
+    },
+    {
+      "path": "tests/unit/core/tpch/test_q21_multi_supplier_semantics.py",
       "kind": "file"
     },
     {
@@ -59583,6 +60207,10 @@
     },
     {
       "path": "tests/unit/core/tpch/test_tpch_refresh.py",
+      "kind": "file"
+    },
+    {
+      "path": "tests/unit/core/tpch/test_tpch_refresh_native_ingest.py",
       "kind": "file"
     },
     {
@@ -60098,6 +60726,10 @@
       "kind": "file"
     },
     {
+      "path": "tests/unit/core/write_primitives/test_singlestore_decimal_guard_overrides.py",
+      "kind": "file"
+    },
+    {
       "path": "tests/unit/core/write_primitives/test_sketch_storage_smoke.py",
       "kind": "file"
     },
@@ -60359,6 +60991,10 @@
     },
     {
       "path": "tests/unit/mcp/test_run_surface_contract.py",
+      "kind": "file"
+    },
+    {
+      "path": "tests/unit/mcp/test_scale_factor_rule.py",
       "kind": "file"
     },
     {
@@ -60786,7 +61422,15 @@
       "kind": "file"
     },
     {
+      "path": "tests/unit/platforms/dataframe/test_df_request_contract.py",
+      "kind": "file"
+    },
+    {
       "path": "tests/unit/platforms/dataframe/test_df_timing_contract.py",
+      "kind": "file"
+    },
+    {
+      "path": "tests/unit/platforms/dataframe/test_distinct_count_null_parity.py",
       "kind": "file"
     },
     {
@@ -60903,6 +61547,10 @@
     },
     {
       "path": "tests/unit/platforms/dataframe/test_shared_loading.py",
+      "kind": "file"
+    },
+    {
+      "path": "tests/unit/platforms/dataframe/test_text_plan_fingerprint.py",
       "kind": "file"
     },
     {
@@ -61046,6 +61694,14 @@
       "kind": "file"
     },
     {
+      "path": "tests/unit/platforms/test_arrow_fetch_native_drivers.py",
+      "kind": "file"
+    },
+    {
+      "path": "tests/unit/platforms/test_arrow_result_capture.py",
+      "kind": "file"
+    },
+    {
       "path": "tests/unit/platforms/test_athena_adapter.py",
       "kind": "file"
     },
@@ -61142,6 +61798,10 @@
       "kind": "file"
     },
     {
+      "path": "tests/unit/platforms/test_clickhouse_http_insert.py",
+      "kind": "file"
+    },
+    {
       "path": "tests/unit/platforms/test_clickhouse_introspection.py",
       "kind": "file"
     },
@@ -61178,6 +61838,10 @@
       "kind": "file"
     },
     {
+      "path": "tests/unit/platforms/test_clickhouse_timing_contract.py",
+      "kind": "file"
+    },
+    {
       "path": "tests/unit/platforms/test_clickhouse_tpcds_untuned_layout.py",
       "kind": "file"
     },
@@ -61203,6 +61867,10 @@
     },
     {
       "path": "tests/unit/platforms/test_cloud_sorted_ingestion_strategy.py",
+      "kind": "file"
+    },
+    {
+      "path": "tests/unit/platforms/test_cloud_warehouse_timing_contract.py",
       "kind": "file"
     },
     {
@@ -61242,6 +61910,10 @@
       "kind": "file"
     },
     {
+      "path": "tests/unit/platforms/test_data_loading_arrow_insert.py",
+      "kind": "file"
+    },
+    {
       "path": "tests/unit/platforms/test_data_loading_registry.py",
       "kind": "file"
     },
@@ -61251,6 +61923,10 @@
     },
     {
       "path": "tests/unit/platforms/test_databend_adapter.py",
+      "kind": "file"
+    },
+    {
+      "path": "tests/unit/platforms/test_databend_bulk_load.py",
       "kind": "file"
     },
     {
@@ -61354,7 +62030,19 @@
       "kind": "file"
     },
     {
+      "path": "tests/unit/platforms/test_doris_stream_load_null_handling.py",
+      "kind": "file"
+    },
+    {
       "path": "tests/unit/platforms/test_duckdb_adapter.py",
+      "kind": "file"
+    },
+    {
+      "path": "tests/unit/platforms/test_duckdb_arrow_fetch.py",
+      "kind": "file"
+    },
+    {
+      "path": "tests/unit/platforms/test_duckdb_arrow_result_path.py",
       "kind": "file"
     },
     {
@@ -61390,6 +62078,10 @@
       "kind": "file"
     },
     {
+      "path": "tests/unit/platforms/test_embedded_timing_contract.py",
+      "kind": "file"
+    },
+    {
       "path": "tests/unit/platforms/test_enhanced_benchmark_results.py",
       "kind": "file"
     },
@@ -61419,6 +62111,10 @@
     },
     {
       "path": "tests/unit/platforms/test_firebolt_cloud.py",
+      "kind": "file"
+    },
+    {
+      "path": "tests/unit/platforms/test_firebolt_core_native_load.py",
       "kind": "file"
     },
     {
@@ -61459,6 +62155,10 @@
     },
     {
       "path": "tests/unit/platforms/test_influxdb_adapter_coverage.py",
+      "kind": "file"
+    },
+    {
+      "path": "tests/unit/platforms/test_influxdb_arrow_load.py",
       "kind": "file"
     },
     {
@@ -61630,11 +62330,23 @@
       "kind": "file"
     },
     {
+      "path": "tests/unit/platforms/test_prepare_local_load_file_streaming.py",
+      "kind": "file"
+    },
+    {
       "path": "tests/unit/platforms/test_presto_adapter.py",
       "kind": "file"
     },
     {
+      "path": "tests/unit/platforms/test_presto_trino_bulk.py",
+      "kind": "file"
+    },
+    {
       "path": "tests/unit/platforms/test_presto_trino_plan_capture.py",
+      "kind": "file"
+    },
+    {
+      "path": "tests/unit/platforms/test_presto_trino_power_connection.py",
       "kind": "file"
     },
     {
@@ -61686,7 +62398,19 @@
       "kind": "file"
     },
     {
+      "path": "tests/unit/platforms/test_questdb_ilp_arrow.py",
+      "kind": "file"
+    },
+    {
+      "path": "tests/unit/platforms/test_questdb_import_value_integrity.py",
+      "kind": "file"
+    },
+    {
       "path": "tests/unit/platforms/test_questdb_join_scope.py",
+      "kind": "file"
+    },
+    {
+      "path": "tests/unit/platforms/test_questdb_join_window_columns.py",
       "kind": "file"
     },
     {
@@ -61830,6 +62554,22 @@
       "kind": "file"
     },
     {
+      "path": "tests/unit/platforms/test_singlestore_analyze_after_load.py",
+      "kind": "file"
+    },
+    {
+      "path": "tests/unit/platforms/test_singlestore_decimal_load_guard.py",
+      "kind": "file"
+    },
+    {
+      "path": "tests/unit/platforms/test_singlestore_parquet_chunks.py",
+      "kind": "file"
+    },
+    {
+      "path": "tests/unit/platforms/test_singlestore_refresh_ingest_nulls.py",
+      "kind": "file"
+    },
+    {
       "path": "tests/unit/platforms/test_snowflake_adapter.py",
       "kind": "file"
     },
@@ -61882,6 +62622,10 @@
       "kind": "file"
     },
     {
+      "path": "tests/unit/platforms/test_spark_arrow_fetch.py",
+      "kind": "file"
+    },
+    {
       "path": "tests/unit/platforms/test_spark_benchmark_gates.py",
       "kind": "file"
     },
@@ -61898,6 +62642,10 @@
       "kind": "file"
     },
     {
+      "path": "tests/unit/platforms/test_spark_family_timing.py",
+      "kind": "file"
+    },
+    {
       "path": "tests/unit/platforms/test_spark_helpers.py",
       "kind": "file"
     },
@@ -61907,6 +62655,10 @@
     },
     {
       "path": "tests/unit/platforms/test_spark_tpchavoc_transformer.py",
+      "kind": "file"
+    },
+    {
+      "path": "tests/unit/platforms/test_sql_family_timing_contract.py",
       "kind": "file"
     },
     {
@@ -61939,6 +62691,10 @@
     },
     {
       "path": "tests/unit/platforms/test_starrocks_setup_config.py",
+      "kind": "file"
+    },
+    {
+      "path": "tests/unit/platforms/test_starrocks_stream_load.py",
       "kind": "file"
     },
     {
@@ -61975,6 +62731,26 @@
     },
     {
       "path": "tests/unit/platforms/test_timescaledb_cloud.py",
+      "kind": "file"
+    },
+    {
+      "path": "tests/unit/platforms/test_timing_contract_warehouse_adapters.py",
+      "kind": "file"
+    },
+    {
+      "path": "tests/unit/platforms/test_tpcds_combined_order.py",
+      "kind": "file"
+    },
+    {
+      "path": "tests/unit/platforms/test_tpcds_maintenance_execution.py",
+      "kind": "file"
+    },
+    {
+      "path": "tests/unit/platforms/test_tpcds_maintenance_primary_keys.py",
+      "kind": "file"
+    },
+    {
+      "path": "tests/unit/platforms/test_tpcds_maintenance_seed.py",
       "kind": "file"
     },
     {
@@ -62338,7 +63114,7 @@
       "kind": "file"
     },
     {
-      "path": "tests/unit/scripts/test_check_makefile_inventory.py",
+      "path": "tests/unit/scripts/test_check_make_targets.py",
       "kind": "file"
     },
     {
@@ -62347,10 +63123,6 @@
     },
     {
       "path": "tests/unit/scripts/test_check_project_references.py",
-      "kind": "file"
-    },
-    {
-      "path": "tests/unit/scripts/test_check_release_curation.py",
       "kind": "file"
     },
     {
@@ -62391,6 +63163,10 @@
     },
     {
       "path": "tests/unit/scripts/test_check_windows_antipatterns.py",
+      "kind": "file"
+    },
+    {
+      "path": "tests/unit/scripts/test_ci_failures.py",
       "kind": "file"
     },
     {
@@ -62538,11 +63314,19 @@
       "kind": "file"
     },
     {
+      "path": "tests/unit/scripts/test_heavy_run_events.py",
+      "kind": "file"
+    },
+    {
       "path": "tests/unit/scripts/test_heavy_tier_needed.py",
       "kind": "file"
     },
     {
       "path": "tests/unit/scripts/test_host_lock.py",
+      "kind": "file"
+    },
+    {
+      "path": "tests/unit/scripts/test_host_lock_preflight_scope.py",
       "kind": "file"
     },
     {
@@ -62558,7 +63342,7 @@
       "kind": "file"
     },
     {
-      "path": "tests/unit/scripts/test_make_interface_summary.py",
+      "path": "tests/unit/scripts/test_local_review.py",
       "kind": "file"
     },
     {
@@ -62575,22 +63359,6 @@
     },
     {
       "path": "tests/unit/scripts/test_new_platform_scaffold.py",
-      "kind": "file"
-    },
-    {
-      "path": "tests/unit/scripts/test_oracle_gateway_host.py",
-      "kind": "file"
-    },
-    {
-      "path": "tests/unit/scripts/test_oracle_local_review.py",
-      "kind": "file"
-    },
-    {
-      "path": "tests/unit/scripts/test_oracle_mutation_stage.py",
-      "kind": "file"
-    },
-    {
-      "path": "tests/unit/scripts/test_oracle_policy_pin.py",
       "kind": "file"
     },
     {
@@ -62638,6 +63406,14 @@
       "kind": "file"
     },
     {
+      "path": "tests/unit/scripts/test_pr_stale_base.py",
+      "kind": "file"
+    },
+    {
+      "path": "tests/unit/scripts/test_preflight_receipt.py",
+      "kind": "file"
+    },
+    {
       "path": "tests/unit/scripts/test_preflight_targets.py",
       "kind": "file"
     },
@@ -62674,19 +63450,39 @@
       "kind": "file"
     },
     {
-      "path": "tests/unit/scripts/test_release_curation_dry_run.py",
-      "kind": "file"
-    },
-    {
-      "path": "tests/unit/scripts/test_release_cut_start.py",
-      "kind": "file"
-    },
-    {
-      "path": "tests/unit/scripts/test_release_finalize.py",
+      "path": "tests/unit/scripts/test_release_canary_freshness.py",
       "kind": "file"
     },
     {
       "path": "tests/unit/scripts/test_release_flow.py",
+      "kind": "file"
+    },
+    {
+      "path": "tests/unit/scripts/test_release_hosted_fetch.py",
+      "kind": "file"
+    },
+    {
+      "path": "tests/unit/scripts/test_release_maintenance_admission.py",
+      "kind": "file"
+    },
+    {
+      "path": "tests/unit/scripts/test_release_probe.py",
+      "kind": "file"
+    },
+    {
+      "path": "tests/unit/scripts/test_release_probe_graph.py",
+      "kind": "file"
+    },
+    {
+      "path": "tests/unit/scripts/test_release_probe_launch.py",
+      "kind": "file"
+    },
+    {
+      "path": "tests/unit/scripts/test_release_probe_uat.py",
+      "kind": "file"
+    },
+    {
+      "path": "tests/unit/scripts/test_release_releasable.py",
       "kind": "file"
     },
     {
@@ -62695,6 +63491,10 @@
     },
     {
       "path": "tests/unit/scripts/test_release_tag_recheck.py",
+      "kind": "file"
+    },
+    {
+      "path": "tests/unit/scripts/test_release_uat_evidence_check.py",
       "kind": "file"
     },
     {
@@ -62719,6 +63519,22 @@
     },
     {
       "path": "tests/unit/scripts/test_results_explorer_snapshot_invariants.py",
+      "kind": "file"
+    },
+    {
+      "path": "tests/unit/scripts/test_review_gateway_host.py",
+      "kind": "file"
+    },
+    {
+      "path": "tests/unit/scripts/test_review_mutation_stage.py",
+      "kind": "file"
+    },
+    {
+      "path": "tests/unit/scripts/test_review_policy_pin.py",
+      "kind": "file"
+    },
+    {
+      "path": "tests/unit/scripts/test_review_provider_diversity.py",
       "kind": "file"
     },
     {
@@ -62758,15 +63574,15 @@
       "kind": "file"
     },
     {
+      "path": "tests/unit/scripts/test_soundness_merge_digest_release_lines.py",
+      "kind": "file"
+    },
+    {
       "path": "tests/unit/scripts/test_sql_execution_gate.py",
       "kind": "file"
     },
     {
-      "path": "tests/unit/scripts/test_sqlglot_fork_diff.py",
-      "kind": "file"
-    },
-    {
-      "path": "tests/unit/scripts/test_sqlglot_fork_refresh.py",
+      "path": "tests/unit/scripts/test_sqlglot_delivery.py",
       "kind": "file"
     },
     {
@@ -62842,7 +63658,15 @@
       "kind": "file"
     },
     {
+      "path": "tests/unit/scripts/test_trunk_uat.py",
+      "kind": "file"
+    },
+    {
       "path": "tests/unit/scripts/test_uat_loc_bucket_coverage.py",
+      "kind": "file"
+    },
+    {
+      "path": "tests/unit/scripts/test_uat_rubric.py",
       "kind": "file"
     },
     {
@@ -62867,6 +63691,10 @@
     },
     {
       "path": "tests/unit/scripts/test_validate_submission_slim_fallback.py",
+      "kind": "file"
+    },
+    {
+      "path": "tests/unit/scripts/test_vendor_publication_conditions.py",
       "kind": "file"
     },
     {
@@ -63023,10 +63851,6 @@
     },
     {
       "path": "tests/unit/sql_compat/test_datafusion_fork_rewrites_reference.py",
-      "kind": "file"
-    },
-    {
-      "path": "tests/unit/sql_compat/test_duckdb_write_primitives_gate.py",
       "kind": "file"
     },
     {
@@ -63238,6 +64062,10 @@
       "kind": "file"
     },
     {
+      "path": "tests/unit/test_makefile_heavy_run_cmd.py",
+      "kind": "file"
+    },
+    {
       "path": "tests/unit/test_marker_strategy.py",
       "kind": "file"
     },
@@ -63302,6 +64130,10 @@
       "kind": "file"
     },
     {
+      "path": "tests/unit/test_primary_clone_write_guard.py",
+      "kind": "file"
+    },
+    {
       "path": "tests/unit/test_process_state_guard.py",
       "kind": "file"
     },
@@ -63331,10 +64163,6 @@
     },
     {
       "path": "tests/unit/test_release_infrastructure.py",
-      "kind": "file"
-    },
-    {
-      "path": "tests/unit/test_release_readiness.py",
       "kind": "file"
     },
     {
@@ -63642,6 +64470,10 @@
       "kind": "file"
     },
     {
+      "path": "tests/unit/utils/test_arrow_rows.py",
+      "kind": "file"
+    },
+    {
       "path": "tests/unit/utils/test_binary_manifest.py",
       "kind": "file"
     },
@@ -63742,6 +64574,10 @@
       "kind": "file"
     },
     {
+      "path": "tests/unit/utils/test_duckdb_extensions.py",
+      "kind": "file"
+    },
+    {
       "path": "tests/unit/utils/test_environment.py",
       "kind": "file"
     },
@@ -63814,6 +64650,10 @@
       "kind": "file"
     },
     {
+      "path": "tests/unit/utils/test_qualify_order_by_rewrite.py",
+      "kind": "file"
+    },
+    {
       "path": "tests/unit/utils/test_quiet_console.py",
       "kind": "file"
     },
@@ -63831,6 +64671,10 @@
     },
     {
       "path": "tests/unit/utils/test_runtime_env.py",
+      "kind": "file"
+    },
+    {
+      "path": "tests/unit/utils/test_singlestore_query_shape_rewrites.py",
       "kind": "file"
     },
     {
@@ -63938,11 +64782,19 @@
       "kind": "file"
     },
     {
+      "path": "tests/unit/workflows/test_batch_loop_e2e_workflow.py",
+      "kind": "file"
+    },
+    {
       "path": "tests/unit/workflows/test_ci_aggregate_cancelled.py",
       "kind": "file"
     },
     {
       "path": "tests/unit/workflows/test_ci_changelog_gate.py",
+      "kind": "file"
+    },
+    {
+      "path": "tests/unit/workflows/test_ci_maintenance_base.py",
       "kind": "file"
     },
     {
@@ -63998,6 +64850,10 @@
       "kind": "file"
     },
     {
+      "path": "tests/unit/workflows/test_local_spark_jdk_pin.py",
+      "kind": "file"
+    },
+    {
       "path": "tests/unit/workflows/test_medium_suite_setup_parity.py",
       "kind": "file"
     },
@@ -64030,18 +64886,6 @@
       "kind": "file"
     },
     {
-      "path": "tests/unit/workflows/test_oracle_gate_workflow.py",
-      "kind": "file"
-    },
-    {
-      "path": "tests/unit/workflows/test_oracle_review_workflow.py",
-      "kind": "file"
-    },
-    {
-      "path": "tests/unit/workflows/test_oracle_verdict_workflow.py",
-      "kind": "file"
-    },
-    {
       "path": "tests/unit/workflows/test_pr_hold_workflow.py",
       "kind": "file"
     },
@@ -64054,15 +64898,31 @@
       "kind": "file"
     },
     {
-      "path": "tests/unit/workflows/test_release_pr_check_scope.py",
-      "kind": "file"
-    },
-    {
-      "path": "tests/unit/workflows/test_release_uat_charter_guard.py",
+      "path": "tests/unit/workflows/test_release_v2_probe.py",
       "kind": "file"
     },
     {
       "path": "tests/unit/workflows/test_release_v2_workflow.py",
+      "kind": "file"
+    },
+    {
+      "path": "tests/unit/workflows/test_release_v2_workflow_reuse_step.py",
+      "kind": "file"
+    },
+    {
+      "path": "tests/unit/workflows/test_review_gate_workflow.py",
+      "kind": "file"
+    },
+    {
+      "path": "tests/unit/workflows/test_review_posting_detector.py",
+      "kind": "file"
+    },
+    {
+      "path": "tests/unit/workflows/test_review_verdict_workflow.py",
+      "kind": "file"
+    },
+    {
+      "path": "tests/unit/workflows/test_review_workflow.py",
       "kind": "file"
     },
     {
@@ -64082,7 +64942,7 @@
       "kind": "file"
     },
     {
-      "path": "tests/unit/workflows/test_sqlglot_fork_refresh_workflow.py",
+      "path": "tests/unit/workflows/test_sqlglot_delivery_workflow.py",
       "kind": "file"
     },
     {
@@ -64091,6 +64951,10 @@
     },
     {
       "path": "tests/unit/workflows/test_t2_partition_workflow.py",
+      "kind": "file"
+    },
+    {
+      "path": "tests/unit/workflows/test_theseus_pin_consistency.py",
       "kind": "file"
     },
     {
@@ -64103,6 +64967,10 @@
     },
     {
       "path": "tests/unit/workflows/test_trunk_red_disarm_workflow.py",
+      "kind": "file"
+    },
+    {
+      "path": "tests/unit/workflows/test_trunk_uat_workflow.py",
       "kind": "file"
     },
     {
@@ -64418,6 +65286,14 @@
       "kind": "tree"
     },
     {
+      "path": ".codex",
+      "kind": "tree"
+    },
+    {
+      "path": ".gemini",
+      "kind": "tree"
+    },
+    {
       "path": ".github",
       "kind": "tree"
     },
@@ -64438,7 +65314,19 @@
       "kind": "tree"
     },
     {
-      "path": ".todo-db",
+      "path": ".omp",
+      "kind": "tree"
+    },
+    {
+      "path": ".omp/hooks",
+      "kind": "tree"
+    },
+    {
+      "path": ".omp/hooks/pre",
+      "kind": "tree"
+    },
+    {
+      "path": ".tractable",
       "kind": "tree"
     },
     {
@@ -64535,6 +65423,18 @@
     },
     {
       "path": "_project/analysis",
+      "kind": "tree"
+    },
+    {
+      "path": "_project/analysis/clickhouse-tuning-evidence-sf1",
+      "kind": "tree"
+    },
+    {
+      "path": "_project/analysis/clickhouse-tuning-evidence-sf1/cells",
+      "kind": "tree"
+    },
+    {
+      "path": "_project/analysis/clickhouse-tuning-evidence-sf1/tpch-plans",
       "kind": "tree"
     },
     {
@@ -65966,15 +66866,19 @@
       "kind": "tree"
     },
     {
-      "path": "tests/fixtures/oracle_reviewers",
-      "kind": "tree"
-    },
-    {
-      "path": "tests/fixtures/oracle_reviewers/omp_candidate",
-      "kind": "tree"
-    },
-    {
       "path": "tests/fixtures/query_plans",
+      "kind": "tree"
+    },
+    {
+      "path": "tests/fixtures/review_candidates",
+      "kind": "tree"
+    },
+    {
+      "path": "tests/fixtures/review_candidates/omp_candidate",
+      "kind": "tree"
+    },
+    {
+      "path": "tests/fixtures/review_provider_diversity",
       "kind": "tree"
     },
     {
@@ -66006,11 +66910,11 @@
       "kind": "tree"
     },
     {
-      "path": "tests/integration/oracle",
+      "path": "tests/integration/platforms",
       "kind": "tree"
     },
     {
-      "path": "tests/integration/platforms",
+      "path": "tests/integration/review",
       "kind": "tree"
     },
     {
