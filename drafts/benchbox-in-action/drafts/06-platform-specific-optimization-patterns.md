@@ -198,9 +198,9 @@ Polars changed too. On the in-memory engine the self-join is 15-23x slower than 
 
 Pattern C was the fastest of the patterns in 39 of the 40 combinations of current release and dataset. The exception is DuckDB 2.0.0 at 100K synthetic orders, where the distinct count was 16% faster, half a millisecond. On SF10 data, min/max was 2.8-2.9x faster than the distinct count on Polars 2.1.0, 3.5-3.6x on DuckDB 2.0.0, 3.7-4.3x on DataFusion 55.0.0 and 4.9-5.5x on PySpark 4.3.0.
 
-On the February versions it wins less uniformly. On the Polars 1.37.1 in-memory engine the distinct count was 1.3-1.7x faster than min/max on synthetic data and about level with it on TPC-DS data. On DataFusion 51.0.0, min/max was 6-17x faster than the distinct count. It was also faster than the self-join we had picked for DataFusion, by 2.6-2.9x on synthetic data and 6-22x on TPC-DS data.
+On the February versions it wins less uniformly. On the Polars 1.37.1 in-memory engine the distinct count was 1.3-1.7x faster than min/max on synthetic data and about level with it on TPC-DS data. On DataFusion 51.0.0, min/max was 6-17x faster than the distinct count. It was also faster than the self-join, which had been the faster of the two on DataFusion 51.0.0 in February, by 2.6-2.9x on synthetic data and 6-22x on TPC-DS data.
 
-In February we compared two patterns and found that each engine needed a different one. A pattern we did not test would have served both.
+In February we compared two patterns and each engine preferred a different one. A pattern we did not test is faster than both on the current releases.
 
 ### The SQL form on DuckDB changed with 2.0
 
@@ -241,7 +241,7 @@ The same code had two NULL defects. On Polars, `n_unique()` counts NULL, so Q95 
 
 BenchBox [pull request 4169](https://github.com/BenchBox-dev/BenchBox/pull/4169) removed the dead branches, fixed the NULL handling, and moved Q16, Q94 and Q95 to the minimum and maximum rule on every platform. A second change, [pull request 4196](https://github.com/BenchBox-dev/BenchBox/pull/4196), covers TPC-H Q21, which has the same kind of step. There, carrying the minimum and maximum through the joins was about 10% slower on DataFusion than two distinct counts, and filtering before the joins brought it level.
 
-We timed the complete queries on both sides of the first change. The test used TPC-DS at scale factor 1 and the complete DataFrame queries through `benchbox run`, on the commit before the change and the commit with it, with the checkouts alternating and the best of five runs a side. The engines were the versions BenchBox locks, Polars 1.44.2 and DataFusion 54.0.0, not the newer ones measured above. Times are in milliseconds. "Before" ran the distinct count for Q16 and Q95 and the self-join for Q94, on both engines.
+We timed the complete queries on both sides of the first change. The test used TPC-DS at scale factor 1 and the complete DataFrame queries through `benchbox run`, on the commit before the change and the commit with it, with the checkouts alternating and the best of five runs a side. The engines were the versions BenchBox locked at the time, Polars 1.44.2 and DataFusion 54.0.0, not the newer ones measured above. Times are in milliseconds. "Before" ran the distinct count for Q16 and Q95 and the self-join for Q94, on both engines.
 
 | Query | Polars before | Polars after | Ratio | DataFusion before | DataFusion after | Ratio |
 | --- | --- | --- | --- | --- | --- | --- |
@@ -255,13 +255,15 @@ The ratio is the time after divided by the time before, so below 1 is faster. Th
 
 ## What we learned about benchmarking
 
-**A tuning has a version and a data shape attached.** The February result was reproducible and well explained, and four DataFusion releases later it was out of date. A platform-specific code path needs the versions and data it was measured on recorded next to it, and a date to measure it again.
+**A tuning has a version and a data shape attached.** The February result was reproducible and well explained, and four DataFusion releases later it was out of date. A measured preference for one pattern on one engine needs the versions and data it was measured on recorded next to it, and a date to measure it again.
 
-**Test data should have the benchmark's shape.** Our synthetic orders had 1.2 lines each. TPC-DS orders have about ten. The pattern we tuned is sensitive to exactly that number.
+**Test data should have the benchmark's shape.** Our synthetic orders had 1.2 lines each. TPC-DS orders have about ten. The patterns we compared are sensitive to exactly that number.
 
 **Two candidates are not the search space.** We framed the question as self-join against distinct count and answered it carefully. The better answer was outside the frame.
 
-**A step is not a query.** The isolated `EXISTS` statement is 45x slower on DuckDB 2.0.0 than on 1.5.6 at SF10, and the query that contains it takes the same 7 ms. Per-query timing is what BenchBox reports, and it is the level at which a change like the platform branch has to be judged.
+**A step is not a query.** The isolated `EXISTS` statement is 45x slower on DuckDB 2.0.0 than on 1.5.6 at SF10, and the query that contains it takes the same 7 ms. Per-query timing is what BenchBox reports, and it is the level at which a change to Q16, Q94 or Q95 has to be judged.
+
+**A platform branch needs a check that it runs.** BenchBox's branch compared against a string the DataFusion adapter never reports, and no result showed it, because the path that ran instead returned correct answers. A test that the DataFusion path is taken would have caught it in February.
 
 ---
 
@@ -284,7 +286,7 @@ The ratio is the time after divided by the time before, so below 1 is faster. Th
 
 ## Conclusions
 
-The same query did need different code in February, on the versions and data we tested. Nine months later it does not: one pattern is fastest on Polars 2.1.0, DuckDB 2.0.0, DataFusion 55.0.0 and PySpark 4.3.0, on both data shapes, in all but one of 40 tests.
+In February two patterns had different winners on different engines, on the versions and data we tested. Nine months later one pattern is fastest on Polars 2.1.0, DuckDB 2.0.0, DataFusion 55.0.0 and PySpark 4.3.0, on both data shapes, in all but one of 40 tests.
 
 Running the old releases next to the new ones is what made the result readable. Without them we could not have told a mistake in February from a change in the engines. It was neither a mistake nor only a change: the measurement was right, the data was the wrong shape, and the engines moved.
 

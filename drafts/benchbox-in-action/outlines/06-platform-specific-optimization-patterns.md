@@ -288,8 +288,8 @@ None - all research complete.
 
 ### BenchBox Implementation
 
-8. **BenchBox commit (TPC-H Q21)**: `d59507be` - perf(tpch): optimize Q21 DataFrame implementation with filter pushdown
-9. **BenchBox commit (TPC-DS Q16/Q95)**: `8726dd47` - perf(tpcds): add platform-specific multi-warehouse detection
+8. **BenchBox pull request 4169 (TPC-DS Q16, Q94, Q95)**: removed the dead platform branches and moved the three queries to the min/max rule, merged as `7f42e37e7f`
+9. **BenchBox pull request 4196 (TPC-H Q21)**: filters each per-order supplier aggregate before the joins
 
 ### Related Research
 
