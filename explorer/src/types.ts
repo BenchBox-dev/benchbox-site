@@ -57,9 +57,16 @@ export interface CostDeploymentFields {
   storage_tier?: string | null;
 }
 
+export interface CombinedCohortFields {
+  qphh_at_size?: number | null;
+  qphds_at_size?: number | null;
+  load_scope?: string[] | null;
+  transactional_steps?: Record<string, boolean> | null;
+}
+
 export type TranslatorVersionSource = "recorded" | "attested" | "not_recorded" | "not_applicable";
 
-export interface DetailResult extends CostDeploymentFields {
+export interface DetailResult extends CostDeploymentFields, CombinedCohortFields {
   result_id: string;
   benchmark: string;
   scale_factor: number;
@@ -141,7 +148,7 @@ export interface PercentileStats {
   p99: number;
 }
 
-export interface PlatformRow extends CostDeploymentFields {
+export interface PlatformRow extends CostDeploymentFields, CombinedCohortFields {
   result_id: string;
   short_id: string;
   platform_id: string;

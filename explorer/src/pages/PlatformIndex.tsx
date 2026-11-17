@@ -35,6 +35,8 @@ import {
   normalizePrimaryMetric,
   phaseScoreValue,
   primaryMetricHigherIsBetter,
+  primaryMetricLabel,
+  primaryMetricValue,
   type PrimaryMetric,
 } from "@/lib/displayEligibility";
 import {
@@ -164,9 +166,8 @@ function platformRowsForRequest(rows: PlatformIndexRowRow[], platform: string): 
 }
 
 function trendMetricDescription(metric: TrendMetric): string {
-  if (metric === "power_score") return "Power score (higher is better)";
-  if (metric === "throughput_at_size") return "Throughput@Size (higher is better)";
-  return "Geomean latency (lower is better)";
+  if (metric === "display_geomean_ms") return "Geomean latency (lower is better)";
+  return `${primaryMetricLabel(metric)} (higher is better)`;
 }
 
 function buildVersionCellLabels(rows: readonly PlatformIndexRowRow[]): string[] {
@@ -205,9 +206,8 @@ function primaryMetricRankingValue(row: PlatformIndexRowRow): number | null {
 
 function primaryMetricShort(metric: string): string {
   const normalized = normalizeTrendMetric(metric);
-  if (normalized === "power_score") return "Power score ↑";
-  if (normalized === "throughput_at_size") return "Throughput@Size ↑";
-  return "Geomean ↓";
+  if (normalized === "display_geomean_ms") return "Geomean ↓";
+  return `${primaryMetricLabel(normalized)} ↑`;
 }
 
 function platformTableColumnIndex(column: PlatformTableColumn, showMetricContract: boolean): number {
@@ -1264,9 +1264,7 @@ function normalizeTrendMetric(metric: string): TrendMetric {
 }
 
 function trendValue(row: PlatformIndexRowRow, metric: TrendMetric): number | null {
-  if (metric === "power_score") return row.power_score;
-  if (metric === "throughput_at_size") return row.throughput_at_size ?? null;
-  return row.display_geomean_ms;
+  return primaryMetricValue(row, metric);
 }
 
 function AnalysisMiniFrame({ children }: { children: ComponentChildren }) {

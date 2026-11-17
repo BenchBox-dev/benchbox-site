@@ -10,8 +10,13 @@ import type {
 } from "@/types";
 
 export type EligibilityRow = DetailResult | PlatformRow | MetaCohortPlatform;
-export type PrimaryMetricRow = Pick<PlatformRow, "power_score" | "throughput_at_size" | "display_geomean_ms">;
-export type PrimaryMetric = "power_score" | "throughput_at_size" | "display_geomean_ms";
+export type PrimaryMetricRow = Pick<
+  PlatformRow,
+  "power_score" | "throughput_at_size" | "qphh_at_size" | "qphds_at_size" | "display_geomean_ms"
+>;
+export type CompositeMetric = "qphh_at_size" | "qphds_at_size";
+export type ScoreMetric = "power_score" | "throughput_at_size" | CompositeMetric;
+export type PrimaryMetric = ScoreMetric | "display_geomean_ms";
 export type ChartDatasetEligibilityClass =
   | "display_safe"
   | "rank_safe"
@@ -30,6 +35,8 @@ export interface CompareEvidenceSummary {
 
 const EXCLUSION_LABELS: Record<string, string> = {
   compliance_not_rankable: "This result does not meet the requirements for ranking.",
+  combined_refresh_not_clean: "A refresh or maintenance step failed, so this combined result is not ranked.",
+  combined_throughput_not_clean: "A throughput stream did not complete cleanly, so this combined result is not ranked.",
   display_metric_unavailable: "Display timing is unavailable.",
   failed_queries: "One or more queries failed.",
   hidden_result: "Result is not in the public comparison set.",
@@ -207,8 +214,31 @@ export function summarizeChartDatasetExclusions(
 }
 
 export function normalizePrimaryMetric(metric: string | null | undefined): PrimaryMetric {
-  if (metric === "power_score" || metric === "throughput_at_size") return metric;
+  if (
+    metric === "power_score" ||
+    metric === "throughput_at_size" ||
+    metric === "qphh_at_size" ||
+    metric === "qphds_at_size"
+  ) {
+    return metric;
+  }
   return "display_geomean_ms";
+}
+
+export function isCompositeMetric(metric: PrimaryMetric): metric is CompositeMetric {
+  return metric === "qphh_at_size" || metric === "qphds_at_size";
+}
+
+export function isScoreMetric(metric: PrimaryMetric): metric is ScoreMetric {
+  return metric !== "display_geomean_ms";
+}
+
+export function rankingScoreMetric(metric: PrimaryMetric): ScoreMetric {
+  return isScoreMetric(metric) ? metric : "power_score";
+}
+
+export function secondaryScoreMetrics(metric: PrimaryMetric): ScoreMetric[] {
+  return isCompositeMetric(metric) ? ["power_score", "throughput_at_size"] : [];
 }
 
 export function primaryMetricHigherIsBetter(metric: PrimaryMetric): boolean {
@@ -221,9 +251,17 @@ export function primaryMetricLabel(metric: PrimaryMetric): string {
       return "Power score";
     case "throughput_at_size":
       return "Throughput@Size";
+    case "qphh_at_size":
+      return "QphH@Size";
+    case "qphds_at_size":
+      return "QphDS@SF";
     case "display_geomean_ms":
       return "Geomean query time";
   }
+}
+
+export function secondaryScoreLabel(metric: ScoreMetric): string {
+  return metric === "power_score" ? "Power@Size" : primaryMetricLabel(metric);
 }
 
 export function phaseScoreValue(row: {
@@ -231,8 +269,13 @@ export function phaseScoreValue(row: {
   phase?: string | null;
   power_score: number | null;
   throughput_at_size?: number | null;
+  qphh_at_size?: number | null;
+  qphds_at_size?: number | null;
 }): number | null {
-  return canonicalPhase(row.phase ?? row.test_type) === "throughput" ? (row.throughput_at_size ?? null) : row.power_score;
+  const phase = canonicalPhase(row.phase ?? row.test_type);
+  if (phase === "throughput") return row.throughput_at_size ?? null;
+  if (phase === "combined") return row.qphh_at_size ?? row.qphds_at_size ?? null;
+  return row.power_score;
 }
 
 export function primaryMetricValue(row: PrimaryMetricRow, metric: PrimaryMetric): number | null {
@@ -241,6 +284,10 @@ export function primaryMetricValue(row: PrimaryMetricRow, metric: PrimaryMetric)
       return row.power_score;
     case "throughput_at_size":
       return row.throughput_at_size ?? null;
+    case "qphh_at_size":
+      return row.qphh_at_size ?? null;
+    case "qphds_at_size":
+      return row.qphds_at_size ?? null;
     case "display_geomean_ms":
       return row.display_geomean_ms;
   }

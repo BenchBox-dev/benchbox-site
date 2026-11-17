@@ -44,6 +44,22 @@ const SCORE_DEFINITIONS: Record<PrimaryMetric, ScoreDefinition> = {
     meaning: "Throughput@Size: number of queries run across all streams × scale factor × 3600 divided by the elapsed throughput time, in seconds.",
     href: `${METHODOLOGY_PATH}#when-two-results-are-comparable`,
   },
+  qphh_at_size: {
+    metric: "qphh_at_size",
+    label: "QphH@Size",
+    unit: "composite queries per hour at scale factor size",
+    direction: "higher is better",
+    meaning: "QphH@Size: the square root of Power@Size times Throughput@Size, from a full-specification TPC-H run with refresh functions.",
+    href: `${METHODOLOGY_PATH}#when-two-results-are-comparable`,
+  },
+  qphds_at_size: {
+    metric: "qphds_at_size",
+    label: "QphDS@SF",
+    unit: "composite queries per hour at scale factor",
+    direction: "higher is better",
+    meaning: "QphDS@SF: scale factor × queries run across all streams, divided by the fourth root of the power, throughput, data maintenance and load times, from a full-specification TPC-DS run.",
+    href: `${METHODOLOGY_PATH}#when-two-results-are-comparable`,
+  },
   display_geomean_ms: {
     metric: "display_geomean_ms",
     label: "Geomean query time",
