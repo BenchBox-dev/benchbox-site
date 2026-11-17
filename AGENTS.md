@@ -221,6 +221,9 @@ versioned core bundle; it reads nothing else from core.
   `deploy/README.md` "Snapshot digest"). Never set these variables yourself.
 - A rollback is replaced by the next passing deploy; to hold one, the owner
   follows `deploy/README.md` "Holding a rollback".
+- A rollback reaches back 14 days, the retention of `site-artifact-<run>`.
+  `deploy/README.md` "Artifact retention" lists every reader of the deploy
+  artifacts and their retention.
 
 ## Core and this repository
 

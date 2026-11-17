@@ -66,9 +66,11 @@ when it was first deployed. The links allowance file is not read.
 Core no longer ships `docs` or `downloads` bundle members, and this site
 verifies only bundle schemas 4, 5 and 6. To return to pages from before the
 removal, dispatch a rollback with the `receipt_run_id` of a deploy from before
-it: the run restores that built artifact and needs no bundle. A rebuild from an
-older core revision does not restore them, because the site no longer reads
-those members, and schema 3 bundles are rejected.
+it: the run restores that built artifact and needs no bundle. The artifact
+exists only inside the rollback window (see "Artifact retention"), so a deploy
+from before the removal is out of reach once it is older than that window. A
+rebuild from an older core revision does not restore them, because the site no
+longer reads those members, and schema 3 bundles are rejected.
 
 ## Holding a rollback
 
@@ -98,6 +100,25 @@ variables.
 
 Unsetting the variable before step 2 completes leaves the rollback run
 without a `deploy` job, so nothing is restored.
+
+## Artifact retention
+
+The rollback window is 14 days: a rollback can restore any deploy whose run is
+at most 14 days old. Each deploy run uploads three artifacts, with these
+retentions and readers:
+
+| Artifact | Retention | Readers |
+| --- | --- | --- |
+| `site-artifact-<run>` (about 126 MB) | 14 days | `build` job, step "Restore the receipt's artifact": a rollback downloads the artifact of `receipt_run_id` with `gh run download`. `deploy` job: downloads its own run's artifact moments later. `visual.yml`, step "Download the deployed artifact": downloads the live generation's artifact on each pull request run. `rollback-decision` (the "Dispatch the rollback" step): the automatic rollback targets the previous live generation, whose artifact the rollback run then restores. |
+| `deploy-work-<run>` (about 2 KB) | 14 days | `deploy` job: downloads its own run's work files. A re-run of a failed `deploy` job reads it again, and that re-run also needs `site-artifact-<run>`, so a longer retention than the artifact's would serve no reader. Nothing else reads it; the files are also kept for triage of a failed run. |
+| `site-deploy-receipt-<run>` (under 1 KB) | 90 days | `downloadReceipt` in `deploy/lib/github.ts`, through `resolve`, `recheck`, `deployed` and the rollback lookup, in every `deploy.yml` and `visual.yml` run. Each run reads the receipt of the live generation, which is as old as the last successful deploy, so no run bounds how late it is read. It is kept at 90 days and is too small to matter for storage. |
+
+The live generation's artifact is read by `visual.yml` and by an automatic
+rollback, so both need a successful deploy within the last 14 days. Deploys in
+the 40 days before this window was set were never more than two days apart.
+The `build` job's and the `deploy` job's `npm ci` both run npm and both import
+`parse5` through `deploy/cli.ts`, so both keep the `setup-node` npm cache; the
+other jobs in `deploy.yml` do not restore it.
 
 ## Deployed-generation lookup
 
