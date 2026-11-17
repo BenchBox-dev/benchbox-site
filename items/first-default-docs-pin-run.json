@@ -70,6 +70,17 @@
       "op": "update",
       "op_id": "864932613c8f453ca4aaaa21d71abff0",
       "session_id": "c8eea21eea3644c89311c25d48789197"
+    },
+    {
+      "actor": "mcp:omp:joe@joe-mac-mini.local:9d7b6ea6e6098f3e535a1583",
+      "at": "2026-11-17T21:10:03Z",
+      "client": "omp",
+      "displaced": "mcp:omp-coding-agent:joe@joe-mac-mini.local:4f989261ea761824918fb61e",
+      "generation": "47e71146314a443a81b448040c7bcb7c",
+      "op": "takeover",
+      "op_id": "e6347bc1f9d645928151600053dff60c",
+      "reason": "The earlier MCP session that holds the claim ended; this session completed the release and closes the item.",
+      "session_id": "647d23d47db44da19b09abb0fb3219aa"
     }
   ]
 }

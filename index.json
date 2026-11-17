@@ -574,10 +574,10 @@
     },
     "first-default-docs-pin-run": {
       "claim": {
-        "expires_at": "2026-11-18T15:28:59Z",
-        "generation": "fe1729d73f7b4e4cb915bf025c7f2b20",
+        "expires_at": "2026-11-18T21:10:03Z",
+        "generation": "47e71146314a443a81b448040c7bcb7c",
         "renewals": 0,
-        "worker": "mcp:omp-coding-agent:joe@joe-mac-mini.local:4f989261ea761824918fb61e"
+        "worker": "mcp:omp:joe@joe-mac-mini.local:9d7b6ea6e6098f3e535a1583"
       },
       "needs": [],
       "priority": "medium",
