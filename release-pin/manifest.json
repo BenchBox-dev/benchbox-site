@@ -1,23 +1,23 @@
 {
   "schema": 5,
-  "core_sha": "dfe585e0944ee7a4b0e52da4994f1e1fee6669f1",
-  "package_version": "0.5.0",
-  "certified_by": "42112094059",
-  "corpus_sha": "381b3322aa329bf8c2b3df0392dccae08660371b",
-  "parent_core_sha": "e3b793bdf55a538e06c8dcffd5530fc548fedad9",
+  "core_sha": "91d357a1a2e4a6f327e7f14717c98470e3aa2f79",
+  "package_version": "0.5.1",
+  "certified_by": "43448694521",
+  "corpus_sha": "123334ee7b16206398d47aaa0b897e2090b94396",
+  "parent_core_sha": "960c6922e808b58db777b997a2625c742b2a93a4",
   "parent_source": "bundle",
   "members": {
-    "repo-files.json": "5406e5eb7c41abfbf24a384740ff16c617986a0494b09597fd5a623ba84781f1",
-    "explorer/results.duckdb": "88d98be718e1a6174049c6ef2b0751b4e2752ece792a7be232652a12b49925d2",
+    "repo-files.json": "9c14f1a7a750e145f45ca5bbf6d8639b8cbbd637211f1c040532df5667ad235e",
+    "explorer/results.duckdb": "a6c0bf62fa502c6c8fbcac96ff6b8f918fc5fe3cc48314b1d77921a4ae2b2b00",
     "explorer/contract.json": "f8b4683aec7733e7198777fdca23957009b9320f0336cf756eea14af2e1c5524",
-    "explorer/fixtures": "80ade9381f34fa103c334b3ac33136f36f5fa031bbaea6e93e1d71a1ca739600",
+    "explorer/fixtures": "4947a82cb29b2ce7e5bc0925b548983ba6d80866f8a1252a5247e5152d712bbb",
     "explorer/parity": "210268130b33c24fde73cabf21c3b7ab0a1c81f07e27e090e4c92f4e2e5fbc80",
-    "explorer/bundles": "922ba1cb4e5191eab9b463cadefc5aaa1f7cbc457e410924cbe9a7725a5c5c45",
-    "landing/prompt-catalog.json": "3cfcf3afb12d3dca012edd095ec098dc0d6ba1659c422bba2e14a5d191d9a42e",
+    "explorer/bundles": "48dc6bdfed2a4875715019bc3ec118980cea56498dc320e98054d305ff7e4d91",
+    "landing/prompt-catalog.json": "bfdb79da7835c92795e935dea6e519bbe6452aaeb9eaf5d89852b3b6ed5b66bc",
     "api-public-symbols.json": "a41ccb728ad91fd64a3ba2a626b68052882c38ed24383017a7aaa20b691e2375",
-    "attestations.json": "c117fc7d2c316d9d42a607e6be4553517d78bfdaf86bb56b1f2c572843dd7bf1",
-    "docs-data": "0e758b3a32a4c8edb2c780a7472d806d51a0519f5a6bc550ec23ed1ea760e661",
-    "doc-contracts.json": "ccb5991b9d9bc4d2e97d60e72e57428acf23a115f75b0e779f9134a08061307d"
+    "attestations.json": "5976e401ed03a2da3e37b1600d78111be21a86a28e6b075b496aa868853be236",
+    "docs-data": "b5d5c02cb46e0e57660aebdb63c34d641ea74e5cd48c59ab51cad49f5d8764f2",
+    "doc-contracts.json": "15f01ec77ad8df021977c8b3da8778106666931d48a3cf6c779ba4f8e777f05d"
   },
-  "produced_at": "2026-11-05T21:41:12.875242+00:00"
+  "produced_at": "2026-11-13T15:23:28.157945+00:00"
 }
