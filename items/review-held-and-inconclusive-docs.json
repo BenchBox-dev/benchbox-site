@@ -6,7 +6,7 @@
     "Changes land on main for corrections true at the pinned release, and on next for unreleased behaviour, each by pull request with ci green; after a main merge, main is merged into next and next's unreleased text is checked to have survived (see document-main-removals-reaching-next)",
     "`npm run docs:check -- --docs-mode block` passes on main (pin) and on next (develop bundle)"
   ],
-  "context": "Source: /tmp/docs-audit-2026-11-14.md was a local scratch file and is not durable; the lists above are its content. Relation: if v0.5.1 is pinned first (first-default-docs-pin-run), re-check every passage against v0.5.1 instead of v0.5.0. Guardrails: never revert a correction that was already true at the pinned release; never weaken a docs-contracts check; do not touch blog/ or release-pin/.",
+  "context": "Source: /tmp/docs-audit-2026-11-14.md was a local scratch file and is not durable; the lists above are its content. Relation: if v0.5.1 is pinned first (first-default-docs-pin-run), re-check every passage against v0.5.1 instead of v0.5.0. Guardrails: never revert a correction that was already true at the pinned release; never weaken a docs-contracts check; do not touch blog/ or release-pin/.\n\n2026-11-17 owner decision: settle every passage that has a source answer against core v0.5.1 by evidence; mark unmeasured sizes as estimates; leave pure judgement calls (Snowflake gateway caching and cost advice) unchanged and list them for the owner. Runs after the v0.5.1 release pull request merges, against the v0.5.1 pin.",
   "description": "Problem: the audit of documentation merged after v0.5.0 (pull request #160) removed passages with clear evidence and left others unchanged for the owner. Its independent review added optional findings that were not acted on. Some of these passages are live on main and all of them will go live at the next release unless settled.\n\nInconclusive (from #160): TPC-DS-OBT size rows for scale factors 1 and 10 (which core version produced them); TPC-DI sizes at 0.01, 0.1 and 10, marked 'not measured'; caching and cost advice on platforms/snowflake-gateways.md; the check names and severities table in development/result-integrity-validation.md (spot-checked only); whether CoffeeShop and TPC-DS should list the 0.001 scale row #138 removed; the status matrix saying 17 TPC-DS-OBT queries while the benchmark page says 90 of 99; an ADR that refers to result schema 2.4.\nReview optionals not acted on: size tables on amplab, h2odb, coffeeshop, read-primitives, ssb and tsbs-devops list scale factors `benchbox run` rejects at v0.5.0 with no flag; tpc-ds-obt.md SF 10 row needs a note that only the Python API reaches it; TPC-H RF2 batching figures in the maintenance guide (1,500 keys, ~750x) were never checked; the pull request template does not mention the next into main release pull request.\n\nOutcome: each passage has a recorded verdict, and main and next each state only what is true for the release they document.",
   "links": [
     "https://github.com/BenchBox-dev/benchbox-site/pull/160",
@@ -24,6 +24,14 @@
       "client": "omp-coding-agent",
       "op": "create",
       "op_id": "992c5efd0e9f480b8436a70ce6bb3b41",
+      "session_id": "c8eea21eea3644c89311c25d48789197"
+    },
+    {
+      "actor": "mcp:omp-coding-agent:joe@joe-mac-mini.local:4f989261ea761824918fb61e",
+      "at": "2026-11-17T16:23:22Z",
+      "client": "omp-coding-agent",
+      "op": "update",
+      "op_id": "401cf844a61941ea8c4ba74a5da84b49",
       "session_id": "c8eea21eea3644c89311c25d48789197"
     }
   ]
