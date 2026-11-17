@@ -234,8 +234,6 @@ modes remain available because they do not hold the request for execution.
 | `validate_only` | boolean | No | `false` | Validate platform, benchmark, scale, and mode without executing. |
 | `link_probe` | boolean | No | `true` | Measure post-benchmark statement overhead (6 metered `SELECT 1` statements on billable warehouses). Set `false` to skip; equivalent to the CLI `--no-link-probe` flag. |
 | `platform_options` | object or null | No | `null` | Typed, bounded, non-secret settings approved for the selected platform; credentials, endpoints, paths, and package-install controls are rejected. |
-| `seed` | integer or null | No | `null` | RNG seed for query parameter generation, 0 to 2147483647; equivalent to the CLI `--seed` flag. The effective value is reported in `mcp_metadata.seed`. |
-| `iterations` | integer or null | No | `null` | Power test measurement iterations, at least 1 (the shared default is 3); equivalent to the CLI `--iterations` flag and applies to the power or standard phase. `mcp_metadata.iterations` reports the count the result bundle recorded. Remote servers bound it with `max_iterations`. |
 
 **Behavior:**
 
@@ -262,8 +260,6 @@ modes remain available because they do not hold the request for execution.
 - Under a remote security policy, `allowed_platforms` is matched against the
   platform string exactly as sent. Listing `clickhouse` does not admit
   `clickhouse:server`; list the selector form you want to allow.
-- A billable platform (registry category `cloud` or a managed deployment mode) is refused unless the operator started the server with `BENCHBOX_ACKNOWLEDGE_BILLABLE_PLATFORM=1`. The default allows no billable platform, the variable is read once at server start, and no tool argument, including `platform_options`, can grant it. The refusal is an error response with `error_code` `RESOURCE_ACCESS_DENIED`, returned before any adapter, credential or connection is used. When the operator opts in, the acknowledgement is recorded in the result bundle under `execution.billable_platform_acknowledgement` with source `mcp_server_environment`. See [Billable platforms](cli/run.md#billable-platforms) for the platforms and limits.
-- A run through `run_benchmark` uses the same run configuration as the CLI for the same request. Data compression comes from the saved `output.compression` setting (`benchbox.yaml` in the working directory, then `~/.benchbox/config.yaml`, then the default of `zstd`) and the `BENCHBOX_NO_COMPRESSION` variable, falling back to uncompressed when the codec is unavailable. The registered platform defaults, such as the DuckDB `memory_limit`, are applied and recorded in `config.platform_options`. Bundles from earlier releases recorded `none` compression and the system-profile memory limit; they keep recording that and are not reinterpreted.
 - `mode=data_only` generates benchmark data without running queries. MCP
   accepts this value but `benchbox run --mode` does not: on the CLI, use
   `--phases generate` for the same result. `sql` and `dataframe` select how
@@ -443,6 +439,8 @@ the same three categories as above.
 | `--no-progress` | Omitted | interaction-scoped | Progress bars are terminal presentation; MCP returns structured JSON. |
 | `--quiet` | Omitted | interaction-scoped | Console verbosity control; MCP already suppresses console output. |
 | `--verbose` | Omitted | interaction-scoped | Console verbosity control; MCP response detail is governed by tool schemas. |
+| `--iterations` | Omitted | not-yet-demanded | Repeated power-test measurement is expressible over MCP; no client has demanded it. |
+| `--seed` | Omitted | not-yet-demanded | RNG seed for query parameter generation; bounded integer, no client demand yet. |
 | `--official` | Omitted | not-yet-demanded | TPC official mode is a bounded boolean; it additionally requires `--seed`, so both promote together. |
 | `--compression` | Omitted | not-yet-demanded | Bounded codec enum; no client demand yet. |
 | `--table-format` | Omitted | not-yet-demanded | Bounded table-format spec; no client demand yet. |
