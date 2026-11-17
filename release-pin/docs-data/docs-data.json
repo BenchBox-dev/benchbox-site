@@ -4692,258 +4692,6 @@
         "support_level": "SKIPPED_QUERY"
       },
       {
-        "action": "skip_query",
-        "benchmark": "write_primitives",
-        "failure_mode": "UNSUPPORTED_FEATURE",
-        "phase": "execution_filter",
-        "platform": "duckdb",
-        "query_id": "bulk_load_upsert_mode",
-        "reason": "DuckDB 1.3.2 rejects the catalog's MERGE INTO statements; keep them explicit skips until the bundled driver supports MERGE. Portable merge operations written as UPDATE/INSERT run normally.",
-        "rule_id": "execution_filter.duckdb.write_primitives.bulk_load_upsert_mode",
-        "scope": "benchmark=write_primitives, query=bulk_load_upsert_mode",
-        "support_level": "SKIPPED_QUERY"
-      },
-      {
-        "action": "skip_query",
-        "benchmark": "write_primitives",
-        "failure_mode": "UNSUPPORTED_FEATURE",
-        "phase": "execution_filter",
-        "platform": "duckdb",
-        "query_id": "merge_computed_values",
-        "reason": "DuckDB 1.3.2 rejects the catalog's MERGE INTO statements; keep them explicit skips until the bundled driver supports MERGE. Portable merge operations written as UPDATE/INSERT run normally.",
-        "rule_id": "execution_filter.duckdb.write_primitives.merge_computed_values",
-        "scope": "benchmark=write_primitives, query=merge_computed_values",
-        "support_level": "SKIPPED_QUERY"
-      },
-      {
-        "action": "skip_query",
-        "benchmark": "write_primitives",
-        "failure_mode": "UNSUPPORTED_FEATURE",
-        "phase": "execution_filter",
-        "platform": "duckdb",
-        "query_id": "merge_conditional_insert",
-        "reason": "DuckDB 1.3.2 rejects the catalog's MERGE INTO statements; keep them explicit skips until the bundled driver supports MERGE. Portable merge operations written as UPDATE/INSERT run normally.",
-        "rule_id": "execution_filter.duckdb.write_primitives.merge_conditional_insert",
-        "scope": "benchmark=write_primitives, query=merge_conditional_insert",
-        "support_level": "SKIPPED_QUERY"
-      },
-      {
-        "action": "skip_query",
-        "benchmark": "write_primitives",
-        "failure_mode": "UNSUPPORTED_FEATURE",
-        "phase": "execution_filter",
-        "platform": "duckdb",
-        "query_id": "merge_conditional_update",
-        "reason": "DuckDB 1.3.2 rejects the catalog's MERGE INTO statements; keep them explicit skips until the bundled driver supports MERGE. Portable merge operations written as UPDATE/INSERT run normally.",
-        "rule_id": "execution_filter.duckdb.write_primitives.merge_conditional_update",
-        "scope": "benchmark=write_primitives, query=merge_conditional_update",
-        "support_level": "SKIPPED_QUERY"
-      },
-      {
-        "action": "skip_query",
-        "benchmark": "write_primitives",
-        "failure_mode": "UNSUPPORTED_FEATURE",
-        "phase": "execution_filter",
-        "platform": "duckdb",
-        "query_id": "merge_date_arithmetic",
-        "reason": "DuckDB 1.3.2 rejects the catalog's MERGE INTO statements; keep them explicit skips until the bundled driver supports MERGE. Portable merge operations written as UPDATE/INSERT run normally.",
-        "rule_id": "execution_filter.duckdb.write_primitives.merge_date_arithmetic",
-        "scope": "benchmark=write_primitives, query=merge_date_arithmetic",
-        "support_level": "SKIPPED_QUERY"
-      },
-      {
-        "action": "skip_query",
-        "benchmark": "write_primitives",
-        "failure_mode": "UNSUPPORTED_FEATURE",
-        "phase": "execution_filter",
-        "platform": "duckdb",
-        "query_id": "merge_deduplication_window_function",
-        "reason": "DuckDB 1.3.2 rejects the catalog's MERGE INTO statements; keep them explicit skips until the bundled driver supports MERGE. Portable merge operations written as UPDATE/INSERT run normally.",
-        "rule_id": "execution_filter.duckdb.write_primitives.merge_deduplication_window_function",
-        "scope": "benchmark=write_primitives, query=merge_deduplication_window_function",
-        "support_level": "SKIPPED_QUERY"
-      },
-      {
-        "action": "skip_query",
-        "benchmark": "write_primitives",
-        "failure_mode": "UNSUPPORTED_FEATURE",
-        "phase": "execution_filter",
-        "platform": "duckdb",
-        "query_id": "merge_error_handling",
-        "reason": "DuckDB 1.3.2 rejects the catalog's MERGE INTO statements; keep them explicit skips until the bundled driver supports MERGE. Portable merge operations written as UPDATE/INSERT run normally.",
-        "rule_id": "execution_filter.duckdb.write_primitives.merge_error_handling",
-        "scope": "benchmark=write_primitives, query=merge_error_handling",
-        "support_level": "SKIPPED_QUERY"
-      },
-      {
-        "action": "skip_query",
-        "benchmark": "write_primitives",
-        "failure_mode": "UNSUPPORTED_FEATURE",
-        "phase": "execution_filter",
-        "platform": "duckdb",
-        "query_id": "merge_etl_aggregation_pattern",
-        "reason": "DuckDB 1.3.2 rejects the catalog's MERGE INTO statements; keep them explicit skips until the bundled driver supports MERGE. Portable merge operations written as UPDATE/INSERT run normally.",
-        "rule_id": "execution_filter.duckdb.write_primitives.merge_etl_aggregation_pattern",
-        "scope": "benchmark=write_primitives, query=merge_etl_aggregation_pattern",
-        "support_level": "SKIPPED_QUERY"
-      },
-      {
-        "action": "skip_query",
-        "benchmark": "write_primitives",
-        "failure_mode": "UNSUPPORTED_FEATURE",
-        "phase": "execution_filter",
-        "platform": "duckdb",
-        "query_id": "merge_from_subquery_aggregated",
-        "reason": "DuckDB 1.3.2 rejects the catalog's MERGE INTO statements; keep them explicit skips until the bundled driver supports MERGE. Portable merge operations written as UPDATE/INSERT run normally.",
-        "rule_id": "execution_filter.duckdb.write_primitives.merge_from_subquery_aggregated",
-        "scope": "benchmark=write_primitives, query=merge_from_subquery_aggregated",
-        "support_level": "SKIPPED_QUERY"
-      },
-      {
-        "action": "skip_query",
-        "benchmark": "write_primitives",
-        "failure_mode": "UNSUPPORTED_FEATURE",
-        "phase": "execution_filter",
-        "platform": "duckdb",
-        "query_id": "merge_full_overlap_all_update",
-        "reason": "DuckDB 1.3.2 rejects the catalog's MERGE INTO statements; keep them explicit skips until the bundled driver supports MERGE. Portable merge operations written as UPDATE/INSERT run normally.",
-        "rule_id": "execution_filter.duckdb.write_primitives.merge_full_overlap_all_update",
-        "scope": "benchmark=write_primitives, query=merge_full_overlap_all_update",
-        "support_level": "SKIPPED_QUERY"
-      },
-      {
-        "action": "skip_query",
-        "benchmark": "write_primitives",
-        "failure_mode": "UNSUPPORTED_FEATURE",
-        "phase": "execution_filter",
-        "platform": "duckdb",
-        "query_id": "merge_multi_column_update",
-        "reason": "DuckDB 1.3.2 rejects the catalog's MERGE INTO statements; keep them explicit skips until the bundled driver supports MERGE. Portable merge operations written as UPDATE/INSERT run normally.",
-        "rule_id": "execution_filter.duckdb.write_primitives.merge_multi_column_update",
-        "scope": "benchmark=write_primitives, query=merge_multi_column_update",
-        "support_level": "SKIPPED_QUERY"
-      },
-      {
-        "action": "skip_query",
-        "benchmark": "write_primitives",
-        "failure_mode": "UNSUPPORTED_FEATURE",
-        "phase": "execution_filter",
-        "platform": "duckdb",
-        "query_id": "merge_no_overlap_all_insert",
-        "reason": "DuckDB 1.3.2 rejects the catalog's MERGE INTO statements; keep them explicit skips until the bundled driver supports MERGE. Portable merge operations written as UPDATE/INSERT run normally.",
-        "rule_id": "execution_filter.duckdb.write_primitives.merge_no_overlap_all_insert",
-        "scope": "benchmark=write_primitives, query=merge_no_overlap_all_insert",
-        "support_level": "SKIPPED_QUERY"
-      },
-      {
-        "action": "skip_query",
-        "benchmark": "write_primitives",
-        "failure_mode": "UNSUPPORTED_FEATURE",
-        "phase": "execution_filter",
-        "platform": "duckdb",
-        "query_id": "merge_overlap_10pct",
-        "reason": "DuckDB 1.3.2 rejects the catalog's MERGE INTO statements; keep them explicit skips until the bundled driver supports MERGE. Portable merge operations written as UPDATE/INSERT run normally.",
-        "rule_id": "execution_filter.duckdb.write_primitives.merge_overlap_10pct",
-        "scope": "benchmark=write_primitives, query=merge_overlap_10pct",
-        "support_level": "SKIPPED_QUERY"
-      },
-      {
-        "action": "skip_query",
-        "benchmark": "write_primitives",
-        "failure_mode": "UNSUPPORTED_FEATURE",
-        "phase": "execution_filter",
-        "platform": "duckdb",
-        "query_id": "merge_overlap_50pct",
-        "reason": "DuckDB 1.3.2 rejects the catalog's MERGE INTO statements; keep them explicit skips until the bundled driver supports MERGE. Portable merge operations written as UPDATE/INSERT run normally.",
-        "rule_id": "execution_filter.duckdb.write_primitives.merge_overlap_50pct",
-        "scope": "benchmark=write_primitives, query=merge_overlap_50pct",
-        "support_level": "SKIPPED_QUERY"
-      },
-      {
-        "action": "skip_query",
-        "benchmark": "write_primitives",
-        "failure_mode": "UNSUPPORTED_FEATURE",
-        "phase": "execution_filter",
-        "platform": "duckdb",
-        "query_id": "merge_overlap_90pct",
-        "reason": "DuckDB 1.3.2 rejects the catalog's MERGE INTO statements; keep them explicit skips until the bundled driver supports MERGE. Portable merge operations written as UPDATE/INSERT run normally.",
-        "rule_id": "execution_filter.duckdb.write_primitives.merge_overlap_90pct",
-        "scope": "benchmark=write_primitives, query=merge_overlap_90pct",
-        "support_level": "SKIPPED_QUERY"
-      },
-      {
-        "action": "skip_query",
-        "benchmark": "write_primitives",
-        "failure_mode": "UNSUPPORTED_FEATURE",
-        "phase": "execution_filter",
-        "platform": "duckdb",
-        "query_id": "merge_returning_clause",
-        "reason": "DuckDB 1.3.2 rejects the catalog's MERGE INTO statements; keep them explicit skips until the bundled driver supports MERGE. Portable merge operations written as UPDATE/INSERT run normally.",
-        "rule_id": "execution_filter.duckdb.write_primitives.merge_returning_clause",
-        "scope": "benchmark=write_primitives, query=merge_returning_clause",
-        "support_level": "SKIPPED_QUERY"
-      },
-      {
-        "action": "skip_query",
-        "benchmark": "write_primitives",
-        "failure_mode": "UNSUPPORTED_FEATURE",
-        "phase": "execution_filter",
-        "platform": "duckdb",
-        "query_id": "merge_simple_upsert_small",
-        "reason": "DuckDB 1.3.2 rejects the catalog's MERGE INTO statements; keep them explicit skips until the bundled driver supports MERGE. Portable merge operations written as UPDATE/INSERT run normally.",
-        "rule_id": "execution_filter.duckdb.write_primitives.merge_simple_upsert_small",
-        "scope": "benchmark=write_primitives, query=merge_simple_upsert_small",
-        "support_level": "SKIPPED_QUERY"
-      },
-      {
-        "action": "skip_query",
-        "benchmark": "write_primitives",
-        "failure_mode": "UNSUPPORTED_FEATURE",
-        "phase": "execution_filter",
-        "platform": "duckdb",
-        "query_id": "merge_string_operations",
-        "reason": "DuckDB 1.3.2 rejects the catalog's MERGE INTO statements; keep them explicit skips until the bundled driver supports MERGE. Portable merge operations written as UPDATE/INSERT run normally.",
-        "rule_id": "execution_filter.duckdb.write_primitives.merge_string_operations",
-        "scope": "benchmark=write_primitives, query=merge_string_operations",
-        "support_level": "SKIPPED_QUERY"
-      },
-      {
-        "action": "skip_query",
-        "benchmark": "write_primitives",
-        "failure_mode": "UNSUPPORTED_FEATURE",
-        "phase": "execution_filter",
-        "platform": "duckdb",
-        "query_id": "merge_upsert_with_delete",
-        "reason": "DuckDB 1.3.2 rejects the catalog's MERGE INTO statements; keep them explicit skips until the bundled driver supports MERGE. Portable merge operations written as UPDATE/INSERT run normally.",
-        "rule_id": "execution_filter.duckdb.write_primitives.merge_upsert_with_delete",
-        "scope": "benchmark=write_primitives, query=merge_upsert_with_delete",
-        "support_level": "SKIPPED_QUERY"
-      },
-      {
-        "action": "skip_query",
-        "benchmark": "write_primitives",
-        "failure_mode": "UNSUPPORTED_FEATURE",
-        "phase": "execution_filter",
-        "platform": "duckdb",
-        "query_id": "merge_with_cte_source",
-        "reason": "DuckDB 1.3.2 rejects the catalog's MERGE INTO statements; keep them explicit skips until the bundled driver supports MERGE. Portable merge operations written as UPDATE/INSERT run normally.",
-        "rule_id": "execution_filter.duckdb.write_primitives.merge_with_cte_source",
-        "scope": "benchmark=write_primitives, query=merge_with_cte_source",
-        "support_level": "SKIPPED_QUERY"
-      },
-      {
-        "action": "skip_query",
-        "benchmark": "write_primitives",
-        "failure_mode": "UNSUPPORTED_FEATURE",
-        "phase": "execution_filter",
-        "platform": "duckdb",
-        "query_id": "merge_with_join_condition",
-        "reason": "DuckDB 1.3.2 rejects the catalog's MERGE INTO statements; keep them explicit skips until the bundled driver supports MERGE. Portable merge operations written as UPDATE/INSERT run normally.",
-        "rule_id": "execution_filter.duckdb.write_primitives.merge_with_join_condition",
-        "scope": "benchmark=write_primitives, query=merge_with_join_condition",
-        "support_level": "SKIPPED_QUERY"
-      },
-      {
         "action": "rewrite_ddl",
         "benchmark": "transaction_primitives",
         "failure_mode": "SYNTAX_ERROR",
@@ -16115,7 +15863,7 @@
         "tpc_derived": false
       },
       {
-        "default_scale": 0.001,
+        "default_scale": 0.01,
         "display_name": "CoffeeShop",
         "groups": null,
         "id": "coffeeshop",
@@ -17444,12 +17192,12 @@
             "answer_set_note": null,
             "dataframe": {
               "family": "expression",
-              "source": "def q21_expression_impl(ctx: DataFrameContext) -> Any:\n\n    params = get_parameters(\"Q21\")\n    col, lit = ctx.col, ctx.lit\n    nation = params.get(\"nation\", \"SAUDI ARABIA\")\n\n    ss = _strip_audit_columns(ctx.get_table(\"sat_supplier\").filter(col(\"load_end_dts\").is_null()))\n    ll = _strip_audit_columns(ctx.get_table(\"link_lineitem\"))\n    sl = _strip_audit_columns(ctx.get_table(\"sat_lineitem\").filter(col(\"load_end_dts\").is_null()))\n    so = _strip_audit_columns(ctx.get_table(\"sat_order\").filter(col(\"load_end_dts\").is_null()))\n    lsn = _strip_audit_columns(ctx.get_table(\"link_supplier_nation\"))\n    sn = _strip_audit_columns(ctx.get_table(\"sat_nation\").filter(col(\"load_end_dts\").is_null()))\n\n    li = ll.join(sl, left_on=\"hk_lineitem_link\", right_on=\"hk_lineitem_link\")\n    late_li = li.filter(col(\"l_receiptdate\") > col(\"l_commitdate\"))\n\n    failed_orders = so.filter(col(\"o_orderstatus\") == lit(\"F\")).select(\"hk_order\")\n\n    supp_nation = (\n        ss.join(lsn, left_on=\"hk_supplier\", right_on=\"hk_supplier\")\n        .join(sn, left_on=\"hk_nation\", right_on=\"hk_nation\")\n        .filter(col(\"n_name\") == lit(nation))\n    )\n\n    l1 = late_li.join(failed_orders, left_on=\"hk_order\", right_on=\"hk_order\")\n\n    order_suppliers = li.group_by(\"hk_order\").agg(col(\"hk_supplier\").n_unique().alias(\"n_suppliers\"))\n    order_late_suppliers = late_li.group_by(\"hk_order\").agg(col(\"hk_supplier\").n_unique().alias(\"n_late\"))\n\n    df = (\n        l1.join(supp_nation, left_on=\"hk_supplier\", right_on=\"hk_supplier\")\n        .join(order_suppliers, left_on=\"hk_order\", right_on=\"hk_order\")\n        .filter(col(\"n_suppliers\") > lit(1))\n        .join(order_late_suppliers, left_on=\"hk_order\", right_on=\"hk_order\")\n        .filter(col(\"n_late\") == lit(1))\n    )\n\n    result = df.group_by(\"s_name\").agg(col(\"hk_order\").count().alias(\"numwait\"))\n    return result.sort([(\"numwait\", \"desc\"), (\"s_name\", \"asc\")]).limit(100)"
+              "source": "def q21_expression_impl(ctx: DataFrameContext) -> Any:\n\n    params = get_parameters(\"Q21\")\n    col, lit = ctx.col, ctx.lit\n    nation = params.get(\"nation\", \"SAUDI ARABIA\")\n\n    ss = _strip_audit_columns(ctx.get_table(\"sat_supplier\").filter(col(\"load_end_dts\").is_null()))\n    ll = _strip_audit_columns(ctx.get_table(\"link_lineitem\"))\n    sl = _strip_audit_columns(ctx.get_table(\"sat_lineitem\").filter(col(\"load_end_dts\").is_null()))\n    so = _strip_audit_columns(ctx.get_table(\"sat_order\").filter(col(\"load_end_dts\").is_null()))\n    lsn = _strip_audit_columns(ctx.get_table(\"link_supplier_nation\"))\n    sn = _strip_audit_columns(ctx.get_table(\"sat_nation\").filter(col(\"load_end_dts\").is_null()))\n\n    li = ll.join(sl, left_on=\"hk_lineitem_link\", right_on=\"hk_lineitem_link\")\n    late_li = li.filter(col(\"l_receiptdate\") > col(\"l_commitdate\"))\n\n    failed_orders = so.filter(col(\"o_orderstatus\") == lit(\"F\")).select(\"hk_order\")\n\n    supp_nation = (\n        ss.join(lsn, left_on=\"hk_supplier\", right_on=\"hk_supplier\")\n        .join(sn, left_on=\"hk_nation\", right_on=\"hk_nation\")\n        .filter(col(\"n_name\") == lit(nation))\n    )\n\n    l1 = late_li.join(failed_orders, left_on=\"hk_order\", right_on=\"hk_order\")\n\n    order_suppliers = li.group_by(\"hk_order\").agg(\n        col(\"hk_supplier\").min().alias(\"min_supp\"), col(\"hk_supplier\").max().alias(\"max_supp\")\n    )\n    order_late_suppliers = late_li.group_by(\"hk_order\").agg(\n        col(\"hk_supplier\").min().alias(\"min_late_supp\"), col(\"hk_supplier\").max().alias(\"max_late_supp\")\n    )\n\n    df = (\n        l1.join(supp_nation, left_on=\"hk_supplier\", right_on=\"hk_supplier\")\n        .join(order_suppliers, left_on=\"hk_order\", right_on=\"hk_order\")\n        .filter(col(\"min_supp\") != col(\"max_supp\"))\n        .join(order_late_suppliers, left_on=\"hk_order\", right_on=\"hk_order\")\n        .filter(col(\"min_late_supp\") == col(\"max_late_supp\"))\n    )\n\n    result = df.group_by(\"s_name\").agg(col(\"hk_order\").count().alias(\"numwait\"))\n    return result.sort([(\"numwait\", \"desc\"), (\"s_name\", \"asc\")]).limit(100)"
             },
             "dataframe_renderings": [
               {
                 "family": "expression",
-                "source": "def q21_expression_impl(ctx: DataFrameContext) -> Any:\n\n    params = get_parameters(\"Q21\")\n    col, lit = ctx.col, ctx.lit\n    nation = params.get(\"nation\", \"SAUDI ARABIA\")\n\n    ss = _strip_audit_columns(ctx.get_table(\"sat_supplier\").filter(col(\"load_end_dts\").is_null()))\n    ll = _strip_audit_columns(ctx.get_table(\"link_lineitem\"))\n    sl = _strip_audit_columns(ctx.get_table(\"sat_lineitem\").filter(col(\"load_end_dts\").is_null()))\n    so = _strip_audit_columns(ctx.get_table(\"sat_order\").filter(col(\"load_end_dts\").is_null()))\n    lsn = _strip_audit_columns(ctx.get_table(\"link_supplier_nation\"))\n    sn = _strip_audit_columns(ctx.get_table(\"sat_nation\").filter(col(\"load_end_dts\").is_null()))\n\n    li = ll.join(sl, left_on=\"hk_lineitem_link\", right_on=\"hk_lineitem_link\")\n    late_li = li.filter(col(\"l_receiptdate\") > col(\"l_commitdate\"))\n\n    failed_orders = so.filter(col(\"o_orderstatus\") == lit(\"F\")).select(\"hk_order\")\n\n    supp_nation = (\n        ss.join(lsn, left_on=\"hk_supplier\", right_on=\"hk_supplier\")\n        .join(sn, left_on=\"hk_nation\", right_on=\"hk_nation\")\n        .filter(col(\"n_name\") == lit(nation))\n    )\n\n    l1 = late_li.join(failed_orders, left_on=\"hk_order\", right_on=\"hk_order\")\n\n    order_suppliers = li.group_by(\"hk_order\").agg(col(\"hk_supplier\").n_unique().alias(\"n_suppliers\"))\n    order_late_suppliers = late_li.group_by(\"hk_order\").agg(col(\"hk_supplier\").n_unique().alias(\"n_late\"))\n\n    df = (\n        l1.join(supp_nation, left_on=\"hk_supplier\", right_on=\"hk_supplier\")\n        .join(order_suppliers, left_on=\"hk_order\", right_on=\"hk_order\")\n        .filter(col(\"n_suppliers\") > lit(1))\n        .join(order_late_suppliers, left_on=\"hk_order\", right_on=\"hk_order\")\n        .filter(col(\"n_late\") == lit(1))\n    )\n\n    result = df.group_by(\"s_name\").agg(col(\"hk_order\").count().alias(\"numwait\"))\n    return result.sort([(\"numwait\", \"desc\"), (\"s_name\", \"asc\")]).limit(100)"
+                "source": "def q21_expression_impl(ctx: DataFrameContext) -> Any:\n\n    params = get_parameters(\"Q21\")\n    col, lit = ctx.col, ctx.lit\n    nation = params.get(\"nation\", \"SAUDI ARABIA\")\n\n    ss = _strip_audit_columns(ctx.get_table(\"sat_supplier\").filter(col(\"load_end_dts\").is_null()))\n    ll = _strip_audit_columns(ctx.get_table(\"link_lineitem\"))\n    sl = _strip_audit_columns(ctx.get_table(\"sat_lineitem\").filter(col(\"load_end_dts\").is_null()))\n    so = _strip_audit_columns(ctx.get_table(\"sat_order\").filter(col(\"load_end_dts\").is_null()))\n    lsn = _strip_audit_columns(ctx.get_table(\"link_supplier_nation\"))\n    sn = _strip_audit_columns(ctx.get_table(\"sat_nation\").filter(col(\"load_end_dts\").is_null()))\n\n    li = ll.join(sl, left_on=\"hk_lineitem_link\", right_on=\"hk_lineitem_link\")\n    late_li = li.filter(col(\"l_receiptdate\") > col(\"l_commitdate\"))\n\n    failed_orders = so.filter(col(\"o_orderstatus\") == lit(\"F\")).select(\"hk_order\")\n\n    supp_nation = (\n        ss.join(lsn, left_on=\"hk_supplier\", right_on=\"hk_supplier\")\n        .join(sn, left_on=\"hk_nation\", right_on=\"hk_nation\")\n        .filter(col(\"n_name\") == lit(nation))\n    )\n\n    l1 = late_li.join(failed_orders, left_on=\"hk_order\", right_on=\"hk_order\")\n\n    order_suppliers = li.group_by(\"hk_order\").agg(\n        col(\"hk_supplier\").min().alias(\"min_supp\"), col(\"hk_supplier\").max().alias(\"max_supp\")\n    )\n    order_late_suppliers = late_li.group_by(\"hk_order\").agg(\n        col(\"hk_supplier\").min().alias(\"min_late_supp\"), col(\"hk_supplier\").max().alias(\"max_late_supp\")\n    )\n\n    df = (\n        l1.join(supp_nation, left_on=\"hk_supplier\", right_on=\"hk_supplier\")\n        .join(order_suppliers, left_on=\"hk_order\", right_on=\"hk_order\")\n        .filter(col(\"min_supp\") != col(\"max_supp\"))\n        .join(order_late_suppliers, left_on=\"hk_order\", right_on=\"hk_order\")\n        .filter(col(\"min_late_supp\") == col(\"max_late_supp\"))\n    )\n\n    result = df.group_by(\"s_name\").agg(col(\"hk_order\").count().alias(\"numwait\"))\n    return result.sort([(\"numwait\", \"desc\"), (\"s_name\", \"asc\")]).limit(100)"
               },
               {
                 "family": "pandas",
@@ -31228,8 +30976,8 @@
             "sql": {
               "dialect": "datafusion",
               "is_template": false,
-              "pretty_sql": "SELECT\n  c_custkey,\n  c_name,\n  o_orderkey,\n  o_orderdate,\n  o_totalprice,\n  order_rank\nFROM (\n  SELECT\n    c_custkey,\n    c_name,\n    o_orderkey,\n    o_orderdate,\n    o_totalprice,\n    ROW_NUMBER() OVER (PARTITION BY c_custkey ORDER BY o_totalprice DESC) AS order_rank,\n    ROW_NUMBER() OVER (PARTITION BY c_custkey ORDER BY o_totalprice DESC) AS _w\n  FROM customer AS c\n  JOIN orders AS o\n    ON c.c_custkey = o.o_custkey\n  WHERE\n    o_orderdate >= CAST('1995-01-01' AS DATE)\n  ORDER BY\n    c_custkey,\n    order_rank\n) AS _t\nWHERE\n  _w <= 3",
-              "sql": "SELECT c_custkey, c_name, o_orderkey, o_orderdate, o_totalprice, order_rank FROM (SELECT c_custkey, c_name, o_orderkey, o_orderdate, o_totalprice, ROW_NUMBER() OVER (PARTITION BY c_custkey ORDER BY o_totalprice DESC) AS order_rank, ROW_NUMBER() OVER (PARTITION BY c_custkey ORDER BY o_totalprice DESC) AS _w FROM customer AS c JOIN orders AS o ON c.c_custkey = o.o_custkey WHERE o_orderdate >= CAST('1995-01-01' AS DATE) ORDER BY c_custkey, order_rank) AS _t WHERE _w <= 3"
+              "pretty_sql": "SELECT\n  c_custkey,\n  c_name,\n  o_orderkey,\n  o_orderdate,\n  o_totalprice,\n  order_rank\nFROM (\n  SELECT\n    c_custkey,\n    c_name,\n    o_orderkey,\n    o_orderdate,\n    o_totalprice,\n    ROW_NUMBER() OVER (PARTITION BY c_custkey ORDER BY o_totalprice DESC) AS order_rank,\n    ROW_NUMBER() OVER (PARTITION BY c_custkey ORDER BY o_totalprice DESC) AS _w\n  FROM customer AS c\n  JOIN orders AS o\n    ON c.c_custkey = o.o_custkey\n  WHERE\n    o_orderdate >= CAST('1995-01-01' AS DATE)\n) AS _t\nWHERE\n  _w <= 3\nORDER BY\n  c_custkey,\n  order_rank",
+              "sql": "SELECT c_custkey, c_name, o_orderkey, o_orderdate, o_totalprice, order_rank FROM (SELECT c_custkey, c_name, o_orderkey, o_orderdate, o_totalprice, ROW_NUMBER() OVER (PARTITION BY c_custkey ORDER BY o_totalprice DESC) AS order_rank, ROW_NUMBER() OVER (PARTITION BY c_custkey ORDER BY o_totalprice DESC) AS _w FROM customer AS c JOIN orders AS o ON c.c_custkey = o.o_custkey WHERE o_orderdate >= CAST('1995-01-01' AS DATE)) AS _t WHERE _w <= 3 ORDER BY c_custkey, order_rank"
             },
             "sql_native": {
               "dialect": "default",
@@ -31272,8 +31020,8 @@
             "sql": {
               "dialect": "datafusion",
               "is_template": false,
-              "pretty_sql": "SELECT\n  p_type,\n  p_name,\n  p_retailprice,\n  price_rank\nFROM (\n  SELECT\n    p_type,\n    p_name,\n    p_retailprice,\n    DENSE_RANK() OVER (PARTITION BY p_type ORDER BY p_retailprice DESC) AS price_rank,\n    DENSE_RANK() OVER (PARTITION BY p_type ORDER BY p_retailprice DESC) AS _w\n  FROM part\n  ORDER BY\n    p_type,\n    price_rank,\n    p_name\n) AS _t\nWHERE\n  _w <= 2",
-              "sql": "SELECT p_type, p_name, p_retailprice, price_rank FROM (SELECT p_type, p_name, p_retailprice, DENSE_RANK() OVER (PARTITION BY p_type ORDER BY p_retailprice DESC) AS price_rank, DENSE_RANK() OVER (PARTITION BY p_type ORDER BY p_retailprice DESC) AS _w FROM part ORDER BY p_type, price_rank, p_name) AS _t WHERE _w <= 2"
+              "pretty_sql": "SELECT\n  p_type,\n  p_name,\n  p_retailprice,\n  price_rank\nFROM (\n  SELECT\n    p_type,\n    p_name,\n    p_retailprice,\n    DENSE_RANK() OVER (PARTITION BY p_type ORDER BY p_retailprice DESC) AS price_rank,\n    DENSE_RANK() OVER (PARTITION BY p_type ORDER BY p_retailprice DESC) AS _w\n  FROM part\n) AS _t\nWHERE\n  _w <= 2\nORDER BY\n  p_type,\n  price_rank,\n  p_name",
+              "sql": "SELECT p_type, p_name, p_retailprice, price_rank FROM (SELECT p_type, p_name, p_retailprice, DENSE_RANK() OVER (PARTITION BY p_type ORDER BY p_retailprice DESC) AS price_rank, DENSE_RANK() OVER (PARTITION BY p_type ORDER BY p_retailprice DESC) AS _w FROM part) AS _t WHERE _w <= 2 ORDER BY p_type, price_rank, p_name"
             },
             "sql_native": {
               "dialect": "default",
@@ -31316,8 +31064,8 @@
             "sql": {
               "dialect": "datafusion",
               "is_template": false,
-              "pretty_sql": "SELECT\n  o_orderpriority,\n  o_orderkey,\n  o_totalprice,\n  price_percentile\nFROM (\n  SELECT\n    o_orderpriority,\n    o_orderkey,\n    o_totalprice,\n    PERCENT_RANK() OVER (PARTITION BY o_orderpriority ORDER BY o_totalprice) AS price_percentile,\n    PERCENT_RANK() OVER (PARTITION BY o_orderpriority ORDER BY o_totalprice) AS _w\n  FROM orders\n  WHERE\n    o_orderdate >= CAST('1995-01-01' AS DATE)\n  ORDER BY\n    o_orderpriority,\n    o_totalprice DESC\n) AS _t\nWHERE\n  _w >= 0.9",
-              "sql": "SELECT o_orderpriority, o_orderkey, o_totalprice, price_percentile FROM (SELECT o_orderpriority, o_orderkey, o_totalprice, PERCENT_RANK() OVER (PARTITION BY o_orderpriority ORDER BY o_totalprice) AS price_percentile, PERCENT_RANK() OVER (PARTITION BY o_orderpriority ORDER BY o_totalprice) AS _w FROM orders WHERE o_orderdate >= CAST('1995-01-01' AS DATE) ORDER BY o_orderpriority, o_totalprice DESC) AS _t WHERE _w >= 0.9"
+              "pretty_sql": "SELECT\n  o_orderpriority,\n  o_orderkey,\n  o_totalprice,\n  price_percentile\nFROM (\n  SELECT\n    o_orderpriority,\n    o_orderkey,\n    o_totalprice,\n    PERCENT_RANK() OVER (PARTITION BY o_orderpriority ORDER BY o_totalprice) AS price_percentile,\n    PERCENT_RANK() OVER (PARTITION BY o_orderpriority ORDER BY o_totalprice) AS _w\n  FROM orders\n  WHERE\n    o_orderdate >= CAST('1995-01-01' AS DATE)\n) AS _t\nWHERE\n  _w >= 0.9\nORDER BY\n  o_orderpriority,\n  o_totalprice DESC",
+              "sql": "SELECT o_orderpriority, o_orderkey, o_totalprice, price_percentile FROM (SELECT o_orderpriority, o_orderkey, o_totalprice, PERCENT_RANK() OVER (PARTITION BY o_orderpriority ORDER BY o_totalprice) AS price_percentile, PERCENT_RANK() OVER (PARTITION BY o_orderpriority ORDER BY o_totalprice) AS _w FROM orders WHERE o_orderdate >= CAST('1995-01-01' AS DATE)) AS _t WHERE _w >= 0.9 ORDER BY o_orderpriority, o_totalprice DESC"
             },
             "sql_native": {
               "dialect": "default",
@@ -31360,8 +31108,8 @@
             "sql": {
               "dialect": "datafusion",
               "is_template": false,
-              "pretty_sql": "SELECT\n  c_mktsegment,\n  o_orderkey,\n  o_totalprice,\n  quartile\nFROM (\n  SELECT\n    c_mktsegment,\n    o_orderkey,\n    o_totalprice,\n    NTILE(4) OVER (PARTITION BY c_mktsegment ORDER BY o_totalprice, o_orderkey) AS quartile,\n    NTILE(4) OVER (PARTITION BY c_mktsegment ORDER BY o_totalprice, o_orderkey) AS _w\n  FROM orders AS o\n  JOIN customer AS c\n    ON o.o_custkey = c.c_custkey\n  WHERE\n    o_orderdate >= CAST('1995-01-01' AS DATE)\n  ORDER BY\n    c_mktsegment,\n    o_totalprice DESC,\n    o_orderkey DESC\n) AS _t\nWHERE\n  _w = 4",
-              "sql": "SELECT c_mktsegment, o_orderkey, o_totalprice, quartile FROM (SELECT c_mktsegment, o_orderkey, o_totalprice, NTILE(4) OVER (PARTITION BY c_mktsegment ORDER BY o_totalprice, o_orderkey) AS quartile, NTILE(4) OVER (PARTITION BY c_mktsegment ORDER BY o_totalprice, o_orderkey) AS _w FROM orders AS o JOIN customer AS c ON o.o_custkey = c.c_custkey WHERE o_orderdate >= CAST('1995-01-01' AS DATE) ORDER BY c_mktsegment, o_totalprice DESC, o_orderkey DESC) AS _t WHERE _w = 4"
+              "pretty_sql": "SELECT\n  c_mktsegment,\n  o_orderkey,\n  o_totalprice,\n  quartile\nFROM (\n  SELECT\n    c_mktsegment,\n    o_orderkey,\n    o_totalprice,\n    NTILE(4) OVER (PARTITION BY c_mktsegment ORDER BY o_totalprice, o_orderkey) AS quartile,\n    NTILE(4) OVER (PARTITION BY c_mktsegment ORDER BY o_totalprice, o_orderkey) AS _w\n  FROM orders AS o\n  JOIN customer AS c\n    ON o.o_custkey = c.c_custkey\n  WHERE\n    o_orderdate >= CAST('1995-01-01' AS DATE)\n) AS _t\nWHERE\n  _w = 4\nORDER BY\n  c_mktsegment,\n  o_totalprice DESC,\n  o_orderkey DESC",
+              "sql": "SELECT c_mktsegment, o_orderkey, o_totalprice, quartile FROM (SELECT c_mktsegment, o_orderkey, o_totalprice, NTILE(4) OVER (PARTITION BY c_mktsegment ORDER BY o_totalprice, o_orderkey) AS quartile, NTILE(4) OVER (PARTITION BY c_mktsegment ORDER BY o_totalprice, o_orderkey) AS _w FROM orders AS o JOIN customer AS c ON o.o_custkey = c.c_custkey WHERE o_orderdate >= CAST('1995-01-01' AS DATE)) AS _t WHERE _w = 4 ORDER BY c_mktsegment, o_totalprice DESC, o_orderkey DESC"
             },
             "sql_native": {
               "dialect": "default",
@@ -31404,8 +31152,8 @@
             "sql": {
               "dialect": "datafusion",
               "is_template": false,
-              "pretty_sql": "SELECT\n  l_shipdate,\n  l_orderkey,\n  l_linenumber,\n  l_quantity,\n  quantity_cumulative_dist\nFROM (\n  SELECT\n    l_shipdate,\n    l_orderkey,\n    l_linenumber,\n    l_quantity,\n    CUME_DIST() OVER (PARTITION BY l_shipdate ORDER BY l_quantity) AS quantity_cumulative_dist,\n    CUME_DIST() OVER (PARTITION BY l_shipdate ORDER BY l_quantity) AS _w\n  FROM lineitem\n  WHERE\n    l_shipdate >= CAST('1995-01-01' AS DATE)\n    AND l_shipdate < CAST('1996-01-01' AS DATE)\n  ORDER BY\n    l_shipdate,\n    l_quantity DESC,\n    l_orderkey,\n    l_linenumber\n) AS _t\nWHERE\n  _w >= 0.95",
-              "sql": "SELECT l_shipdate, l_orderkey, l_linenumber, l_quantity, quantity_cumulative_dist FROM (SELECT l_shipdate, l_orderkey, l_linenumber, l_quantity, CUME_DIST() OVER (PARTITION BY l_shipdate ORDER BY l_quantity) AS quantity_cumulative_dist, CUME_DIST() OVER (PARTITION BY l_shipdate ORDER BY l_quantity) AS _w FROM lineitem WHERE l_shipdate >= CAST('1995-01-01' AS DATE) AND l_shipdate < CAST('1996-01-01' AS DATE) ORDER BY l_shipdate, l_quantity DESC, l_orderkey, l_linenumber) AS _t WHERE _w >= 0.95"
+              "pretty_sql": "SELECT\n  l_shipdate,\n  l_orderkey,\n  l_linenumber,\n  l_quantity,\n  quantity_cumulative_dist\nFROM (\n  SELECT\n    l_shipdate,\n    l_orderkey,\n    l_linenumber,\n    l_quantity,\n    CUME_DIST() OVER (PARTITION BY l_shipdate ORDER BY l_quantity) AS quantity_cumulative_dist,\n    CUME_DIST() OVER (PARTITION BY l_shipdate ORDER BY l_quantity) AS _w\n  FROM lineitem\n  WHERE\n    l_shipdate >= CAST('1995-01-01' AS DATE)\n    AND l_shipdate < CAST('1996-01-01' AS DATE)\n) AS _t\nWHERE\n  _w >= 0.95\nORDER BY\n  l_shipdate,\n  l_quantity DESC,\n  l_orderkey,\n  l_linenumber",
+              "sql": "SELECT l_shipdate, l_orderkey, l_linenumber, l_quantity, quantity_cumulative_dist FROM (SELECT l_shipdate, l_orderkey, l_linenumber, l_quantity, CUME_DIST() OVER (PARTITION BY l_shipdate ORDER BY l_quantity) AS quantity_cumulative_dist, CUME_DIST() OVER (PARTITION BY l_shipdate ORDER BY l_quantity) AS _w FROM lineitem WHERE l_shipdate >= CAST('1995-01-01' AS DATE) AND l_shipdate < CAST('1996-01-01' AS DATE)) AS _t WHERE _w >= 0.95 ORDER BY l_shipdate, l_quantity DESC, l_orderkey, l_linenumber"
             },
             "sql_native": {
               "dialect": "default",
@@ -31448,8 +31196,8 @@
             "sql": {
               "dialect": "datafusion",
               "is_template": false,
-              "pretty_sql": "SELECT\n  c_custkey,\n  c_name,\n  o_orderkey,\n  o_orderdate,\n  o_totalprice,\n  prev_order_price\nFROM (\n  SELECT\n    c_custkey,\n    c_name,\n    o_orderkey,\n    o_orderdate,\n    o_totalprice,\n    LAG(o_totalprice) OVER (PARTITION BY c_custkey ORDER BY o_orderdate, o_orderkey) AS prev_order_price,\n    LAG(o_totalprice) OVER (PARTITION BY c_custkey ORDER BY o_orderdate, o_orderkey) AS _w\n  FROM customer AS c\n  JOIN orders AS o\n    ON c.c_custkey = o.o_custkey\n  WHERE\n    o_orderdate >= CAST('1995-01-01' AS DATE)\n  ORDER BY\n    c_custkey,\n    o_orderdate,\n    o_orderkey\n) AS _t\nWHERE\n  o_totalprice > _w",
-              "sql": "SELECT c_custkey, c_name, o_orderkey, o_orderdate, o_totalprice, prev_order_price FROM (SELECT c_custkey, c_name, o_orderkey, o_orderdate, o_totalprice, LAG(o_totalprice) OVER (PARTITION BY c_custkey ORDER BY o_orderdate, o_orderkey) AS prev_order_price, LAG(o_totalprice) OVER (PARTITION BY c_custkey ORDER BY o_orderdate, o_orderkey) AS _w FROM customer AS c JOIN orders AS o ON c.c_custkey = o.o_custkey WHERE o_orderdate >= CAST('1995-01-01' AS DATE) ORDER BY c_custkey, o_orderdate, o_orderkey) AS _t WHERE o_totalprice > _w"
+              "pretty_sql": "SELECT\n  c_custkey,\n  c_name,\n  o_orderkey,\n  o_orderdate,\n  o_totalprice,\n  prev_order_price\nFROM (\n  SELECT\n    c_custkey,\n    c_name,\n    o_orderkey,\n    o_orderdate,\n    o_totalprice,\n    LAG(o_totalprice) OVER (PARTITION BY c_custkey ORDER BY o_orderdate, o_orderkey) AS prev_order_price,\n    LAG(o_totalprice) OVER (PARTITION BY c_custkey ORDER BY o_orderdate, o_orderkey) AS _w\n  FROM customer AS c\n  JOIN orders AS o\n    ON c.c_custkey = o.o_custkey\n  WHERE\n    o_orderdate >= CAST('1995-01-01' AS DATE)\n) AS _t\nWHERE\n  o_totalprice > _w\nORDER BY\n  c_custkey,\n  o_orderdate,\n  o_orderkey",
+              "sql": "SELECT c_custkey, c_name, o_orderkey, o_orderdate, o_totalprice, prev_order_price FROM (SELECT c_custkey, c_name, o_orderkey, o_orderdate, o_totalprice, LAG(o_totalprice) OVER (PARTITION BY c_custkey ORDER BY o_orderdate, o_orderkey) AS prev_order_price, LAG(o_totalprice) OVER (PARTITION BY c_custkey ORDER BY o_orderdate, o_orderkey) AS _w FROM customer AS c JOIN orders AS o ON c.c_custkey = o.o_custkey WHERE o_orderdate >= CAST('1995-01-01' AS DATE)) AS _t WHERE o_totalprice > _w ORDER BY c_custkey, o_orderdate, o_orderkey"
             },
             "sql_native": {
               "dialect": "default",
@@ -32668,16 +32416,16 @@
             "answer_set_note": null,
             "dataframe": {
               "family": "expression",
-              "source": "def struct_construction_expression_impl(ctx: DataFrameContext) -> Any:\n    if _is_datafusion_context(ctx):\n        from benchbox.core.read_primitives.datafusion_queries import struct_construction\n\n        return struct_construction(ctx)\n\n    import polars as pl\n\n    return (\n        ctx.get_table(\"customer\")\n        .native.filter(pl.col(\"c_nationkey\") == 1)\n        .sort(\"c_custkey\")\n        .select(\n            \"c_custkey\",\n            pl.concat_list([pl.col(\"c_name\"), pl.col(\"c_address\"), pl.col(\"c_phone\")]).alias(\"contact_info\"),\n            \"c_acctbal\",\n        )\n        .limit(100)\n    )"
+              "source": "def struct_construction_expression_impl(ctx: DataFrameContext) -> Any:\n    if _is_datafusion_context(ctx):\n        from benchbox.core.read_primitives.datafusion_queries import struct_construction\n\n        return struct_construction(ctx)\n\n    import polars as pl\n\n    return (\n        ctx.get_table(\"customer\")\n        .native.filter(pl.col(\"c_nationkey\") == 1)\n        .sort(\"c_custkey\")\n        .select(\n            \"c_custkey\",\n            pl.struct([pl.col(\"c_name\"), pl.col(\"c_address\"), pl.col(\"c_phone\")]).alias(\"contact_info\"),\n            \"c_acctbal\",\n        )\n        .limit(100)\n    )"
             },
             "dataframe_renderings": [
               {
                 "family": "expression",
-                "source": "def struct_construction_expression_impl(ctx: DataFrameContext) -> Any:\n    if _is_datafusion_context(ctx):\n        from benchbox.core.read_primitives.datafusion_queries import struct_construction\n\n        return struct_construction(ctx)\n\n    import polars as pl\n\n    return (\n        ctx.get_table(\"customer\")\n        .native.filter(pl.col(\"c_nationkey\") == 1)\n        .sort(\"c_custkey\")\n        .select(\n            \"c_custkey\",\n            pl.concat_list([pl.col(\"c_name\"), pl.col(\"c_address\"), pl.col(\"c_phone\")]).alias(\"contact_info\"),\n            \"c_acctbal\",\n        )\n        .limit(100)\n    )"
+                "source": "def struct_construction_expression_impl(ctx: DataFrameContext) -> Any:\n    if _is_datafusion_context(ctx):\n        from benchbox.core.read_primitives.datafusion_queries import struct_construction\n\n        return struct_construction(ctx)\n\n    import polars as pl\n\n    return (\n        ctx.get_table(\"customer\")\n        .native.filter(pl.col(\"c_nationkey\") == 1)\n        .sort(\"c_custkey\")\n        .select(\n            \"c_custkey\",\n            pl.struct([pl.col(\"c_name\"), pl.col(\"c_address\"), pl.col(\"c_phone\")]).alias(\"contact_info\"),\n            \"c_acctbal\",\n        )\n        .limit(100)\n    )"
               },
               {
                 "family": "pandas",
-                "source": "def struct_construction_pandas_impl(ctx: DataFrameContext) -> Any:\n    customer = ctx.get_table(\"customer\")\n    filtered = customer[customer[\"c_nationkey\"] == 1].copy().sort_values(\"c_custkey\")\n    filtered[\"contact_info\"] = filtered.apply(lambda row: [row[\"c_name\"], row[\"c_address\"], row[\"c_phone\"]], axis=1)\n    return filtered[[\"c_custkey\", \"contact_info\", \"c_acctbal\"]].head(100).reset_index(drop=True)"
+                "source": "def struct_construction_pandas_impl(ctx: DataFrameContext) -> Any:\n    customer = ctx.get_table(\"customer\")\n    filtered = customer[customer[\"c_nationkey\"] == 1].copy().sort_values(\"c_custkey\")\n    filtered[\"contact_info\"] = filtered.apply(\n        lambda row: {\"c_name\": row[\"c_name\"], \"c_address\": row[\"c_address\"], \"c_phone\": row[\"c_phone\"]}, axis=1\n    )\n    return filtered[[\"c_custkey\", \"contact_info\", \"c_acctbal\"]].head(100).reset_index(drop=True)"
               }
             ],
             "description": "Construct struct from columns",
@@ -36528,16 +36276,16 @@
             "answer_set_note": null,
             "dataframe": {
               "family": "expression",
-              "source": "def q16_expression_impl(ctx: DataFrameContext) -> Any:\n    from datetime import datetime, timedelta\n\n    params = get_parameters(16)\n    year = params.get(\"year\", 1999)\n    month = params.get(\"month\", 2)\n    state = params.get(\"state\", \"IL\")\n    counties = list(params.get(\"counties\", [\"Williamson County\"] * 5))\n\n    catalog_sales, catalog_returns, date_dim, customer_address, call_center = _tables(\n        ctx, \"catalog_sales\", \"catalog_returns\", \"date_dim\", \"customer_address\", \"call_center\"\n    )\n    col = ctx.col\n    lit = ctx.lit\n\n    start_date = datetime(year, month, 1).date()\n    end_date = start_date + timedelta(days=60)\n\n    date_filtered = date_dim.filter((col(\"d_date\") >= lit(start_date)) & (col(\"d_date\") <= lit(end_date)))\n\n    ca_filtered = customer_address.filter(col(\"ca_state\") == lit(state))\n\n    cc_filtered = call_center.filter(col(\"cc_county\").is_in(counties))\n\n    returned_orders = catalog_returns.select([\"cr_order_number\"]).unique()\n\n    shipped = catalog_sales.filter(col(\"cs_warehouse_sk\").is_not_null())\n    platform = getattr(ctx, \"platform\", \"polars\")\n    if platform == \"datafusion\":\n        order_warehouses = shipped.select([\"cs_order_number\", \"cs_warehouse_sk\"]).unique()\n        multi_warehouse_orders = (\n            order_warehouses.join(\n                order_warehouses.rename({\"cs_warehouse_sk\": \"cs_warehouse_sk_2\"}),\n                on=\"cs_order_number\",\n            )\n            .filter(col(\"cs_warehouse_sk\") != col(\"cs_warehouse_sk_2\"))\n            .select([\"cs_order_number\"])\n            .unique()\n        )\n    else:\n        multi_warehouse_orders = (\n            shipped.group_by(\"cs_order_number\")\n            .agg(col(\"cs_warehouse_sk\").n_unique().alias(\"num_warehouses\"))\n            .filter(col(\"num_warehouses\") > lit(1))\n            .select(\"cs_order_number\")\n        )\n\n    result = (\n        shipped.join(date_filtered, left_on=\"cs_ship_date_sk\", right_on=\"d_date_sk\")\n        .join(ca_filtered, left_on=\"cs_ship_addr_sk\", right_on=\"ca_address_sk\")\n        .join(cc_filtered, left_on=\"cs_call_center_sk\", right_on=\"cc_call_center_sk\")\n        .join(multi_warehouse_orders, on=\"cs_order_number\", how=\"semi\")\n        .join(returned_orders, left_on=\"cs_order_number\", right_on=\"cr_order_number\", how=\"anti\")\n    )\n\n    tallied = result.select(\n        [\n            col(\"cs_order_number\").n_unique().alias(\"order count\"),\n            ctx.sum(\"cs_ext_ship_cost\").alias(\"ship_cost\"),\n            ctx.sum(\"cs_net_profit\").alias(\"net_profit\"),\n            col(\"cs_order_number\").count().alias(\"n\"),\n        ]\n    )\n    return tallied.select(\n        [\n            col(\"order count\"),\n            ctx.when(col(\"n\") > lit(0)).then(col(\"ship_cost\")).otherwise(lit(None)).alias(\"total shipping cost\"),\n            ctx.when(col(\"n\") > lit(0)).then(col(\"net_profit\")).otherwise(lit(None)).alias(\"total net profit\"),\n        ]\n    )"
+              "source": "def q16_expression_impl(ctx: DataFrameContext) -> Any:\n    from datetime import datetime, timedelta\n\n    params = get_parameters(16)\n    year = params.get(\"year\", 1999)\n    month = params.get(\"month\", 2)\n    state = params.get(\"state\", \"IL\")\n    counties = list(params.get(\"counties\", [\"Williamson County\"] * 5))\n\n    catalog_sales, catalog_returns, date_dim, customer_address, call_center = _tables(\n        ctx, \"catalog_sales\", \"catalog_returns\", \"date_dim\", \"customer_address\", \"call_center\"\n    )\n    col = ctx.col\n    lit = ctx.lit\n\n    start_date = datetime(year, month, 1).date()\n    end_date = start_date + timedelta(days=60)\n\n    date_filtered = date_dim.filter((col(\"d_date\") >= lit(start_date)) & (col(\"d_date\") <= lit(end_date)))\n\n    ca_filtered = customer_address.filter(col(\"ca_state\") == lit(state))\n\n    cc_filtered = call_center.filter(col(\"cc_county\").is_in(counties))\n\n    returned_orders = catalog_returns.select([\"cr_order_number\"]).unique()\n\n    shipped = catalog_sales.filter(col(\"cs_warehouse_sk\").is_not_null())\n    multi_warehouse_orders = _multi_warehouse_orders_expression(ctx, shipped, \"cs_order_number\", \"cs_warehouse_sk\")\n\n    result = (\n        shipped.join(date_filtered, left_on=\"cs_ship_date_sk\", right_on=\"d_date_sk\")\n        .join(ca_filtered, left_on=\"cs_ship_addr_sk\", right_on=\"ca_address_sk\")\n        .join(cc_filtered, left_on=\"cs_call_center_sk\", right_on=\"cc_call_center_sk\")\n        .join(multi_warehouse_orders, on=\"cs_order_number\", how=\"semi\")\n        .join(returned_orders, left_on=\"cs_order_number\", right_on=\"cr_order_number\", how=\"anti\")\n    )\n\n    tallied = result.select(\n        [\n            col(\"cs_order_number\").n_unique().alias(\"order count\"),\n            ctx.sum(\"cs_ext_ship_cost\").alias(\"ship_cost\"),\n            ctx.sum(\"cs_net_profit\").alias(\"net_profit\"),\n            col(\"cs_order_number\").count().alias(\"n\"),\n        ]\n    )\n    return tallied.select(\n        [\n            col(\"order count\"),\n            ctx.when(col(\"n\") > lit(0)).then(col(\"ship_cost\")).otherwise(lit(None)).alias(\"total shipping cost\"),\n            ctx.when(col(\"n\") > lit(0)).then(col(\"net_profit\")).otherwise(lit(None)).alias(\"total net profit\"),\n        ]\n    )"
             },
             "dataframe_renderings": [
               {
                 "family": "expression",
-                "source": "def q16_expression_impl(ctx: DataFrameContext) -> Any:\n    from datetime import datetime, timedelta\n\n    params = get_parameters(16)\n    year = params.get(\"year\", 1999)\n    month = params.get(\"month\", 2)\n    state = params.get(\"state\", \"IL\")\n    counties = list(params.get(\"counties\", [\"Williamson County\"] * 5))\n\n    catalog_sales, catalog_returns, date_dim, customer_address, call_center = _tables(\n        ctx, \"catalog_sales\", \"catalog_returns\", \"date_dim\", \"customer_address\", \"call_center\"\n    )\n    col = ctx.col\n    lit = ctx.lit\n\n    start_date = datetime(year, month, 1).date()\n    end_date = start_date + timedelta(days=60)\n\n    date_filtered = date_dim.filter((col(\"d_date\") >= lit(start_date)) & (col(\"d_date\") <= lit(end_date)))\n\n    ca_filtered = customer_address.filter(col(\"ca_state\") == lit(state))\n\n    cc_filtered = call_center.filter(col(\"cc_county\").is_in(counties))\n\n    returned_orders = catalog_returns.select([\"cr_order_number\"]).unique()\n\n    shipped = catalog_sales.filter(col(\"cs_warehouse_sk\").is_not_null())\n    platform = getattr(ctx, \"platform\", \"polars\")\n    if platform == \"datafusion\":\n        order_warehouses = shipped.select([\"cs_order_number\", \"cs_warehouse_sk\"]).unique()\n        multi_warehouse_orders = (\n            order_warehouses.join(\n                order_warehouses.rename({\"cs_warehouse_sk\": \"cs_warehouse_sk_2\"}),\n                on=\"cs_order_number\",\n            )\n            .filter(col(\"cs_warehouse_sk\") != col(\"cs_warehouse_sk_2\"))\n            .select([\"cs_order_number\"])\n            .unique()\n        )\n    else:\n        multi_warehouse_orders = (\n            shipped.group_by(\"cs_order_number\")\n            .agg(col(\"cs_warehouse_sk\").n_unique().alias(\"num_warehouses\"))\n            .filter(col(\"num_warehouses\") > lit(1))\n            .select(\"cs_order_number\")\n        )\n\n    result = (\n        shipped.join(date_filtered, left_on=\"cs_ship_date_sk\", right_on=\"d_date_sk\")\n        .join(ca_filtered, left_on=\"cs_ship_addr_sk\", right_on=\"ca_address_sk\")\n        .join(cc_filtered, left_on=\"cs_call_center_sk\", right_on=\"cc_call_center_sk\")\n        .join(multi_warehouse_orders, on=\"cs_order_number\", how=\"semi\")\n        .join(returned_orders, left_on=\"cs_order_number\", right_on=\"cr_order_number\", how=\"anti\")\n    )\n\n    tallied = result.select(\n        [\n            col(\"cs_order_number\").n_unique().alias(\"order count\"),\n            ctx.sum(\"cs_ext_ship_cost\").alias(\"ship_cost\"),\n            ctx.sum(\"cs_net_profit\").alias(\"net_profit\"),\n            col(\"cs_order_number\").count().alias(\"n\"),\n        ]\n    )\n    return tallied.select(\n        [\n            col(\"order count\"),\n            ctx.when(col(\"n\") > lit(0)).then(col(\"ship_cost\")).otherwise(lit(None)).alias(\"total shipping cost\"),\n            ctx.when(col(\"n\") > lit(0)).then(col(\"net_profit\")).otherwise(lit(None)).alias(\"total net profit\"),\n        ]\n    )"
+                "source": "def q16_expression_impl(ctx: DataFrameContext) -> Any:\n    from datetime import datetime, timedelta\n\n    params = get_parameters(16)\n    year = params.get(\"year\", 1999)\n    month = params.get(\"month\", 2)\n    state = params.get(\"state\", \"IL\")\n    counties = list(params.get(\"counties\", [\"Williamson County\"] * 5))\n\n    catalog_sales, catalog_returns, date_dim, customer_address, call_center = _tables(\n        ctx, \"catalog_sales\", \"catalog_returns\", \"date_dim\", \"customer_address\", \"call_center\"\n    )\n    col = ctx.col\n    lit = ctx.lit\n\n    start_date = datetime(year, month, 1).date()\n    end_date = start_date + timedelta(days=60)\n\n    date_filtered = date_dim.filter((col(\"d_date\") >= lit(start_date)) & (col(\"d_date\") <= lit(end_date)))\n\n    ca_filtered = customer_address.filter(col(\"ca_state\") == lit(state))\n\n    cc_filtered = call_center.filter(col(\"cc_county\").is_in(counties))\n\n    returned_orders = catalog_returns.select([\"cr_order_number\"]).unique()\n\n    shipped = catalog_sales.filter(col(\"cs_warehouse_sk\").is_not_null())\n    multi_warehouse_orders = _multi_warehouse_orders_expression(ctx, shipped, \"cs_order_number\", \"cs_warehouse_sk\")\n\n    result = (\n        shipped.join(date_filtered, left_on=\"cs_ship_date_sk\", right_on=\"d_date_sk\")\n        .join(ca_filtered, left_on=\"cs_ship_addr_sk\", right_on=\"ca_address_sk\")\n        .join(cc_filtered, left_on=\"cs_call_center_sk\", right_on=\"cc_call_center_sk\")\n        .join(multi_warehouse_orders, on=\"cs_order_number\", how=\"semi\")\n        .join(returned_orders, left_on=\"cs_order_number\", right_on=\"cr_order_number\", how=\"anti\")\n    )\n\n    tallied = result.select(\n        [\n            col(\"cs_order_number\").n_unique().alias(\"order count\"),\n            ctx.sum(\"cs_ext_ship_cost\").alias(\"ship_cost\"),\n            ctx.sum(\"cs_net_profit\").alias(\"net_profit\"),\n            col(\"cs_order_number\").count().alias(\"n\"),\n        ]\n    )\n    return tallied.select(\n        [\n            col(\"order count\"),\n            ctx.when(col(\"n\") > lit(0)).then(col(\"ship_cost\")).otherwise(lit(None)).alias(\"total shipping cost\"),\n            ctx.when(col(\"n\") > lit(0)).then(col(\"net_profit\")).otherwise(lit(None)).alias(\"total net profit\"),\n        ]\n    )"
               },
               {
                 "family": "pandas",
-                "source": "def q16_pandas_impl(ctx: DataFrameContext) -> Any:\n    from datetime import datetime, timedelta\n\n    import pandas as pd\n\n    params = get_parameters(16)\n    year = params.get(\"year\", 1999)\n    month = params.get(\"month\", 2)\n    state = params.get(\"state\", \"IL\")\n    counties = list(params.get(\"counties\", [\"Williamson County\"] * 5))\n\n    catalog_sales, catalog_returns, date_dim, customer_address, call_center = _tables(\n        ctx, \"catalog_sales\", \"catalog_returns\", \"date_dim\", \"customer_address\", \"call_center\"\n    )\n\n    start_date = datetime(year, month, 1).date()\n    end_date = start_date + timedelta(days=60)\n\n    date_filtered = date_dim[(date_dim[\"d_date\"] >= start_date) & (date_dim[\"d_date\"] <= end_date)][[\"d_date_sk\"]]\n\n    ca_filtered = customer_address[customer_address[\"ca_state\"] == state]\n    cc_filtered = call_center[call_center[\"cc_county\"].isin(counties)]\n\n    returned_orders = catalog_returns[[\"cr_order_number\"]].drop_duplicates()\n\n    shipped = catalog_sales[catalog_sales[\"cs_warehouse_sk\"].notnull()]\n    order_warehouses = shipped[[\"cs_order_number\", \"cs_warehouse_sk\"]].drop_duplicates()\n    ow_count = ctx.groupby_size(order_warehouses, \"cs_order_number\", name=\"wh_count\")\n    multi_warehouse_orders = ow_count[ow_count[\"wh_count\"] > 1][[\"cs_order_number\"]]\n\n    result = shipped.merge(date_filtered, left_on=\"cs_ship_date_sk\", right_on=\"d_date_sk\")\n    result = result.merge(ca_filtered[[\"ca_address_sk\"]], left_on=\"cs_ship_addr_sk\", right_on=\"ca_address_sk\")\n    result = result.merge(cc_filtered[[\"cc_call_center_sk\"]], left_on=\"cs_call_center_sk\", right_on=\"cc_call_center_sk\")\n\n    result = result.merge(multi_warehouse_orders, on=\"cs_order_number\")\n\n    result = result.merge(\n        returned_orders, left_on=\"cs_order_number\", right_on=\"cr_order_number\", how=\"left\", indicator=True\n    )\n    result = result[result[\"_merge\"] == \"left_only\"]\n\n    order_count = materialize(result[\"cs_order_number\"].nunique())\n    if len(result) == 0:\n        return pd.DataFrame({\"order count\": [order_count], \"total shipping cost\": [None], \"total net profit\": [None]})\n    total_shipping, total_profit = materialize(result[\"cs_ext_ship_cost\"].sum(), result[\"cs_net_profit\"].sum())\n\n    return pd.DataFrame(\n        {\n            \"order count\": [order_count],\n            \"total shipping cost\": [total_shipping],\n            \"total net profit\": [total_profit],\n        }\n    )"
+                "source": "def q16_pandas_impl(ctx: DataFrameContext) -> Any:\n    from datetime import datetime, timedelta\n\n    import pandas as pd\n\n    params = get_parameters(16)\n    year = params.get(\"year\", 1999)\n    month = params.get(\"month\", 2)\n    state = params.get(\"state\", \"IL\")\n    counties = list(params.get(\"counties\", [\"Williamson County\"] * 5))\n\n    catalog_sales, catalog_returns, date_dim, customer_address, call_center = _tables(\n        ctx, \"catalog_sales\", \"catalog_returns\", \"date_dim\", \"customer_address\", \"call_center\"\n    )\n\n    start_date = datetime(year, month, 1).date()\n    end_date = start_date + timedelta(days=60)\n\n    date_filtered = date_dim[(date_dim[\"d_date\"] >= start_date) & (date_dim[\"d_date\"] <= end_date)][[\"d_date_sk\"]]\n\n    ca_filtered = customer_address[customer_address[\"ca_state\"] == state]\n    cc_filtered = call_center[call_center[\"cc_county\"].isin(counties)]\n\n    returned_orders = catalog_returns[[\"cr_order_number\"]].drop_duplicates()\n\n    shipped = catalog_sales[catalog_sales[\"cs_warehouse_sk\"].notnull()]\n    multi_warehouse_orders = _multi_warehouse_orders_pandas(ctx, shipped, \"cs_order_number\", \"cs_warehouse_sk\")\n\n    result = shipped.merge(date_filtered, left_on=\"cs_ship_date_sk\", right_on=\"d_date_sk\")\n    result = result.merge(ca_filtered[[\"ca_address_sk\"]], left_on=\"cs_ship_addr_sk\", right_on=\"ca_address_sk\")\n    result = result.merge(cc_filtered[[\"cc_call_center_sk\"]], left_on=\"cs_call_center_sk\", right_on=\"cc_call_center_sk\")\n\n    result = result.merge(multi_warehouse_orders, on=\"cs_order_number\")\n\n    result = result.merge(\n        returned_orders, left_on=\"cs_order_number\", right_on=\"cr_order_number\", how=\"left\", indicator=True\n    )\n    result = result[result[\"_merge\"] == \"left_only\"]\n\n    order_count = materialize(result[\"cs_order_number\"].nunique())\n    if len(result) == 0:\n        return pd.DataFrame({\"order count\": [order_count], \"total shipping cost\": [None], \"total net profit\": [None]})\n    total_shipping, total_profit = materialize(result[\"cs_ext_ship_cost\"].sum(), result[\"cs_net_profit\"].sum())\n\n    return pd.DataFrame(\n        {\n            \"order count\": [order_count],\n            \"total shipping cost\": [total_shipping],\n            \"total net profit\": [total_profit],\n        }\n    )"
               }
             ],
             "description": "Catalog orders shipped from multiple warehouses not returned",
@@ -44192,12 +43940,12 @@
             "answer_set_note": null,
             "dataframe": {
               "family": "expression",
-              "source": "def q21_expression_impl(ctx: DataFrameContext) -> Any:\n    supplier = ctx.get_table(\"supplier\")\n    lineitem = ctx.get_table(\"lineitem\")\n    orders = ctx.get_table(\"orders\")\n    nation = ctx.get_table(\"nation\")\n    col = ctx.col\n    lit = ctx.lit\n\n    params = get_tpch_parameters(21)\n    nation_name = params[\"nation_name\"]\n\n    target_suppliers = (\n        supplier.join(nation, left_on=\"s_nationkey\", right_on=\"n_nationkey\")\n        .filter(col(\"n_name\") == lit(nation_name))\n        .select(col(\"s_suppkey\").alias(\"target_suppkey\"), col(\"s_name\"))\n    )\n\n    valid_orders = orders.filter(col(\"o_orderstatus\") == lit(\"F\")).select(col(\"o_orderkey\").alias(\"valid_orderkey\"))\n\n    candidates = (\n        lineitem.filter(col(\"l_receiptdate\") > col(\"l_commitdate\"))\n        .join(target_suppliers, left_on=\"l_suppkey\", right_on=\"target_suppkey\")\n        .join(valid_orders, left_on=\"l_orderkey\", right_on=\"valid_orderkey\")\n        .select(\"l_orderkey\", \"l_suppkey\", \"s_name\")\n    )\n\n    candidate_orders = candidates.select(col(\"l_orderkey\").alias(\"cand_orderkey\")).unique()\n\n    suppliers_per_order = (\n        lineitem.join(candidate_orders, left_on=\"l_orderkey\", right_on=\"cand_orderkey\", how=\"semi\")\n        .group_by(\"l_orderkey\")\n        .agg(col(\"l_suppkey\").n_unique().alias(\"num_suppliers\"))\n        .select(col(\"l_orderkey\").alias(\"supp_orderkey\"), col(\"num_suppliers\"))\n    )\n\n    late_suppliers_per_order = (\n        lineitem.filter(col(\"l_receiptdate\") > col(\"l_commitdate\"))\n        .join(candidate_orders, left_on=\"l_orderkey\", right_on=\"cand_orderkey\", how=\"semi\")\n        .group_by(\"l_orderkey\")\n        .agg(col(\"l_suppkey\").n_unique().alias(\"num_late_suppliers\"))\n        .select(col(\"l_orderkey\").alias(\"late_orderkey\"), col(\"num_late_suppliers\"))\n    )\n\n    return (\n        candidates.join(suppliers_per_order, left_on=\"l_orderkey\", right_on=\"supp_orderkey\")\n        .join(late_suppliers_per_order, left_on=\"l_orderkey\", right_on=\"late_orderkey\")\n        .filter(col(\"num_suppliers\") > lit(1))\n        .filter(col(\"num_late_suppliers\") == lit(1))\n        .group_by(\"s_name\")\n        .agg(col(\"l_orderkey\").count().alias(\"numwait\"))\n        .sort([\"numwait\", \"s_name\"], descending=[True, False])\n        .limit(100)\n    )"
+              "source": "def q21_expression_impl(ctx: DataFrameContext) -> Any:\n    supplier = ctx.get_table(\"supplier\")\n    lineitem = ctx.get_table(\"lineitem\")\n    orders = ctx.get_table(\"orders\")\n    nation = ctx.get_table(\"nation\")\n    col = ctx.col\n    lit = ctx.lit\n\n    params = get_tpch_parameters(21)\n    nation_name = params[\"nation_name\"]\n\n    target_suppliers = (\n        supplier.join(nation, left_on=\"s_nationkey\", right_on=\"n_nationkey\")\n        .filter(col(\"n_name\") == lit(nation_name))\n        .select(col(\"s_suppkey\").alias(\"target_suppkey\"), col(\"s_name\"))\n    )\n\n    valid_orders = orders.filter(col(\"o_orderstatus\") == lit(\"F\")).select(col(\"o_orderkey\").alias(\"valid_orderkey\"))\n\n    candidates = (\n        lineitem.filter(col(\"l_receiptdate\") > col(\"l_commitdate\"))\n        .join(target_suppliers, left_on=\"l_suppkey\", right_on=\"target_suppkey\")\n        .join(valid_orders, left_on=\"l_orderkey\", right_on=\"valid_orderkey\")\n        .select(\"l_orderkey\", \"l_suppkey\", \"s_name\")\n    )\n\n    candidate_orders = candidates.select(col(\"l_orderkey\").alias(\"cand_orderkey\")).unique()\n\n    suppliers_per_order = (\n        lineitem.join(candidate_orders, left_on=\"l_orderkey\", right_on=\"cand_orderkey\", how=\"semi\")\n        .group_by(\"l_orderkey\")\n        .agg(col(\"l_suppkey\").min().alias(\"min_supp\"), col(\"l_suppkey\").max().alias(\"max_supp\"))\n        .select(col(\"l_orderkey\").alias(\"supp_orderkey\"), col(\"min_supp\"), col(\"max_supp\"))\n    )\n\n    late_suppliers_per_order = (\n        lineitem.filter(col(\"l_receiptdate\") > col(\"l_commitdate\"))\n        .join(candidate_orders, left_on=\"l_orderkey\", right_on=\"cand_orderkey\", how=\"semi\")\n        .group_by(\"l_orderkey\")\n        .agg(col(\"l_suppkey\").min().alias(\"min_late_supp\"), col(\"l_suppkey\").max().alias(\"max_late_supp\"))\n        .select(col(\"l_orderkey\").alias(\"late_orderkey\"), col(\"min_late_supp\"), col(\"max_late_supp\"))\n    )\n\n    return (\n        candidates.join(suppliers_per_order, left_on=\"l_orderkey\", right_on=\"supp_orderkey\")\n        .join(late_suppliers_per_order, left_on=\"l_orderkey\", right_on=\"late_orderkey\")\n        .filter(col(\"min_supp\") != col(\"max_supp\"))\n        .filter(col(\"min_late_supp\") == col(\"max_late_supp\"))\n        .group_by(\"s_name\")\n        .agg(col(\"l_orderkey\").count().alias(\"numwait\"))\n        .sort([\"numwait\", \"s_name\"], descending=[True, False])\n        .limit(100)\n    )"
             },
             "dataframe_renderings": [
               {
                 "family": "expression",
-                "source": "def q21_expression_impl(ctx: DataFrameContext) -> Any:\n    supplier = ctx.get_table(\"supplier\")\n    lineitem = ctx.get_table(\"lineitem\")\n    orders = ctx.get_table(\"orders\")\n    nation = ctx.get_table(\"nation\")\n    col = ctx.col\n    lit = ctx.lit\n\n    params = get_tpch_parameters(21)\n    nation_name = params[\"nation_name\"]\n\n    target_suppliers = (\n        supplier.join(nation, left_on=\"s_nationkey\", right_on=\"n_nationkey\")\n        .filter(col(\"n_name\") == lit(nation_name))\n        .select(col(\"s_suppkey\").alias(\"target_suppkey\"), col(\"s_name\"))\n    )\n\n    valid_orders = orders.filter(col(\"o_orderstatus\") == lit(\"F\")).select(col(\"o_orderkey\").alias(\"valid_orderkey\"))\n\n    candidates = (\n        lineitem.filter(col(\"l_receiptdate\") > col(\"l_commitdate\"))\n        .join(target_suppliers, left_on=\"l_suppkey\", right_on=\"target_suppkey\")\n        .join(valid_orders, left_on=\"l_orderkey\", right_on=\"valid_orderkey\")\n        .select(\"l_orderkey\", \"l_suppkey\", \"s_name\")\n    )\n\n    candidate_orders = candidates.select(col(\"l_orderkey\").alias(\"cand_orderkey\")).unique()\n\n    suppliers_per_order = (\n        lineitem.join(candidate_orders, left_on=\"l_orderkey\", right_on=\"cand_orderkey\", how=\"semi\")\n        .group_by(\"l_orderkey\")\n        .agg(col(\"l_suppkey\").n_unique().alias(\"num_suppliers\"))\n        .select(col(\"l_orderkey\").alias(\"supp_orderkey\"), col(\"num_suppliers\"))\n    )\n\n    late_suppliers_per_order = (\n        lineitem.filter(col(\"l_receiptdate\") > col(\"l_commitdate\"))\n        .join(candidate_orders, left_on=\"l_orderkey\", right_on=\"cand_orderkey\", how=\"semi\")\n        .group_by(\"l_orderkey\")\n        .agg(col(\"l_suppkey\").n_unique().alias(\"num_late_suppliers\"))\n        .select(col(\"l_orderkey\").alias(\"late_orderkey\"), col(\"num_late_suppliers\"))\n    )\n\n    return (\n        candidates.join(suppliers_per_order, left_on=\"l_orderkey\", right_on=\"supp_orderkey\")\n        .join(late_suppliers_per_order, left_on=\"l_orderkey\", right_on=\"late_orderkey\")\n        .filter(col(\"num_suppliers\") > lit(1))\n        .filter(col(\"num_late_suppliers\") == lit(1))\n        .group_by(\"s_name\")\n        .agg(col(\"l_orderkey\").count().alias(\"numwait\"))\n        .sort([\"numwait\", \"s_name\"], descending=[True, False])\n        .limit(100)\n    )"
+                "source": "def q21_expression_impl(ctx: DataFrameContext) -> Any:\n    supplier = ctx.get_table(\"supplier\")\n    lineitem = ctx.get_table(\"lineitem\")\n    orders = ctx.get_table(\"orders\")\n    nation = ctx.get_table(\"nation\")\n    col = ctx.col\n    lit = ctx.lit\n\n    params = get_tpch_parameters(21)\n    nation_name = params[\"nation_name\"]\n\n    target_suppliers = (\n        supplier.join(nation, left_on=\"s_nationkey\", right_on=\"n_nationkey\")\n        .filter(col(\"n_name\") == lit(nation_name))\n        .select(col(\"s_suppkey\").alias(\"target_suppkey\"), col(\"s_name\"))\n    )\n\n    valid_orders = orders.filter(col(\"o_orderstatus\") == lit(\"F\")).select(col(\"o_orderkey\").alias(\"valid_orderkey\"))\n\n    candidates = (\n        lineitem.filter(col(\"l_receiptdate\") > col(\"l_commitdate\"))\n        .join(target_suppliers, left_on=\"l_suppkey\", right_on=\"target_suppkey\")\n        .join(valid_orders, left_on=\"l_orderkey\", right_on=\"valid_orderkey\")\n        .select(\"l_orderkey\", \"l_suppkey\", \"s_name\")\n    )\n\n    candidate_orders = candidates.select(col(\"l_orderkey\").alias(\"cand_orderkey\")).unique()\n\n    suppliers_per_order = (\n        lineitem.join(candidate_orders, left_on=\"l_orderkey\", right_on=\"cand_orderkey\", how=\"semi\")\n        .group_by(\"l_orderkey\")\n        .agg(col(\"l_suppkey\").min().alias(\"min_supp\"), col(\"l_suppkey\").max().alias(\"max_supp\"))\n        .select(col(\"l_orderkey\").alias(\"supp_orderkey\"), col(\"min_supp\"), col(\"max_supp\"))\n    )\n\n    late_suppliers_per_order = (\n        lineitem.filter(col(\"l_receiptdate\") > col(\"l_commitdate\"))\n        .join(candidate_orders, left_on=\"l_orderkey\", right_on=\"cand_orderkey\", how=\"semi\")\n        .group_by(\"l_orderkey\")\n        .agg(col(\"l_suppkey\").min().alias(\"min_late_supp\"), col(\"l_suppkey\").max().alias(\"max_late_supp\"))\n        .select(col(\"l_orderkey\").alias(\"late_orderkey\"), col(\"min_late_supp\"), col(\"max_late_supp\"))\n    )\n\n    return (\n        candidates.join(suppliers_per_order, left_on=\"l_orderkey\", right_on=\"supp_orderkey\")\n        .join(late_suppliers_per_order, left_on=\"l_orderkey\", right_on=\"late_orderkey\")\n        .filter(col(\"min_supp\") != col(\"max_supp\"))\n        .filter(col(\"min_late_supp\") == col(\"max_late_supp\"))\n        .group_by(\"s_name\")\n        .agg(col(\"l_orderkey\").count().alias(\"numwait\"))\n        .sort([\"numwait\", \"s_name\"], descending=[True, False])\n        .limit(100)\n    )"
               },
               {
                 "family": "pandas",
@@ -45133,12 +44881,12 @@
             "answer_set_note": null,
             "dataframe": {
               "family": "expression",
-              "source": "def q21_expression_impl(ctx: DataFrameContext) -> Any:\n    supplier = ctx.get_table(\"supplier\")\n    lineitem = ctx.get_table(\"lineitem\")\n    orders = ctx.get_table(\"orders\")\n    nation = ctx.get_table(\"nation\")\n    col = ctx.col\n    lit = ctx.lit\n\n    params = get_tpch_parameters(21)\n    nation_name = params[\"nation_name\"]\n\n    target_suppliers = (\n        supplier.join(nation, left_on=\"s_nationkey\", right_on=\"n_nationkey\")\n        .filter(col(\"n_name\") == lit(nation_name))\n        .select(col(\"s_suppkey\").alias(\"target_suppkey\"), col(\"s_name\"))\n    )\n\n    valid_orders = orders.filter(col(\"o_orderstatus\") == lit(\"F\")).select(col(\"o_orderkey\").alias(\"valid_orderkey\"))\n\n    candidates = (\n        lineitem.filter(col(\"l_receiptdate\") > col(\"l_commitdate\"))\n        .join(target_suppliers, left_on=\"l_suppkey\", right_on=\"target_suppkey\")\n        .join(valid_orders, left_on=\"l_orderkey\", right_on=\"valid_orderkey\")\n        .select(\"l_orderkey\", \"l_suppkey\", \"s_name\")\n    )\n\n    candidate_orders = candidates.select(col(\"l_orderkey\").alias(\"cand_orderkey\")).unique()\n\n    suppliers_per_order = (\n        lineitem.join(candidate_orders, left_on=\"l_orderkey\", right_on=\"cand_orderkey\", how=\"semi\")\n        .group_by(\"l_orderkey\")\n        .agg(col(\"l_suppkey\").n_unique().alias(\"num_suppliers\"))\n        .select(col(\"l_orderkey\").alias(\"supp_orderkey\"), col(\"num_suppliers\"))\n    )\n\n    late_suppliers_per_order = (\n        lineitem.filter(col(\"l_receiptdate\") > col(\"l_commitdate\"))\n        .join(candidate_orders, left_on=\"l_orderkey\", right_on=\"cand_orderkey\", how=\"semi\")\n        .group_by(\"l_orderkey\")\n        .agg(col(\"l_suppkey\").n_unique().alias(\"num_late_suppliers\"))\n        .select(col(\"l_orderkey\").alias(\"late_orderkey\"), col(\"num_late_suppliers\"))\n    )\n\n    return (\n        candidates.join(suppliers_per_order, left_on=\"l_orderkey\", right_on=\"supp_orderkey\")\n        .join(late_suppliers_per_order, left_on=\"l_orderkey\", right_on=\"late_orderkey\")\n        .filter(col(\"num_suppliers\") > lit(1))\n        .filter(col(\"num_late_suppliers\") == lit(1))\n        .group_by(\"s_name\")\n        .agg(col(\"l_orderkey\").count().alias(\"numwait\"))\n        .sort([\"numwait\", \"s_name\"], descending=[True, False])\n        .limit(100)\n    )"
+              "source": "def q21_expression_impl(ctx: DataFrameContext) -> Any:\n    supplier = ctx.get_table(\"supplier\")\n    lineitem = ctx.get_table(\"lineitem\")\n    orders = ctx.get_table(\"orders\")\n    nation = ctx.get_table(\"nation\")\n    col = ctx.col\n    lit = ctx.lit\n\n    params = get_tpch_parameters(21)\n    nation_name = params[\"nation_name\"]\n\n    target_suppliers = (\n        supplier.join(nation, left_on=\"s_nationkey\", right_on=\"n_nationkey\")\n        .filter(col(\"n_name\") == lit(nation_name))\n        .select(col(\"s_suppkey\").alias(\"target_suppkey\"), col(\"s_name\"))\n    )\n\n    valid_orders = orders.filter(col(\"o_orderstatus\") == lit(\"F\")).select(col(\"o_orderkey\").alias(\"valid_orderkey\"))\n\n    candidates = (\n        lineitem.filter(col(\"l_receiptdate\") > col(\"l_commitdate\"))\n        .join(target_suppliers, left_on=\"l_suppkey\", right_on=\"target_suppkey\")\n        .join(valid_orders, left_on=\"l_orderkey\", right_on=\"valid_orderkey\")\n        .select(\"l_orderkey\", \"l_suppkey\", \"s_name\")\n    )\n\n    candidate_orders = candidates.select(col(\"l_orderkey\").alias(\"cand_orderkey\")).unique()\n\n    suppliers_per_order = (\n        lineitem.join(candidate_orders, left_on=\"l_orderkey\", right_on=\"cand_orderkey\", how=\"semi\")\n        .group_by(\"l_orderkey\")\n        .agg(col(\"l_suppkey\").min().alias(\"min_supp\"), col(\"l_suppkey\").max().alias(\"max_supp\"))\n        .select(col(\"l_orderkey\").alias(\"supp_orderkey\"), col(\"min_supp\"), col(\"max_supp\"))\n    )\n\n    late_suppliers_per_order = (\n        lineitem.filter(col(\"l_receiptdate\") > col(\"l_commitdate\"))\n        .join(candidate_orders, left_on=\"l_orderkey\", right_on=\"cand_orderkey\", how=\"semi\")\n        .group_by(\"l_orderkey\")\n        .agg(col(\"l_suppkey\").min().alias(\"min_late_supp\"), col(\"l_suppkey\").max().alias(\"max_late_supp\"))\n        .select(col(\"l_orderkey\").alias(\"late_orderkey\"), col(\"min_late_supp\"), col(\"max_late_supp\"))\n    )\n\n    return (\n        candidates.join(suppliers_per_order, left_on=\"l_orderkey\", right_on=\"supp_orderkey\")\n        .join(late_suppliers_per_order, left_on=\"l_orderkey\", right_on=\"late_orderkey\")\n        .filter(col(\"min_supp\") != col(\"max_supp\"))\n        .filter(col(\"min_late_supp\") == col(\"max_late_supp\"))\n        .group_by(\"s_name\")\n        .agg(col(\"l_orderkey\").count().alias(\"numwait\"))\n        .sort([\"numwait\", \"s_name\"], descending=[True, False])\n        .limit(100)\n    )"
             },
             "dataframe_renderings": [
               {
                 "family": "expression",
-                "source": "def q21_expression_impl(ctx: DataFrameContext) -> Any:\n    supplier = ctx.get_table(\"supplier\")\n    lineitem = ctx.get_table(\"lineitem\")\n    orders = ctx.get_table(\"orders\")\n    nation = ctx.get_table(\"nation\")\n    col = ctx.col\n    lit = ctx.lit\n\n    params = get_tpch_parameters(21)\n    nation_name = params[\"nation_name\"]\n\n    target_suppliers = (\n        supplier.join(nation, left_on=\"s_nationkey\", right_on=\"n_nationkey\")\n        .filter(col(\"n_name\") == lit(nation_name))\n        .select(col(\"s_suppkey\").alias(\"target_suppkey\"), col(\"s_name\"))\n    )\n\n    valid_orders = orders.filter(col(\"o_orderstatus\") == lit(\"F\")).select(col(\"o_orderkey\").alias(\"valid_orderkey\"))\n\n    candidates = (\n        lineitem.filter(col(\"l_receiptdate\") > col(\"l_commitdate\"))\n        .join(target_suppliers, left_on=\"l_suppkey\", right_on=\"target_suppkey\")\n        .join(valid_orders, left_on=\"l_orderkey\", right_on=\"valid_orderkey\")\n        .select(\"l_orderkey\", \"l_suppkey\", \"s_name\")\n    )\n\n    candidate_orders = candidates.select(col(\"l_orderkey\").alias(\"cand_orderkey\")).unique()\n\n    suppliers_per_order = (\n        lineitem.join(candidate_orders, left_on=\"l_orderkey\", right_on=\"cand_orderkey\", how=\"semi\")\n        .group_by(\"l_orderkey\")\n        .agg(col(\"l_suppkey\").n_unique().alias(\"num_suppliers\"))\n        .select(col(\"l_orderkey\").alias(\"supp_orderkey\"), col(\"num_suppliers\"))\n    )\n\n    late_suppliers_per_order = (\n        lineitem.filter(col(\"l_receiptdate\") > col(\"l_commitdate\"))\n        .join(candidate_orders, left_on=\"l_orderkey\", right_on=\"cand_orderkey\", how=\"semi\")\n        .group_by(\"l_orderkey\")\n        .agg(col(\"l_suppkey\").n_unique().alias(\"num_late_suppliers\"))\n        .select(col(\"l_orderkey\").alias(\"late_orderkey\"), col(\"num_late_suppliers\"))\n    )\n\n    return (\n        candidates.join(suppliers_per_order, left_on=\"l_orderkey\", right_on=\"supp_orderkey\")\n        .join(late_suppliers_per_order, left_on=\"l_orderkey\", right_on=\"late_orderkey\")\n        .filter(col(\"num_suppliers\") > lit(1))\n        .filter(col(\"num_late_suppliers\") == lit(1))\n        .group_by(\"s_name\")\n        .agg(col(\"l_orderkey\").count().alias(\"numwait\"))\n        .sort([\"numwait\", \"s_name\"], descending=[True, False])\n        .limit(100)\n    )"
+                "source": "def q21_expression_impl(ctx: DataFrameContext) -> Any:\n    supplier = ctx.get_table(\"supplier\")\n    lineitem = ctx.get_table(\"lineitem\")\n    orders = ctx.get_table(\"orders\")\n    nation = ctx.get_table(\"nation\")\n    col = ctx.col\n    lit = ctx.lit\n\n    params = get_tpch_parameters(21)\n    nation_name = params[\"nation_name\"]\n\n    target_suppliers = (\n        supplier.join(nation, left_on=\"s_nationkey\", right_on=\"n_nationkey\")\n        .filter(col(\"n_name\") == lit(nation_name))\n        .select(col(\"s_suppkey\").alias(\"target_suppkey\"), col(\"s_name\"))\n    )\n\n    valid_orders = orders.filter(col(\"o_orderstatus\") == lit(\"F\")).select(col(\"o_orderkey\").alias(\"valid_orderkey\"))\n\n    candidates = (\n        lineitem.filter(col(\"l_receiptdate\") > col(\"l_commitdate\"))\n        .join(target_suppliers, left_on=\"l_suppkey\", right_on=\"target_suppkey\")\n        .join(valid_orders, left_on=\"l_orderkey\", right_on=\"valid_orderkey\")\n        .select(\"l_orderkey\", \"l_suppkey\", \"s_name\")\n    )\n\n    candidate_orders = candidates.select(col(\"l_orderkey\").alias(\"cand_orderkey\")).unique()\n\n    suppliers_per_order = (\n        lineitem.join(candidate_orders, left_on=\"l_orderkey\", right_on=\"cand_orderkey\", how=\"semi\")\n        .group_by(\"l_orderkey\")\n        .agg(col(\"l_suppkey\").min().alias(\"min_supp\"), col(\"l_suppkey\").max().alias(\"max_supp\"))\n        .select(col(\"l_orderkey\").alias(\"supp_orderkey\"), col(\"min_supp\"), col(\"max_supp\"))\n    )\n\n    late_suppliers_per_order = (\n        lineitem.filter(col(\"l_receiptdate\") > col(\"l_commitdate\"))\n        .join(candidate_orders, left_on=\"l_orderkey\", right_on=\"cand_orderkey\", how=\"semi\")\n        .group_by(\"l_orderkey\")\n        .agg(col(\"l_suppkey\").min().alias(\"min_late_supp\"), col(\"l_suppkey\").max().alias(\"max_late_supp\"))\n        .select(col(\"l_orderkey\").alias(\"late_orderkey\"), col(\"min_late_supp\"), col(\"max_late_supp\"))\n    )\n\n    return (\n        candidates.join(suppliers_per_order, left_on=\"l_orderkey\", right_on=\"supp_orderkey\")\n        .join(late_suppliers_per_order, left_on=\"l_orderkey\", right_on=\"late_orderkey\")\n        .filter(col(\"min_supp\") != col(\"max_supp\"))\n        .filter(col(\"min_late_supp\") == col(\"max_late_supp\"))\n        .group_by(\"s_name\")\n        .agg(col(\"l_orderkey\").count().alias(\"numwait\"))\n        .sort([\"numwait\", \"s_name\"], descending=[True, False])\n        .limit(100)\n    )"
               },
               {
                 "family": "pandas",
@@ -45750,14 +45498,14 @@
             "sql": {
               "dialect": "datafusion",
               "is_template": false,
-              "pretty_sql": "SELECT\n  l_returnflag,\n  l_linestatus,\n  sum_qty,\n  sum_base_price,\n  sum_disc_price,\n  sum_charge,\n  avg_qty,\n  avg_price,\n  avg_disc,\n  count_order\nFROM (\n  SELECT DISTINCT\n    l_returnflag,\n    l_linestatus,\n    SUM(l_quantity) OVER w AS sum_qty,\n    SUM(l_extendedprice) OVER w AS sum_base_price,\n    SUM(l_extendedprice * (\n      1 - l_discount\n    )) OVER w AS sum_disc_price,\n    SUM(l_extendedprice * (\n      1 - l_discount\n    ) * (\n      1 + l_tax\n    )) OVER w AS sum_charge,\n    AVG(l_quantity) OVER w AS avg_qty,\n    AVG(l_extendedprice) OVER w AS avg_price,\n    AVG(l_discount) OVER w AS avg_disc,\n    COUNT(*) OVER w AS count_order,\n    COUNT(*) OVER w AS _w\n  FROM lineitem\n  WHERE\n    l_shipdate <= CAST('1998-12-01' AS DATE) - INTERVAL '90 DAY'\n  WINDOW w AS (PARTITION BY l_returnflag, l_linestatus)\n  ORDER BY\n    l_returnflag,\n    l_linestatus\n) AS _t\nWHERE\n  _w > 0",
-              "sql": "SELECT l_returnflag, l_linestatus, sum_qty, sum_base_price, sum_disc_price, sum_charge, avg_qty, avg_price, avg_disc, count_order FROM (SELECT DISTINCT l_returnflag, l_linestatus, SUM(l_quantity) OVER w AS sum_qty, SUM(l_extendedprice) OVER w AS sum_base_price, SUM(l_extendedprice * (1 - l_discount)) OVER w AS sum_disc_price, SUM(l_extendedprice * (1 - l_discount) * (1 + l_tax)) OVER w AS sum_charge, AVG(l_quantity) OVER w AS avg_qty, AVG(l_extendedprice) OVER w AS avg_price, AVG(l_discount) OVER w AS avg_disc, COUNT(*) OVER w AS count_order, COUNT(*) OVER w AS _w FROM lineitem WHERE l_shipdate <= CAST('1998-12-01' AS DATE) - INTERVAL '90 DAY' WINDOW w AS (PARTITION BY l_returnflag, l_linestatus) ORDER BY l_returnflag, l_linestatus) AS _t WHERE _w > 0"
+              "pretty_sql": "SELECT DISTINCT\n  l_returnflag,\n  l_linestatus,\n  sum_qty,\n  sum_base_price,\n  sum_disc_price,\n  sum_charge,\n  avg_qty,\n  avg_price,\n  avg_disc,\n  count_order\nFROM (\n  SELECT\n    l_returnflag,\n    l_linestatus,\n    SUM(l_quantity) OVER w AS sum_qty,\n    SUM(l_extendedprice) OVER w AS sum_base_price,\n    SUM(l_extendedprice * (\n      1 - l_discount\n    )) OVER w AS sum_disc_price,\n    SUM(l_extendedprice * (\n      1 - l_discount\n    ) * (\n      1 + l_tax\n    )) OVER w AS sum_charge,\n    AVG(l_quantity) OVER w AS avg_qty,\n    AVG(l_extendedprice) OVER w AS avg_price,\n    AVG(l_discount) OVER w AS avg_disc,\n    COUNT(*) OVER w AS count_order,\n    COUNT(*) OVER w AS _w\n  FROM lineitem\n  WHERE\n    l_shipdate <= CAST('1998-12-01' AS DATE) - INTERVAL '90 DAY'\n  WINDOW w AS (PARTITION BY l_returnflag, l_linestatus)\n) AS _t\nWHERE\n  _w > 0\nORDER BY\n  l_returnflag,\n  l_linestatus",
+              "sql": "SELECT DISTINCT l_returnflag, l_linestatus, sum_qty, sum_base_price, sum_disc_price, sum_charge, avg_qty, avg_price, avg_disc, count_order FROM (SELECT l_returnflag, l_linestatus, SUM(l_quantity) OVER w AS sum_qty, SUM(l_extendedprice) OVER w AS sum_base_price, SUM(l_extendedprice * (1 - l_discount)) OVER w AS sum_disc_price, SUM(l_extendedprice * (1 - l_discount) * (1 + l_tax)) OVER w AS sum_charge, AVG(l_quantity) OVER w AS avg_qty, AVG(l_extendedprice) OVER w AS avg_price, AVG(l_discount) OVER w AS avg_disc, COUNT(*) OVER w AS count_order, COUNT(*) OVER w AS _w FROM lineitem WHERE l_shipdate <= CAST('1998-12-01' AS DATE) - INTERVAL '90 DAY' WINDOW w AS (PARTITION BY l_returnflag, l_linestatus)) AS _t WHERE _w > 0 ORDER BY l_returnflag, l_linestatus"
             },
             "sql_native": {
               "dialect": "default",
               "is_template": false,
-              "pretty_sql": "SELECT l_returnflag, l_linestatus, sum_qty, sum_base_price, sum_disc_price, sum_charge, avg_qty, avg_price, avg_disc, count_order FROM (SELECT DISTINCT l_returnflag, l_linestatus, SUM(l_quantity) OVER w AS sum_qty, SUM(l_extendedprice) OVER w AS sum_base_price, SUM(l_extendedprice * (1 - l_discount)) OVER w AS sum_disc_price, SUM(l_extendedprice * (1 - l_discount) * (1 + l_tax)) OVER w AS sum_charge, AVG(l_quantity) OVER w AS avg_qty, AVG(l_extendedprice) OVER w AS avg_price, AVG(l_discount) OVER w AS avg_disc, COUNT(*) OVER w AS count_order, COUNT(*) OVER w AS _w FROM lineitem WHERE l_shipdate <= CAST('1998-12-01' AS DATE) - INTERVAL '90 DAY' WINDOW w AS (PARTITION BY l_returnflag, l_linestatus) ORDER BY l_returnflag, l_linestatus) AS _t WHERE _w > 0",
-              "sql": "SELECT l_returnflag, l_linestatus, sum_qty, sum_base_price, sum_disc_price, sum_charge, avg_qty, avg_price, avg_disc, count_order FROM (SELECT DISTINCT l_returnflag, l_linestatus, SUM(l_quantity) OVER w AS sum_qty, SUM(l_extendedprice) OVER w AS sum_base_price, SUM(l_extendedprice * (1 - l_discount)) OVER w AS sum_disc_price, SUM(l_extendedprice * (1 - l_discount) * (1 + l_tax)) OVER w AS sum_charge, AVG(l_quantity) OVER w AS avg_qty, AVG(l_extendedprice) OVER w AS avg_price, AVG(l_discount) OVER w AS avg_disc, COUNT(*) OVER w AS count_order, COUNT(*) OVER w AS _w FROM lineitem WHERE l_shipdate <= CAST('1998-12-01' AS DATE) - INTERVAL '90 DAY' WINDOW w AS (PARTITION BY l_returnflag, l_linestatus) ORDER BY l_returnflag, l_linestatus) AS _t WHERE _w > 0"
+              "pretty_sql": "SELECT DISTINCT l_returnflag, l_linestatus, sum_qty, sum_base_price, sum_disc_price, sum_charge, avg_qty, avg_price, avg_disc, count_order FROM (SELECT l_returnflag, l_linestatus, SUM(l_quantity) OVER w AS sum_qty, SUM(l_extendedprice) OVER w AS sum_base_price, SUM(l_extendedprice * (1 - l_discount)) OVER w AS sum_disc_price, SUM(l_extendedprice * (1 - l_discount) * (1 + l_tax)) OVER w AS sum_charge, AVG(l_quantity) OVER w AS avg_qty, AVG(l_extendedprice) OVER w AS avg_price, AVG(l_discount) OVER w AS avg_disc, COUNT(*) OVER w AS count_order, COUNT(*) OVER w AS _w FROM lineitem WHERE l_shipdate <= CAST('1998-12-01' AS DATE) - INTERVAL '90 DAY' WINDOW w AS (PARTITION BY l_returnflag, l_linestatus)) AS _t WHERE _w > 0 ORDER BY l_returnflag, l_linestatus",
+              "sql": "SELECT DISTINCT l_returnflag, l_linestatus, sum_qty, sum_base_price, sum_disc_price, sum_charge, avg_qty, avg_price, avg_disc, count_order FROM (SELECT l_returnflag, l_linestatus, SUM(l_quantity) OVER w AS sum_qty, SUM(l_extendedprice) OVER w AS sum_base_price, SUM(l_extendedprice * (1 - l_discount)) OVER w AS sum_disc_price, SUM(l_extendedprice * (1 - l_discount) * (1 + l_tax)) OVER w AS sum_charge, AVG(l_quantity) OVER w AS avg_qty, AVG(l_extendedprice) OVER w AS avg_price, AVG(l_discount) OVER w AS avg_disc, COUNT(*) OVER w AS count_order, COUNT(*) OVER w AS _w FROM lineitem WHERE l_shipdate <= CAST('1998-12-01' AS DATE) - INTERVAL '90 DAY' WINDOW w AS (PARTITION BY l_returnflag, l_linestatus)) AS _t WHERE _w > 0 ORDER BY l_returnflag, l_linestatus"
             },
             "subscale_note": null
           },

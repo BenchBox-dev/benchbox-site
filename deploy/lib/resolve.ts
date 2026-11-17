@@ -64,15 +64,44 @@ export function deployedBundleErrors(receipt: { core_sha: string; bundle_digest:
   return errors;
 }
 
-export function chainErrors(deployed: Deployed, candidate: Candidate): string[] {
+export type CompareResult = { status: number; body?: { status?: CompareStatus } };
+
+export type ParityAncestry = { baseToDeployed?: CompareResult; deployedToCandidate?: CompareResult };
+
+export function parityNeedsAncestry(deployed: Deployed, candidate: Candidate): boolean {
+  const base = candidate.validator_parity?.base;
+  return Boolean(deployed && deployed.corpus_sha !== candidate.corpus_sha && base && base !== deployed.core_sha);
+}
+
+function ancestryReadError(result: CompareResult | undefined, label: string): string | null {
+  if (!result || result.status !== 200 || !result.body?.status) {
+    return `the ${label} comparison could not be read (${result ? `HTTP ${result.status}` : "not performed"}); refusing to accept the validator_parity range`;
+  }
+  return null;
+}
+
+export function chainErrors(deployed: Deployed, candidate: Candidate, ancestry: ParityAncestry = {}): string[] {
   if (!deployed || deployed.corpus_sha === candidate.corpus_sha) return [];
   const parity = candidate.validator_parity;
   if (!parity) return ["corpus changed but the bundle has no validator_parity attestation"];
-  if (parity.base !== deployed.core_sha) {
-    return [
-      `corpus changed but validator_parity covers ${parity.base ?? "no base"}..${candidate.core_sha}, not the deployed ${deployed.core_sha}; ` +
-        `dispatch core site-inputs.yml with parent_core_sha=${deployed.core_sha}`,
-    ];
+  if (parity.base === deployed.core_sha) return [];
+  const recovery = `dispatch core site-inputs.yml with parent_core_sha=${deployed.core_sha}`;
+  const range = `${parity.base ?? "no base"}..${candidate.core_sha}`;
+  if (!parity.base) return [`corpus changed but validator_parity covers ${range}, not the deployed ${deployed.core_sha}; ${recovery}`];
+  const unreadable = [ancestryReadError(ancestry.baseToDeployed, "validator_parity base to deployed core_sha")];
+  if (candidate.core_sha !== deployed.core_sha) {
+    unreadable.push(ancestryReadError(ancestry.deployedToCandidate, "deployed core_sha to bundle core_sha"));
+  }
+  const unread = unreadable.filter((error): error is string => error !== null);
+  if (unread.length > 0) return unread.map((error) => `${error}; ${recovery}`);
+  if (ancestry.baseToDeployed?.body?.status !== "ahead") {
+    return [`corpus changed but validator_parity covers ${range}, and its base is not an ancestor of the deployed ${deployed.core_sha}; ${recovery}`];
+  }
+  if (candidate.core_sha !== deployed.core_sha) {
+    const forward = ancestry.deployedToCandidate?.body?.status;
+    if (forward !== "ahead" && forward !== "identical") {
+      return [`corpus changed but the bundle core_sha ${candidate.core_sha} is not a descendant of the deployed ${deployed.core_sha}; refusing the validator_parity range ${range}`];
+    }
   }
   return [];
 }

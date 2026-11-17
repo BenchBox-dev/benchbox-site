@@ -52,7 +52,7 @@ TPC-H uses DBGen update sets. `tpch_refresh_functions` defaults to `false`; set 
 
 DBGen creates update files before measurement. Power uses RF1(set F), runs the 22 queries, then applies RF2(set F); only the final measurement iteration modifies data. Throughput starts a separate refresh stream and runs S serial RF1/RF2 pairs on sets F+1 through F+S alongside the S query streams. Refresh time contributes to the throughput interval; the refresh safety checks run before the interval starts and after it ends.
 
-The standalone TPC-H maintenance phase runs only on adapters that declare refresh support (DuckDB, SQLite, PostgreSQL and the adapters built on it, Snowflake, and SingleStore). On other adapters it completes with one skipped `maintenance_not_supported` row and issues no refresh SQL.
+The standalone TPC-H maintenance phase runs only on adapters that declare refresh support: DuckDB, SQLite, PostgreSQL, DuckLake (which inherits it from DuckDB), Snowflake and SingleStore. The adapters built on PostgreSQL (CedarDB, Citus, ParadeDB, pg_duckdb, pg_mooncake and TimescaleDB) do not declare it. On these and every other adapter, the standalone phase completes with one skipped `maintenance_not_supported` row and issues no refresh SQL. A Snowflake run routed through the Greybeam gateway is different: both the standalone maintenance phase and the refresh functions in a power or throughput phase fail with a configuration error.
 
 RF1 inserts the DBGen order and lineitem rows in 1,000-row chunks and rejects order-key collisions. RF2 verifies that all selected orders exist, then deletes their lineitems before the orders. Each function uses a transaction. The standalone Maintenance phase uses the same generator and executor. These operations permanently modify the database.
 
@@ -125,7 +125,8 @@ Maintenance timings from earlier BenchBox versions used a different method and a
 |----------|-----------|
 | DuckDB, PostgreSQL, SQLite | Runs when no maintenance target table enforces a primary key; otherwise refuses |
 | Snowflake | Runs; primary keys are informational constraints that Snowflake does not enforce |
-| SingleStore | Reports the phase as skipped, because the refresh statements are not validated against its SQL |
+| SingleStore | Runs; BenchBox does not check its primary keys beforehand |
+| DuckLake | Runs; its tables are created without primary keys, so nothing enforces them |
 | Other platforms | Report the phase as skipped |
 
 ### Enforced Primary Keys

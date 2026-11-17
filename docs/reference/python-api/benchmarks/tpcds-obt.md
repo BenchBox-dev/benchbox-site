@@ -8,9 +8,9 @@ Python API reference for the TPC-DS One Big Table (OBT) benchmark.
 
 TPCDSOBT flattens the TPC-DS sales and returns facts and their dimensions into one wide table, `tpcds_sales_returns_obt`, and serves TPC-DS queries rewritten to run against that table.
 
-Two limits apply to the 0.4.1 release:
+Two limits apply:
 
-- `get_query()` and `get_queries()` fail with `FileNotFoundError` when BenchBox is installed from PyPI, because the TPC-DS query templates they read are not at the location they look in. See `get_query()` below.
+- On 0.4.1, `get_query()` and `get_queries()` fail with `FileNotFoundError` when BenchBox is installed from PyPI, because the TPC-DS query templates they read are not at the location they look in. On 0.5.1 the OBT query text comes from a catalog packaged with BenchBox, but `get_query()` still runs the TPC-DS `dsqgen` tool and reads the TPC-DS query templates, found in the bundled binaries or a source checkout, to draw each query's parameters. Whether a PyPI install of 0.5.1 finds them was not checked, and the examples below show 0.4.1 output. See `get_query()` below.
 - `generate_data()` writes the full TPC-DS source data first.
 
 ## `benchbox.TPCDSOBT`
@@ -53,7 +53,7 @@ custom = TPCDSOBT(scale_factor=1, output_dir="obt_out", tpcds_source_dir="tpcds_
 print(custom.output_dir)
 ```
 
-Output on 0.4.1:
+Output (the scale-factor message is from 0.5.1; the paths are from 0.4.1):
 
 ```text
 Scale factors >= 1 must be whole integers. Got: 1.5.
@@ -77,7 +77,7 @@ Scale factor 1 writes about a gigabyte of source data.
 
 `get_query(query_id, **kwargs) -> str` is meant to return one TPC-DS query rewritten for the OBT table. `query_id` is an `int` or a numeric `str`.
 
-On 0.4.1 installed from PyPI it raises `FileNotFoundError` for every query id, because the query templates are not where it looks for them.
+On 0.4.1 installed from PyPI it raises `FileNotFoundError` for every query id, because the query templates are not where it looks for them. On 0.5.1 the query text is read from a packaged catalog and only the parameter draw needs `dsqgen` and the TPC-DS query templates.
 
 ```python
 from benchbox import TPCDSOBT

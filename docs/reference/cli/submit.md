@@ -137,7 +137,7 @@ uv run -- benchbox results --submitted
 Both destinations refuse a result whose `compliance_class` is `unofficial_subscale` or `unofficial_nonstandard`, with exit code 1 and the message `Submission refused: compliance_class=<class>`. For TPC-H and TPC-DS that means:
 
 - Any run below scale factor 1 (`--scale 0.01`, for example) is `unofficial_subscale`.
-- A run at scale factor 1 or above is `unofficial_nonstandard` unless `benchbox run --official` produced it, at an official scale factor with a `--seed`.
+- A run at scale factor 1 or above is `unofficial_nonstandard` unless `benchbox run --official` produced it, at an official scale factor with a `--seed`. `--official` also refuses partial runs, query subsets and too few streams; see [Contributing Benchmark Results](../../contributing-results.md) for what each benchmark needs.
 
 Benchmarks that have no TPC compliance class, such as SSB, are not subject to this check. `--dry-run` applies it too, so a refusal shows before anything is packaged or uploaded.
 
