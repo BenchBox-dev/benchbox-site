@@ -37,6 +37,7 @@ import {
   primaryMetricValue,
   type PrimaryMetric,
 } from "@/lib/displayEligibility";
+import { combinedDisclosures } from "@/lib/combinedDisclosure";
 import { formatDurationSeconds, formatLatencyMs, formatScaleFactor } from "@/lib/metricFormatters";
 import { visibleResultIdForRow } from "@/lib/resultLinks";
 import { RunDateChip } from "@/components/RunAge";
@@ -378,6 +379,13 @@ export function ResultDetail({ resultId = "", source = "public" }: ResultDetailP
             <TuningSettingsDisclosure bundleUrl={detail.bundle_download_url} />
           ) : null}
         </div>
+        {combinedDisclosures(detail).length > 0 && (
+          <ul class="mt-3 list-disc pl-5 text-xs text-[var(--bb-data-fg-subtle)]" aria-label="Combined run disclosures">
+            {combinedDisclosures(detail).map((note) => (
+              <li key={note}>{note}</li>
+            ))}
+          </ul>
+        )}
       </section>
 
       <div class="space-y-6">

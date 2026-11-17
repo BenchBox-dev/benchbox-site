@@ -569,11 +569,15 @@ function cohortMetricSublabel(cohort: MetaCohort): string {
     ? "Power score"
     : metric === "throughput_at_size"
       ? "Throughput@Size"
-      : metric === "display_geomean_ms" || metric === "geomean_ms"
-        ? "Geomean latency"
-        : metric === "total_duration_s"
-          ? "Total duration"
-          : metric;
+      : metric === "qphh_at_size"
+        ? "QphH@Size"
+        : metric === "qphds_at_size"
+          ? "QphDS@SF"
+          : metric === "display_geomean_ms" || metric === "geomean_ms"
+            ? "Geomean latency"
+            : metric === "total_duration_s"
+              ? "Total duration"
+              : metric;
   return `${formatPhaseWithStreams(cohort.phase, cohort.stream_count)} · ${metricLabel} · ${direction}`;
 }
 
@@ -601,6 +605,12 @@ function exactMetricTitle(rank: MetaRank | undefined, cohort: MetaCohort): strin
   }
   if (cohort.primary_metric === "throughput_at_size") {
     return `Exact Throughput@Size: ${fmtScoreExact(rank.metric_value)}`;
+  }
+  if (cohort.primary_metric === "qphh_at_size") {
+    return `Exact QphH@Size: ${fmtScoreExact(rank.metric_value)}`;
+  }
+  if (cohort.primary_metric === "qphds_at_size") {
+    return `Exact QphDS@SF: ${fmtScoreExact(rank.metric_value)}`;
   }
   return null;
 }
