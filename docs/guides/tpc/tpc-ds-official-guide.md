@@ -6,25 +6,25 @@ tags: [advanced, guide, tpc-ds, validation]
 
 # TPC-DS Official Benchmark Guide
 
-This guide provides systematic documentation for the TPC-DS official benchmark implementation in BenchBox, including Power@Size and Throughput@Size. BenchBox does not export the composite QphDS@Size; see [QphDS@Size (not exported)](tpc-ds-official-guide.md#qphds-size-not-exported).
+This guide provides systematic documentation for the TPC-DS official benchmark implementation in BenchBox, including Power@Size, Throughput@Size and the composite QphDS@Size; see [QphDS@Size](tpc-ds-official-guide.md#qphds-size).
 
 > **Derived results.** Derived from TPC-DS. Results produced by BenchBox do not comply with the TPC-DS Specification and must not be compared with official TPC-DS results. The TPC publishes official TPC-DS results only after an audit.
 
 ## Overview
 
-The TPC-DS official benchmark implementation coordinates all three test phases and reports Power@Size and Throughput@Size. It does not export the composite QphDS@Size (see below). It includes:
+The TPC-DS official benchmark implementation coordinates all three test phases and reports Power@Size and Throughput@Size. An official run that meets the conditions under [QphDS@Size](tpc-ds-official-guide.md#qphds-size) also exports the composite QphDS@Size. It includes:
 
 - **Complete benchmark execution** with all three phases
-- **Power@Size and Throughput@Size** (no composite QphDS@Size; see below)
+- **Power@Size, Throughput@Size and QphDS@Size** (QphDS@Size only for a complete official run; see below)
 - **Comprehensive reporting** and validation
 - **Validation framework** integration
 - **Audit trail functionality** recording run evidence
 
 ### Key Features
 
-- **TPC-DS Metrics**: Reports Power@Size and Throughput@Size (see the deviation note above)
+- **TPC-DS Metrics**: Reports Power@Size and Throughput@Size, and QphDS@Size for a complete official run
 - **Complete Implementation**: Power, Throughput, and Maintenance Tests
-- **Metrics**: Power@Size and Throughput@Size (`Q = 99 × S`)
+- **Metrics**: Power@Size and Throughput@Size (`Q = 99 × S`), and QphDS@Size
 - **Multi-format Reporting**: Text, JSON, CSV, HTML reports
 - **Validation Framework**: Comprehensive result validation
 - **Error Handling**: Robust error handling and recovery
@@ -33,10 +33,11 @@ The TPC-DS official benchmark implementation coordinates all three test phases a
 
 ## Quick Start
 
-Run the official TPC-DS benchmark with the CLI (this SF1 DuckDB run completes in about a minute and reports a result in the `official` result class):
+Run the official TPC-DS benchmark with the CLI. `--official` refuses a partial run: it needs the load, power, throughput and maintenance phases, a `--seed`, and an even `--streams` of at least 4. It also refuses `--queries`:
 
 ```bash
-benchbox run --official --platform duckdb --benchmark tpcds --scale 1 --seed 42 --output ./official_data
+benchbox run --official --platform duckdb --benchmark tpcds --scale 1 --seed 42 \
+  --phases load,power,throughput,maintenance --streams 4 --output ./official_data
 ```
 
 ### Programmatic Usage
@@ -64,7 +65,7 @@ The TPC-DS benchmark is the official Transaction Processing Performance Council 
 - **Multi-Stream**: Concurrent execution capability
 - **Refresh Functions**: Data maintenance operations
 
-### QphDS@Size (not exported)
+### QphDS@Size
 
 The **QphDS@Size** (Queries per Hour at Scale Factor) is the TPC-DS primary composite metric. The specification defines it as:
 
@@ -72,11 +73,23 @@ The **QphDS@Size** (Queries per Hour at Scale Factor) is the TPC-DS primary comp
 QphDS@Size = SF × Q / (T_PT × T_TT × T_DM × T_LD)^(1/4)
 ```
 
-Where `Q = 99 × S` (S is the number of throughput streams), `T_PT` is the power test time, `T_TT = TT1 + TT2` is the total throughput test time, `T_DM = DM1 + DM2` is the data maintenance time, and `T_LD = 0.01 × S × T_load` is the weighted load time. TPC-DS has no Power@Size metric.
+Where `Q = 99 × S` (S is the number of throughput streams), `T_PT = S × T_Power` is the power test time scaled by the stream count, `T_TT = TT1 + TT2` is the total throughput test time, `T_DM = DM1 + DM2` is the data maintenance time, and `T_LD = 0.01 × S × T_load` is the weighted load time. TPC-DS has no Power@Size metric.
 
-**Deviation from the specification.** BenchBox does not export QphDS@Size. Earlier releases exported the geometric mean of Power@Size and Throughput@Size under that name. That value is not the specification metric, because it omits the data maintenance and load times and uses a different combination, so results carrying it are not comparable with published TPC-DS results. BenchBox runs a single throughput test with no data maintenance between throughput tests, so the specification formula is not yet implemented. Implementing it is tracked as follow-up work.
+**What BenchBox exports.** A run with `--official` and the load, power, throughput and maintenance phases runs the tests in the specification's order: power, throughput, maintenance, throughput, maintenance. When the run meets every condition below, `summary.tpc_metrics` carries `qphds_at_size`, the formula's value rounded down to a whole number, and `qphds_terms`. The terms are `q` (`99 × S`), `t_pt_hours` (power time × S, in hours), `t_tt_hours` (the two throughput times), `t_dm_hours` (the two maintenance times), and `t_ld_hours` (`0.01 × S × load time`).
 
-BenchBox exports two metrics instead:
+The conditions are:
+
+- the result is `official`, with no failed queries and no query subset;
+- `S` (`--streams`) is an even number of at least 4, and both throughput tests run all 99 queries on S streams each, the second on the stream numbers that follow the first's;
+- the power test completed all 99 queries;
+- both data maintenance tests completed S/2 refresh runs, the second on the refresh sets that follow the first's;
+- the database load ran in this run and was timed, not reused.
+
+When a condition fails, `qphds_at_size` is absent and `summary.tpc_metrics.qphds_unavailable` lists the reasons. A run with a single query phase carries neither field; any other TPC-DS run that misses a condition, including one that is not official, carries `qphds_unavailable`. `benchbox metrics qphh` computes QphH@Size only for TPC-H and does not compute QphDS@Size; it points to the run's own results.
+
+Earlier releases exported the geometric mean of Power@Size and Throughput@Size under the QphDS@Size name. That value is not the specification metric, and results carrying it are not comparable with the metric described here.
+
+BenchBox also exports two component metrics:
 
 - `Power@Size = 3600 × Scale_Factor / geometric_mean(power query times)`
 - `Throughput@Size = Q × 3600 × Scale_Factor / Throughput_Test_Time`, with `Q = 99 × S`. Template variants 14a/14b, 23a/23b, 24a/24b and 39a/39b count once, so a stream executes 103 statements but is scored as 99 queries. `Throughput_Test_Time` is the wall-clock interval from the first stream's first query to the last stream's last query; connection setup is excluded.
@@ -124,17 +137,17 @@ dialect; `dialect=` applies to the power and maintenance phases only. For suppor
 
 ```bash
 benchbox run --official --platform duckdb --benchmark tpcds --scale 10 --seed 42 \
-  --phases power,throughput --streams 4 --output ./official_data
+  --phases load,power,throughput,maintenance --streams 4 --output ./official_data
 ```
 
 ### Individual Phases
 
-The first command runs the Power Test only. The second runs the Throughput Test only.
+`--official` refuses single-phase runs, so these two commands run without it and are not official. The first runs the Power Test only. The second runs the Throughput Test only.
 
 ```bash
-benchbox run --official --platform duckdb --benchmark tpcds --scale 10 --seed 42 --phases power --output ./official_data
+benchbox run --platform duckdb --benchmark tpcds --scale 10 --seed 42 --phases power --output ./official_data
 
-benchbox run --official --platform duckdb --benchmark tpcds --scale 10 --seed 42 --phases throughput --streams 8 --output ./official_data
+benchbox run --platform duckdb --benchmark tpcds --scale 10 --seed 42 --phases throughput --streams 8 --output ./official_data
 ```
 
 ### Custom Configuration
@@ -143,7 +156,7 @@ This example uses advanced-level configuration:
 
 ```bash
 benchbox run --official --platform duckdb --benchmark tpcds --scale 10 --seed 42 \
-  --phases power,throughput --streams 6 --validation full --output ./official_data
+  --phases load,power,throughput,maintenance --streams 6 --validation full --output ./official_data
 ```
 
 ## Configuration
@@ -179,10 +192,10 @@ benchbox run --official --platform duckdb --benchmark tpcds --scale 10 --seed 42
 The Power Test measures single-stream query processing power by executing all 99 TPC-DS queries sequentially.
 
 ```bash
-benchbox run --official --platform duckdb --benchmark tpcds --scale 1 --seed 42 --phases power --output ./official_data
+benchbox run --platform duckdb --benchmark tpcds --scale 1 --seed 42 --phases power --output ./official_data
 ```
 
-Read `Power@Size` from the result file's `summary.tpc_metrics` (see [Understanding Results](../../tutorials/understanding-results.md)).
+This run is not official, so `summary.tpc_metrics` is suppressed at scale factor 1 and above and carries no `Power@Size`. For the metrics, run the full official command from the [Quick Start](#quick-start).
 
 **Characteristics:**
 
@@ -196,10 +209,10 @@ Read `Power@Size` from the result file's `summary.tpc_metrics` (see [Understandi
 The Throughput Test measures concurrent query processing capability by executing multiple streams of queries simultaneously.
 
 ```bash
-benchbox run --official --platform duckdb --benchmark tpcds --scale 1 --seed 42 --phases throughput --streams 2 --output ./official_data
+benchbox run --platform duckdb --benchmark tpcds --scale 1 --seed 42 --phases throughput --streams 2 --output ./official_data
 ```
 
-Read `Throughput@Size` from the result file's `summary.tpc_metrics`.
+This run is not official, so `summary.tpc_metrics` is suppressed at scale factor 1 and above and carries no `Throughput@Size`. For the metrics, run the full official command from the [Quick Start](#quick-start).
 
 **Characteristics:**
 
@@ -347,7 +360,7 @@ Maintenance results use the same result-file shape as power and throughput runs:
 
 ### TPC-DS Derived Metrics
 
-The implementation calculates Power@Size and Throughput@Size. It does not calculate the composite QphDS@Size (see [QphDS@Size (not exported)](tpc-ds-official-guide.md#qphds-size-not-exported)):
+The implementation calculates Power@Size and Throughput@Size, and QphDS@Size for a complete official run (see [QphDS@Size](tpc-ds-official-guide.md#qphds-size)):
 
 ```python
 from benchbox.core.results.loader import load_result_file
@@ -462,7 +475,7 @@ reports = generator.generate_complete_report(result)
 The benchmark validates results against the TPC-DS specification. Request full validation and read the verdict from the result file:
 
 ```bash
-benchbox run --official --platform duckdb --benchmark tpcds --scale 1 --seed 42 --validation full --output ./official_data
+benchbox run --official --platform duckdb --benchmark tpcds --scale 1 --seed 42 --phases load,power,throughput,maintenance --streams 4 --validation full --output ./official_data
 ```
 
 ```python
@@ -505,21 +518,21 @@ Custom databases connect through platform adapters, not subclasses. Pick the ada
 
 ### Performance Tuning
 
-For large scale factors, add streams for throughput. Skip the Maintenance Test if you do not need it:
+For large scale factors, add streams for throughput. `--official` requires the Maintenance Test, so an official run cannot skip it:
 
 ```bash
 benchbox run --official --platform duckdb --benchmark tpcds --scale 100 --seed 42 \
-  --phases power,throughput --streams 16 --output ./official_data
+  --phases load,power,throughput,maintenance --streams 16 --output ./official_data
 ```
 
 ### Integration with CI/CD
 
-Fail the job when Throughput@Size drops below a minimum threshold (100 here is an example). `jq -e` exits non-zero when the check is false or the metric is missing:
+Fail the job when Throughput@Size drops below a minimum threshold (100 here is an example). Only an official run exports `tpc_metrics`, so the job runs the full official command. `jq -e` exits non-zero when the check is false or the metric is missing:
 
 ```bash
 export BENCHBOX_OUTPUT_DIR=./ci_data
 benchbox run --official --platform duckdb --benchmark tpcds --scale 1 --seed 42 \
-  --phases throughput --streams 2 --output ./ci_data
+  --phases load,power,throughput,maintenance --streams 4 --output ./ci_data
 
 jq -e '.summary.tpc_metrics.throughput_at_size > 100' ./ci_data/results/*.json
 ```
@@ -528,7 +541,8 @@ jq -e '.summary.tpc_metrics.throughput_at_size > 100' ./ci_data/results/*.json
 
 ```bash
 for sf in 1.0 10.0; do
-  benchbox run --official --platform duckdb --benchmark tpcds --scale $sf --seed 42 --output ./official_data
+  benchbox run --official --platform duckdb --benchmark tpcds --scale $sf --seed 42 \
+    --phases load,power,throughput,maintenance --streams 4 --output ./official_data
 done
 
 benchbox results --limit 3
@@ -552,7 +566,7 @@ benchbox check-deps --platform duckdb
 For large scale factors, use fewer streams and monitor memory usage:
 
 ```bash
-benchbox run --official --platform duckdb --benchmark tpcds --scale 100 --seed 42 \
+benchbox run --platform duckdb --benchmark tpcds --scale 100 --seed 42 \
   --phases power --streams 2 --output ./official_data
 ```
 
@@ -566,10 +580,10 @@ print(f"Memory usage: {psutil.virtual_memory().percent}%")
 Split the phases so a slow phase can be retried alone:
 
 ```bash
-benchbox run --official --platform duckdb --benchmark tpcds --scale 10 --seed 42 \
+benchbox run --platform duckdb --benchmark tpcds --scale 10 --seed 42 \
   --phases power --output ./official_data
 
-benchbox run --official --platform duckdb --benchmark tpcds --scale 10 --seed 42 \
+benchbox run --platform duckdb --benchmark tpcds --scale 10 --seed 42 \
   --phases throughput --streams 2 --output ./official_data
 ```
 
@@ -589,7 +603,8 @@ print(f"Success rate: {raw['summary']['queries']['passed']}/{raw['summary']['que
 Enable verbose output with an official scale factor:
 
 ```bash
-benchbox run --official --platform duckdb --benchmark tpcds --scale 1 --seed 42 -vv --output ./official_data
+benchbox run --official --platform duckdb --benchmark tpcds --scale 1 --seed 42 -vv \
+  --phases load,power,throughput,maintenance --streams 4 --output ./official_data
 ```
 
 ### Error Recovery
@@ -599,7 +614,7 @@ Retry a failed run from the shell, waiting 60 seconds between attempts:
 ```bash
 for attempt in 1 2 3; do
   if benchbox run --official --platform duckdb --benchmark tpcds --scale 1 --seed 42 \
-    --output ./official_data; then
+    --phases load,power,throughput,maintenance --streams 4 --output ./official_data; then
     break
   fi
   echo "Attempt $attempt failed"
@@ -632,14 +647,16 @@ benchmark = TPCDSBenchmark(scale_factor=scale_factors["testing"])
 Point `--output` at a temporary directory for throwaway runs:
 
 ```bash
-benchbox run --official --platform duckdb --benchmark tpcds --scale 1 --seed 42 --output "$(mktemp -d)"
+benchbox run --official --platform duckdb --benchmark tpcds --scale 1 --seed 42 \
+  --phases load,power,throughput,maintenance --streams 4 --output "$(mktemp -d)"
 ```
 
 ### 3. Performance Monitoring
 
 ```bash
 START=$(date +%s)
-benchbox run --official --platform duckdb --benchmark tpcds --scale 1 --seed 42 --output ./official_data
+benchbox run --official --platform duckdb --benchmark tpcds --scale 1 --seed 42 \
+  --phases load,power,throughput,maintenance --streams 4 --output ./official_data
 echo "Benchmark time: $(( $(date +%s) - START ))s"
 ```
 
@@ -665,13 +682,13 @@ with open(f"benchmark_archive_{datetime.now().strftime('%Y%m%d_%H%M%S')}.json", 
 ### 5. Continuous Benchmarking
 
 The loop runs every hour (`sleep 3600`) against your own baseline power number, and alerts when the result falls
-more than 5% below it:
+more than 5% below it. It uses the full official command, because only an official run exports `tpc_metrics`:
 
 ```bash
 while true; do
   export BENCHBOX_OUTPUT_DIR=./ci_data
   benchbox run --official --platform duckdb --benchmark tpcds --scale 1 --seed 42 \
-    --phases power --output ./ci_data
+    --phases load,power,throughput,maintenance --streams 4 --output ./ci_data
   jq -e '.summary.tpc_metrics.power_at_size > 250000.0 * 0.95' ./ci_data/results/*.json \
     || echo "ALERT: Power@Size regressed"
   sleep 3600
@@ -680,7 +697,7 @@ done
 
 ## Conclusion
 
-The TPC-DS official benchmark implementation coordinates the power, throughput, and maintenance phases with Power@Size and Throughput@Size reporting. It does not export the composite QphDS@Size. Results are derived from TPC-DS and carry the derived-results disclaimer above.
+The TPC-DS official benchmark implementation coordinates the power, throughput, and maintenance phases with Power@Size and Throughput@Size reporting, and exports the composite QphDS@Size for a complete official run. Results are derived from TPC-DS and carry the derived-results disclaimer above.
 
 For additional support:
 

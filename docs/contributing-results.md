@@ -31,10 +31,13 @@ The result JSON is written to `benchmark_runs/results/`.
 - A run below scale factor 1 is `unofficial_subscale`, so `--scale 0.01` produces a
   result that `submit` refuses.
 - A run at scale factor 1 or above is `unofficial_nonstandard` unless it came from
-  `benchbox run --official`, which needs an official scale factor (1, 10, 30, 100
-  and so on) and a `--seed`. `--official` also refuses a partial run: it needs the
-  power and throughput phases, `--streams` of at least 2 at scale factor 1 and, for
-  TPC-H, the refresh functions.
+  `benchbox run --official`, which needs an official scale factor and a `--seed`.
+  TPC-H official scale factors are 1, 10, 30, 100, 300, 1000, 3000, 10000, 30000
+  and 100000; TPC-DS has the same list without 30. `--official` also refuses a
+  partial run and a query subset. TPC-H needs the power and throughput phases, the
+  refresh functions and `--streams` of at least the minimum for the scale (2 at
+  scale factor 1, 3 at 10, 4 at 30, 5 at 100). TPC-DS needs the load, power,
+  throughput and maintenance phases and an even `--streams` of at least 4.
 
 Benchmarks without a TPC compliance class, such as SSB, are not subject to that
 check. See the [TPC-H official guide](guides/tpc/tpc-h-official-guide.md) for

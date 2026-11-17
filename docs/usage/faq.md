@@ -331,11 +331,11 @@ stream count with `--concurrency` (a hidden option on `run`, shown by
 `benchbox run --help-topic all`):
 
 ```bash
-benchbox run --official --benchmark tpch --platform duckdb --scale 1 \
+benchbox run --benchmark tpch --platform duckdb --scale 1 \
   --phases throughput --concurrency 4 --seed 42
 ```
 
-The throughput driver floors the stream count at the TPC minimum of 2.
+The throughput driver floors the stream count at the TPC minimum of 2. `--official` would refuse this single-phase run; an official run needs more than the throughput phase (see [Contributing Benchmark Results](../contributing-results.md)).
 See [Power Run & Concurrent Queries](../advanced/power-run-concurrent-queries.md).
 
 ### How do I compare results across runs?

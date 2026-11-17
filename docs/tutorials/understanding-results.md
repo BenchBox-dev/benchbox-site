@@ -76,7 +76,9 @@ A failed query carries an `ERROR` status and an error message instead of timing 
 
 ## TPC Metrics
 
-For TPC-H/TPC-DS, BenchBox calculates Power@Size and Throughput@Size:
+For TPC-H/TPC-DS, BenchBox calculates Power@Size and Throughput@Size. At scale factor 1 and above a run that is not `--official` records `summary.tpc_metrics` as suppressed.
+
+They are computed as:
 
 ```text
 Power@Size      = (SF × 3600) / geometric_mean(query times, final iteration)
@@ -91,7 +93,7 @@ Where:
 
 **Higher is better.** Compare these metrics only at the same scale factor.
 
-BenchBox exports QphH@Size only for an official TPC-H run with all 22 power queries, successful RF1 and RF2 in Power, at least two completed throughput query streams, and one successful refresh pair per throughput stream using consecutive update sets. Failed queries, incomplete phases, query subsets, missing refresh evidence, or a nonofficial compliance class withhold the composite; `qphh_unavailable` lists the reasons. BenchBox does not export QphDS@Size (TPC-DS), which also needs data maintenance and load times. A failed query or throughput phase also withholds Throughput@Size.
+BenchBox exports QphH@Size only for an official TPC-H run with all 22 power queries, successful RF1 and RF2 in Power, at least two completed throughput query streams, and one successful refresh pair per throughput stream using consecutive update sets. Failed queries, incomplete phases, query subsets, missing refresh evidence, or a nonofficial compliance class withhold the composite; `qphh_unavailable` lists the reasons. For TPC-DS, an official run of the load, power, throughput and maintenance phases with an even `--streams` of at least 4 exports `qphds_at_size`, and `qphds_unavailable` lists the reasons otherwise (see the [TPC-DS official guide](../guides/tpc/tpc-ds-official-guide.md#qphds-size)). A failed query or throughput phase also withholds Throughput@Size.
 
 ### Price/Performance
 
