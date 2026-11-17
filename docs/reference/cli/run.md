@@ -355,47 +355,6 @@ benchbox run --platform databricks --benchmark tpch --scale 1 \
 
 The commands, in order, run Databricks with Z-order clustering, with liquid clustering on specific columns, and with automatic liquid clustering.
 
-## Billable Platforms
-
-A platform is billable when its registry category is `cloud` or its resolved deployment mode is managed. A non-interactive `run` of a billable platform exits with code 6 unless you acknowledge that it may incur cost. The refusal happens before the platform manager, saved credentials, adapter or any connection is used.
-
-```bash
-benchbox run --platform snowflake --benchmark tpch --non-interactive
-
-benchbox run --platform snowflake --benchmark tpch --non-interactive --acknowledge-billable-platform
-
-BENCHBOX_ACKNOWLEDGE_BILLABLE_PLATFORM=1 benchbox run --platform snowflake --benchmark tpch --non-interactive
-```
-
-The first command exits 6 with the refusal message. The second acknowledges with the flag, and the third with the environment variable (`1`, `true`, `yes` or `on`). The result bundle records the acknowledgement and its source under `execution.billable_platform_acknowledgement` (see [Result Formats](../result-formats.md)).
-
-- **Non-interactive** means `--non-interactive`, `BENCHBOX_NON_INTERACTIVE` set to a true value, or a standard input or output that is not a terminal. On a terminal the usual prompt applies.
-- **`benchbox compare -p`** applies the same rule and takes the same flag.
-- **Billable by default:** `athena`, `athena-spark`, `bigquery`, `clickhouse-cloud`, `databend`, `databricks`, `databricks-df`, `dataproc`, `dataproc-serverless`, `emr-serverless`, `fabric-lakehouse`, `fabric-spark`, `fabric_dw`, `firebolt`, `glue`, `influxdb`, `motherduck`, `quanton`, `redshift`, `snowflake`, `snowpark-connect`, `starburst`, `synapse`, `synapse-spark`. `timescaledb` (`cloud` mode) and `pg-duckdb` (`motherduck` mode) are billable only in a managed mode.
-- **`run-official`** takes the same `--acknowledge-billable-platform` flag and forwards it to `run`; the environment variable works there too.
-
-> [!WARNING]
-> The acknowledgement is a statement of intent, not an access control.
->
-> - Any caller that can start the command can set the flag or the variable itself.
-> - `--dry-run` is exempt. It reads saved credentials but installs no package and makes no Databricks network call.
-> - `databend` and `firebolt` stay billable when you run them self-hosted or in core mode, and a billable service reached through a self-hosted mode is not detected.
-> - The paths in [Paths the guard does not cover](#paths-the-guard-does-not-cover) are not guarded.
-> - Platform credentials saved in `~/.benchbox/credentials.yaml` are stored in plain text, readable by any process you run. The operating system keyring holds only the hosted-submission token.
-
-### Paths the guard does not cover
-
-| Path | Why it is not guarded |
-|---|---|
-| `run --dry-run` | It previews configuration. It reads `~/.benchbox/credentials.yaml`, installs no package and makes no Databricks network call. |
-| `setup --validate-only`, `setup --diagnose` | Connecting is their purpose. A Snowflake check can resume a suspended warehouse. |
-| Remote `start_benchmark` | Gated only by the operator allow-list; the acknowledgement is not passed through it. |
-| `shell` with an `md:` MotherDuck path | You asked for that connection. |
-
-The local MCP `run_benchmark` tool is guarded.
-
-The MCP server applies the same rule: it allows no billable platform unless the operator started the server with `BENCHBOX_ACKNOWLEDGE_BILLABLE_PLATFORM=1`, and no tool argument can grant it. See [MCP](../mcp.md).
-
 ## Driver Auto-Install
 
 `--platform-option driver_version=X` selects an exact driver version. The value must be a valid package version such as `1.2.3`; anything else is refused before it reaches an installer, and `run` exits 2.

@@ -13,30 +13,6 @@ These options are available for all BenchBox commands:
 - `--version`: Show version information and exit
 - `--help`: Show help message and exit
 
-## Exit Codes
-
-Scripts and CI jobs can rely on these exit codes.
-
-| Code | Meaning | Commands |
-| ---- | ------- | -------- |
-| `0`  | Success | all |
-| `1`  | Error, including a missing or unreadable input | all |
-| `2`  | Usage error, such as an invalid option combination | all |
-| `3`  | A regression exceeded the `--fail-on-regression` threshold (result-file mode only) | [`compare`](results.md#cli-compare-exit-codes) |
-| `4`  | The results cannot be compared: different variants or timing modes | [`compare`](results.md#cli-compare-exit-codes) |
-| `5`  | A result file has a FAIL finding, or a WARN finding with `--fail-on-warn` | [`results validate`](results.md#cli-results-validate) |
-| `6`  | A command needed an acknowledgement or an answer that a non-interactive session could not give. The cases are listed below. | [`run`](run.md#billable-platforms), [`compare`](results.md#cli-compare-exit-codes), [`submit`](submit.md#hosted-submission-acknowledgement), [`publish`](../../CLI_REFERENCE.md#benchbox-publish), [`setup`](setup.md), [`export`](results.md) |
-
-Exit code 6 covers these refusals:
-
-- `run`, `run-official` and `compare`: a non-interactive run of a billable platform without `--acknowledge-billable-platform` or `BENCHBOX_ACKNOWLEDGE_BILLABLE_PLATFORM=1`.
-- `run` and `run-official`: a non-interactive driver auto-install without `BENCHBOX_DRIVER_AUTO_INSTALL=1` ([Driver auto-install](run.md#driver-auto-install)).
-- `submit --service`: a non-interactive hosted upload without `--acknowledge-hosted-submission` or `BENCHBOX_ACKNOWLEDGE_HOSTED_SUBMISSION=1`.
-- `publish run` and `run --publish`: the `maintainer-run` label without `BENCHBOX_ALLOW_MAINTAINER_LABEL=1`.
-- `setup --remove`, `export` and `publish remove`: a confirmation prompt with no terminal to answer it. The refusal names the flag that skips the prompt: `--yes` or `--force`.
-
-Codes 75 to 79 belong to the heavy-work host lock and are not used by the commands above.
-
 ## Commands Overview
 
 BenchBox provides the following commands:
@@ -57,7 +33,6 @@ BenchBox provides the following commands:
 | `submit`               | Package results for PR contribution or hosted API upload | [submit](submit.md)                   |
 | `auth`                 | Manage hosted submission credentials               | [auth](auth.md)                           |
 | `results`              | Display exported benchmark results                 | [results](results.md#results-show-benchmark-results)             |
-| `results validate`     | Check result files for integrity, completeness and believability | [results](results.md#cli-results-validate) |
 | `compare`              | Compare benchmark results for regression detection | [results](results.md#compare-compare-benchmark-results)             |
 | `visualize`            | Generate ASCII charts from benchmark results       | [visualize](visualize.md)                 |
 | `report`               | Historical analysis, rankings, and regressions     | [report](report.md)                       |

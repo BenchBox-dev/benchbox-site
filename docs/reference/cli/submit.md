@@ -32,7 +32,6 @@ uv run -- benchbox submit [RESULT_FILE] [OPTIONS]
 | `--platform TEXT` | str | - | Filter by platform name (with `--last`) |
 | `--output DIRECTORY` | path | `./submission` | Output directory for submission package |
 | `--service [URL]` | str | - | Upload to hosted ingest API; without a URL uses `https://api.benchbox.dev/v1` |
-| `--acknowledge-hosted-submission` | flag | - | Acknowledge a hosted upload in a non-interactive session; see [Hosted submission acknowledgement](#hosted-submission-acknowledgement) |
 | `--visibility public\|unlisted\|private` | choice | `public` | Hosted submission visibility |
 | `--idempotency-key TEXT` | str | auto | Hosted retry/resubmit key |
 | `--wait / --no-wait` | flag | `--wait` | Poll for hosted publication before returning |
@@ -95,15 +94,6 @@ Then submit a result:
 ```bash
 uv run -- benchbox submit --last --service
 ```
-
-### Hosted submission acknowledgement
-
-A non-interactive `--service` submission exits 6 unless you pass `--acknowledge-hosted-submission` or set `BENCHBOX_ACKNOWLEDGE_HOSTED_SUBMISSION=1`. The refusal happens before the bundle is read or a token is resolved. A terminal session is not prompted, and `--dry-run` is exempt and needs no acknowledgement or credentials. The upload shares the result with a hosted corpus without a human step, which is why it needs a statement of intent.
-
-> [!WARNING]
-> The flag and the variable are a statement of intent, not an access control. Any caller that can run the command can set either one.
-
-The package mode (`--output`) uploads nothing and is not affected.
 
 Hosted mode sends a multipart request containing:
 

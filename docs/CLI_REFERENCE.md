@@ -34,15 +34,12 @@ Common flags:
 - `--compression <none|gzip|zstd|bzip2|xz>`
 - `--seed <int>`
 - `--iterations <int>` (advanced; default 3)
-- `--acknowledge-billable-platform`
 
 Examples:
 
 - `benchbox run --platform duckdb --benchmark tpch --scale 0.01 --phases power --non-interactive`
 - `benchbox run --platform polars-df --benchmark tpch --scale 0.01 --non-interactive`
 - `benchbox run --platform duckdb --benchmark tpch --scale 0.1 --dry-run ./preview --phases generate,load`
-
-A non-interactive run of a billable platform (cloud category or managed deployment) exits 6 unless `--acknowledge-billable-platform` or `BENCHBOX_ACKNOWLEDGE_BILLABLE_PLATFORM=1` is set. See [Billable platforms](reference/cli/run.md#billable-platforms) for the limits.
 
 ### `benchbox profile`
 
@@ -112,7 +109,7 @@ only possible when a resolver service exists and is explicitly configured.
 Common flags:
 
 - `--target <path-or-uri>` - destination directory or cloud URI prefix
-- `--label <maintainer-run|community-submission|vendor-supplied|ci|local|unofficial-research>` - provenance label. `maintainer-run` is the default and is refused with exit 6 unless `BENCHBOX_ALLOW_MAINTAINER_LABEL=1` is set, so a plain `publish run` needs either that variable or an explicit `--label`. The same rule applies to `run --publish` (label `--publish-label`), which is checked before the run starts. Other labels are unaffected
+- `--label <maintainer-run|community-submission|vendor-supplied|ci|local|unofficial-research>` - provenance label (default `maintainer-run`)
 - `--dry-run` - preview without publishing
 - `--last` - publish the last exported result
 
@@ -155,7 +152,6 @@ Common flags:
 - `--last` - use the most recent result file
 - `--output <dir>` - create a PR-ready local submission package
 - `--service [url]` - upload to the hosted ingest API
-- `--acknowledge-hosted-submission` - acknowledge a hosted upload; a non-interactive `--service` submission exits 6 without it or `BENCHBOX_ACKNOWLEDGE_HOSTED_SUBMISSION=1`
 - `--visibility <public|unlisted|private>` - hosted visibility
 - `--idempotency-key <key>` - override the stable hosted retry key
 - `--wait / --no-wait` - poll or return after hosted acceptance
@@ -234,11 +230,7 @@ offline row-count validation.
 
 ### `benchbox compare`
 
-Compares benchmark result files for regression detection. Exit codes: 0 success, 1 error, 2 usage error, 3 regression over `--fail-on-regression`, 4 results not comparable, 6 billable platform refused without acknowledgement. See [results](reference/cli/results.md#compare-compare-benchmark-results) and [CLI exit codes](reference/cli/index.md#exit-codes).
-
-### `benchbox results validate`
-
-Checks result files for integrity, completeness and believability, and exits 5 when a file has a FAIL finding. See [results](reference/cli/results.md#cli-results-validate).
+Compares benchmark result files for regression detection. See [results](reference/cli/results.md#compare-compare-benchmark-results).
 
 ### `benchbox convert`
 
