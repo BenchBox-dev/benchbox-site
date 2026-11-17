@@ -63,7 +63,7 @@ Creates a Write Primitives benchmark that runs 112 write operations against stag
 
 | Name | Type | Default | Meaning |
 | --- | --- | --- | --- |
-| `scale_factor` | `float` | `1.0` | TPC-H scale factor; use the one of the TPC-H data in the database. Must be positive. Values of 1 or more must be whole numbers. |
+| `scale_factor` | `float` | `1.0` | TPC-H scale factor; use the one of the TPC-H data in the database. Must be a number from 0.01 up to 100000. Values of 1 or more must be whole numbers. The range that applies when the benchmark is run is in [Scale factors](../../../benchmarks/index.md#scale-factors). |
 | `output_dir` | `str`, `Path` or `None` | `None` | Directory for generated data files. When `None`, the TPC-H directory `benchmark_runs/datagen/tpch_<sf token>` under the current directory (for example `tpch_sf001` for 0.01), or under `$BENCHBOX_OUTPUT_DIR/datagen`, so data is shared with a `TPCH` benchmark of the same scale factor. |
 | `**kwargs` | keyword arguments | none | `verbose` (`bool` or `int`) and `quiet` (`bool`) set the log level. Other keywords are stored as attributes. |
 
@@ -75,7 +75,7 @@ A `WritePrimitives` instance. It subclasses `BaseBenchmark`; see [Base Benchmark
 
 ##### Raises
 
-`ValueError` when `scale_factor` is zero or negative, or is 1 or more and not a whole number.
+`ValueError` when `scale_factor` is zero or negative, is below 0.01 or above 100000, or is 1 or more and not a whole number.
 
 ##### Example
 

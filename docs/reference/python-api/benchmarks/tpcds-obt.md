@@ -23,7 +23,7 @@ Creates a TPC-DS OBT benchmark that provides a single wide table and its `CREATE
 
 | Name | Type | Default | Meaning |
 | --- | --- | --- | --- |
-| `scale_factor` | `float` | `1.0` | TPC-DS scale factor. Must be a number from 0.01 up to 100000. Values of 1 or more must be whole numbers. |
+| `scale_factor` | `float` | `1.0` | TPC-DS scale factor. Must be a number from 0.01 up to 100000. Values of 1 or more must be whole numbers. The range that applies when the benchmark is run is in [Scale factors](../../../benchmarks/index.md#scale-factors). |
 | `output_dir` | `str`, `Path` or `None` | `None` | Directory for the OBT file. When `None`, the directory is `benchmark_runs/datagen/tpcds_obt_<sf token>` under the current directory (for example `tpcds_obt_sf1`), or under `$BENCHBOX_OUTPUT_DIR/datagen` when that variable is set. |
 | `**kwargs` | keyword arguments | none | `tpcds_source_dir` is the directory for the TPC-DS source data (default `benchmark_runs/datagen/tpcds_<sf token>`). `output_format` is `"parquet"` (default) or `"dat"`. `dimension_mode` is `"full"` (default) or `"minimal"`. `channels` is a list drawn from `"store"`, `"web"` and `"catalog"` (default: all three). `parallel` (`int`, default `1`), `force_regenerate` (`bool`) and the compression keywords `compress_data`, `compression_type` and `compression_level` are passed to the TPC-DS generator. `verbose` (`bool` or `int`) and `quiet` (`bool`) set the log level. The constructor does not validate their values. |
 

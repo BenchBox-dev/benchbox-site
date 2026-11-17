@@ -55,7 +55,7 @@ Creates an H2O.ai benchmark that generates one table of synthetic taxi trips (`t
 
 | Name | Type | Default | Meaning |
 | --- | --- | --- | --- |
-| `scale_factor` | `float` | `1.0` | Data size multiplier. Must be positive. Values of 1 or more must be whole numbers. 0.01 generates 100,000 rows and 0.1 generates 1,000,000. |
+| `scale_factor` | `float` | `1.0` | Data size multiplier. Must be positive. Values of 1 or more must be whole numbers. The constructor checks nothing else. The range that applies when the benchmark is run is in [Scale factors](../../../benchmarks/index.md#scale-factors). 0.01 generates 100,000 rows and 0.1 generates 1,000,000. |
 | `output_dir` | `str`, `Path` or `None` | `None` | Directory for generated data files. When `None`, the directory is `benchmark_runs/datagen/h2odb_<sf token>` under the current directory (for example `h2odb_sf001` for 0.01), or under `$BENCHBOX_OUTPUT_DIR/datagen` when that variable is set. |
 | `**kwargs` | keyword arguments | none | `verbose` (`bool` or `int`) and `quiet` (`bool`) set the log level. `force_regenerate` is forwarded to the data generator. Any other keyword is stored as an attribute on the instance. |
 

@@ -56,7 +56,7 @@ Creates a ClickBench benchmark that generates synthetic web-analytics rows for o
 
 | Name | Type | Default | Meaning |
 | --- | --- | --- | --- |
-| `scale_factor` | `float` | `1.0` | Data size multiplier. Must be positive. Values of 1 or more must be whole numbers. 1.0 generates 1,000,000 rows. |
+| `scale_factor` | `float` | `1.0` | Data size multiplier. Must be positive. Values of 1 or more must be whole numbers. The constructor checks nothing else. The range that applies when the benchmark is run is in [Scale factors](../../../benchmarks/index.md#scale-factors). 1.0 generates 1,000,000 rows. |
 | `output_dir` | `str`, `Path` or `None` | `None` | Directory for generated data files. When `None`, the directory is `benchmark_runs/datagen/clickbench_<sf token>` under the current directory (for example `clickbench_sf001` for 0.01), or under `$BENCHBOX_OUTPUT_DIR/datagen` when that variable is set. |
 | `**kwargs` | keyword arguments | none | `verbose` (`bool` or `int`) and `quiet` (`bool`) set the log level. `force_regenerate` is forwarded to the data generator. `compress_data=True` writes `hits.csv.zst`; add `compression_type="gzip"` for `hits.csv.gz`; `compression_level` sets the level; `uncompressed_output=True` overrides compression. `compression_type` alone, without `compress_data=True`, has no effect, and an unsupported type raises `ValueError`. Any other keyword is stored as an attribute on the instance and otherwise ignored. |
 

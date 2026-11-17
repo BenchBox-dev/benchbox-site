@@ -20,7 +20,7 @@ Creates an NYC Taxi benchmark that provides trip data in CSV files and serves 25
 
 | Name | Type | Default | Meaning |
 | --- | --- | --- | --- |
-| `scale_factor` | `float` | `1.0` | Sampling size of the trip data. Must be positive. Values of 1 or more must be whole numbers. At 0.01 the sample rate reported by `get_download_stats()` is 0.001 and the synthetic fallback writes 12,000 `trips` rows. |
+| `scale_factor` | `float` | `1.0` | Sampling size of the trip data. Must be positive. Values of 1 or more must be whole numbers. The constructor checks nothing else. The range that applies when the benchmark is run is in [Scale factors](../../../benchmarks/index.md#scale-factors). At 0.01 the sample rate reported by `get_download_stats()` is 0.001 and the synthetic fallback writes 12,000 `trips` rows. |
 | `output_dir` | `str`, `Path` or `None` | `None` | Directory for generated data files. When `None`, the directory is `benchmark_runs/datagen/nyctaxi_<sf token>` under the current directory (for example `nyctaxi_sf001` for 0.01), or under `$BENCHBOX_OUTPUT_DIR/datagen` when that variable is set. |
 | `year` | `int` | `2019` | Year of trip data, from 2019 to 2025. |
 | `months` | `list[int]` or `None` | `None` | Months to use, each 1 to 12. `None` means all 12. Only these months are generated: with `year=2020, months=[3, 4]`, `get_download_stats()["months"]` is `[3, 4]`. |

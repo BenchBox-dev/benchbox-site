@@ -65,11 +65,21 @@ BenchBox differs from the specification in these ways:
 
 - It writes the warehouse tables directly; it does not produce the official generator's source files, so a
   warehouse table has the row count of its source file. In the specification, FactCashBalances and FactWatches
-  hold fewer rows than their source files.
+  hold fewer rows than their source files. BenchBox measures the query workload over the warehouse tables, not
+  the source-to-warehouse ETL, and keeping the source-file factors keeps the data volume stable. Changing it
+  would regenerate every published TPC-DI result.
 - It generates one account per customer. The official generator derives accounts from customer-management
-  actions, so its account count can differ.
-- DimBroker, DimDate, DimTime and the reference tables (Industry, StatusType, TaxRate, TradeType) are smaller
-  than the specification's.
+  actions, so its account count can differ. One account per customer keeps generation simple and
+  deterministic; deriving accounts from customer-management actions would change join fan-out and every
+  published result.
+- DimBroker, DimDate, DimTime and the reference tables are smaller than the specification's: DimBroker has 100
+  rows (trades draw broker ids 1 to 100; the specification gives about 1,500 brokers per unit), DimDate has
+  5,844 days (2010 to 2025; the specification covers 1950 to 2021), DimTime has 288 rows (the specification
+  has 86,400), Industry has 12 rows (102), StatusType 4 (6), TaxRate 10 (320) and TradeType 6 (5). The queries
+  and fact generators use these fixed key ranges, and enlarging them touches every fact generator and query.
+- FactMarketHistory has the design paper's 541,550 rows per unit. The official generator's configuration (about
+  two years of trading days times 800 securities) gives about 584,800, roughly 8% more. The cause of the gap
+  was not investigated, and BenchBox keeps the paper's figure.
 
 ### Key Schema Features
 

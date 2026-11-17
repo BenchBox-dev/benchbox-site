@@ -18,7 +18,7 @@ Creates a Data Vault benchmark that generates TPC-H source data, transforms it i
 
 | Name | Type | Default | Meaning |
 | --- | --- | --- | --- |
-| `scale_factor` | `float` | `1.0` | Scale factor of the TPC-H source data. Must be a positive number. Values of 1 or more must be whole numbers. |
+| `scale_factor` | `float` | `1.0` | Scale factor of the TPC-H source data. Must be a positive number. Values of 1 or more must be whole numbers. The constructor checks nothing else, but `generate_data()` uses the TPC-H generator, which refuses values below 0.01 or above 100000. The range that applies when the benchmark is run is in [Scale factors](../../../benchmarks/index.md#scale-factors). |
 | `output_dir` | `str`, `Path` or `None` | `None` | Directory for the Data Vault files. When `None`, the directory is `benchmark_runs/datagen/datavault_<sf token>` under the current directory (for example `datavault_sf001` for 0.01), or under `$BENCHBOX_OUTPUT_DIR/datagen` when that variable is set. The TPC-H source files go to a sibling directory named `tpch_<sf token>` (for example `tpch_sf001`). |
 | `**kwargs` | keyword arguments | none | `hash_algorithm` is `"md5"` (default) or `"sha256"` and sets the hash used for the hash-key columns. `record_source` (default `"TPCH"`) is the value written to the `record_source` column. `verbose` (`bool` or `int`) and `quiet` (`bool`) set the log level. Other keywords are stored as attributes and are not validated. |
 

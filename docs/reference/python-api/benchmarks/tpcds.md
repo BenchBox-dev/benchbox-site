@@ -52,7 +52,7 @@ Creates a TPC-DS benchmark that generates the 25 TPC-DS tables with `dsdgen` and
 
 | Name | Type | Default | Meaning |
 | --- | --- | --- | --- |
-| `scale_factor` | `float` | `1.0` | Data size multiplier. Must be a number from 0.01 up to 100000. Values of 1 or more must be whole numbers. |
+| `scale_factor` | `float` | `1.0` | Data size multiplier. Must be a number from 0.01 up to 100000. Values of 1 or more must be whole numbers. The range that applies when the benchmark is run is in [Scale factors](../../../benchmarks/index.md#scale-factors). |
 | `output_dir` | `str`, `Path` or `None` | `None` | Directory for generated data files. When `None`, the directory is `benchmark_runs/datagen/tpcds_<sf token>` under the current directory (for example `tpcds_sf001` for 0.01), or under `$BENCHBOX_OUTPUT_DIR/datagen` when that variable is set. |
 | `**kwargs` | keyword arguments | none | See the list below. |
 
