@@ -52,7 +52,9 @@ The TPC-DI schema models a financial services data warehouse with dimension tabl
 | **FactWatches** | Customer watch lists | 300,000 |
 
 The five fact tables and the customer, account, security and company dimensions grow linearly with the scale
-factor. DimBroker, DimDate and DimTime have the same size at every scale factor.
+factor. DimDate and DimTime have the same size at every scale factor. DimBroker has 100 rows up to scale
+factor 2 and then grows (`max(100, int(50 * scale factor))` rows), while FactTrade still draws broker ids from 1
+to 100.
 
 #### How the row counts relate to the TPC-DI specification
 
@@ -73,7 +75,8 @@ BenchBox differs from the specification in these ways:
   deterministic; deriving accounts from customer-management actions would change join fan-out and every
   published result.
 - DimBroker, DimDate, DimTime and the reference tables are smaller than the specification's: DimBroker has 100
-  rows (trades draw broker ids 1 to 100; the specification gives about 1,500 brokers per unit), DimDate has
+  rows up to scale factor 2 and `int(50 * scale factor)` rows above that, yet trades draw broker ids 1 to 100 at
+  every scale factor (the specification gives about 1,500 brokers per unit), DimDate has
   5,844 days (2010 to 2025; the specification covers 1950 to 2021), DimTime has 288 rows (the specification
   has 86,400), Industry has 12 rows (102), StatusType 4 (6), TaxRate 10 (320) and TradeType 6 (5). The queries
   and fact generators use these fixed key ranges, and enlarging them touches every fact generator and query.
