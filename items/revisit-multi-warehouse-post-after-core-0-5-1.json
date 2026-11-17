@@ -8,7 +8,7 @@
     "The publication schedule row's next action is updated to the human editorial check.",
     "Publication check: the post carries `requires_release: 0.5.1`, `npm run lint:blog` passes on the branch it merges to, and pull request 143 has ci green before merge; every timing in the post matches a run recorded in the research note with its command, machine state and engine versions"
   ],
-  "context": "Blocked on the BenchBox v0.5.1 release; unblock when the v0.5.1 tag and PyPI package exist. The core work item for the DataFrame change had not been created in core's tracker when this item was written (2026-11-12); the proposed id was tpcds-df-multi-warehouse-min-max. Findings core is acting on: on DataFusion 55.0.0 the self-join is the slower option on every dataset; a min/max per order pattern was fastest in 39 of 40 tests on current engine releases; Polars n_unique() counts NULL as a value and the Q95 helper does not drop NULL warehouses first. Pull request 143 holds the rewritten draft and evidence and was an unmerged draft on 2026-11-12. If the full-query timings do not support the isolated-step result, the post's conclusion changes, not only its numbers.\n\n2026-11-17: unblock condition met. Tag v0.5.1 (commit 91d357a) published 2026-11-15 and PyPI serves 0.5.1. Publication rule since 2026-11-14: a post describing 0.5.1 behaviour must carry front matter `requires_release: 0.5.1`; `npm run lint:blog` fails it on main until release-pin/ reaches 0.5.1 (first-default-docs-pin-run), so either merge the post after that item lands or target next. Decision gate: owner chooses which. Guardrail: do not edit release-pin/ or lower requires_release to get the post through.\n\n2026-11-17 owner decision: finish to main after v0.5.1 is pinned, with `requires_release: 0.5.1`.",
+  "context": "Blocked on the BenchBox v0.5.1 release; unblock when the v0.5.1 tag and PyPI package exist. The core work item for the DataFrame change had not been created in core's tracker when this item was written (2026-11-12); the proposed id was tpcds-df-multi-warehouse-min-max. Findings core is acting on: on DataFusion 55.0.0 the self-join is the slower option on every dataset; a min/max per order pattern was fastest in 39 of 40 tests on current engine releases; Polars n_unique() counts NULL as a value and the Q95 helper does not drop NULL warehouses first. Pull request 143 holds the rewritten draft and evidence and was an unmerged draft on 2026-11-12. If the full-query timings do not support the isolated-step result, the post's conclusion changes, not only its numbers.\n\n2026-11-17: unblock condition met. Tag v0.5.1 (commit 91d357a) published 2026-11-15 and PyPI serves 0.5.1. Publication rule since 2026-11-14: a post describing 0.5.1 behaviour must carry front matter `requires_release: 0.5.1`; `npm run lint:blog` fails it on main until release-pin/ reaches 0.5.1 (first-default-docs-pin-run), so either merge the post after that item lands or target next. Decision gate: owner chooses which. Guardrail: do not edit release-pin/ or lower requires_release to get the post through.\n\n2026-11-17 owner decision: finish to main after v0.5.1 is pinned, with `requires_release: 0.5.1`.\n\n2026-11-17: the release pin reached v0.5.1. #181 published the v0.5.1 documentation to main (squash 4d789ea), and the production deploy succeeded (run 44169263175). A post with `requires_release: 0.5.1` now passes `npm run lint:blog` on main.",
   "description": "The draft \"BenchBox in action: when the same query needs different code\" says BenchBox 0.5.0 still picks the multi-warehouse pattern by platform name in TPC-DS DataFrame Q16 and Q95, and that we have not changed it. Core will change that logic and release it in v0.5.1. When v0.5.1 is out, bring the post in line with what shipped and finish the evidence it still lacks.\n\nWhat the draft is missing today:\n- Timings from an idle machine. The 2026-11-11 run shared the machine with other jobs, so the draft reports best times and ratios only.\n- Timings of the complete DataFrame Q16 and Q95. Only the isolated step was timed, plus the complete SQL queries on DuckDB.\n- The outcome. The section \"What this means for BenchBox\" describes the branch as unchanged.",
   "links": [
     "https://github.com/BenchBox-dev/benchbox-site/pull/143",
@@ -57,6 +57,14 @@
       "op": "update",
       "op_id": "95ff30d3d3ec4564a50c1f91c7edbcd1",
       "session_id": "c8eea21eea3644c89311c25d48789197"
+    },
+    {
+      "actor": "mcp:omp:joe@joe-mac-mini.local:9d7b6ea6e6098f3e535a1583",
+      "at": "2026-11-17T20:44:56Z",
+      "client": "omp",
+      "op": "update",
+      "op_id": "95ef2b1f547b40e890b13020ebd4c699",
+      "session_id": "647d23d47db44da19b09abb0fb3219aa"
     }
   ]
 }
