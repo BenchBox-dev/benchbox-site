@@ -99,14 +99,14 @@ jobs:
           name: site-artifact-${{ github.run_id }}
           path: website/dist
           include-hidden-files: true
-          retention-days: 90
+          retention-days: 14
           if-no-files-found: error
       - uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f
         if: steps.resolve.outputs.superseded != 'true'
         with:
           name: deploy-work-${{ github.run_id }}
           path: deploy-work
-          retention-days: 90
+          retention-days: 14
           if-no-files-found: error
       - name: Stop before deploy when no target is set
         if: env.SITE_DEPLOY_TARGET != 'rehearsal' && env.SITE_DEPLOY_TARGET != 'production' && steps.resolve.outputs.superseded != 'true'
