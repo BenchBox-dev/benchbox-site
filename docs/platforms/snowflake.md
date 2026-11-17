@@ -57,7 +57,7 @@ export SNOWFLAKE_DATABASE=BENCHBOX
 export SNOWFLAKE_SCHEMA=PUBLIC
 ```
 
-To give `benchbox run` the same values from the environment, write `${SNOWFLAKE_*}` references in the `snowflake` section of `~/.benchbox/credentials.yaml`, for example `password: ${SNOWFLAKE_PASSWORD}`. `run` reads Snowflake settings only from that file. The file is unencrypted plain YAML; see [Saved Credentials File](../reference/cli/configuration.md#saved-credentials-file).
+To give `benchbox run` the same values from the environment, write `${SNOWFLAKE_*}` references in the `snowflake` section of `~/.benchbox/credentials.yaml`, for example `password: ${SNOWFLAKE_PASSWORD}`. `run` reads Snowflake settings only from that file. The file is unencrypted plain YAML, and a later `benchbox setup` save writes the resolved values over the references; see [Saved Credentials File](../reference/cli/configuration.md#saved-credentials-file).
 
 ### CLI Options
 

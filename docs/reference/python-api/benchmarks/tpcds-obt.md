@@ -8,7 +8,7 @@ Python API reference for the TPC-DS One Big Table (OBT) benchmark.
 
 TPCDSOBT flattens the TPC-DS sales and returns facts and their dimensions into one wide table, `tpcds_sales_returns_obt`, and serves TPC-DS queries rewritten to run against that table.
 
-Two limits apply to the 0.4.1 release:
+One limit is documented for the 0.4.1 release and was not rechecked on 0.5.1; the other is 0.5.1 behaviour:
 
 - `get_query()` and `get_queries()` fail with `FileNotFoundError` when BenchBox is installed from PyPI, because the TPC-DS query templates they read are not at the location they look in. See `get_query()` below.
 - `generate_data()` writes the full TPC-DS source data first.
@@ -53,7 +53,7 @@ custom = TPCDSOBT(scale_factor=1, output_dir="obt_out", tpcds_source_dir="tpcds_
 print(custom.output_dir)
 ```
 
-Output on 0.4.1:
+Output (the scale-factor message is from 0.5.1; the paths are from 0.4.1):
 
 ```text
 Scale factors >= 1 must be whole integers. Got: 1.5.

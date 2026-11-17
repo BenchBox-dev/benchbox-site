@@ -84,7 +84,7 @@ except ValueError as error:
     print(error)
 ```
 
-Output on 0.4.1:
+Output (the last line, the scale-factor message, is from 0.5.1; the rest is from 0.4.1):
 
 ```text
 ['documents', 'rankings', 'uservisits']

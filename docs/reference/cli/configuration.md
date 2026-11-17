@@ -201,7 +201,7 @@ The Snowflake account, user, and password come from
 
 `benchbox setup` saves platform credentials in `~/.benchbox/credentials.yaml`. The file is plain YAML and is not encrypted. It holds secrets such as Snowflake, Redshift, SingleStore and Athena passwords, AWS keys and the Databricks token, and any process you run can read it. Only the hosted-submission token (`benchbox auth login`) is kept in the operating system keyring.
 
-A value written as `${VAR}` is read from the environment when `benchbox run` loads the file.
+A value written as `${VAR}` is read from the environment when `benchbox run` loads the file. A later save of the file, such as `benchbox setup` or `benchbox setup --remove`, writes the resolved values in place of the `${VAR}` references, so a secret read from the environment ends up in the file.
 
 ```yaml
 snowflake:

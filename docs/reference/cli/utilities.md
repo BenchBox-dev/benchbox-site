@@ -121,7 +121,7 @@ developer guide for the full check list.
 
 **Notes:**
 
-- Automatically excludes `.plans.json` and `.tuning.json` companion files
+- Automatically excludes `.plans.json`, `.tuning.json`, `.applied.json` and `.override.json` companion files
 - Specs cover 21 of 22 benchmarks with 8 legacy alias mappings (e.g., `star_schema` → `ssb`); `ai_primitives` is not yet covered
 
 ## Related

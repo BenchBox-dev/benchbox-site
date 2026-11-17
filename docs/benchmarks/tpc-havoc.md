@@ -240,7 +240,7 @@ All transformations use **SQL:2016 standard features**:
 TPC-Havoc inherits all TPC-H infrastructure:
 
 - Uses identical data and schema as TPC-H
-- Same scale factors as TPC-H (0.01 to 100000)
+- Accepts scale factors from 0.01 to 100000 like TPC-H, but the standard set is 0.01, 0.1, 1 and 10; other values run with a note that their results are not comparable with published results
 - Same data generation tools
 - No additional data preparation required
 

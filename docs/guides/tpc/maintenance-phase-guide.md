@@ -126,6 +126,7 @@ Maintenance timings from earlier BenchBox versions used a different method and a
 | DuckDB, PostgreSQL, SQLite | Runs when no maintenance target table enforces a primary key; otherwise refuses |
 | Snowflake | Runs; primary keys are informational constraints that Snowflake does not enforce |
 | SingleStore | Runs; BenchBox does not check its primary keys beforehand |
+| DuckLake | Runs; its tables are created without primary keys, so nothing enforces them |
 | Other platforms | Report the phase as skipped |
 
 ### Enforced Primary Keys
