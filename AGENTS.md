@@ -180,14 +180,34 @@ versioned core bundle; it reads nothing else from core.
   is set, as on `next`, the release gate is skipped: the develop bundle's
   version is the last release, not the upcoming one. A post that links a core path added after
   the pinned release must link by commit SHA or carry `requires_release`.
-- A release is: the owner runs `npm run docs:pin -- vX.Y.Z` on `next` by pull
-  request, then opens one pull request from `next` into `main`. After that
-  squash merge, merge `main` into `next` by pull request with
-  `gh pr merge --merge` to bring it level; the `next-behind-main` issue tracks
-  it. The workflow uses the default token, which cannot start `ci` on a pull
-  request it opens, so it does not open that pull request itself.
+- A release is automated up to two pull requests that the owner merges; no
+  workflow merges, pushes to `main` or `next`, or force-pushes. The Release
+  docs workflow (hourly, on dispatch and on the `core-release` repository
+  dispatch) runs `docs:pin -- --pending` against `next`'s pin. For a newer
+  release it creates the branch `release-pin/<tag>` from `next`, runs
+  `npm run docs:pin -- <tag>`, and opens a pull request into `next`; the
+  owner squash-merges it. A tag that already has that branch or an open pull
+  request is skipped. A pin that fails, for example because no certified bundle
+  exists, creates no branch and comments the error on the open
+  `docs-release-pending` issue. The same workflow, on each push to `next`,
+  opens `Release documentation for <tag>` from `next` into `main` when `next`'s
+  pin tag is above `main`'s and no such pull request is open. It uses the
+  `SITE_BRIDGE_APP_ID` GitHub App, whose pushes and pull requests start `ci`
+  where the default token's would not; the app needs contents and pull-requests
+  write on this repository.
+- Hold back what is not true at the release before merging the release pull
+  request. `next` documents core `develop`, which runs ahead of the release, so
+  `docs:check` against the new pin fails `ci` on any passage that is not true at
+  the release. Automation never edits those passages. The owner branches from
+  `next`, restores the released text for each such passage, points the release pull
+  request at that branch or replaces it with a pull request from that branch,
+  squash-merges it into
+  `main`, then merges `main` into `next` by pull request with
+  `gh pr merge --merge` and confirms the held-back text is still on `next`.
 - The Nightly workflow opens or updates the `docs-release-pending` issue when
-  core has published a release newer than the pin. The owner acts on it.
+  core has published a release newer than the pin. It remains the backstop when the Release docs workflow cannot
+  open the pin pull request, and the owner then acts on it by hand with
+  `npm run docs:pin -- <tag>`.
 - Compatibility window: site code on `main` must read the pinned release's
   `docs-data` and `doc-contracts.json`. Code on `next` must read both the pin
   and the newest develop bundle until the next release is pinned.

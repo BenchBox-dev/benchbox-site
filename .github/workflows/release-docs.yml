@@ -1,0 +1,242 @@
+name: Release docs
+
+on:
+  schedule:
+    - cron: "17 * * * *"
+  workflow_dispatch:
+  repository_dispatch:
+    types: [core-release]
+  push:
+    branches: [next]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: release-docs
+  cancel-in-progress: false
+
+env:
+  REPO: ${{ github.repository }}
+
+jobs:
+  pin-pull-request:
+    name: pin a new core release on next
+    if: github.event_name != 'push'
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    permissions:
+      contents: read
+      issues: write
+      pull-requests: read
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09
+        with:
+          ref: next
+          persist-credentials: false
+      - uses: actions/setup-node@a0853c24544627f65ddf259abe73b1d18a591444
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+      - run: npm ci --ignore-scripts
+      - name: Compare the release pin on next with core's latest published release
+        id: pending
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set +e
+          npm run -s docs:pin -- --pending > "$RUNNER_TEMP/pending.txt" 2>&1
+          code=$?
+          set -e
+          cat "$RUNNER_TEMP/pending.txt"
+          echo "code=$code" >> "$GITHUB_OUTPUT"
+          if [ "$code" -eq 1 ]; then
+            tag="$(sed -n 's/^.*newest release is \(v[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\),.*$/\1/p' "$RUNNER_TEMP/pending.txt")"
+            if [ -z "$tag" ]; then
+              echo "could not read the release tag from the pending check" >&2
+              exit 1
+            fi
+            echo "tag=$tag" >> "$GITHUB_OUTPUT"
+          elif [ "$code" -ne 0 ]; then
+            exit "$code"
+          fi
+      - name: Look for an existing pin branch or pull request
+        id: existing
+        if: steps.pending.outputs.code == '1'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG: ${{ steps.pending.outputs.tag }}
+        run: |
+          set -euo pipefail
+          if out="$(gh api "repos/$REPO/git/ref/heads/release-pin/$TAG" --jq .ref 2>&1)"; then
+            branch=true
+          elif printf '%s' "$out" | grep -q 'HTTP 404'; then
+            branch=false
+          else
+            echo "$out" >&2
+            exit 1
+          fi
+          number="$(gh pr list --repo "$REPO" --head "release-pin/$TAG" --state open --json number --jq '.[0].number // empty')"
+          if [ "$branch" = true ] || [ -n "$number" ]; then
+            echo "release-pin/$TAG already has a branch or an open pull request; nothing to do"
+            echo "skip=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "skip=false" >> "$GITHUB_OUTPUT"
+          fi
+      - name: Mint a core-scoped token
+        id: core
+        if: steps.existing.outputs.skip == 'false'
+        uses: actions/create-github-app-token@bcd2ba49218906704ab6c1aa796996da409d3eb1
+        with:
+          app-id: ${{ secrets.SITE_BRIDGE_APP_ID }}
+          private-key: ${{ secrets.SITE_BRIDGE_PRIVATE_KEY }}
+          owner: BenchBox-dev
+          repositories: BenchBox
+          permission-actions: read
+      - name: Pin the release
+        id: pin
+        if: steps.existing.outputs.skip == 'false'
+        env:
+          GH_TOKEN: ${{ steps.core.outputs.token }}
+          TAG: ${{ steps.pending.outputs.tag }}
+        run: |
+          set +e
+          npm run -s docs:pin -- "$TAG" > "$RUNNER_TEMP/pin.txt" 2>&1
+          code=$?
+          set -e
+          cat "$RUNNER_TEMP/pin.txt"
+          if [ "$code" -eq 0 ]; then
+            echo "pinned=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "pinned=false" >> "$GITHUB_OUTPUT"
+          fi
+      - name: Report a failed pin on the docs-release-pending issue
+        if: steps.pin.outputs.pinned == 'false'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG: ${{ steps.pending.outputs.tag }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: |
+          set -euo pipefail
+          NUMBER="$(gh issue list --repo "$REPO" --label docs-release-pending --state open --json number --jq '.[0].number // empty')"
+          if [ -z "$NUMBER" ]; then
+            echo "no open docs-release-pending issue to comment on" >&2
+            exit 0
+          fi
+          MARKER="release-docs-pin-failure:$TAG:$(sha256sum "$RUNNER_TEMP/pin.txt" | cut -c1-16)"
+          if gh issue view "$NUMBER" --repo "$REPO" --json comments --jq '.comments[].body' | grep -qF "$MARKER"; then
+            exit 0
+          fi
+          BODY="$(printf '<!-- %s -->\nThe release pin pull request for `%s` could not be prepared, so no branch was created.\n\nRun: %s\n\n```\n' "$MARKER" "$TAG" "$RUN_URL"; cat "$RUNNER_TEMP/pin.txt"; printf '```\n')"
+          gh issue comment "$NUMBER" --repo "$REPO" --body "$BODY"
+      - name: Fail the run when the pin failed
+        if: steps.pin.outputs.pinned == 'false'
+        run: exit 1
+      - name: Mint a token for this repository
+        id: site
+        if: steps.pin.outputs.pinned == 'true'
+        uses: actions/create-github-app-token@bcd2ba49218906704ab6c1aa796996da409d3eb1
+        with:
+          app-id: ${{ secrets.SITE_BRIDGE_APP_ID }}
+          private-key: ${{ secrets.SITE_BRIDGE_PRIVATE_KEY }}
+          owner: BenchBox-dev
+          repositories: benchbox-site
+          permission-contents: write
+          permission-pull-requests: write
+      - name: Commit the pin, push its branch and open the pull request
+        if: steps.pin.outputs.pinned == 'true'
+        env:
+          GH_TOKEN: ${{ steps.site.outputs.token }}
+          APP_SLUG: ${{ steps.site.outputs.app-slug }}
+          TAG: ${{ steps.pending.outputs.tag }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+          SERVER: ${{ github.server_url }}
+        run: |
+          set -euo pipefail
+          BOT="${APP_SLUG}[bot]"
+          BOT_ID="$(gh api "users/${BOT}" --jq .id)"
+          export GIT_AUTHOR_NAME="$BOT" GIT_COMMITTER_NAME="$BOT"
+          export GIT_AUTHOR_EMAIL="${BOT_ID}+${BOT}@users.noreply.github.com" GIT_COMMITTER_EMAIL="${BOT_ID}+${BOT}@users.noreply.github.com"
+          BRANCH="release-pin/$TAG"
+          git switch -c "$BRANCH"
+          git add --all -- release-pin
+          git commit -m "docs: pin the documentation inputs to core $TAG" -m "The published documentation describes one released core version. Pinning $TAG moves the generated pages, the contracts and the version markers to that release."
+          git push "https://x-access-token:${GH_TOKEN}@${SERVER#https://}/${REPO}.git" "HEAD:refs/heads/${BRANCH}"
+          BODY="$(printf 'Pins the documentation inputs in `release-pin/` to core `%s`, written by `npm run docs:pin -- %s` from the certified bundle of that release.\n\nMerging this pull request into `next` opens the `next` into `main` release pull request, which a person reviews and merges.\n\nRun: %s\n' "$TAG" "$TAG" "$RUN_URL")"
+          gh pr create --repo "$REPO" --base next --head "$BRANCH" --title "Pin the documentation to core $TAG" --body "$BODY"
+
+  release-pull-request:
+    name: open the release pull request into main
+    if: github.event_name == 'push'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: read
+      pull-requests: read
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09
+        with:
+          ref: next
+          fetch-depth: 0
+          persist-credentials: false
+      - name: Compare the release pin on next with the one on main
+        id: pins
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          git fetch --no-tags origin '+refs/heads/main:refs/remotes/origin/main' '+refs/heads/next:refs/remotes/origin/next'
+          NEXT_TAG="$(git show origin/next:release-pin/pin.json | jq -r .tag)"
+          MAIN_TAG="$(git show origin/main:release-pin/pin.json | jq -r .tag)"
+          echo "release pin: next has $NEXT_TAG, main has $MAIN_TAG"
+          if [ "$NEXT_TAG" = "$MAIN_TAG" ] || [ "$(printf '%s\n%s\n' "$MAIN_TAG" "$NEXT_TAG" | sort -V | tail -n 1)" != "$NEXT_TAG" ]; then
+            echo "release=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          NUMBER="$(gh pr list --repo "$REPO" --base main --head next --state open --json number --jq '.[0].number // empty')"
+          if [ -n "$NUMBER" ]; then
+            echo "pull request #$NUMBER from next into main is already open"
+            echo "release=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          echo "release=true" >> "$GITHUB_OUTPUT"
+          echo "tag=$NEXT_TAG" >> "$GITHUB_OUTPUT"
+      - name: Mint a token for this repository
+        id: site
+        if: steps.pins.outputs.release == 'true'
+        uses: actions/create-github-app-token@bcd2ba49218906704ab6c1aa796996da409d3eb1
+        with:
+          app-id: ${{ secrets.SITE_BRIDGE_APP_ID }}
+          private-key: ${{ secrets.SITE_BRIDGE_PRIVATE_KEY }}
+          owner: BenchBox-dev
+          repositories: benchbox-site
+          permission-pull-requests: write
+      - name: Open the release pull request
+        if: steps.pins.outputs.release == 'true'
+        env:
+          GH_TOKEN: ${{ steps.site.outputs.token }}
+          TAG: ${{ steps.pins.outputs.tag }}
+        run: |
+          set -euo pipefail
+          COMMITS="$(git log --oneline origin/main..origin/next -- docs blog)"
+          TOTAL="$(printf '%s' "$COMMITS" | grep -c . || true)"
+          SHOWN="$(printf '%s\n' "$COMMITS" | head -n 200)"
+          BODY="$(cat <<EOF
+          Brings the documentation on \`next\` to the release pinned in \`release-pin/\`: core \`$TAG\`.
+
+          Commits to \`docs\` and \`blog\` on \`next\` that \`main\` lacks ($TOTAL):
+
+          \`\`\`
+          $SHOWN
+          \`\`\`
+
+          \`next\` documents core \`develop\`, which runs ahead of the release, so some passages may not be true at \`$TAG\`. \`ci\` runs \`docs:check\` against the new pin and fails if any passage is not true at the release. Do not merge a failing pull request; hold those passages back first:
+
+          1. Branch from \`next\`.
+          2. For each passage that is not true at \`$TAG\`, restore the text released on \`main\`.
+          3. Retarget this pull request to that branch, or close it and open a replacement from the branch into \`main\`.
+          4. Squash-merge it into \`main\` once \`ci\` is green.
+          5. Merge \`main\` into \`next\` by pull request with \`gh pr merge --merge\`, and confirm that the held-back text is still on \`next\`.
+          EOF
+          )"
+          gh pr create --repo "$REPO" --base main --head next --title "Release documentation for $TAG" --body "$BODY"
