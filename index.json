@@ -620,7 +620,7 @@
       "claim": null,
       "needs": [],
       "priority": "high",
-      "status": "blocked",
+      "status": "open",
       "title": "Revisit the multi-warehouse pattern post once BenchBox v0.5.1 is released"
     },
     "rollback-gates-on-pre-allowlist-removal-artifacts-20261029": {
