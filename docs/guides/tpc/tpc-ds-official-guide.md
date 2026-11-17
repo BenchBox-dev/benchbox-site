@@ -73,7 +73,7 @@ The **QphDS@Size** (Queries per Hour at Scale Factor) is the TPC-DS primary comp
 QphDS@Size = SF × Q / (T_PT × T_TT × T_DM × T_LD)^(1/4)
 ```
 
-Where `Q = 99 × S` (S is the number of throughput streams), `T_PT` is the power test time, `T_TT = TT1 + TT2` is the total throughput test time, `T_DM = DM1 + DM2` is the data maintenance time, and `T_LD = 0.01 × S × T_load` is the weighted load time. TPC-DS has no Power@Size metric.
+Where `Q = 99 × S` (S is the number of throughput streams), `T_PT = S × T_Power` is the power test time scaled by the stream count, `T_TT = TT1 + TT2` is the total throughput test time, `T_DM = DM1 + DM2` is the data maintenance time, and `T_LD = 0.01 × S × T_load` is the weighted load time. TPC-DS has no Power@Size metric.
 
 **What BenchBox exports.** A run with `--official` and the load, power, throughput and maintenance phases runs the tests in the specification's order: power, throughput, maintenance, throughput, maintenance. When the run meets every condition below, `summary.tpc_metrics` carries `qphds_at_size`, the formula's value rounded down to a whole number, and `qphds_terms`. The terms are `q` (`99 × S`), `t_pt_hours` (power time × S, in hours), `t_tt_hours` (the two throughput times), `t_dm_hours` (the two maintenance times), and `t_ld_hours` (`0.01 × S × load time`).
 
@@ -85,7 +85,7 @@ The conditions are:
 - both data maintenance tests completed S/2 refresh runs, the second on the refresh sets that follow the first's;
 - the database load ran in this run and was timed, not reused.
 
-When a condition fails, `qphds_at_size` is absent and `summary.tpc_metrics.qphds_unavailable` lists the reasons. A run that is not official, or that is not a combined run of all the phases, carries none. `benchbox metrics qphh` is TPC-H only and does not compute QphDS@Size; it points to the run's own results.
+When a condition fails, `qphds_at_size` is absent and `summary.tpc_metrics.qphds_unavailable` lists the reasons. A run with a single query phase carries neither field; any other TPC-DS run that misses a condition, including one that is not official, carries `qphds_unavailable`. `benchbox metrics qphh` computes QphH@Size only for TPC-H and does not compute QphDS@Size; it points to the run's own results.
 
 Earlier releases exported the geometric mean of Power@Size and Throughput@Size under the QphDS@Size name. That value is not the specification metric, and results carrying it are not comparable with the metric described here.
 

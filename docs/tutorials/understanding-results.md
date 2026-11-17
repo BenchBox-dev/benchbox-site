@@ -76,7 +76,9 @@ A failed query carries an `ERROR` status and an error message instead of timing 
 
 ## TPC Metrics
 
-For TPC-H/TPC-DS, BenchBox calculates Power@Size and Throughput@Size. At scale factor 1 and above a run that is not `--official` records `summary.tpc_metrics` as suppressed:
+For TPC-H/TPC-DS, BenchBox calculates Power@Size and Throughput@Size. At scale factor 1 and above a run that is not `--official` records `summary.tpc_metrics` as suppressed.
+
+They are computed as:
 
 ```text
 Power@Size      = (SF × 3600) / geometric_mean(query times, final iteration)
