@@ -61,7 +61,7 @@ To choose the exact file, or to use an in-memory database, pass `database_path` 
 
 ### DuckDB 1.x and 2.x File Formats
 
-BenchBox supports DuckDB 1.x and 2.x. DuckDB 2.x writes new database files in a storage format that DuckDB 1.x cannot open: a 1.x process reports `Trying to read a database file with version number 999`. Running BenchBox on DuckDB 2.x therefore makes these files unreadable by DuckDB 1.x:
+BenchBox supports DuckDB 1.x and 2.x. DuckDB 2.x writes new database files in a storage format that DuckDB 1.x cannot open: DuckDB 1.5.5 and earlier report `Trying to read a database file with version number 999`, and DuckDB 1.5.6 reports version number 69. Running BenchBox on DuckDB 2.x therefore makes these files unreadable by DuckDB 1.x:
 
 - the `.duckdb` database (and its `.wal` file) that a DuckDB run creates, including databases BenchBox reuses between runs when 2.x creates them;
 - DuckLake catalogs (`metadata.ducklake`) created by the DuckLake platform and the DuckLake format converter;
