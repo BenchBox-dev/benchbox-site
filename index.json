@@ -573,15 +573,10 @@
       "title": "Document and guard that a removal on main also removes the text from next at the next merge"
     },
     "first-default-docs-pin-run": {
-      "claim": {
-        "expires_at": "2026-11-18T21:10:03Z",
-        "generation": "47e71146314a443a81b448040c7bcb7c",
-        "renewals": 0,
-        "worker": "mcp:omp:joe@joe-mac-mini.local:9d7b6ea6e6098f3e535a1583"
-      },
+      "claim": null,
       "needs": [],
       "priority": "medium",
-      "status": "active",
+      "status": "done",
       "title": "Pin the next core release through the default docs:pin path and confirm the status matrix corrects itself"
     },
     "keep-next-level-with-main": {
