@@ -33,10 +33,11 @@ The TPC-DS official benchmark implementation coordinates all three test phases a
 
 ## Quick Start
 
-Run the official TPC-DS benchmark with the CLI (this SF1 DuckDB run completes in about a minute and reports a result in the `official` result class):
+Run the official TPC-DS benchmark with the CLI. `--official` refuses a partial run: it needs the load, power, throughput and maintenance phases, a `--seed`, and an even `--streams` of at least 4. It also refuses `--queries`:
 
 ```bash
-benchbox run --official --platform duckdb --benchmark tpcds --scale 1 --seed 42 --output ./official_data
+benchbox run --official --platform duckdb --benchmark tpcds --scale 1 --seed 42 \
+  --phases load,power,throughput,maintenance --streams 4 --output ./official_data
 ```
 
 ### Programmatic Usage
@@ -124,17 +125,17 @@ dialect; `dialect=` applies to the power and maintenance phases only. For suppor
 
 ```bash
 benchbox run --official --platform duckdb --benchmark tpcds --scale 10 --seed 42 \
-  --phases power,throughput --streams 4 --output ./official_data
+  --phases load,power,throughput,maintenance --streams 4 --output ./official_data
 ```
 
 ### Individual Phases
 
-The first command runs the Power Test only. The second runs the Throughput Test only.
+`--official` refuses single-phase runs, so these two commands run without it and are not official. The first runs the Power Test only. The second runs the Throughput Test only.
 
 ```bash
-benchbox run --official --platform duckdb --benchmark tpcds --scale 10 --seed 42 --phases power --output ./official_data
+benchbox run --platform duckdb --benchmark tpcds --scale 10 --seed 42 --phases power --output ./official_data
 
-benchbox run --official --platform duckdb --benchmark tpcds --scale 10 --seed 42 --phases throughput --streams 8 --output ./official_data
+benchbox run --platform duckdb --benchmark tpcds --scale 10 --seed 42 --phases throughput --streams 8 --output ./official_data
 ```
 
 ### Custom Configuration
@@ -143,7 +144,7 @@ This example uses advanced-level configuration:
 
 ```bash
 benchbox run --official --platform duckdb --benchmark tpcds --scale 10 --seed 42 \
-  --phases power,throughput --streams 6 --validation full --output ./official_data
+  --phases load,power,throughput,maintenance --streams 6 --validation full --output ./official_data
 ```
 
 ## Configuration
@@ -179,7 +180,7 @@ benchbox run --official --platform duckdb --benchmark tpcds --scale 10 --seed 42
 The Power Test measures single-stream query processing power by executing all 99 TPC-DS queries sequentially.
 
 ```bash
-benchbox run --official --platform duckdb --benchmark tpcds --scale 1 --seed 42 --phases power --output ./official_data
+benchbox run --platform duckdb --benchmark tpcds --scale 1 --seed 42 --phases power --output ./official_data
 ```
 
 Read `Power@Size` from the result file's `summary.tpc_metrics` (see [Understanding Results](../../tutorials/understanding-results.md)).
@@ -196,7 +197,7 @@ Read `Power@Size` from the result file's `summary.tpc_metrics` (see [Understandi
 The Throughput Test measures concurrent query processing capability by executing multiple streams of queries simultaneously.
 
 ```bash
-benchbox run --official --platform duckdb --benchmark tpcds --scale 1 --seed 42 --phases throughput --streams 2 --output ./official_data
+benchbox run --platform duckdb --benchmark tpcds --scale 1 --seed 42 --phases throughput --streams 2 --output ./official_data
 ```
 
 Read `Throughput@Size` from the result file's `summary.tpc_metrics`.
@@ -462,7 +463,7 @@ reports = generator.generate_complete_report(result)
 The benchmark validates results against the TPC-DS specification. Request full validation and read the verdict from the result file:
 
 ```bash
-benchbox run --official --platform duckdb --benchmark tpcds --scale 1 --seed 42 --validation full --output ./official_data
+benchbox run --official --platform duckdb --benchmark tpcds --scale 1 --seed 42 --phases load,power,throughput,maintenance --streams 4 --validation full --output ./official_data
 ```
 
 ```python
@@ -509,7 +510,7 @@ For large scale factors, add streams for throughput. Skip the Maintenance Test i
 
 ```bash
 benchbox run --official --platform duckdb --benchmark tpcds --scale 100 --seed 42 \
-  --phases power,throughput --streams 16 --output ./official_data
+  --phases load,power,throughput,maintenance --streams 16 --output ./official_data
 ```
 
 ### Integration with CI/CD
@@ -518,7 +519,7 @@ Fail the job when Throughput@Size drops below a minimum threshold (100 here is a
 
 ```bash
 export BENCHBOX_OUTPUT_DIR=./ci_data
-benchbox run --official --platform duckdb --benchmark tpcds --scale 1 --seed 42 \
+benchbox run --platform duckdb --benchmark tpcds --scale 1 --seed 42 \
   --phases throughput --streams 2 --output ./ci_data
 
 jq -e '.summary.tpc_metrics.throughput_at_size > 100' ./ci_data/results/*.json
@@ -528,7 +529,8 @@ jq -e '.summary.tpc_metrics.throughput_at_size > 100' ./ci_data/results/*.json
 
 ```bash
 for sf in 1.0 10.0; do
-  benchbox run --official --platform duckdb --benchmark tpcds --scale $sf --seed 42 --output ./official_data
+  benchbox run --official --platform duckdb --benchmark tpcds --scale $sf --seed 42 \
+    --phases load,power,throughput,maintenance --streams 4 --output ./official_data
 done
 
 benchbox results --limit 3
@@ -552,7 +554,7 @@ benchbox check-deps --platform duckdb
 For large scale factors, use fewer streams and monitor memory usage:
 
 ```bash
-benchbox run --official --platform duckdb --benchmark tpcds --scale 100 --seed 42 \
+benchbox run --platform duckdb --benchmark tpcds --scale 100 --seed 42 \
   --phases power --streams 2 --output ./official_data
 ```
 
@@ -566,10 +568,10 @@ print(f"Memory usage: {psutil.virtual_memory().percent}%")
 Split the phases so a slow phase can be retried alone:
 
 ```bash
-benchbox run --official --platform duckdb --benchmark tpcds --scale 10 --seed 42 \
+benchbox run --platform duckdb --benchmark tpcds --scale 10 --seed 42 \
   --phases power --output ./official_data
 
-benchbox run --official --platform duckdb --benchmark tpcds --scale 10 --seed 42 \
+benchbox run --platform duckdb --benchmark tpcds --scale 10 --seed 42 \
   --phases throughput --streams 2 --output ./official_data
 ```
 
@@ -589,7 +591,8 @@ print(f"Success rate: {raw['summary']['queries']['passed']}/{raw['summary']['que
 Enable verbose output with an official scale factor:
 
 ```bash
-benchbox run --official --platform duckdb --benchmark tpcds --scale 1 --seed 42 -vv --output ./official_data
+benchbox run --official --platform duckdb --benchmark tpcds --scale 1 --seed 42 -vv \
+  --phases load,power,throughput,maintenance --streams 4 --output ./official_data
 ```
 
 ### Error Recovery
@@ -599,7 +602,7 @@ Retry a failed run from the shell, waiting 60 seconds between attempts:
 ```bash
 for attempt in 1 2 3; do
   if benchbox run --official --platform duckdb --benchmark tpcds --scale 1 --seed 42 \
-    --output ./official_data; then
+    --phases load,power,throughput,maintenance --streams 4 --output ./official_data; then
     break
   fi
   echo "Attempt $attempt failed"
@@ -632,14 +635,16 @@ benchmark = TPCDSBenchmark(scale_factor=scale_factors["testing"])
 Point `--output` at a temporary directory for throwaway runs:
 
 ```bash
-benchbox run --official --platform duckdb --benchmark tpcds --scale 1 --seed 42 --output "$(mktemp -d)"
+benchbox run --official --platform duckdb --benchmark tpcds --scale 1 --seed 42 \
+  --phases load,power,throughput,maintenance --streams 4 --output "$(mktemp -d)"
 ```
 
 ### 3. Performance Monitoring
 
 ```bash
 START=$(date +%s)
-benchbox run --official --platform duckdb --benchmark tpcds --scale 1 --seed 42 --output ./official_data
+benchbox run --official --platform duckdb --benchmark tpcds --scale 1 --seed 42 \
+  --phases load,power,throughput,maintenance --streams 4 --output ./official_data
 echo "Benchmark time: $(( $(date +%s) - START ))s"
 ```
 
@@ -670,7 +675,7 @@ more than 5% below it:
 ```bash
 while true; do
   export BENCHBOX_OUTPUT_DIR=./ci_data
-  benchbox run --official --platform duckdb --benchmark tpcds --scale 1 --seed 42 \
+  benchbox run --platform duckdb --benchmark tpcds --scale 1 --seed 42 \
     --phases power --output ./ci_data
   jq -e '.summary.tpc_metrics.power_at_size > 250000.0 * 0.95' ./ci_data/results/*.json \
     || echo "ALERT: Power@Size regressed"

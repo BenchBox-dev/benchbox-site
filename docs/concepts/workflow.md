@@ -188,15 +188,15 @@ See: [Testing Guide](../development/testing.md)
 
 ## Compliance Workflow (Official TPC Benchmarks)
 
-Running benchmarks according to TPC specifications for official results:
+Running power and throughput tests separately for composite metrics. `--official` refuses a single-phase run, so these commands are not official; an official TPC-H run needs the power and throughput phases together with the refresh functions and enough streams (see [Contributing Benchmark Results](../contributing-results.md)):
 
 ```bash
-benchbox run --official --benchmark tpch --platform snowflake --scale 100 \
+benchbox run --benchmark tpch --platform snowflake --scale 100 \
   --phases power \
   --seed 42 \
   --output results/power/
 
-benchbox run --official --benchmark tpch --platform snowflake --scale 100 \
+benchbox run --benchmark tpch --platform snowflake --scale 100 \
   --phases throughput \
   --concurrency 4 \
   --seed 42 \
