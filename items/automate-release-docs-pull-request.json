@@ -9,7 +9,7 @@
     "Proven once end to end against a real or rehearsed release (a scratch tag on a fork, or the next real release), with the run links recorded here",
     "AGENTS.md 'Release pin' describes the mechanism in place of the manual step"
   ],
-  "context": "Decision gates: (1) owner picks option; (2) owner approves any new permission or secret, since granting the app pull-request write widens what a core-side compromise of that app could do to the site. Guardrails: never push to main or next directly and never force-push; no bypass of the main or next rulesets; the workflow refuses a draft, prerelease or non-vX.Y.Z release and a tag whose bundle fails verification, and then leaves the issue open with the error; never use --from in automation; deploy.yml is unchanged; with option 2 a failed release pull request is reported, never retried with weaker checks. Found 2026-11-17.",
+  "context": "Decision gates: (1) owner picks option; (2) owner approves any new permission or secret, since granting the app pull-request write widens what a core-side compromise of that app could do to the site. Guardrails: never push to main or next directly and never force-push; no bypass of the main or next rulesets; the workflow refuses a draft, prerelease or non-vX.Y.Z release and a tag whose bundle fails verification, and then leaves the issue open with the error; never use --from in automation; deploy.yml is unchanged; with option 2 a failed release pull request is reported, never retried with weaker checks. Found 2026-11-17.\n\n2026-11-17 owner decision: option 1 (workflow pins on next by pull request and opens the next into main pull request; a person merges), token = the existing bridge app granted pull-request and contents write on benchbox-site by the owner. Design consequence found the same day: next runs ahead of each release, so the release pull request needs a human hold-back step for passages not true at the release; the workflow lists the held commits and states the steps, and never tries to hold text back itself. Implementation in progress on ci/release-docs-pr.",
   "description": "Problem: core published v0.5.1 on 2026-11-15 and benchbox.dev still showed v0.5.0 two days later. The release process is manual by design (AGENTS.md: the owner runs docs:pin on next and opens the next into main pull request when the docs-release-pending issue appears), but the owner expected publication to follow a release, and the only signal is an unassigned issue opened by a nightly job up to a day later. The choice between manual and automatic publication was never put to the owner. Two linked gaps: the issue carries no steps and no assignee, and tracker items blocked on a release stay blocked after it (first-default-docs-pin-run and revisit-multi-warehouse-post-after-core-0-5-1 both did).\n\nOutcome: a published core release reliably leads to a release pull request the owner can merge, or to automatic publication, as the owner decides.\n\nOptions: (1) on a new release, a workflow pins it on next by pull request and opens the next into main pull request; a person merges it. (2) as 1, plus merging both once ci is green. (3) stay manual: assign the issue to the owner and put the release steps in its body.\n\nConstraint found 2026-11-14: a pull request opened with the default GITHUB_TOKEN never starts ci, and main and next both require ci. Options 1 and 2 need a token that can open pull requests, push to a branch and start ci: either the existing GitHub App (secrets SITE_BRIDGE_APP_ID / SITE_BRIDGE_PRIVATE_KEY) granted pull_requests and contents write on this repository, or a new fine-grained token secret. The app's current permissions were reported as contents write, issues write, actions read; that was not confirmed on the app's settings page. Repository auto-merge is off.",
   "links": [
     "AGENTS.md",
@@ -25,6 +25,14 @@
       "client": "omp-coding-agent",
       "op": "create",
       "op_id": "b78ce2ae692b42f3beca055f88dd46e7",
+      "session_id": "c8eea21eea3644c89311c25d48789197"
+    },
+    {
+      "actor": "mcp:omp-coding-agent:joe@joe-mac-mini.local:4f989261ea761824918fb61e",
+      "at": "2026-11-17T16:23:19Z",
+      "client": "omp-coding-agent",
+      "op": "update",
+      "op_id": "0209a0b660154ebbabfeb125c6ad02b3",
       "session_id": "c8eea21eea3644c89311c25d48789197"
     }
   ]
