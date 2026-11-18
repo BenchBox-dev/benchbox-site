@@ -638,10 +638,15 @@
       "title": "Highlight the Results header link on /result-summaries/ pages"
     },
     "review-held-and-inconclusive-docs": {
-      "claim": null,
+      "claim": {
+        "expires_at": "2026-11-19T02:20:47Z",
+        "generation": "abef82a537dd439cad1db88b5cd43704",
+        "renewals": 0,
+        "worker": "mcp:omp:joe@joe-mac-mini.local:9d7b6ea6e6098f3e535a1583"
+      },
       "needs": [],
       "priority": "medium-high",
-      "status": "open",
+      "status": "active",
       "title": "Settle the documentation passages the release-pin audit left inconclusive"
     },
     "revisit-multi-warehouse-post-after-core-0-5-1": {
