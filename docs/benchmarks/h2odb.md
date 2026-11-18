@@ -512,14 +512,14 @@ The example loads the data into pandas to simulate ML preprocessing, then times 
 
 ### Scale Factor Guidelines
 
-| Scale Factor | Rows | Data Size | Memory Usage | Use Case |
-|-------------|------|-----------|--------------|----------|
-| 0.01 | ~100K | ~14 MB | < 100 MB | Development |
-| 0.1 | ~1M | ~140 MB | < 500 MB | Testing |
-| 1.0 | ~10M | ~1.4 GB | < 4 GB | Standard benchmark |
-| 10.0 | ~100M | ~14 GB | < 20 GB | Performance testing |
-| 100.0 | ~1B | ~140 GB | < 100 GB | Large-scale testing |
-| 1000.0 | ~10B | ~1.4 TB | < 500 GB | Production simulation |
+| Scale Factor | Rows | Data Size | Use Case |
+|-------------|------|-----------|----------|
+| 0.01 | ~100K | ~14 MB | Development |
+| 0.1 | ~1M | ~140 MB | Testing |
+| 1.0 | ~10M | ~1.4 GB | Standard benchmark |
+| 10.0 | ~100M | ~14 GB | Performance testing |
+| 100.0 | ~1B | ~140 GB | Large-scale testing |
+| 1000.0 | ~10B | ~1.4 TB | Production simulation |
 
 The 1.0 data size is the measured uncompressed size from [SF1 calibrated sizes](sf1-calibrated-sizes.md); the other
 data sizes are estimates that scale it in proportion. The standard scale factors for H2O DB are 0.01, 0.1 and 1. The
