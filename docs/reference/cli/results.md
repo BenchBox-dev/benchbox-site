@@ -395,7 +395,7 @@ Before this table, exits 3 and 4 were reported as 1. A script that tested for ex
 ### Notes
 
 - The first result file is always treated as the baseline
-- Both result files must use a schema version accepted by the current result loader (schema 2.0 through 2.4).
+- Both result files must use a schema version accepted by the current result loader (schema 2.0 through 2.5).
 - Results should be from the same benchmark and scale factor for meaningful comparison
 - When more than two result paths are supplied, only the first two are compared.
 - Use `benchbox results` to find available result files for comparison

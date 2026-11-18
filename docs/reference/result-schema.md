@@ -159,9 +159,9 @@ The URL names the major version, so a pipeline that validates against `result-bu
 
 What this means for consumers:
 
-- **Ignore keys you do not recognize** inside blocks, and do not rely on key order. A later 2.x bundle can carry keys that 2.4 does not know.
+- **Ignore keys you do not recognize** inside blocks, and do not rely on key order. A later 2.x bundle can carry keys that 2.5 does not know.
 - **The schema's top level is closed.** The published schema is the newest 2.x, and it sets `additionalProperties: false` for the top level, as BenchBox's validator rejects unknown top-level keys. A bundle from a newer BenchBox that adds a top-level block validates against the schema published with that release. Fetch the schema again when you upgrade BenchBox, or pin the schema file you validated against.
-- **Older BenchBox releases reject newer minors.** The runtime accepts only the versions it knows (currently 2.0 to 2.4) and fails closed on others, so a 2.5 bundle needs a BenchBox release that knows 2.5 to be read. Only the public submission check accepts any numeric 2.x version.
+- **Older BenchBox releases reject newer minors.** The runtime accepts only the versions it knows (currently 2.0 to 2.5) and fails closed on others, so a 2.6 bundle needs a BenchBox release that knows 2.6 to be read. Only the public submission check accepts any numeric 2.x version.
 
 ## Legacy
 
