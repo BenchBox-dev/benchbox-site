@@ -1,0 +1,23 @@
+{
+  "acceptance": [
+    "costStatusLabel and costStatusShortLabel return a 'not comparable (gateway)' label for not_comparable_gateway",
+    "A unit test covers the new branch",
+    "No cost figure is plotted for such rows"
+  ],
+  "context": "Found by an independent review of the site page docs/platforms/snowflake-gateways.md against core v0.5.1 (91d357a); each claim was re-verified by a second reviewer.",
+  "description": "explorer/src/lib/costDisplay.ts:60-71 (costStatusLabel, costStatusShortLabel) has branches for not_applicable_local, estimated and unavailable only, so a gateway bundle shows 'Not recorded'. Trusted internal gateway bundles are allowed (docs/contributing-results.md), and for them the cost is deliberately not comparable, not missing.",
+  "links": [
+    "explorer/src/lib/costDisplay.ts",
+    "docs/platforms/snowflake-gateways.md"
+  ],
+  "sessions": [
+    {
+      "actor": "mcp:omp:joe@joe-mac-mini.local:39443f37357137a925008b2e",
+      "at": "2026-11-18T21:37:04Z",
+      "client": "omp",
+      "op": "create",
+      "op_id": "d229baf010cf47198e638eb3907129ff",
+      "session_id": "2d465df13b314e26b89253d19db23908"
+    }
+  ]
+}

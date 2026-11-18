@@ -572,6 +572,13 @@
       "status": "open",
       "title": "Document and guard that a removal on main also removes the text from next at the next merge"
     },
+    "explorer-cost-label-not-comparable-gateway": {
+      "claim": null,
+      "needs": [],
+      "priority": "low",
+      "status": "open",
+      "title": "Label not_comparable_gateway cost in the Explorer"
+    },
     "first-default-docs-pin-run": {
       "claim": null,
       "needs": [],
