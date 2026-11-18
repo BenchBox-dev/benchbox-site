@@ -148,8 +148,9 @@ test("the release pull request lists the documentation commits and gives the hol
   assert.ok(!run.includes("origin/main..origin/next"));
   assert.ok(!/retarget/i.test(run));
   assert.ok(run.includes('--title "Release documentation for $TAG"'));
-  assert.ok(run.includes("\\`ci\\` runs \\`docs:check\\` against the new pin and fails if any passage is not true at the release"));
-  for (const phrase of ["Branch from \\`next\\`", "restore the text released on \\`main\\`", "Close this pull request and open one from the hold-back branch", "Squash-merge it into \\`main\\`", "gh pr merge --merge"]) {
+  assert.ok(run.includes("which fails only on the facts core exports in \\`doc-contracts.json\\`"));
+  assert.ok(!run.includes("fails if any passage is not true at the release"));
+  for (const phrase of ["review each documentation change on \\`next\\` since the previous pin", "Branch from \\`next\\`", "restore the text released on \\`main\\`", "Close this pull request and open one from the hold-back branch", "Squash-merge it into \\`main\\`", "Apply to \\`next\\` the corrections that are also true on \\`develop\\`", "gh pr merge --merge"]) {
     assert.ok(run.includes(phrase), phrase);
   }
 });

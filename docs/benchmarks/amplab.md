@@ -531,14 +531,16 @@ The framework runs each query type with standard parameters so results are repro
 
 | Scale Factor | Rankings Rows | UserVisits Rows | Documents Rows | Total Size | Use Case |
 |-------------|---------------|-----------------|---------------|------------|----------|
-| 0.01 | ~2.5K | ~25K | ~1.25K | ~11 MB | Development |
-| 0.1 | ~25K | ~250K | ~12.5K | ~110 MB | Testing |
-| 1.0 | ~250K | ~2.5M | ~125K | ~1.1 GB | Standard benchmark |
-| 10.0 | ~2.5M | ~25M | ~1.25M | ~11 GB | Large-scale testing |
-| 100.0 | ~25M | ~250M | ~12.5M | ~110 GB | Production simulation |
+| 0.01 | ~2.5K | ~25K | ~1.25K | ~7 MB | Development |
+| 0.1 | ~25K | ~250K | ~12.5K | ~70 MB | Testing |
+| 1.0 | ~250K | ~2.5M | ~125K | ~0.7 GB | Standard benchmark |
+| 10.0 | ~2.5M | ~25M | ~1.25M | ~7 GB | Large-scale testing |
+| 100.0 | ~25M | ~250M | ~12.5M | ~70 GB | Production simulation |
 
-The standard scale factors for AMPLab are 0.01, 0.1 and 1. The 10 and 100 rows run with a note that their results
-are not comparable with published results; see [Scale factors](index.md#scale-factors).
+The 1.0 size is the measured uncompressed size from [SF1 calibrated sizes](sf1-calibrated-sizes.md); the other
+sizes are estimates that scale it in proportion. The standard scale factors for AMPLab are 0.01, 0.1 and 1. The 10
+and 100 rows run with a note that their results are not comparable with published results; see
+[Scale factors](index.md#scale-factors).
 
 ### Advanced-level Configuration
 
