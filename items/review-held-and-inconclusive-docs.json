@@ -6,7 +6,7 @@
     "Changes land on main for corrections true at the pinned release, and on next for unreleased behaviour, each by pull request with ci green; after a main merge, main is merged into next and next's unreleased text is checked to have survived (see document-main-removals-reaching-next)",
     "`npm run docs:check -- --docs-mode block` passes on main (pin) and on next (develop bundle)"
   ],
-  "context": "Source: /tmp/docs-audit-2026-11-14.md was a local scratch file and is not durable; the lists above are its content. Relation: if v0.5.1 is pinned first (first-default-docs-pin-run), re-check every passage against v0.5.1 instead of v0.5.0. Guardrails: never revert a correction that was already true at the pinned release; never weaken a docs-contracts check; do not touch blog/ or release-pin/.\n\n2026-11-17 owner decision: settle every passage that has a source answer against core v0.5.1 by evidence; mark unmeasured sizes as estimates; leave pure judgement calls (Snowflake gateway caching and cost advice) unchanged and list them for the owner. Runs after the v0.5.1 release pull request merges, against the v0.5.1 pin.",
+  "context": "Source: /tmp/docs-audit-2026-11-14.md was a local scratch file and is not durable; the lists above are its content. Relation: if v0.5.1 is pinned first (first-default-docs-pin-run), re-check every passage against v0.5.1 instead of v0.5.0. Guardrails: never revert a correction that was already true at the pinned release; never weaken a docs-contracts check; do not touch blog/ or release-pin/.\n\n2026-11-17 owner decision: settle every passage that has a source answer against core v0.5.1 by evidence; mark unmeasured sizes as estimates; leave pure judgement calls (Snowflake gateway caching and cost advice) unchanged and list them for the owner. Runs after the v0.5.1 release pull request merges, against the v0.5.1 pin.\n\n2026-11-18 progress: every passage checked against core v0.5.1 (main) and develop (next); evidence in PR #191 (main) and #192 (next). Verdicts: TPC-DS-OBT sizes unverified (no recorded run), rows kept; TPC-DI non-SF1 sizes estimates; six size tables corrected to the measured SF1 baseline with proportional estimates; listed scale factors all accepted by benchbox run, 0.001 stays off; validation table correct at v0.5.1 except missing file_readable; ADR schema 2.4 kept (v0.5.1 writes 2.4); TPC-DS-OBT 17-vs-90 already fixed, ADR 89 corrected; RF2 ~750x and RF1 ~100x removed (no source); PR template and release body corrected. Snowflake gateway caching/cost advice left unchanged for the owner (its facts are true at v0.5.1); H2O DB memory column unmeasured, left for the owner.",
   "description": "Problem: the audit of documentation merged after v0.5.0 (pull request #160) removed passages with clear evidence and left others unchanged for the owner. Its independent review added optional findings that were not acted on. Some of these passages are live on main and all of them will go live at the next release unless settled.\n\nInconclusive (from #160): TPC-DS-OBT size rows for scale factors 1 and 10 (which core version produced them); TPC-DI sizes at 0.01, 0.1 and 10, marked 'not measured'; caching and cost advice on platforms/snowflake-gateways.md; the check names and severities table in development/result-integrity-validation.md (spot-checked only); whether CoffeeShop and TPC-DS should list the 0.001 scale row #138 removed; the status matrix saying 17 TPC-DS-OBT queries while the benchmark page says 90 of 99; an ADR that refers to result schema 2.4.\nReview optionals not acted on: size tables on amplab, h2odb, coffeeshop, read-primitives, ssb and tsbs-devops list scale factors `benchbox run` rejects at v0.5.0 with no flag; tpc-ds-obt.md SF 10 row needs a note that only the Python API reaches it; TPC-H RF2 batching figures in the maintenance guide (1,500 keys, ~750x) were never checked; the pull request template does not mention the next into main release pull request.\n\nOutcome: each passage has a recorded verdict, and main and next each state only what is true for the release they document.",
   "links": [
     "https://github.com/BenchBox-dev/benchbox-site/pull/160",
@@ -50,6 +50,14 @@
       "generation": "abef82a537dd439cad1db88b5cd43704",
       "op": "renew",
       "op_id": "3a3d3b2187ef47f89e7da8361444cf32",
+      "session_id": "647d23d47db44da19b09abb0fb3219aa"
+    },
+    {
+      "actor": "mcp:omp:joe@joe-mac-mini.local:9d7b6ea6e6098f3e535a1583",
+      "at": "2026-11-18T02:42:32Z",
+      "client": "omp",
+      "op": "update",
+      "op_id": "6312590248a44c6a8de479ecad89b9ef",
       "session_id": "647d23d47db44da19b09abb0fb3219aa"
     }
   ]
