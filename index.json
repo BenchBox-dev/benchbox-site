@@ -646,10 +646,10 @@
     },
     "review-held-and-inconclusive-docs": {
       "claim": {
-        "expires_at": "2026-11-19T02:42:29Z",
-        "generation": "abef82a537dd439cad1db88b5cd43704",
-        "renewals": 1,
-        "worker": "mcp:omp:joe@joe-mac-mini.local:9d7b6ea6e6098f3e535a1583"
+        "expires_at": "2026-11-19T23:18:47Z",
+        "generation": "2306715967b44e8094cd70731d16a24b",
+        "renewals": 0,
+        "worker": "mcp:omp:joe@joe-mac-mini.local:8acd5eb72a0f7b327051ca7e"
       },
       "needs": [],
       "priority": "medium-high",

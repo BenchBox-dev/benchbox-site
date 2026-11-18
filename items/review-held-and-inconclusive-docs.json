@@ -59,6 +59,17 @@
       "op": "update",
       "op_id": "6312590248a44c6a8de479ecad89b9ef",
       "session_id": "647d23d47db44da19b09abb0fb3219aa"
+    },
+    {
+      "actor": "mcp:omp:joe@joe-mac-mini.local:8acd5eb72a0f7b327051ca7e",
+      "at": "2026-11-18T23:18:47Z",
+      "client": "omp",
+      "displaced": "mcp:omp:joe@joe-mac-mini.local:9d7b6ea6e6098f3e535a1583",
+      "generation": "2306715967b44e8094cd70731d16a24b",
+      "op": "takeover",
+      "op_id": "ba0c102984bd42f08eaead231258564e",
+      "reason": "The MCP server process that held the claim ended with its kernel; this session continues the same work.",
+      "session_id": "143dfa6708e14f018bf7cc5e3241a9ce"
     }
   ]
 }
