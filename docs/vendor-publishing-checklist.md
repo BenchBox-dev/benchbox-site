@@ -25,7 +25,7 @@ bundle validator reads the same fields when your pull request is validated
 | `vendor_notice` | `--vendor-notice-date YYYY-MM-DD` and `--vendor-notice-ref <reference>` | The date and a reference (message id, ticket or link) for what you sent the vendor. |
 | `self_run` | `--self-run` | An attestation that you ran the benchmark yourself. |
 
-Three outcomes matter:
+Four outcomes matter:
 
 - **Refusal.** A `free` or `trial` `plan_tier`, or any entry in
   `preview_features`, with no `vendor_permission`, is an error: `benchbox
@@ -35,11 +35,16 @@ Three outcomes matter:
   error, as is a malformed `vendor_notice` (it needs a `sent_on` date in
   `YYYY-MM-DD` form and a non-empty `reference`) or a `plan_tier` outside the
   four values above.
-- **Warning.** A missing `vendor_notice` on a platform that needs one, a
-  missing `self_run` attestation on BigQuery, and a missing `plan_tier` on a
-  platform with tier or preview conditions are warnings. They do not block the
-  package, but they mean the condition is not recorded, so treat each as a
-  step you still owe.
+- **Required fields.** For BigQuery, Snowflake and Databricks, a submission
+  dated on or after 2026-11-18 must record a `plan_tier` of `paid`, `free` or
+  `trial`, a `vendor_notice`, and `self_run` set with `--self-run`. A
+  submission without all three is refused. Results published before that date
+  are labelled `pre_policy`: they are reported, not refused, and are not
+  required to carry these fields.
+- **Warning.** On the other platforms, a missing `vendor_notice` where one is
+  needed and a missing `plan_tier` where tier or preview conditions apply are
+  warnings. They do not block the package, but they mean the condition is not
+  recorded, so treat each as a step you still owe.
 - **Not checked.** The checks read only what you record. A run on a free
   tier that you declare as `paid`, or a Preview feature you leave out of
   `preview_features`, passes. The checks cannot see which plan or features a
@@ -59,7 +64,7 @@ Terms: Google Cloud Service Specific Terms, General Service Terms section 7.
 
 | Condition | Met by |
 | --- | --- |
-| Tests you run yourself. Not on behalf of a hyperscale cloud provider without consent. | Automated: `self_run`, set with `--self-run`. `self_run: false` refuses; a missing value warns. |
+| Tests you run yourself. Not on behalf of a hyperscale cloud provider without consent. | Automated: `self_run`, set with `--self-run`. `self_run: false` refuses, and so does a missing value on a submission dated on or after 2026-11-18. |
 | The disclosure includes what is needed to replicate the tests. | The bundle's recorded configuration and query text. |
 | Reciprocity: Google may benchmark the customer's public products in return. | Manual step: no check exists. By publishing under these terms you accept that Google may do the same to your public products. |
 | Consent when running on behalf of a hyperscale cloud provider. | Manual step: obtain Google's consent before running. `--self-run` is true only when you ran the test yourself, so do not set it for a run done for a hyperscale provider without that consent. |
@@ -82,7 +87,7 @@ Terms: Acceptable Use Policy section IV.
 
 | Condition | Met by |
 | --- | --- |
-| Results are shared with Snowflake reasonably in advance of publishing. | Manual step: send the results to Snowflake before you open the pull request, then record `vendor_notice`. The check confirms that a dated reference is recorded; a missing one warns. It does not judge whether the notice came reasonably in advance, so check that the `sent_on` date leaves enough time. |
+| Results are shared with Snowflake reasonably in advance of publishing. | Manual step: send the results to Snowflake before you open the pull request, then record `vendor_notice`. The check confirms that a dated reference is recorded; a missing one refuses a submission dated on or after 2026-11-18. It does not judge whether the notice came reasonably in advance, so check that the `sent_on` date leaves enough time. |
 | The disclosure includes what is needed to replicate the test. | The bundle's recorded configuration and query text. |
 | Preview results need Snowflake's written approval. | Automated: `preview_features` with `vendor_permission`. Preview features without permission refuse. Manual step: obtain the written approval first. |
 
