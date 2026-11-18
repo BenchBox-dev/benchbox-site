@@ -385,14 +385,16 @@ This sets a custom host count, interval and start time.
 
 | Scale Factor | Hosts | Duration | CPU Rows | Total Rows | Data Size | Use Case |
 |-------------|-------|----------|----------|------------|-----------|----------|
-| 0.01 | 10 | 2 days | ~173K | ~1M | ~93 MB | Quick testing |
-| 0.1 | 10 | 2 days | ~173K | ~1M | ~93 MB | Development |
-| 1.0 | 100 | 2 days | ~1.7M | ~10M | ~0.93 GB | Standard benchmark |
-| 10.0 | 1,000 | 2 days | ~17.3M | ~100M | ~9.3 GB | Performance testing |
-| 100.0 | 10,000 | 2 days | ~173M | ~1B | ~93 GB | Large scale testing |
+| 0.01 | 10 | 2 days | ~173K | ~1M | ~92 MB | Quick testing |
+| 0.1 | 10 | 2 days | ~173K | ~1M | ~92 MB | Development |
+| 1.0 | 100 | 2 days | ~1.7M | ~10M | ~0.92 GB | Standard benchmark |
+| 10.0 | 1,000 | 2 days | ~17.3M | ~100M | ~9.2 GB | Performance testing |
+| 100.0 | 10,000 | 2 days | ~173M | ~1B | ~92 GB | Large scale testing |
 
-The standard scale factors for TSBS DevOps are 0.01, 0.1, 1 and 10. The 100 row runs with a note that its results
-are not comparable with published results; see [Scale factors](index.md#scale-factors).
+The 1.0 size is the measured uncompressed size from [SF1 calibrated sizes](sf1-calibrated-sizes.md); the other
+sizes are estimates that scale it by host count. The standard scale factors for TSBS DevOps are 0.01, 0.1, 1 and 10.
+The 100 row runs with a note that its results are not comparable with published results; see
+[Scale factors](index.md#scale-factors).
 
 > **Note:** Duration is fixed at 2 days; only host count scales with SF. If both
 > hosts *and* duration scaled, total rows would grow as SF² (quadratic) instead of SF (linear),

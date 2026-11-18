@@ -118,8 +118,9 @@ The inventory also exposed qualification blockers:
 - TPC-Havoc documents 220 variants, but `TPCHavocQueryManager.get_all_queries()` currently catches any
   generation exception and silently omits that variant. A registry count alone cannot establish the scored
   cohort.
-- TPC-DS OBT currently identifies 89 convertible queries, while older catalog descriptions still describe
-  a much smaller subset.
+- TPC-DS OBT's query count has drifted: the converter once identified 89 convertible queries and older catalog
+  descriptions a much smaller subset. It now runs 90 of the 99 TPC-DS queries, and its registry entry and
+  documentation agree on that count.
 - Read Primitives has grown beyond older documented counts. Its full catalog is richer than the subset that
   runs without skips on every platform, so “portable everywhere” would remove much of the advanced SQL
   coverage the suite exists to provide.
