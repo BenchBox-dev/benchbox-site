@@ -12,7 +12,9 @@ accepts the same `gateway` setting with the `espresso` and `custom` values and t
 [Databricks](#databricks).
 
 A gateway-routed run measures the gateway and whatever it routes to, not Snowflake alone. BenchBox records that
-fact in the result and keeps the run out of every native comparison, ranking and cost total.
+fact in the result and keeps the run out of native rankings, cost totals and native regression baselines.
+`benchbox compare` and the MCP `compare_results` tool refuse to pair it with a native run; `benchbox compare` accepts
+`--allow-heterogeneous-comparison` to override.
 
 > [!WARNING]
 > A gateway sees your Snowflake credentials, every SQL statement and every result row. Use it only with disposable
@@ -25,8 +27,9 @@ fact in the result and keeps the run out of every native comparison, ranking and
    gateway (see the lifecycle guardrails below); treat every gateway run as query-only.
 2. Confirm the gateway endpoint answers Snowflake connector logins for your account. The Snowflake `account` is still
    sent, so login succeeds through the gateway.
-3. Run the same query phases twice: once natively, once with the gateway. Compare them only by reading both results,
-   never with `benchbox compare` (it refuses the pair).
+3. Run the same query phases twice: once natively, once with the gateway. `benchbox compare` refuses the pair unless
+   you pass `--allow-heterogeneous-comparison`. With the flag, the comparison measures the gateway and whatever it
+   routes to against native Snowflake.
 
 ```bash
 benchbox run --platform snowflake --benchmark tpch --scale 0.01 --phases power \
@@ -34,9 +37,6 @@ benchbox run --platform snowflake --benchmark tpch --scale 0.01 --phases power \
   --platform-option gateway_host=gateway.example.com \
   --platform-option gateway_port=8443
 ```
-
-Snowflake multi-cluster warehouses are an Enterprise edition feature. Check the gateway vendor's edition
-requirements before the run; BenchBox does not verify them.
 
 ## Options
 
@@ -46,9 +46,9 @@ requirements before the run; BenchBox does not verify them.
 | `gateway_host` | (required) | Bare gateway host name or address; a value with credentials (`user:password@`), a scheme or a path is rejected |
 | `gateway_port` | connector default | Gateway port (1-65535) |
 | `gateway_protocol` | `https` | `https` or `http` |
-| `gateway_ca_bundle` | (none) | CA bundle file for a private-CA gateway. The connector reads it from the process environment, so `REQUESTS_CA_BUNDLE` must name the same file before BenchBox starts; otherwise construction fails. BenchBox never changes the environment |
-| `gateway_ocsp_fail_open` | (connector default) | Passed to the connector only when set |
-| `allow_insecure_gateway` | false | Disables certificate verification (`insecure_mode`) |
+| `gateway_ca_bundle` | (none) | CA bundle file for a private-CA gateway, on connector 4.x and earlier. The connector reads it from the process environment, so `REQUESTS_CA_BUNDLE` must name the same file before BenchBox starts; otherwise construction fails. BenchBox never changes the environment |
+| `gateway_ocsp_fail_open` | (connector default) | Passed to the connector only when set; see OCSP below |
+| `allow_insecure_gateway` | false | Sets the connector's `insecure_mode`, which turns off the OCSP revocation check on connector 4.x and earlier; 5.0 and later ignore it. Certificate and host name verification still apply |
 
 Gateway options are accepted only with a gateway other than `native`. A bare `--platform-option gateway_host=...`
 with the native gateway is an error, not a silent no-op.
@@ -58,13 +58,19 @@ log a warning. Gateway options are not available through MCP.
 
 ## Transport security
 
-- **TLS.** `https` is the default and certificates are verified. `allow_insecure_gateway` turns verification off
-  (`insecure_mode`) and is for a throwaway test gateway only.
-- **Private CA.** Set `gateway_ca_bundle` to the CA file and export `REQUESTS_CA_BUNDLE` with the same path before
-  BenchBox starts. The connector reads the bundle from the process environment; BenchBox never changes the
-  environment and fails construction if the two disagree.
-- **OCSP.** Revocation checking follows the connector default. Pass `gateway_ocsp_fail_open` only when your gateway
-  cannot serve OCSP responses; BenchBox sends the value to the connector only when you set it.
+- **TLS.** `https` is the default and certificates are verified. `allow_insecure_gateway` turns off only the OCSP
+  revocation check (`insecure_mode`, ignored from connector 5.0); it does not make the connector accept a self-signed
+  or untrusted certificate.
+- **Private CA.** On snowflake-connector-python 4.x and earlier, set `gateway_ca_bundle` to the CA file and export
+  `REQUESTS_CA_BUNDLE` with the same path before BenchBox starts. The connector reads the bundle from the process
+  environment; BenchBox never changes the environment and fails construction if the two disagree. Connector 5.0 and
+  later do not read `REQUESTS_CA_BUNDLE`, and BenchBox does not yet pass the bundle to them another way.
+- **OCSP.** Revocation checking depends on the installed snowflake-connector-python. Up to 4.7, OCSP checking is on
+  and fails open; `gateway_ocsp_fail_open=false` makes it fail closed. In 4.8, checking is off unless `ocsp_fail_open`
+  is set; either value turns it on, `true` failing open and `false` failing closed. On 4.x and earlier,
+  `allow_insecure_gateway` turns OCSP off even when `gateway_ocsp_fail_open` is set. From 5.0 the connector checks
+  revocation with certificate revocation lists, off by default, and ignores both options. BenchBox passes
+  `gateway_ocsp_fail_open` to the connector only when you set it.
 - **Plain HTTP.** `http` to a loopback host needs no opt-in because the traffic never leaves the machine. Any other
   `http` endpoint needs the environment opt-in above.
 - **Credentials.** A host with embedded credentials (`user:password@`), a scheme or a path is rejected without being
@@ -92,8 +98,8 @@ verification, plus `gateway_ca_bundle` when the private endpoint presents a cert
   benchmark reports, so TPC metrics are suppressed and publish, submit, bundle validation, the results database and
   metrics readiness all refuse the run as non-official. A stored result that claims `official` while
   `platform.gateway.routed` is true is treated the same way.
-- Gateway runs never compare with native runs, with another gateway, or with another execution engine. `benchbox
-  compare` and the regression baseline select only runs of the same variant.
+- `benchbox compare` refuses to pair a gateway run with a native run, another gateway or another execution engine
+  unless you pass `--allow-heterogeneous-comparison`. The regression baseline selects only runs of the same variant.
 - Every `queries[].execution_engine` is `unknown` unless the platform manifest names the engine the gateway reported,
   so DuckDB, Snowflake and unknown buckets stay separate and are never blended.
 - A metadata probe that the gateway answers with an empty, truncated or synthetic row does not fail the run. The
@@ -101,24 +107,29 @@ verification, plus `gateway_ca_bundle` when the private endpoint presents a cert
 
 ## Caching
 
-BenchBox sets `USE_CACHED_RESULT = FALSE` on the Snowflake session, reads the parameter back and keeps that receipt in
-`platform.compute.cache_control`. A session parameter can only describe Snowflake's own result cache. It cannot
-verify a cache inside the gateway or inside an engine the gateway routes to, so a gateway run also records:
+BenchBox sets `USE_CACHED_RESULT = FALSE` on the session, reads the parameter back with `SHOW PARAMETERS` and keeps
+that receipt in `platform.compute.cache_control`. On a gateway run both statements pass through the gateway, so the
+receipt records what the gateway answered. It cannot show whether the setting held in the Snowflake session that ran
+each query. It also cannot show a cache inside the gateway or in an engine the gateway routes to, or the warehouse's
+local data cache, which no session parameter controls. A gateway run therefore also records:
 
 ```json
 {
-  "validated": true,
-  "cache_disabled": true,
   "snowflake_result_cache": "disabled",
   "gateway_cache": "unverified",
   "warm_run_metrics": "cache_unverified"
 }
 ```
 
-Warm-run gateway numbers are not valid measurements: a second run may be answered from a gateway cache that nothing
-in the result can show. Report warm gateway timings only with the label cache-unverified, and never as cold-run
-results. `strict_validation` keeps its meaning for the Snowflake receipt: a failed read-back fails the run when it is
-on.
+`snowflake_result_cache` is `disabled` when the read-back confirmed the result cache is off. It is `enabled` when you
+left the result cache on, in which case nothing is read back. It is `unvalidated` when the read-back returned no row,
+or, with `strict_validation` off, returned the wrong value or failed. With `strict_validation` on (the default), a
+read-back that returns the wrong value or errors fails the run; a read-back that returns no row only adds a warning.
+
+`warm_run_metrics` covers every timing in the run. A power run executes one warm-up pass, then repeats the same
+queries with the same parameters (see [Benchmark methodology](../concepts/benchmark-methodology.md#iterations-and-warm-up)),
+so a gateway cache could have answered any measured iteration without the result showing it. If you publish gateway
+timings, label them cache-unverified.
 
 ## Cost and TCO
 
@@ -126,29 +137,29 @@ BenchBox does not publish a cost total for a gateway run. `normalized_cost.cost_
 `not_comparable_gateway`, `normalized_cost_usd` is null, per-query costs are empty and the result has no cost total,
 because the credits a gateway run consumes depend on how the gateway routes each query.
 
-For a total cost of ownership comparison, fill in the worksheet below from your own invoices. BenchBox reads none of
-these inputs and never combines them with its own cost fields.
+BenchBox reads no invoices and never combines outside costs with its own cost fields. A total cost comparison has to
+come from your own bills, and each source has limits:
 
-| Input | Source |
-|-------|--------|
-| Snowflake credits for the run window | Snowflake billing or `WAREHOUSE_METERING_HISTORY`, for the same warehouse and window |
-| Gateway subscription or usage fee | Gateway vendor invoice |
-| Delegated engine compute, if the gateway runs queries outside Snowflake | Vendor-reported usage |
-| Replica storage and replication cost | Vendor invoice |
-| Data transfer between the gateway and your network | Cloud provider bill |
-| Engineering and operating time | Your own estimate |
+- **Snowflake credits.** `WAREHOUSE_METERING_HISTORY` is hourly, can lag up to three hours (six for cloud services
+  credits), and reports credits before the cloud services adjustment. Billed credits are in
+  `METERING_DAILY_HISTORY`, which is daily and account-wide, so it cannot isolate a run. To isolate a gateway run by
+  warehouse, give it a warehouse that nothing else uses during those hours, including the native run; a gateway can
+  also send queries to other warehouses. `QUERY_ATTRIBUTION_HISTORY` attributes compute credits per query and records
+  `QUERY_ID` and `QUERY_TAG`. Join it on the statement ids the result records in
+  `queries[].platform_timing.requests[].id`, which survive a gateway that rewrites the tag, or select the run's `_gw-`
+  tag suffix. It lags up to eight hours, leaves out queries of about 100 ms or less and most idle time (only gaps
+  between queries within the same minute are attributed), and excludes cloud services and data transfer costs.
+- **Costs outside Snowflake.** The gateway fee, compute for queries another engine answered, replica storage
+  (possibly in a bucket you own) and network transfer come from the vendor's invoice and your cloud provider's bill.
 
-Any table, chart or page that shows gateway-derived cost beside native cost must carry this banner:
-
-> [!CAUTION]
-> Cost is not comparable for gateway-routed runs. Inputs are supplied by the operator and are unverified by BenchBox.
+If you show these figures beside a native BenchBox cost, state that BenchBox did not measure them.
 
 ## Log join
 
 A gateway-routed run appends a run-level suffix, `_gw-<8 hex characters>`, to the per-query tag, for example
 `BenchBox_Q1_gw-3fa9c2d1`. Every query in the run shares the suffix, so a gateway vendor can join its logs to the run
 by tag. The statistics lookup against `QUERY_HISTORY` uses the statement id the connector returns, not the tag, so a
-gateway that rewrites or drops the tag does not break timing or credit capture. Native runs keep the unsuffixed tag.
+gateway that rewrites or drops the tag does not break timing or statistics capture. Native runs keep the unsuffixed tag.
 
 ## Semantic gaps
 
@@ -198,15 +209,11 @@ BenchBox enforces these runtime restrictions:
   TPC-H refresh functions enabled inside the power or throughput phase (`tpch_refresh_functions`) also fail closed
   before any refresh set is generated or applied; the phase reports a `FAILED` row naming the greybeam gateway.
 
-Quiescence runbook, to run after every native load or refresh and before the first gateway query:
+To wait for CDC quiescence, confirm from the vendor's replication status that the replica has caught up before the
+first gateway query after a native load or refresh. BenchBox does not read replication lag. Comparing row counts
+through the native endpoint and through the gateway is a useful smoke test but not proof: a gateway may answer a
+`COUNT(*)` from Snowflake rather than the replica, and a TPC-H RF1/RF2 pair leaves the `ORDERS` row count unchanged
+even when the replica applied neither refresh. Discard any run in which a gateway query returns zero rows for a table
+that is non-empty natively.
 
-1. **Row-count parity.** For every benchmark table, compare `SELECT COUNT(*)` through the native endpoint with the same
-   count through the gateway. Any difference means the replica has not caught up.
-2. **Lag threshold.** Repeat the parity check at a fixed interval (for example 60 seconds). Treat the replica as
-   quiescent only after parity holds on three consecutive checks with no source writes in between. Replication lag
-   itself comes from the vendor's own monitoring; BenchBox does not read it.
-3. **Abort criteria.** Abort the run without recording results if parity is not reached within the time budget you set
-   before the load (size it to the data volume), if row counts ever move backwards, or if a gateway query returns zero
-   rows for a table that is non-empty natively.
-
-Only after step 3 passes run `benchbox run --platform snowflake --gateway greybeam ... --phases power`.
+Then run `benchbox run --platform snowflake --gateway greybeam ... --phases power`.
