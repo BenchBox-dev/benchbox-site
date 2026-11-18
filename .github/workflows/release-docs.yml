@@ -260,13 +260,14 @@ jobs:
 
           $SINCE
 
-          \`next\` documents core \`develop\`, which runs ahead of the release, so some passages may not be true at \`$TAG\`. \`ci\` runs \`docs:check\` against the new pin and fails if any passage is not true at the release. Do not merge a failing pull request; hold those passages back first:
+          \`next\` documents core \`develop\`, which runs ahead of the release, so some passages may not be true at \`$TAG\`. \`ci\` runs \`docs:check\` against the new pin, which fails only on the facts core exports in \`doc-contracts.json\`; every other passage passes \`ci\`, so review each documentation change on \`next\` since the previous pin against the source at \`$TAG\`. Hold back each passage that is not true at the release:
 
           1. Branch from \`next\`.
-          2. For each passage that is not true at \`$TAG\`, restore the text released on \`main\`.
+          2. For each passage that is not true at \`$TAG\`, restore the text released on \`main\`. Correct passages that are false at the release, here and on \`next\`.
           3. Close this pull request and open one from the hold-back branch into \`main\`, titled \`Release documentation for $TAG\`.
           4. Squash-merge it into \`main\` once \`ci\` is green.
-          5. Merge \`main\` into \`next\` by pull request with \`gh pr merge --merge\`, and confirm that the held-back text is still on \`next\`.
+          5. Apply to \`next\` the corrections that are also true on \`develop\`.
+          6. Merge \`main\` into \`next\` by pull request with \`gh pr merge --merge\`, and confirm that the held-back text is still on \`next\`.
           EOF
           )"
           gh pr create --repo "$REPO" --base main --head next --title "Release documentation for $TAG" --body "$BODY"
