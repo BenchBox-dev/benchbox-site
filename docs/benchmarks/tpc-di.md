@@ -52,7 +52,9 @@ The TPC-DI schema models a financial services data warehouse with dimension tabl
 | **FactWatches** | Customer watch lists | 300,000 |
 
 The five fact tables and the customer, account, security and company dimensions grow linearly with the scale
-factor. DimBroker, DimDate and DimTime have the same size at every scale factor.
+factor. DimDate and DimTime have the same size at every scale factor. DimBroker has 100 rows up to scale
+factor 2 and then grows (`max(100, int(50 * scale factor))` rows), while FactTrade still draws broker ids from 1
+to 100.
 
 #### How the row counts relate to the TPC-DI specification
 
@@ -431,15 +433,17 @@ This enables parallel ETL with 4 workers.
 
 | Scale Factor | Generated Data Size | ETL Complexity | Use Case |
 |-------------|---------------------|----------------|----------|
-| 0.01 | ~1 MB | Simple | Development, unit testing |
-| 0.1 | ~8 MB | Simple | Integration testing |
+| 0.01 | ~1 MB (estimate) | Simple | Development, unit testing |
+| 0.1 | ~8 MB (estimate) | Simple | Integration testing |
 | 1.0 | ~76 MB | Standard | Standard benchmark |
-| 10.0 | ~760 MB | Complex | Stress testing |
-| 30.0+ | ~2.3+ GB | Production-like | Enterprise simulation |
+| 10.0 | ~760 MB (estimate) | Complex | Stress testing |
+| 30.0+ | ~2.3+ GB (estimate) | Production-like | Enterprise simulation |
 
-The 1.0 size is measured from uncompressed generated files; the other sizes scale it in proportion. The standard
-scale factors for TPC-DI are 0.01, 0.1, 1 and 10. Other values, such as 30, run with a note that their results are
-not comparable with published results; see [Scale factors](index.md#scale-factors).
+The 1.0 size is measured: 76,020,843 bytes of uncompressed generated files. The other sizes are estimates that scale
+it in proportion and have not been measured. DimDate, DimTime, the reference tables and, below scale factor 2,
+DimBroker do not grow with the scale factor, so the real size at 0.01 and 0.1 is larger than the estimate. The
+standard scale factors for TPC-DI are 0.01, 0.1, 1 and 10. Other values, such as 30, run with a note that their
+results are not comparable with published results; see [Scale factors](index.md#scale-factors).
 
 ### ETL Configuration
 

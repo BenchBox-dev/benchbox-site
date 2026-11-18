@@ -61,7 +61,7 @@ Validates that the result JSON is well-formed and internally consistent. When `s
 | `schema_v2` | FAIL | Delegates to `SchemaV2Validator` for schema compliance |
 | `required_keys` | FAIL | Top-level keys present (`version`, `run`, `benchmark`, `platform`, `config`, `summary`, `phases`, `queries`, `execution`, `environment`, `export`) |
 | `query_count_math` | FAIL | `passed + failed + skipped = total` in summary |
-| `timing_non_negative` | FAIL | All timing fields >= 0 |
+| `timing_non_negative` | FAIL | All numeric `summary.timing` fields >= 0 |
 | `percentile_ordering` | FAIL | p90 <= p95 <= p99 |
 | `phase_status_values` | FAIL | Phase statuses are recognized values |
 | `query_entry_fields` | FAIL | Each query has required fields (id, ms, status) |
@@ -73,7 +73,7 @@ Validates that the result contains expected content for its benchmark type.
 
 | Check | Severity | Description |
 |-------|----------|-------------|
-| `expected_query_ids` | FAIL below 80% of the expected IDs found, WARN from 80% to 99% | Query IDs match benchmark spec (e.g., 22 for TPC-H). Benchmarks with a minimum unique-query count FAIL below it |
+| `expected_query_ids` | FAIL below 80% of the expected IDs found, WARN from 80% up to but not including 100% | Query IDs match benchmark spec (e.g., 22 for TPC-H). Benchmarks with a minimum unique-query count FAIL below it |
 | `measurement_queries_present` | FAIL | At least one measurement query (run_type='measurement' or iter > 0) |
 | `power_phase_completed` | WARN | Power test phase present and in a completed status |
 | `tables_object` | WARN | Tables object present when spec requires it |
@@ -94,6 +94,8 @@ Validates that reported metrics are statistically plausible.
 | `load_time_nonzero` | WARN | Data load time > 0 |
 
 The overall status is FAIL when any check FAILs, otherwise WARN when any check WARNs, otherwise PASS. INFO findings never change it.
+
+A file that cannot be opened or parsed as JSON gets one structural `file_readable` FAIL check instead of the three tiers.
 
 ## BenchmarkSpec System
 

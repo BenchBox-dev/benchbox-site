@@ -241,13 +241,15 @@ ORDER BY revenue DESC;
 
 | Scale Factor | Orders | Order Lines | Data Size |
 |--------------|--------|-------------|-----------|
-| 0.01 | ~85K | ~133K | ~10 MB |
-| 0.1 | ~850K | ~1.3M | ~100 MB |
-| 1.0 | ~8.5M | ~13.3M | ~1 GB |
-| 10.0 | ~85M | ~133M | ~10 GB |
+| 0.01 | ~85K | ~133K | ~9 MB |
+| 0.1 | ~850K | ~1.3M | ~90 MB |
+| 1.0 | ~8.5M | ~13.3M | ~0.9 GB |
+| 10.0 | ~85M | ~133M | ~9 GB |
 
-The standard scale factors for CoffeeShop are 0.01, 0.1 and 1. The 10 row runs with a note that its results are not
-comparable with published results; see [Scale factors](index.md#scale-factors).
+The 1.0 size is the measured uncompressed size from [SF1 calibrated sizes](sf1-calibrated-sizes.md); the other
+sizes are estimates that scale it in proportion. The standard scale factors for CoffeeShop are 0.01, 0.1
+and 1. The 10 row runs with a note that its results are not comparable with published results; see
+[Scale factors](index.md#scale-factors).
 
 ## API Reference
 
