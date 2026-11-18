@@ -45,8 +45,8 @@ The first command writes to a local directory and the second writes to cloud sto
 ## JSON Format (Schema v2)
 
 The JSON export is the canonical schema-v2 result bundle containing complete
-benchmark details. Schema v2 spans minors `"2.0"` through `"2.4"`. Current runs emit
-`"2.3"` in the top-level `result_schema_version` field. Readers accept
+benchmark details. Schema v2 spans minors `"2.0"` through `"2.5"`. Current runs emit
+`"2.5"` in the top-level `result_schema_version` field. Readers accept
 `result_schema_version` -> `version` -> `schema_version` in that order, so
 bundles written before the rename keep loading.
 Consumer policy is intentionally split by use case:
