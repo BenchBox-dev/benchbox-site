@@ -501,6 +501,7 @@ pagerank
 palo
 paradedb
 parameterised
+paramstyle
 partkey
 partkeydef
 partmethod

@@ -416,13 +416,15 @@ The categories are sorted by total time to identify bottlenecks.
 
 | Scale Factor | Data Size | Query Times | Use Case |
 |-------------|-----------|-------------|----------|
-| 0.01 (small) | ~10 MB | 10-100ms | Unit tests, CI/CD pipelines |
-| 0.1 (medium) | ~100 MB | 100ms-1s | Regression testing |
-| 1.0 (large) | ~1 GB | 1-10s | Performance validation |
-| 10.0 (xlarge) | ~10 GB | 10s-60s | Stress testing |
+| 0.01 (small) | ~11 MB | 10-100ms | Unit tests, CI/CD pipelines |
+| 0.1 (medium) | ~110 MB | 100ms-1s | Regression testing |
+| 1.0 (large) | ~1.1 GB | 1-10s | Performance validation |
+| 10.0 (xlarge) | ~11 GB | 10s-60s | Stress testing |
 
-The standard scale factors for Read Primitives are 0.01 and 0.1. The 1.0 and 10.0 rows run with a note that their
-results are not comparable with published results; see [Scale factors](index.md#scale-factors).
+The 1.0 size is the measured uncompressed size from [SF1 calibrated sizes](sf1-calibrated-sizes.md); the other
+sizes are estimates that scale it in proportion. The standard scale factors for Read Primitives are 0.01 and
+0.1. The 1.0 and 10.0 rows run with a note that their results are not comparable with published results; see
+[Scale factors](index.md#scale-factors).
 
 ## Configuration Options
 

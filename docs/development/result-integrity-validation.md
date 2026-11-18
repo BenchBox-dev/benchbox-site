@@ -96,7 +96,7 @@ Validates that reported metrics are statistically plausible.
 
 The overall status is FAIL when any check FAILs, otherwise WARN when any check WARNs, otherwise PASS. INFO findings never change it.
 
-A file that cannot be read, is not valid JSON, or is not a JSON object gets one structural `file_readable` FAIL check instead of the three tiers.
+A file that cannot be opened, is not valid JSON, or is not a JSON object gets one structural `file_readable` FAIL check instead of the three tiers.
 
 ## BenchmarkSpec System
 

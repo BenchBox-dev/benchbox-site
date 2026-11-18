@@ -168,46 +168,34 @@ maintenance_result = adapter.run_benchmark(benchmark, test_execution_type="maint
 
 The maintenance run refuses when the target tables carry enforced primary keys, and it modifies the database when it runs. Load without primary keys, and reload the data before running Power or Throughput again or before repeating maintenance on the same refresh sets.
 
-### TPC-H Refresh Performance
+<span id="tpc-h-refresh-performance"></span>
 
-**Batched Multi-Row INSERTs:**
+### TPC-H Refresh Statements
 
-TPC-H RF1 uses batched multi-row INSERT statements for ~100x performance improvement:
+**RF1 inserts:**
+
+RF1 inserts the DBGen ORDERS and LINEITEM update rows with multi-row INSERT statements of up to 1,000 rows each, with the values written into the statement as SQL literals:
 
 ```sql
-INSERT INTO LINEITEM (...) VALUES (?, ?, ?, ...)
-INSERT INTO LINEITEM (...) VALUES (?, ?, ?, ...)
-... (998 more times)
-
 INSERT INTO LINEITEM (...) VALUES
-  (?, ?, ?, ...),
-  (?, ?, ?, ...),
+  (<row 1>),
+  (<row 2>),
   ...
-  (?, ?, ?, ...)
+  (<row 1000>)
 ```
 
-**Batched DELETE Operations:**
+A platform that provides a refresh-file ingester loads the update files through it instead.
 
-RF2 deletes use batched IN clauses instead of individual DELETE statements:
+**RF2 deletes:**
+
+RF2 reads the order keys from the DBGen delete file in chunks of 1,000. For each chunk it issues one DELETE against LINEITEM and one against ORDERS, with the keys written into the IN list:
 
 ```sql
-DELETE FROM LINEITEM WHERE L_ORDERKEY = ?
-DELETE FROM LINEITEM WHERE L_ORDERKEY = ?
-... (1498 more times)
-
-DELETE FROM LINEITEM WHERE L_ORDERKEY IN (?, ?, ?, ...)
+DELETE FROM LINEITEM WHERE L_ORDERKEY IN (<key>, <key>, ...)
+DELETE FROM ORDERS WHERE O_ORDERKEY IN (<key>, <key>, ...)
 ```
 
-The per-key form issues 1,500 individual DELETE statements. The batched form replaces them with one statement whose IN list covers all 1,500 keys. This provides ~750x performance improvement for delete operations.
-
-**Platform-Specific Parameter Placeholders:**
-
-BenchBox automatically detects the correct SQL parameter placeholder style:
-
-- `?` for SQLite, DuckDB, SQL Server
-- `%s` for PostgreSQL, MySQL, Redshift
-
-This ensures compatibility across all supported platforms without manual configuration.
+At scale factor 1 the delete set holds 1,500 keys, so RF2 runs four DELETE statements (chunks of 1,000 and 500 keys, two tables each) where deleting one key at a time would take 3,000.
 
 ## Why Database Reload Is Required
 
