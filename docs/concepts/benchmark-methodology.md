@@ -105,6 +105,41 @@ Cite a result by its `public_result_id`, the only identifier that is stable acro
 
 A cited result is fixed to a named snapshot and carries the snapshot's SHA-256 and date, so analysis does not change after publication. Do not type the values by hand: print the block with `npm run results:cite -w website -- <result id>` in the site repository ([Results embeds](../design/results-embeds.md)). A result withdrawn from the snapshot cannot be cited ([Results embeds](../design/results-embeds.md)).
 
+Third parties cite a result in this form:
+
+```text
+BenchBox <version>, result <public_result_id>, <permalink>, accessed <date>. Not an official TPC result.
+```
+
+The version is the BenchBox release that produced the result when the bundle records it. When the bundle does not, the version is inferred as the latest release published on or before the run date, and the line reads `BenchBox <version> (inferred from run date)`. The id is the `public_result_id`, the permalink is the result's page URL, and the date is the day the citing party read the result. The subscale or derived label travels with the number, as [Publication limits](#publication-limits) describes. Every result page and result summary page prints this line for each result, with the date the page was built; replace it with the day you read the result.
+
+## Hardware class
+
+Every published result carries a hardware class, so a ranking can be filtered to results from comparable hardware. The class never changes a result's rank: the default ranking stays hardware-agnostic, and the Explorer offers the class as a filter only where it has at least three ranked platforms in the cohort, so a filtered ranking keeps the three-identity minimum.
+
+The class comes from a pinned, versioned CPU class table (table version `2026-11-17.1`). A result's score is the table's per-thread factor for its CPU model times the logical CPUs the run could see, in BenchBox CPU units relative to one AMD EPYC 7763 SMT thread. A CPU quota or CPU set below that count is not read, so a limited container is scored on the CPUs it can see. The unit is BenchBox's own and is never a SPEC metric. Tiers are bands four times wide with edges at 2.5, 10, 40, 160 and 640 units: T0 is below 2.5, T1 from 2.5 to 10, T2 from 10 to 40, T3 from 40 to 160, T4 from 160 to 640 and T5 from 640 up.
+
+A result whose CPU model is known but whose core count is missing gets a tier only when every core count that model ships with lands in one tier; its score stays empty. A container takes the host model when the launcher records it. With a host vendor of Apple and no model, the Apple M4 factor times the visible CPU count is used and the basis says so. A bundle with no CPU model takes one only from a maintainer's attestation, and the basis says the model was attested. Anything else is `unclassified` and is never guessed. A managed service is one `managed` class that is never CPU-tiered; its server-side size is shown as an attribute. A run against a server whose host was not observed is `unclassified`, because the recorded CPU is the client's.
+
+| CPU | Per-thread factor | Stand-in | Estimated |
+|---|---|---|---|
+| AMD EPYC 7763 | 1.00 | None | No |
+| Intel Xeon Platinum 8370C | 1.08 | Intel Xeon Platinum 8380 | Yes |
+| AMD EPYC 9V74 | 1.31 | AMD EPYC 9654 and 9634 | Yes |
+| Intel Xeon Platinum 8573C | 1.33 | Intel Xeon Platinum 8580 | Yes |
+| Intel Xeon 6973P-C | 1.64 | Intel Xeon 6972P | Yes |
+| AMD EPYC 9V45 | 1.68 | AMD EPYC 9655 | Yes |
+| Apple M4 | 2.27 | None | Yes |
+
+The x86 factors are the median SPECrate2017_int_base result per copy from SMT-enabled published results, divided by 3.20, the EPYC 7763 median. A row marked estimated uses a retail sibling as a stand-in because the cloud-only part has no published result. The Apple M4 factor is a bridge from Blender Open Data Cycles runs to the EPYC 7763 per thread. Every factor was retrieved on 2026-11-17.
+
+> [!NOTE]
+> SPEC and SPECrate are registered trademarks of the Standard Performance Evaluation Corporation. BenchBox CPU units are derived values computed by BenchBox from published SPEC CPU2017 results. They are not SPEC metrics and are not comparable with any SPEC result. SPEC CPU2017 retires on 2026-11-17, and the table is not rebased to SPEC CPU2026 until that suite covers the same processors; results of the two suites must not be mixed.
+>
+> Apple Silicon factors use Blender Open Data, released under CC0 ([Blender Open Data](https://opendata.blender.org)).
+
+A change to a factor makes a new table version, and moving a CPU across a tier edge is a reviewed change listed in the changelog. The class, score, basis and table version of every result are recorded in the Explorer snapshot's read model 20.
+
 ## Subscale ranking decision
 
 TPC-H and TPC-DS runs below scale factor 1 are recorded as `unofficial_subscale` results and stay ranked by Power@Size, in their own cohort. Only non-standard runs are excluded from ranking: non-standard runs at scale factor 1 and above remain unranked ([Subscale ranking policy](../development/adr/adr-subscale-tpc-ranking-policy.md), decisions 1 and 7).
@@ -120,14 +155,11 @@ The rules in this section are the project's provisional answers to questions tha
 | Noise thresholds | Measure the noise floor instead of assuming it: 1.25 times the largest spread of a query across at least five runs on one runner class, rounded up to a whole millisecond, recomputed whenever the baseline is refreshed. There is no maximum host load, coefficient of variation or confidence interval. `environment.host_load` records load at the start and end of a run for review. | The nightly gate floors only | The nightly performance gate |
 | Cold against warm | Published and ranked results are warm-state results: measured iterations follow a warm-up pass, with the platform's result cache disabled. No result is called cold unless a platform has a replayable, verified cold-start procedure. | Result-cache disabling at submission | [Contributing results](../contributing-results.md); the cache-state rule in the cross-benchmark score decision |
 | Seed | A seedless run (`qgen -d`) and a seeded run (`qgen -r`) use different parameter conventions, and different seeds are different workloads, so compare and rank only runs with the same recorded convention and seed. Non-official runs need no seed; official mode requires one. | Official mode only | [CLI reference: run](../reference/cli/run.md); [Public contracts](../reference/public-contracts.md) |
-| Hardware and tuning | `tuning_mode` must match exactly. Hardware does not split a ranking, but every result discloses its environment, and a comparison across different hardware says so. A regression or throughput gate compares only runs from the same runner class. | Tuning mode, and the per-class gates | [Tuning mode vocabulary](../development/tuning-adr-002-mode-vocabulary-fallback-facets.md); [Result summary pages](../design/adr-results-summary-pages.md); the nightly gates |
+| Hardware and tuning | `tuning_mode` must match exactly. Hardware is an optional filter on a ranking, not a cohort key: the default ranking stays hardware-agnostic, every result discloses its environment, and the [hardware class](#hardware-class) filters a ranking where the class has at least three ranked platforms in the cohort. A comparison across different hardware says so. A regression or throughput gate compares only runs from the same runner class. | Tuning mode, the hardware class filter, and the per-class gates | [Tuning mode vocabulary](../development/tuning-adr-002-mode-vocabulary-fallback-facets.md); [Result summary pages](../design/adr-results-summary-pages.md); the nightly gates |
 | Non-standard scale, non-TPC benchmarks | A scale outside the benchmark's standard set is labelled not comparable with published results, is not submitted for ranking and is compared only with runs at the identical scale factor. | Scale range only | [Benchmarks overview](../benchmarks/index.md); the exclusion of non-standard TPC runs in the [subscale ranking policy](../development/adr/adr-subscale-tpc-ranking-policy.md) |
 | Scale factor by purpose | Smoke: 0.01. Regression: 0.01 for the nightly gate, otherwise the one scale the baseline was built at. Comparison: the identical scale factor; at scale factor 1 or above a TPC-H or TPC-DS run avoids the subscale cohort. Publication: an `official` TPC run at scale factor 1 or above, or another benchmark's standard scale with its label. Where a benchmark page's size table differs, the page's accepted scales decide what is allowed and this row decides the purpose. | Compliance gate for TPC | The benchmark pages; the nightly gate; [Contributing results](../contributing-results.md) |
 | Regression thresholds | A regression is a slowdown of more than 10% and also more than the measured absolute floor above. The throughput gate fails below 80% of the median of the latest 10 records from the same runner class, and only reports until it has five. New gates use these values unless their measurements show otherwise. | The two nightly gates | The nightly performance and throughput gates |
 
-Two questions are open and are the project owner's to decide; this page asserts nothing for them:
-
-- Whether the "Derived from" wording satisfies clause 4c(3) of the TPC End User License Agreement, which asks that results be "clearly identified as not being comparable to TPC Benchmark Results". [Publication limits](#publication-limits) shows the wording BenchBox uses today.
-- The citation format a third party should use. Until it is decided, carry the subscale or derived label with the number, as [Publication limits](#publication-limits) describes, and cite by `public_result_id` as [How to cite a published result](#how-to-cite-a-published-result) describes.
+One question is open and is the project owner's to decide; this page asserts nothing for it: whether the "Derived from" wording satisfies clause 4c(3) of the TPC End User License Agreement, which asks that results be "clearly identified as not being comparable to TPC Benchmark Results". [Publication limits](#publication-limits) shows the wording BenchBox uses today.
 
 Vendor terms on publishing benchmark results are recorded separately and the page asserts nothing about what any vendor's terms allow. For the conditions that `benchbox submit` records and enforces today, see the [vendor publishing checklist](../vendor-publishing-checklist.md).

@@ -1,6 +1,7 @@
 import { canonicalBenchmarkSlug, canonicalPhase, formatArchitecture, formatBenchmarkLabel, formatCpuFamily, formatExecutionMode, formatMemoryGb, formatPhaseWithStreams, formatTrustLabel, formatTuningMode } from "@/lib/displayLabels";
 import { formatTimingExclusion, normalizePrimaryMetric, type PrimaryMetric } from "@/lib/displayEligibility";
-import { detailResultFromWideRow, getPrimaryMetricForBenchmark, getResultDetailMetrics, type ResultDetailMetricsRow, type ResultRow } from "@/lib/duckdbQueries";
+import { detailResultFromWideRow, getPrimaryMetricForBenchmark, getResultDetailMetrics, getResultSupplement, type ResultDetailMetricsRow, type ResultRow } from "@/lib/duckdbQueries";
+import { formatCitationLine, formatHardwareBasis, formatHardwareClass, knownDefectText, MANAGED_HARDWARE_CLASS, type HardwareFields } from "@/lib/hardwareClass";
 import { formatScaleFactor } from "@/lib/metricFormatters";
 import { embedFacts, presentEmbedResult } from "@/lib/resultEmbed";
 import { visibleResultIdForRow } from "@/lib/resultLinks";
@@ -9,6 +10,7 @@ import { complianceBadge, derivedResultsDisclaimer, derivedTpcName, isDerivedPow
 import { platformVersionDisplay } from "@/lib/versionLabel";
 import { fmtGeomean } from "@/utils";
 import { formatCitationBlock } from "./results-embed.ts";
+import { siteOrigin } from "./site-origin.ts";
 
 export const RECEIPT_ROOT = "/results/r";
 
@@ -36,6 +38,7 @@ export interface ResultReceipt {
   derivedNotice: string | null;
   sections: ReceiptSection[];
   citeLine: string;
+  citation: string | null;
   citationBlock: string;
   summaryHrefs: { label: string; href: string }[];
 }
@@ -43,6 +46,7 @@ export interface ResultReceipt {
 export interface ReceiptSnapshot {
   snapshotSha256: string;
   snapshotDate: string;
+  accessedOn: string;
 }
 
 export function receiptPath(resultId: string): string {
@@ -55,7 +59,18 @@ function recorded(value: string | number | null | undefined, format: (raw: strin
   return format(String(value));
 }
 
-export function buildReceipt(wide: ResultDetailMetricsRow, primaryMetric: PrimaryMetric, snapshot: ReceiptSnapshot): ResultReceipt {
+export function citationLineFor(row: Pick<ResultRow, "result_id"> & HardwareFields, accessedOn: string): string | null {
+  if (!row.benchbox_version) return null;
+  return formatCitationLine({
+    benchboxVersion: row.benchbox_version,
+    versionBasis: row.benchbox_version_basis,
+    publicResultId: visibleResultIdForRow(row),
+    permalink: `${siteOrigin()}${receiptPath(row.result_id)}`,
+    accessed: accessedOn,
+  });
+}
+
+export function buildReceipt(wide: ResultDetailMetricsRow, primaryMetric: PrimaryMetric, snapshot: ReceiptSnapshot, hardware: HardwareFields = {}): ResultReceipt {
   const detail = detailResultFromWideRow(wide, [], []);
   const benchmarkId = canonicalBenchmarkSlug(detail.benchmark);
   const benchmark = formatBenchmarkLabel(benchmarkId);
@@ -74,7 +89,12 @@ export function buildReceipt(wide: ResultDetailMetricsRow, primaryMetric: Primar
   const headline = `${metricName}: ${metricValue} (${direction})`;
   const ranked = embedded.ranked;
   const rankingStatus = ranked ? "Ranked" : "Not ranked";
-  const rankingReason = ranked ? "Included in the rankings for its benchmark, scale factor and phase." : formatTimingExclusion(detail.ranking_exclusion_reason, "This result is not included in rankings.");
+  const knownDefective = detail.ranking_exclusion_reason === "known_defective_data";
+  const rankingReason = ranked
+    ? "Included in the rankings for its benchmark, scale factor and phase."
+    : knownDefective
+      ? knownDefectText(hardware.known_defect_reason)
+      : formatTimingExclusion(detail.ranking_exclusion_reason, "This result is not included in rankings.");
   const derivedName = derivedTpcName(detail.benchmark);
   const derivedNotice = derivedName === null ? null : derivedResultsDisclaimer(derivedName);
   const compliance = recorded(detail.compliance_class, (raw) => complianceBadge(raw) ?? raw);
@@ -125,12 +145,15 @@ export function buildReceipt(wide: ResultDetailMetricsRow, primaryMetric: Primar
         { label: "Tuning mode", value: recorded(detail.tuning_mode, formatTuningMode) },
         { label: "Execution mode", value: recorded(detail.execution_mode, formatExecutionMode) },
         { label: "Driver version", value: recorded(detail.driver_version) },
+        ...(hardware.benchbox_version ? [{ label: "BenchBox version", value: hardware.benchbox_version_basis === "inferred_from_run_date" ? `${hardware.benchbox_version} (inferred from run date)` : hardware.benchbox_version }] : []),
         { label: "Client cloud", value: recorded(environment.client_cloud) },
         { label: "Client region", value: recorded(environment.client_region) },
         { label: "Operating system", value: recorded(environment.os) },
         { label: "Architecture", value: recorded(environment.arch, formatArchitecture) },
         { label: "CPU family", value: recorded(environment.cpu_family, formatCpuFamily) },
         { label: "CPU model", value: recorded(environment.cpu_model) },
+        ...(hardware.hardware_class ? [{ label: "Hardware class", value: `${formatHardwareClass(hardware.hardware_class)}${formatHardwareBasis(hardware.hardware_basis) === null ? "" : `: ${formatHardwareBasis(hardware.hardware_basis)}`}` }] : []),
+        ...(hardware.hardware_class === MANAGED_HARDWARE_CLASS ? [{ label: "Service size", value: recorded(hardware.service_size) }] : []),
         { label: "CPU count", value: recorded(environment.cpu_count) },
         { label: "Memory", value: environment.memory_gb === undefined ? NOT_RECORDED : formatMemoryGb(environment.memory_gb) },
         { label: "Python", value: recorded(environment.python) },
@@ -154,6 +177,7 @@ export function buildReceipt(wide: ResultDetailMetricsRow, primaryMetric: Primar
     rankingStatus,
     derivedNotice,
     sections,
+    citation: citationLineFor({ result_id: detail.result_id, ...hardware }, snapshot.accessedOn),
     citeLine: `Cite as: ${platformWithVersion}, ${benchmark}, ${scale}, run ${runDate}, result ${detail.result_id}, BenchBox results snapshot sha256:${snapshot.snapshotSha256} of ${snapshot.snapshotDate}.`,
     citationBlock: formatCitationBlock(citation),
     summaryHrefs: [platformSummary, benchmarkSummary],
@@ -173,7 +197,7 @@ export async function buildReceipts(rows: readonly ResultRow[], snapshot: Receip
       metric = await getPrimaryMetricForBenchmark(wide.benchmark, phase);
       metrics.set(key, metric);
     }
-    receipts.push(buildReceipt(wide, metric, snapshot));
+    receipts.push(buildReceipt(wide, metric, snapshot, await getResultSupplement(row.result_id)));
   }
   return receipts.sort((left, right) => left.resultId.localeCompare(right.resultId));
 }
@@ -205,7 +229,7 @@ export function renderReceiptMain(receipt: ResultReceipt): string {
     `<section id="run-receipt" aria-label="Run receipt"><h2>Run receipt</h2>`,
     receipt.sections.map(renderSection).join(""),
     `</section>`,
-    `<section id="cite" aria-label="Cite this result"><h2>Cite this result</h2><p>${escapeHtml(receipt.citeLine)}</p><pre><code>${escapeHtml(receipt.citationBlock)}</code></pre></section>`,
+    `<section id="cite" aria-label="Cite this result"><h2>Cite this result</h2>${receipt.citation === null ? "" : `<p data-citation-line>${escapeHtml(receipt.citation)}</p><p>The accessed date is the day this page was built; replace it with the day you read the result.</p>`}<p>${escapeHtml(receipt.citeLine)}</p><pre><code>${escapeHtml(receipt.citationBlock)}</code></pre></section>`,
     `<p>Static summaries: ${summaries}. <a href="/result-summaries/">All result summaries</a>. This page is the plain-HTML form of the run receipt; with JavaScript it opens in the interactive <a href="/results/">Results Explorer</a>.</p>`,
     `</article>`,
     `</main>`,

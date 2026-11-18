@@ -8,10 +8,10 @@ import { fmtGeomean } from "@/utils";
 import { closeResultsSnapshot, openResultsSnapshot, queryRows } from "../src/lib/results-db.ts";
 import { docutilsMakeId } from "../src/lib/docutils-slug.ts";
 import { executionEnvironment, METHODOLOGY_PATH, NOT_RECORDED, runContext, tuningModeText } from "../src/lib/result-context.ts";
-import { buildReceipts } from "../src/lib/result-receipts.ts";
+import { buildReceipts, citationLineFor, renderReceiptMain, type ResultReceipt } from "../src/lib/result-receipts.ts";
 import { buildResultsSummary, snapshotFile, summaryHref, type ResultsSummary } from "../src/lib/results-summary.ts";
 
-const identity = { coreSha: "c".repeat(40), corpusSha: "d".repeat(40), packageVersion: "0.0.0", producedAt: null, snapshotSha256: "e".repeat(64), readModelVersion: 18 };
+const identity = { coreSha: "c".repeat(40), corpusSha: "d".repeat(40), packageVersion: "0.0.0", producedAt: null, snapshotSha256: "e".repeat(64), readModelVersion: 18, accessedOn: "2026-11-18" };
 
 let rows: ResultRow[];
 let summary: ResultsSummary;
@@ -62,7 +62,7 @@ describe("summary pages and the Explorer for one snapshot", () => {
   });
 
   it("builds one receipt per published result, each stating the fields a reader needs", async () => {
-    const receipts = await buildReceipts(rows, { snapshotSha256: identity.snapshotSha256, snapshotDate: "2026-11-13" });
+    const receipts = await buildReceipts(rows, { snapshotSha256: identity.snapshotSha256, snapshotDate: "2026-11-13", accessedOn: identity.accessedOn });
     expect(receipts.map((receipt) => receipt.resultId).sort()).toEqual(rows.map((row) => row.result_id).sort());
     for (const receipt of receipts) {
       const labels = receipt.sections.flatMap((section) => section.rows.map((row) => row.label));
@@ -221,6 +221,49 @@ describe("execution environment, tuning mode and trust label", () => {
         expect(pagePath).toBe(METHODOLOGY_PATH);
         expect(anchors.has(fragment!), `${definition.label} -> #${fragment}`).toBe(true);
       }
+    }
+  });
+});
+
+describe("citation line", () => {
+  const row = { result_id: "tpch_sf1_duckdb_sql_20261007_172956_5e453c54", benchbox_version: "0.5.1", benchbox_version_basis: "recorded" };
+
+  it("names the version, public result id, permalink and access date, and disclaims TPC status", () => {
+    expect(citationLineFor(row, "2026-11-18")).toBe(
+      "BenchBox 0.5.1, result 5e453c54, https://benchbox.dev/results/r/tpch_sf1_duckdb_sql_20261007_172956_5e453c54, accessed 2026-11-18. Not an official TPC result.",
+    );
+  });
+
+  it("marks a version inferred from the run date", () => {
+    expect(citationLineFor({ ...row, benchbox_version: "0.1.5", benchbox_version_basis: "inferred_from_run_date" }, "2026-11-18")).toContain(
+      "BenchBox 0.1.5 (inferred from run date), result 5e453c54,",
+    );
+  });
+
+  it("is absent for a snapshot that records no BenchBox version", () => {
+    expect(citationLineFor({ result_id: row.result_id }, "2026-11-18")).toBeNull();
+  });
+
+  it("is rendered on the result page", () => {
+    const receipt = { resultId: row.result_id, title: "t", description: "d", headline: "h", rankingStatus: "Ranked", derivedNotice: null, sections: [], citeLine: "Cite as: x", citation: citationLineFor(row, "2026-11-18"), citationBlock: "```\n```", summaryHrefs: [] } satisfies ResultReceipt;
+
+    expect(renderReceiptMain(receipt)).toContain("<p data-citation-line>BenchBox 0.5.1, result 5e453c54, https://benchbox.dev/results/r/tpch_sf1_duckdb_sql_20261007_172956_5e453c54, accessed 2026-11-18. Not an official TPC result.</p>");
+    expect(renderReceiptMain({ ...receipt, citation: null })).not.toContain("data-citation-line");
+  });
+
+  it("is on every summary line of a snapshot that records versions", () => {
+    const lines = [
+      ...summary.platforms.flatMap((page) => [...page.ranked, ...page.excluded]),
+      ...summary.benchmarks.flatMap((page) => [...page.cohorts.flatMap((cohort) => cohort.ranked), ...page.excluded]),
+    ];
+    const recorded = rows.filter((result) => result.benchbox_version);
+    if (recorded.length === 0) {
+      expect(lines.every((line) => line.citation === null)).toBe(true);
+      return;
+    }
+    expect(lines.length).toBeGreaterThan(0);
+    for (const line of lines) {
+      expect(line.citation, line.resultId).toMatch(/^BenchBox \d.*, result [^,]+, https:\/\/[^,]+\/results\/r\/[^,]+, accessed 2026-11-18\. Not an official TPC result\.$/);
     }
   });
 });

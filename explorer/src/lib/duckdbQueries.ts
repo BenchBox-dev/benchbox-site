@@ -4,6 +4,7 @@ import { canonicalPhaseSql, type FacetWhereClause } from "@/lib/facetModel";
 import { canonicalBenchmarkSlug } from "@/lib/displayLabels";
 import { isCompositeMetric, normalizePrimaryMetric, type PrimaryMetric } from "@/lib/displayEligibility";
 import { parseJsonColumn } from "@/lib/combinedDisclosure";
+import { HARDWARE_COLUMN_NAMES, type HardwareFields } from "@/lib/hardwareClass";
 import type {
   BenchmarkSummary,
   CombinedCohortFields,
@@ -103,7 +104,7 @@ function normalizeResultSearch(searchText: string): string {
   return searchText.trim();
 }
 
-export interface ResultRow extends CostDeploymentFields {
+export interface ResultRow extends CostDeploymentFields, HardwareFields {
   result_id: string;
   benchmark: string;
   scale_factor: number;
@@ -671,6 +672,7 @@ function memoizedSnapshotQuery<T>(
 export function clearDuckdbQueryCachesForTests() {
   snapshotQueryCache.clear();
   combinedColumnsAvailable = null;
+  hardwareColumnsAvailable = null;
 }
 
 const COMBINED_COLUMN_NAMES = ["qphh_at_size", "qphds_at_size", "load_scope", "transactional_steps"] as const;
@@ -705,6 +707,29 @@ async function queryWithCombinedColumns<T>(
   return runQuery<T>(build(false));
 }
 
+let hardwareColumnsAvailable: boolean | null = null;
+
+function isMissingHardwareColumnError(error: unknown): boolean {
+  const message = error instanceof Error ? error.message : String(error);
+  return /Binder Error/i.test(message) && HARDWARE_COLUMN_NAMES.some((column) => message.includes(column));
+}
+
+async function queryWithOptionalColumns<T>(
+  build: (withCombined: boolean, withHardware: boolean) => { sql: string; params?: readonly unknown[] },
+): Promise<T[]> {
+  if (hardwareColumnsAvailable !== false) {
+    try {
+      const rows = await queryWithCombinedColumns<T>((withCombined) => build(withCombined, true));
+      hardwareColumnsAvailable = true;
+      return rows;
+    } catch (error) {
+      if (!isMissingHardwareColumnError(error)) throw error;
+      hardwareColumnsAvailable = false;
+    }
+  }
+  return queryWithCombinedColumns<T>((withCombined) => build(withCombined, false));
+}
+
 export function memoizedSnapshotQueryRows<T>(
   key: string,
   query: SnapshotRowsQuery,
@@ -732,13 +757,13 @@ export async function listResults(
   const source = needsHardware
     ? "(SELECT r.*, d.arch, d.cpu_family, d.memory_gb FROM bench.results r LEFT JOIN bench.result_detail_metrics d USING (result_id))"
     : "bench.results";
-  const build = (withCombined: boolean) => ({
-    sql: `SELECT ${columns}${withCombined ? `, ${combinedColumnList("")}` : ""} FROM ${source} ${where.sql} ORDER BY run_date DESC`,
+  const build = (withCombined: boolean, withHardware: boolean) => ({
+    sql: `SELECT ${columns}${withHardware ? `, ${HARDWARE_COLUMN_NAMES.join(", ")}` : ""}${withCombined ? `, ${combinedColumnList("")}` : ""} FROM ${source} ${where.sql} ORDER BY run_date DESC`,
     params: where.params,
   });
   return memoizedSnapshotQuery(
-    `rows:list-results\u0000${build(false).sql}\u0000${JSON.stringify(where.params)}`,
-    () => queryWithCombinedColumns<ResultRow>(build),
+    `rows:list-results\u0000${build(false, false).sql}\u0000${JSON.stringify(where.params)}`,
+    () => queryWithOptionalColumns<ResultRow>(build),
     { cacheResult: (rows) => rows.length > 0 },
   );
 }
@@ -910,7 +935,7 @@ export interface TranslatorIdentity {
   translator_version_source: TranslatorVersionSource | null;
 }
 
-export type ResultSupplement = TranslatorIdentity & CombinedCohortFields;
+export type ResultSupplement = TranslatorIdentity & CombinedCohortFields & HardwareFields;
 
 const NO_RESULT_SUPPLEMENT: ResultSupplement = {
   translator_version: null,
@@ -920,6 +945,14 @@ const NO_RESULT_SUPPLEMENT: ResultSupplement = {
   qphds_at_size: null,
   load_scope: null,
   transactional_steps: null,
+  hardware_class: null,
+  hardware_score: null,
+  hardware_basis: null,
+  hardware_table_version: null,
+  service_size: null,
+  known_defect_reason: null,
+  benchbox_version: null,
+  benchbox_version_basis: null,
 };
 
 const TRANSLATOR_VERSION_SOURCES: readonly string[] = ["recorded", "attested", "not_recorded", "not_applicable"];
@@ -952,6 +985,14 @@ export async function getResultSupplement(resultId: string): Promise<ResultSuppl
     translator_version_source:
       source !== null && TRANSLATOR_VERSION_SOURCES.includes(source) ? (source as TranslatorVersionSource) : null,
     ...combinedFieldsFromRow(row),
+    hardware_class: textOrNull(row.hardware_class),
+    hardware_score: numberOrNull(row.hardware_score),
+    hardware_basis: textOrNull(row.hardware_basis),
+    hardware_table_version: textOrNull(row.hardware_table_version),
+    service_size: textOrNull(row.service_size),
+    known_defect_reason: textOrNull(row.known_defect_reason),
+    benchbox_version: textOrNull(row.benchbox_version),
+    benchbox_version_basis: textOrNull(row.benchbox_version_basis),
   };
 }
 

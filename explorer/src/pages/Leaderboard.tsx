@@ -35,6 +35,7 @@ import {
   toDateWindowFacet,
 } from "@/lib/facetMatching";
 import { formatCountWithVerb } from "@/lib/copyFormatters";
+import { formatHardwareClass, hardwareClassOptions, knownDefectText } from "@/lib/hardwareClass";
 import { formatFacetDisplayValue } from "@/lib/facetDisplay";
 import { stringSerde, useUrlState } from "@/lib/useUrlState";
 import { useDocumentTitle } from "@/lib/useDocumentTitle";
@@ -100,6 +101,7 @@ export function Leaderboard({ notice = null }: LeaderboardProps) {
   useDocumentTitle("Compare benchmark results · BenchBox");
   const [results, setResults] = useState<ResultRow[] | null>(null);
   const [platformVersionDomainResults, setPlatformVersionDomainResults] = useState<ResultRow[] | null>(null);
+  const [hardwareDomainResults, setHardwareDomainResults] = useState<ResultRow[] | null>(null);
   const [metaLeaderboard, setMetaLeaderboard] = useState<MetaLeaderboardData | null>(null);
   const [metaLeaderboardLoaded, setMetaLeaderboardLoaded] = useState(false);
   const retriedEmptyResults = useRef(false);
@@ -155,6 +157,26 @@ export function Leaderboard({ notice = null }: LeaderboardProps) {
       cancelled = true;
     };
   }, [facetWhere, resultsRetryToken]);
+
+  const hardwareDomainWhere = useMemo(() => facetsToWhereClause({ ...facets, hardware_class: [] }), [facetWhere, facets.hardware_class]);
+
+  useEffect(() => {
+    if (facets.hardware_class.length === 0) {
+      setHardwareDomainResults(null);
+      return;
+    }
+    let cancelled = false;
+    listResults(hardwareDomainWhere)
+      .then((rows) => {
+        if (!cancelled) setHardwareDomainResults(rows);
+      })
+      .catch(() => {
+        if (!cancelled) setHardwareDomainResults(null);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [facets.hardware_class, hardwareDomainWhere]);
 
   useEffect(() => {
     if (facets.platform_version.length === 0) {
@@ -399,6 +421,9 @@ export function Leaderboard({ notice = null }: LeaderboardProps) {
     return [...versions].sort((a, b) => a.localeCompare(b, undefined, { numeric: true }));
   })();
   const platformVersionFilters = facets.platform_version;
+  const hardwareClassFilters = facets.hardware_class;
+  const hardwareClassChoices = hardwareClassOptions(hardwareDomainResults ?? results).map((option) => option.value);
+  const hardwareClassSelectable = [...new Set([...hardwareClassChoices, ...hardwareClassFilters])].sort();
   const fullLeaderboardPlatformCount = metaLeaderboard?.platforms.length ?? 0;
   const rankedLeaderboardPlatformCount =
     metaLeaderboard?.platforms.filter((platform) => platform.n_cohorts > 0).length ?? 0;
@@ -530,6 +555,22 @@ export function Leaderboard({ notice = null }: LeaderboardProps) {
                   onSelect={(value) => setFacet("phase", value === "all" ? [] : [value])}
                   format={(value) => (value === "all" ? "All phases" : value)}
                 />
+                {hardwareClassSelectable.length > 0 && (
+                  <MultiSelectFilter
+                    label="Hardware class"
+                    allLabel="All hardware"
+                    options={hardwareClassSelectable}
+                    current={hardwareClassFilters}
+                    onSelect={(value) =>
+                      setFacet(
+                        "hardware_class",
+                        value === "all" ? [] : toggleFacetValue(hardwareClassFilters, value),
+                      )
+                    }
+                    format={formatHardwareClass}
+                    description="Offered for classes with at least three ranked platforms in a cohort. Ranks stay hardware-agnostic."
+                  />
+                )}
                 {platformVersionOptions.length > 0 || platformVersionFilters.length > 0 ? (
                   <MultiSelectFilter
                     label="Platform version"
@@ -793,6 +834,7 @@ const FACET_LABELS: Record<ExplorerFacetKey, string> = {
   arch: "Architecture",
   cpu_family: "CPU family",
   memory_gb: "Memory",
+  hardware_class: "Hardware class",
 };
 
 function ActiveLeaderboardSummary({
@@ -1354,7 +1396,7 @@ function LeaderboardComparePicker({
               const disabled = !selected && limitReached;
               const runId = visibleResultIdForRow(result);
               const rankingWarning = result.ranking_exclusion_reason === "known_defective_data"
-                ? "Known defective data; available for comparison, excluded from rankings."
+                ? knownDefectText(result.known_defect_reason)
                 : result.ranking_exclusion_reason === null
                   ? "Ranked result."
                   : `Not ranked: ${formatTimingExclusion(result.ranking_exclusion_reason, "Published evidence is not rankable.")}`;

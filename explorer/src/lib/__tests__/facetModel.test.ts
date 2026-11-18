@@ -39,6 +39,7 @@ const SAMPLE_VALUES: { [K in ExplorerFacetKey]: FacetState[K] } = {
   arch: ["arm64", "x86_64"],
   cpu_family: ["apple_silicon", "graviton"],
   memory_gb: ["64", "128"],
+  hardware_class: ["T1", "T2"],
 };
 
 function clearSearch() {
@@ -54,6 +55,26 @@ function renderFacetUrlState(key: ExplorerFacetKey) {
     ),
   );
 }
+
+describe("hardware class facet", () => {
+  it("filters on the hardware_class column", () => {
+    const clause = facetsToWhereClause({ hardware_class: ["T1", "managed"] });
+
+    expect(clause.sql).toBe("WHERE hardware_class IN (?, ?)");
+    expect(clause.params).toEqual(["T1", "managed"]);
+  });
+
+  it("is absent from the default selection so rankings stay hardware-agnostic", () => {
+    expect(facetsToWhereClause({}).sql).toBe("");
+    expect(DEFAULT_FACETS.hardware_class).toEqual([]);
+  });
+
+  it("round-trips through the hardware URL key", () => {
+    const params = new URLSearchParams("hardware=T2,T3");
+
+    expect(readFacetParam(params, "hardware_class")).toEqual(["T2", "T3"]);
+  });
+});
 
 describe("facet URL contract", () => {
   beforeEach(() => {
@@ -84,6 +105,7 @@ describe("facet URL contract", () => {
       "arch",
       "cpu_family",
       "memory_gb",
+      "hardware_class",
     ]);
     expect(ALL_FACET_KEYS).toStrictEqual([
       ...FACET_KEYS,

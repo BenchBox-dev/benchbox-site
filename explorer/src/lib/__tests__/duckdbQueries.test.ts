@@ -70,6 +70,40 @@ describe("duckdbQueries - SQL targets and parameters", () => {
     expect(sql).toContain("WHERE memory_gb >= ?");
   });
 
+  it("selects the hardware columns and the combined columns from a current snapshot", async () => {
+    mockedQueryRows.mockResolvedValueOnce([]);
+    await listResults();
+    const [sql] = mockedQueryRows.mock.calls[0]!;
+    expect(sql).toContain("hardware_class, hardware_score, hardware_basis, hardware_table_version, service_size, known_defect_reason, benchbox_version, benchbox_version_basis");
+  });
+
+  it("reads a snapshot that predates the hardware columns without them", async () => {
+    mockedQueryRows.mockRejectedValueOnce(
+      new Error('Binder Error: Referenced column "hardware_class" not found in FROM clause!'),
+    );
+    const rows = [{ result_id: "r1" }];
+    mockedQueryRows.mockResolvedValueOnce(rows);
+
+    await expect(listResults()).resolves.toBe(rows);
+
+    const [withHardware] = mockedQueryRows.mock.calls[0]!;
+    const [withoutHardware] = mockedQueryRows.mock.calls[1]!;
+    expect(withHardware).toContain("hardware_class");
+    expect(withoutHardware).not.toContain("hardware_class");
+    expect(withoutHardware).not.toContain("known_defect_reason");
+
+    mockedQueryRows.mockResolvedValueOnce([{ result_id: "r2" }]);
+    await listResults({ sql: "WHERE benchmark IN (?)", params: ["tpch"] });
+    expect(mockedQueryRows.mock.calls[2]![0]).not.toContain("hardware_class");
+  });
+
+  it("does not mask an unrelated binder error as a missing hardware column", async () => {
+    mockedQueryRows.mockRejectedValueOnce(new Error('Binder Error: Referenced column "no_such" not found'));
+
+    await expect(listResults()).rejects.toThrow(/no_such/);
+    expect(mockedQueryRows).toHaveBeenCalledTimes(1);
+  });
+
   it("memoizes listResults by WHERE clause and params for the current snapshot", async () => {
     const rows = [{ result_id: "r1" }];
     mockedQueryRows.mockResolvedValueOnce(rows);

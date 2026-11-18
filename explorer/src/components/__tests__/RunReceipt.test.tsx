@@ -896,4 +896,70 @@ describe("RunReceipt subscale compliance", () => {
 
     expect(screen.queryByText("Power@Size source")).toBeNull();
   });
+  describe("hardware class and citation", () => {
+    const ACCESSED = new Date("2026-11-18T09:30:00Z");
+
+    it("states the recorded BenchBox version in a citation line with the permalink", () => {
+      render(
+        <RunReceipt
+          detail={makeDetail({ benchbox_version: "0.5.1", benchbox_version_basis: "recorded" })}
+          shortId="abc12345"
+          accessedOn={ACCESSED}
+        />,
+      );
+
+      expect(screen.getByTestId("citation-line").textContent).toBe(
+        "BenchBox 0.5.1, result abc12345, https://benchbox.dev/results/r/abcdef1234567890, accessed 2026-11-18. Not an official TPC result.",
+      );
+    });
+
+    it("marks an inferred version in the citation line and the version row", () => {
+      render(
+        <RunReceipt
+          detail={makeDetail({ benchbox_version: "0.1.5", benchbox_version_basis: "inferred_from_run_date" })}
+          accessedOn={ACCESSED}
+        />,
+      );
+
+      expect(screen.getByTestId("citation-line").textContent).toBe(
+        "BenchBox 0.1.5 (inferred from run date), result abcdef1234567890, https://benchbox.dev/results/r/abcdef1234567890, accessed 2026-11-18. Not an official TPC result.",
+      );
+      expect(screen.getByText("0.1.5 (inferred from run date)")).toBeTruthy();
+    });
+
+    it("omits the citation line when the snapshot records no BenchBox version", () => {
+      render(<RunReceipt detail={makeDetail()} accessedOn={ACCESSED} />);
+
+      expect(screen.queryByTestId("citation-line")).toBeNull();
+    });
+
+    it("shows the hardware class with its basis and the managed service size", () => {
+      render(
+        <RunReceipt
+          detail={makeDetail({
+            hardware_class: "managed",
+            hardware_basis: "managed_service",
+            service_size: "X-Small",
+          })}
+        />,
+      );
+
+      const receipt = screen.getByRole("region", { name: "Run receipt" });
+      expect(within(receipt).getByText("Managed service")).toBeTruthy();
+      expect(within(receipt).getByText("Basis: a managed service, never CPU-tiered.")).toBeTruthy();
+      expect(within(receipt).getByText("X-Small")).toBeTruthy();
+    });
+
+    it("shows a tier with its CPU units", () => {
+      render(
+        <RunReceipt
+          detail={makeDetail({ hardware_class: "T2", hardware_score: 22.7, hardware_basis: "model_and_count" })}
+        />,
+      );
+
+      const receipt = screen.getByRole("region", { name: "Run receipt" });
+      expect(within(receipt).getByText("T2 (10 to 40 CPU units)")).toBeTruthy();
+      expect(within(receipt).getByText("22.7 BenchBox CPU units")).toBeTruthy();
+    });
+  });
 });
