@@ -88,13 +88,14 @@ Terms: Acceptable Use Policy section IV.
 
 ## Databricks
 
-Terms: Acceptable Use Policy and the Free Edition Acceptable Use Policy.
+Terms: Acceptable Use Policy, the Master Cloud Services Agreement section 11.5
+and the Free Edition Acceptable Use Policy.
 
 | Condition | Met by |
 | --- | --- |
 | Replication information in the disclosure. | The bundle's recorded configuration and query text. |
 | Reciprocity. | Manual step: no check exists. Publishing under these terms accepts that Databricks may do the same. |
-| Beta services are excluded. | Automated: declare any Beta or Preview feature with `--preview-feature`; a Databricks result that lists one is refused even with `--vendor-permission`, because permission does not lift this exclusion. Manual step: do not run published Databricks benchmarks on Beta services. |
+| Beta services are excluded. The Master Cloud Services Agreement defines a Beta Service as "any feature of the Databricks Services that is designated as "beta," "experimental," "preview," or similar", so Preview features are excluded too. | Automated: declare any Beta or Preview feature with `--preview-feature`; a Databricks result that lists one is refused even with `--vendor-permission`, because permission does not lift this exclusion. Manual step: do not run published Databricks benchmarks on Beta or Preview features. |
 | Free Edition results need Databricks' express permission. | Automated: `plan_tier` of `free` with `vendor_permission`. A free tier without permission refuses. Manual step: obtain the express permission first. |
 
 Accepted risk: AUP item 7(b) restricts bulk export of metadata that Databricks
