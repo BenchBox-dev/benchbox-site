@@ -306,6 +306,63 @@ describe("Leaderboard", () => {
     expect(within(picker).getByText("All 3 published comparable runs in this cohort can be compared together.")).toBeTruthy();
   });
 
+  it("shows the recorded known-defect reason and falls back to the generic text without one", async () => {
+    const havocRows = [
+      makeHavocResult(1, { known_defect_reason: "Scale factor was recorded incorrectly." }),
+      makeHavocResult(2),
+      makeHavocResult(3, { known_defect_reason: "" }),
+    ];
+    vi.mocked(queryRows).mockImplementation(async (sql: string) => {
+      const s = String(sql).replace(/\s+/g, " ").trim();
+      if (s.includes("FROM bench.results")) return havocRows;
+      if (s.includes("FROM bench.cohort_metadata")) return COHORT_ROWS;
+      return [];
+    });
+    window.history.replaceState(null, "", "/results/?benchmark=tpchavoc&sf=10&phase=power");
+
+    render(<Leaderboard />);
+    await waitFor(() => expect(screen.getByTestId("leaderboard-compare-picker")).toBeTruthy());
+    const picker = screen.getByTestId("leaderboard-compare-picker");
+    fireEvent.click(within(picker).getByRole("radio", { name: "All published comparable runs" }));
+
+    await waitFor(() => expect(within(picker).getAllByRole("checkbox", { name: /Select .* run .* for comparison/ })).toHaveLength(3));
+    expect(within(picker).getAllByText("Scale factor was recorded incorrectly.")).toHaveLength(1);
+    expect(within(picker).getAllByText("Known defective data; available for comparison, excluded from rankings.")).toHaveLength(2);
+  });
+
+  it("offers the hardware class filter only for classes with at least three ranked platforms", async () => {
+    const ranked = (index: number, hardwareClass: string) =>
+      makeHavocResult(index, { ranking_exclusion_reason: null, is_ranking_eligible: true, hardware_class: hardwareClass });
+    const rows = [
+      ranked(1, "T2"),
+      ranked(2, "T2"),
+      ranked(3, "T2"),
+      ranked(4, "T1"),
+      ranked(5, "T1"),
+      makeHavocResult(6, { hardware_class: "T3" }),
+      makeHavocResult(7, { hardware_class: "T3" }),
+      makeHavocResult(8, { hardware_class: "T3" }),
+    ];
+    vi.mocked(queryRows).mockImplementation(async (sql: string) => {
+      const s = String(sql).replace(/\s+/g, " ").trim();
+      if (s.includes("FROM bench.results")) return rows;
+      if (s.includes("FROM bench.cohort_metadata")) return COHORT_ROWS;
+      return [];
+    });
+
+    render(<Leaderboard />);
+    const filter = (await screen.findByLabelText("Hardware class")) as HTMLSelectElement;
+
+    expect([...filter.options].map((option) => option.value)).toEqual(["all", "T2"]);
+  });
+
+  it("hides the hardware class filter on a snapshot without hardware classes", async () => {
+    render(<Leaderboard />);
+    await waitFor(() => expect(screen.getByText("Cross-benchmark rankings")).toBeTruthy());
+
+    expect(screen.queryByLabelText("Hardware class")).toBeNull();
+  });
+
   it("keeps a compact compare entry point near the filters and scopes guidance to ranked runs", async () => {
     const havocRows = [makeHavocResult(1), makeHavocResult(2)];
     vi.mocked(queryRows).mockImplementation(async (sql: string) => {

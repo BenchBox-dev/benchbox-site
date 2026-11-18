@@ -1,3 +1,5 @@
+import type { HardwareFields } from "@/lib/hardwareClass";
+
 export interface Environment {
   os?: string;
   arch?: string;
@@ -66,7 +68,7 @@ export interface CombinedCohortFields {
 
 export type TranslatorVersionSource = "recorded" | "attested" | "not_recorded" | "not_applicable";
 
-export interface DetailResult extends CostDeploymentFields, CombinedCohortFields {
+export interface DetailResult extends CostDeploymentFields, CombinedCohortFields, HardwareFields {
   result_id: string;
   benchmark: string;
   scale_factor: number;

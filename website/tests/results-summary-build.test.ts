@@ -63,6 +63,7 @@ describe.skipIf(site === undefined)("built result summary pages", () => {
       producedAt: manifest.produced_at ?? null,
       snapshotSha256: fileSha256(snapshotFile()),
       readModelVersion: 18,
+      accessedOn: "2026-11-18",
     });
   });
 

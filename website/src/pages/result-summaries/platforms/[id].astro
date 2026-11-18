@@ -8,6 +8,7 @@ export async function getStaticPaths() {
 }
 
 const { page } = Astro.props;
+const citations = [...page.ranked, ...page.excluded].flatMap((line) => (line.citation === null ? [] : [line.citation]));
 const description = `${page.label} on BenchBox: ${page.resultCount} published ${page.resultCount === 1 ? "run" : "runs"} across ${page.benchmarks.length} ${page.benchmarks.length === 1 ? "benchmark" : "benchmarks"}.`;
 ---
 
@@ -90,6 +91,16 @@ const description = `${page.label} on BenchBox: ${page.resultCount} published ${
       </tbody>
         </table>
       </div>
+    </>
+  )}
+
+  {citations.length > 0 && (
+    <>
+      <h2 id="cite">How to cite a run</h2>
+      <p>Cite a run with its line below. The date is the day the page was built; replace it with the day you read the result.</p>
+      <ul>
+        {citations.map((citation) => <li>{citation}</li>)}
+      </ul>
     </>
   )}
 </ResultSummary>

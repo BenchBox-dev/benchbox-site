@@ -140,6 +140,7 @@ describe("result permalink pages", () => {
       derivedNotice: null,
       sections: [{ title: "S", rows: [{ label: "L", value: "<img src=x onerror=alert(1)>" }] }],
       citeLine: "c",
+      citation: null,
       citationBlock: "b",
       summaryHrefs: [],
     };

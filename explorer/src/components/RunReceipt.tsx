@@ -25,6 +25,7 @@ import { RunDateChip } from "@/components/RunAge";
 import { VersionLabel } from "@/components/VersionLabel";
 import { SITE_ORIGIN } from "@/components/siteOrigin";
 import { complianceBadge, isDerivedPowerScore } from "@/lib/subscale";
+import { formatCitationLine, formatHardwareBasis, formatHardwareClass, MANAGED_HARDWARE_CLASS } from "@/lib/hardwareClass";
 
 interface RunReceiptProps {
   detail: DetailResult;
@@ -32,6 +33,7 @@ interface RunReceiptProps {
   isRankingEligible?: boolean | null;
   reproduceCommand?: string | null;
   plansUrl?: string | null;
+  accessedOn?: Date;
 }
 
 interface ReceiptRow {
@@ -62,6 +64,38 @@ function rowFromString(
 function rowFromSummary(label: string, value: string): ReceiptRow {
   if (value === MISSING_PLACEHOLDER) return missingRow(label);
   return recordedRow(label, value);
+}
+
+function hardwareClassRow(detail: DetailResult): ReceiptRow {
+  const label = "Hardware class";
+  const hardwareClass = detail.hardware_class;
+  if (!hardwareClass) return missingRow(label);
+  const basis = formatHardwareBasis(detail.hardware_basis);
+  const score = detail.hardware_score;
+  return recordedRow(
+    label,
+    <div class="space-y-1">
+      <span>{formatHardwareClass(hardwareClass)}</span>
+      {typeof score === "number" && <p class="text-xs text-[var(--bb-data-fg-muted)]">{`${score} BenchBox CPU units`}</p>}
+      {basis && <p class="text-xs text-[var(--bb-data-fg-muted)]">{`Basis: ${basis}.`}</p>}
+    </div>,
+  );
+}
+
+function citationRow(detail: DetailResult, publicResultId: string, accessedOn: Date): ReceiptRow | null {
+  if (!detail.benchbox_version) return null;
+  return recordedRow(
+    "Cite as",
+    <span class="min-w-0 break-words" data-testid="citation-line">
+      {formatCitationLine({
+        benchboxVersion: detail.benchbox_version,
+        versionBasis: detail.benchbox_version_basis,
+        publicResultId,
+        permalink: `${SITE_ORIGIN}/results/r/${detail.result_id}`,
+        accessed: accessedOn.toISOString().slice(0, 10),
+      })}
+    </span>,
+  );
 }
 
 function translatorRow(detail: DetailResult): ReceiptRow {
@@ -212,6 +246,7 @@ export function RunReceipt({
   isRankingEligible = null,
   reproduceCommand = buildReproduceCommand(detail),
   plansUrl: plansUrlOverride,
+  accessedOn = new Date(),
 }: RunReceiptProps) {
   const [showMissing, setShowMissing] = useState(false);
   const plansUrl = plansUrlOverride === undefined ? planDownloadUrl(detail) : plansUrlOverride;
@@ -219,6 +254,8 @@ export function RunReceipt({
   const sampleCount =
     detail.display_timings.reduce((sum, timing) => sum + timing.sample_count, 0) || detail.queries.length;
   const clientLocalityRow = buildClientLocalityRow(detail);
+  const publicResultId = shortId ?? visibleResultIdForRow(detail);
+  const citation = citationRow(detail, publicResultId, accessedOn);
 
   const sections = [
     {
@@ -239,6 +276,8 @@ export function RunReceipt({
         detail.platform_version ? recordedRow("Platform version", <VersionLabel version={detail.platform_version} />) : missingRow("Platform version"),
         detail.driver_version ? recordedRow("Driver version", <VersionLabel version={detail.driver_version} />) : missingRow("Driver version"),
         translatorRow(detail),
+        ...(detail.hardware_class === MANAGED_HARDWARE_CLASS ? [rowFromString("Service size", detail.service_size)] : []),
+        ...(detail.benchbox_version ? [recordedRow("BenchBox version", detail.benchbox_version_basis === "inferred_from_run_date" ? `${detail.benchbox_version} (inferred from run date)` : detail.benchbox_version)] : []),
         formattedRow("Execution mode", detail.execution_mode, formatExecutionMode),
         formattedRow("Tuning mode", detail.tuning_mode, formatTuningMode),
         rowFromString("Tuning hash", detail.tuning_hash),
@@ -267,6 +306,7 @@ export function RunReceipt({
         formattedRow("CPU family", detail.environment.cpu_family, formatCpuFamily),
         rowFromString("CPU model", detail.environment.cpu_model),
         rowFromString("CPU evidence", detail.environment.cpu_identity_provenance, formatCpuIdentityProvenance),
+        ...(detail.hardware_class ? [hardwareClassRow(detail)] : []),
         rowFromString("CPU count", detail.environment.cpu_count),
         memoryRow(detail.environment.memory_gb),
         rowFromString("Python", detail.environment.python),
@@ -296,6 +336,7 @@ export function RunReceipt({
         bundleLinkRow(detail.bundle_download_url),
         plansRow(detail, plansUrl),
         reproduceRow(reproduceCommand),
+        ...(citation ? [citation] : []),
       ],
     },
     {

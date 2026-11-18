@@ -1,5 +1,6 @@
 import { formatScaleFactor } from "@/lib/metricFormatters";
 import type { FacetKey } from "@/lib/facetModel";
+import { formatHardwareClass } from "@/lib/hardwareClass";
 
 const CLOUD_PROVIDER_LABELS: Record<string, string> = {
   amazon: "AWS",
@@ -63,6 +64,10 @@ export function formatFacetDisplayValue(
 
   if (key === "arch") {
     return trimmed;
+  }
+
+  if (key === "hardware_class") {
+    return formatHardwareClass(trimmed);
   }
 
   if (key === "memory_gb") {
