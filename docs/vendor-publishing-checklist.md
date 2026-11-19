@@ -8,7 +8,9 @@ into one of two things: an automated check, or a manual step you perform
 before you publish a cloud result.
 
 Work through the section for your platform before you open a results pull
-request. The conditions are the ADR's; this page adds none.
+request. The conditions are the ADR's; this page adds none. You hold the
+account the benchmark ran on, so the vendor's conditions bind you, not the
+project: publishing a result does not make the project a party to them.
 
 ## How the automated checks work
 
@@ -25,8 +27,14 @@ bundle validator reads the same fields when your pull request is validated
 | `vendor_notice` | `--vendor-notice-date YYYY-MM-DD` and `--vendor-notice-ref <reference>` | The date and a reference (message id, ticket or link) for what you sent the vendor. |
 | `self_run` | `--self-run` | An attestation that you ran the benchmark yourself. |
 
-Four outcomes matter:
+Five outcomes matter:
 
+- **Not yet accepted.** Redshift, Athena, ClickHouse Cloud, MotherDuck and
+  Starburst Galaxy have no published result. The project settles each
+  vendor's terms when its first result is submitted, and until then every
+  submission for these platforms is refused. Open an issue to ask for a
+  platform to be settled. The sections below describe the conditions that
+  apply once it is.
 - **Refusal.** A `free` or `trial` `plan_tier`, or any entry in
   `preview_features`, with no `vendor_permission`, is an error: `benchbox
   submit` exits without writing a package and the validator rejects the
@@ -74,6 +82,9 @@ Terms: Google Cloud Service Specific Terms, General Service Terms section 7.
 Terms: AWS Service Terms sections 1.8, 2.3 and 2.5. The same rows apply to
 Athena Spark.
 
+Not yet accepted: submissions are refused until the project settles these
+terms.
+
 | Condition | Met by |
 | --- | --- |
 | Replication information goes in the disclosure. | The bundle's recorded configuration and query text. |
@@ -111,6 +122,9 @@ bundles, as recorded in the ADR. It needs no publisher step.
 
 Terms: Acceptable Use Policy section 2.
 
+Not yet accepted: submissions are refused until the project settles these
+terms.
+
 | Condition | Met by |
 | --- | --- |
 | Replication information goes in the disclosure. | The bundle's recorded configuration and query text. |
@@ -121,6 +135,9 @@ Terms: Acceptable Use Policy section 2.
 ## MotherDuck
 
 Terms: Master Subscription Agreement sections 1.5, 13.1 and 15.
+
+Not yet accepted: submissions are refused until the project settles these
+terms.
 
 | Condition | Met by |
 | --- | --- |
@@ -136,8 +153,10 @@ publisher step.
 
 ## Starburst Galaxy
 
-The Galaxy Terms of Service have no benchmark clause, so there is no condition
-to meet and nothing to record. No telemetry clause was found either.
+The Galaxy Terms of Service have no benchmark clause, and no telemetry clause
+was found either. Starburst's other agreements are read when Galaxy is
+settled. Not yet accepted: submissions are refused until the project settles
+these terms.
 
 ## Before you publish
 
