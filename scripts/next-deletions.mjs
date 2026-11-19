@@ -19,13 +19,13 @@ function mergeTree(cwd, next, main) {
 
 export function nextDeletions({ cwd = process.cwd(), next = "origin/next", main = "origin/main" } = {}) {
   const output = mergeTree(cwd, next, main);
-  const [tree, ...conflicted] = output.split("\n").filter(Boolean);
-  const conflicts = new Set(conflicted);
+  const [tree] = output.split("\n");
   const fields = git(cwd, ["diff", "--numstat", "--no-renames", "-z", next, tree, "--", ...PATHS]).split("\0");
   const deletions = [];
   for (const field of fields) {
-    const [, deleted, file] = field.split("\t");
-    if (!file || conflicts.has(file) || deleted === "-") continue;
+    const [, deleted, ...rest] = field.split("\t");
+    const file = rest.join("\t");
+    if (!file || deleted === "-") continue;
     const count = Number(deleted);
     if (count > 0) deletions.push({ file, deleted: count });
   }

@@ -75,21 +75,37 @@ test("text that only next added survives the merge and is not named", (t) => {
   assert.deepEqual(deletionsOn(repo), []);
 });
 
-test("conflicting files are left to the conflict list and files outside docs and blog are ignored", (t) => {
+test("a conflicting file is named for its clean deletions and files outside docs and blog are ignored", (t) => {
   const repo = scratch(t);
-  repo.write("docs/guide.md", ["# Guide", "Shared line."]);
+  repo.write("docs/guide.md", ["# Guide", "Unreleased passage.", "Context one.", "Context two.", "Context three.", "Shared line."]);
   repo.write("docs/kept.md", ["One.", "Two."]);
   repo.write("website/page.ts", ["export const a = 1;", "export const b = 2;"]);
   repo.commit("base");
   repo.git("branch", "next");
-  repo.write("docs/guide.md", ["# Guide", "Main's wording."]);
+  repo.write("docs/guide.md", ["# Guide", "Context one.", "Context two.", "Context three.", "Main's wording."]);
   repo.write("docs/kept.md", ["One."]);
   repo.write("website/page.ts", ["export const a = 1;"]);
   repo.commit("main edits");
   repo.git("checkout", "-q", "next");
+  repo.write("docs/guide.md", ["# Guide", "Unreleased passage.", "Context one.", "Context two.", "Context three.", "Next's wording."]);
+  repo.commit("next edits");
+  assert.deepEqual(deletionsOn(repo), [
+    { file: "docs/guide.md", deleted: 1 },
+    { file: "docs/kept.md", deleted: 1 },
+  ]);
+});
+
+test("a conflicting file with no clean deletion is not named", (t) => {
+  const repo = scratch(t);
+  repo.write("docs/guide.md", ["# Guide", "Shared line."]);
+  repo.commit("base");
+  repo.git("branch", "next");
+  repo.write("docs/guide.md", ["# Guide", "Main's wording."]);
+  repo.commit("main edits");
+  repo.git("checkout", "-q", "next");
   repo.write("docs/guide.md", ["# Guide", "Next's wording."]);
   repo.commit("next edits");
-  assert.deepEqual(deletionsOn(repo), [{ file: "docs/kept.md", deleted: 1 }]);
+  assert.deepEqual(deletionsOn(repo), []);
 });
 
 test("the merge writes no ref", (t) => {

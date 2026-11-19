@@ -175,10 +175,11 @@ versioned core bundle; it reads nothing else from core.
   `next` has not changed that passage, git applies the removal to `next`. The
   `next-behind-main` issue lists each `docs` or `blog` file the merge would
   delete lines from, computed by `scripts/next-deletions.mjs` from a merge that
-  writes no ref. A listed deletion is either a correction from `main` or such a
-  removal. In the merge pull request, restore `next`'s text for each passage
-  whose removal does not also apply on `develop`, and state in its description
-  that the listed files were checked.
+  writes no ref. A conflicting file is listed too when the merge deletes lines
+  from it outside the conflict markers. A listed deletion is either a correction
+  from `main` or such a removal. In the merge pull request, restore `next`'s
+  text for each passage whose removal does not also apply on `develop`, and
+  state in its description that the listed files were checked.
 - A blog post about unreleased BenchBox behaviour waits on `next` and reaches
   `main` with the release. Nothing mechanical can tell what a post describes,
   so the author declares it with the front matter key `requires_release:
