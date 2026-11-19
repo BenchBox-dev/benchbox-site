@@ -555,22 +555,6 @@ export function Leaderboard({ notice = null }: LeaderboardProps) {
                   onSelect={(value) => setFacet("phase", value === "all" ? [] : [value])}
                   format={(value) => (value === "all" ? "All phases" : value)}
                 />
-                {hardwareClassSelectable.length > 0 && (
-                  <MultiSelectFilter
-                    label="Hardware class"
-                    allLabel="All hardware"
-                    options={hardwareClassSelectable}
-                    current={hardwareClassFilters}
-                    onSelect={(value) =>
-                      setFacet(
-                        "hardware_class",
-                        value === "all" ? [] : toggleFacetValue(hardwareClassFilters, value),
-                      )
-                    }
-                    format={formatHardwareClass}
-                    description="Offered for classes with at least three ranked platforms in a cohort. Ranks stay hardware-agnostic."
-                  />
-                )}
                 {platformVersionOptions.length > 0 || platformVersionFilters.length > 0 ? (
                   <MultiSelectFilter
                     label="Platform version"
@@ -587,6 +571,26 @@ export function Leaderboard({ notice = null }: LeaderboardProps) {
                   />
                 ) : (
                   <div aria-hidden="true" data-testid="home-engine-version-unavailable" />
+                )}
+                {hardwareClassSelectable.length > 0 ? (
+                  <MultiSelectFilter
+                    label="Hardware class"
+                    allLabel="All hardware"
+                    options={hardwareClassSelectable}
+                    current={hardwareClassFilters}
+                    onSelect={(value) =>
+                      setFacet(
+                        "hardware_class",
+                        value === "all" ? [] : toggleFacetValue(hardwareClassFilters, value),
+                      )
+                    }
+                    format={formatHardwareClass}
+                    description="Offered for classes with at least three ranked platforms in a cohort. Ranks stay hardware-agnostic."
+                  />
+                ) : (
+                  <div aria-hidden="true" class="invisible" data-testid="home-hardware-class-unavailable">
+                    <SkeletonSelect label="Hardware class" />
+                  </div>
                 )}
               </div>
 
@@ -763,6 +767,7 @@ function LeaderboardLoadingSkeleton({
               <SkeletonSelect label="Scale" />
               <SkeletonSelect label="Phase" />
               <SkeletonSelect label="Platform version" />
+              <SkeletonSelect label="Hardware class" />
             </div>
             <div aria-hidden="true" class="sm:hidden">
               <div
