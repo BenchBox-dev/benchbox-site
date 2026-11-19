@@ -530,9 +530,13 @@ with a passing A/A, no failures and no answer mismatches.
 | SSB | Benefit, tuned and sort only | Full tuned G 0.6687 (0.6457 to 0.6992); sort only G 0.6816 (0.6373 to 0.7405) |
 | TPC-DS | Regression | Full tuned G 1.0202 (0.9972 to 1.0542), whose interval includes 1.0; the verdict comes from the load clause, load plus settle 75.9 s against 5.6 s notuning. Sort only G 1.0258 (1.0084 to 1.0654) is a regression on query time |
 
-DuckDB SF10 is unmeasured: the TPC-H SF10 cell was killed by the memory-pressure
-watchdog during the `lineitem` load on three attempts. The DuckDB templates are
-unchanged pending SF10.
+DuckDB SF10 is not measured. On the 16 GB macOS host the TPC-H SF10 cell was
+killed by the memory-pressure watchdog during the `lineitem` load on three
+attempts. On a GitHub-hosted runner with 16 GB, the TPC-H, SSB and TPC-DS SF10
+cells failed: the tuned template's sorted rewrite ran out of memory, or the
+runner was shut down after the load. The verdicts above are SF1 only. A template
+setting is retired only when a larger scale also shows it as a regression, so
+the DuckDB templates are unchanged.
 
 ## Addendum (2026-10-17): Spark family capabilities and preview honesty
 
