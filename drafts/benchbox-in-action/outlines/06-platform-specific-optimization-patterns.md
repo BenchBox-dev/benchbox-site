@@ -1,8 +1,50 @@
 # Post outline: BenchBox in action, when the same query needs different code
 
-**Series**: BenchBox in Action | **Post #6**
+**Series**: BenchBox in Action | **Post #7**
 **Target length**: 2,400-2,800 words
-**Status**: OUTLINED
+**Status**: Drafted February 2026; thesis revised 2026-11-11 after remeasurement (see "Revision" below)
+
+---
+
+## Revision, 2026-11-11
+
+The draft no longer follows the outline below, which records the February
+plan. The timings were rerun on the February releases and the current
+ones (Polars 1.37.1 to 2.1.0, DuckDB 1.4.4 to 2.0.0, DataFusion 51.0.0 to
+55.0.0, PySpark 4.1.1 to 4.3.0), on the February synthetic data and on
+TPC-DS `catalog_sales` and `web_sales` at SF1 and SF10. Evidence:
+`../research/multi-warehouse-patterns-remeasured-2026-11-11.md`.
+
+What changed:
+
+- The February result reproduces on the February releases with the
+  synthetic data.
+- On TPC-DS data DataFusion 51.0.0 no longer prefers the self-join, and
+  on DataFusion 55.0.0 the distinct count is faster on every dataset.
+- A third pattern (`min` and `max` per order) is the fastest in 39 of 40
+  tests on the current releases.
+- The isolated `EXISTS` statement is up to 5.4x slower on DuckDB 2.0.0
+  than on 1.5.6, but the complete Q16, Q94 and Q95 are not slower.
+
+Reframed problem: the February question was "which of two patterns does
+each engine need". The real constraint was upstream of it: the test data
+did not have the benchmark's shape, the comparison had only two
+candidates, and a step was timed in place of a query.
+
+Revised thesis:
+
+> A platform-specific code path is true for the versions and data it was
+> measured on. Rerun nine months later, the split between Polars and
+> DataFusion is gone, and one pattern is fastest on all four engines.
+
+Settled on 2026-11-20:
+
+- The timings were rerun on an idle machine. The tables in the draft and
+  the research note come from that run.
+- Complete DataFrame Q16, Q94 and Q95 were timed on BenchBox 0.5.0 and
+  0.5.1 at scale factor 1 on Polars, DataFusion and PySpark. Scale factor
+  10 was refused by BenchBox's memory check on the 16 GB machine.
+- `post_number` is 7, as in the series plan.
 
 ---
 
@@ -156,11 +198,11 @@ n_unique (countDistinct)     184ms   Still 1.3x faster
 
 ### 6. The solution: platform-specific code paths (~300 words)
 
-BenchBox now detects the platform and uses the optimal pattern:
+We added a branch meant to detect the platform and use the faster pattern. It compared the platform with `"datafusion"` while the DataFusion adapter reports `"DataFusion"`, so it was false on every platform and every platform ran the distinct count for Q16 and Q95. The code as written:
 
 ```python
 platform = getattr(ctx, "platform", "polars")
-if platform == "datafusion":
+if platform == "datafusion":  # never true: the adapter reports "DataFusion"
     # Self-join pattern (5x faster on DataFusion)
     order_wh = df.select([...]).unique()
     result = order_wh.join(...).filter(...).unique()
@@ -169,7 +211,7 @@ else:
     result = df.group_by(...).agg(n_unique()).filter(...)
 ```
 
-**Trade-off acknowledged**: This adds complexity. Single-source DataFrame code is cleaner. But a 5x performance difference is too large to ignore for benchmark tooling.
+**What replaced it**: BenchBox now uses the min/max rule for Q16, Q94 and Q95 on every platform, with one code path. The February trade-off (complexity against a 5x difference) did not arise in practice because the branch never ran.
 
 ### 7. Methodology insight (~400 words)
 
@@ -220,7 +262,7 @@ What this reveals about benchmarking and cross-platform DataFrame libraries:
 - [x] Benchmarked both patterns on PySpark (all 6 scales)
 - [x] Analyzed Polars query plans
 - [x] Analyzed DataFusion query plans
-- [x] Implemented platform-specific solution in BenchBox
+- [x] Added a platform branch in BenchBox (it never ran; see section 6)
 - [x] Verified correctness (same results, all platforms)
 - [x] Gathered primary sources for all technical claims
 - [x] Verified PySpark behavior at larger scales (500K, 1M)
@@ -245,8 +287,8 @@ None - all research complete.
 
 ### BenchBox Implementation
 
-8. **BenchBox commit (TPC-H Q21)**: `d59507be` - perf(tpch): optimize Q21 DataFrame implementation with filter pushdown
-9. **BenchBox commit (TPC-DS Q16/Q95)**: `8726dd47` - perf(tpcds): add platform-specific multi-warehouse detection
+8. **BenchBox pull request 4169 (TPC-DS Q16, Q94, Q95)**: removed the dead platform branches and moved the three queries to the min/max rule, merged as `7f42e37e7f`
+9. **BenchBox pull request 4196 (TPC-H Q21)**: filters each per-order supplier aggregate before the joins
 
 ### Related Research
 
