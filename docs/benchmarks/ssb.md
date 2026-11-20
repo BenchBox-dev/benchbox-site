@@ -501,11 +501,16 @@ optimize_for_columnar(ssb, conn)
 
 | Scale Factor | Fact Table Rows | Data Size | Use Case |
 |-------------|-----------------|-----------|----------|
-| 0.01 | ~60,000 | ~5 MB | Development, unit testing |
-| 0.1 | ~600,000 | ~50 MB | Integration testing |
-| 1 | ~6,000,000 | ~500 MB | Standard benchmark |
-| 10 | ~60,000,000 | ~5 GB | Performance testing |
-| 100 | ~600,000,000 | ~50 GB | Large-scale testing |
+| 0.01 | ~60,000 | ~6 MB | Development, unit testing |
+| 0.1 | ~600,000 | ~60 MB | Integration testing |
+| 1 | ~6,000,000 | ~610 MB | Standard benchmark |
+| 10 | ~60,000,000 | ~6 GB | Performance testing |
+| 100 | ~600,000,000 | ~60 GB | Large-scale testing |
+
+The scale factor 1 size is the measured uncompressed size from [SF1 calibrated sizes](sf1-calibrated-sizes.md); the
+other sizes are estimates that scale it in proportion. The standard scale factors for SSB are 0.01, 0.1, 1 and 10.
+The 100 row runs with a note that its results are not comparable with published results; see
+[Scale factors](index.md#scale-factors).
 
 ### Advanced-level Configuration
 

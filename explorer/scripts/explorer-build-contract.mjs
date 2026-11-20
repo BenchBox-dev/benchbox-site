@@ -3,7 +3,7 @@ import { siteInputsPath } from "./site-inputs.mjs";
 
 const EXPECTED_CONTRACT_VERSION = "6";
 export const MINIMUM_READ_MODEL_VERSION = 17;
-export const LATEST_READ_MODEL_VERSION = 18;
+export const LATEST_READ_MODEL_VERSION = 20;
 const SUPPORTED_RANGE = `${MINIMUM_READ_MODEL_VERSION} through ${LATEST_READ_MODEL_VERSION}`;
 
 export function isSupportedReadModelVersion(version) {

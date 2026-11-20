@@ -27,6 +27,7 @@ export const PAGE_TEMPLATES = {
   "docs/search.astro": () => ({ name: "redirect page search", route: "/docs/search.html", stripRefresh: true }),
   "index.astro": () => ({ name: "landing", route: "/" }),
   "prompts/inde[x].astro": () => ({ name: "prompts", route: "/prompts/" }),
+  "results/r/[id].html.ts": (siteDir) => ({ name: "result permalink", route: firstFile(siteDir, "results/r", /\.html$/).replace(/\.html$/, "") }),
   "result-summaries/benchmarks.astro": () => ({ name: "benchmark summaries", route: "/result-summaries/benchmarks.html" }),
   "result-summaries/benchmarks/[id].astro": (siteDir) => ({ name: "benchmark summary", route: firstFile(siteDir, "result-summaries/benchmarks", /\.html$/) }),
   "result-summaries/inde[x].astro": () => ({ name: "result summaries", route: "/result-summaries/" }),

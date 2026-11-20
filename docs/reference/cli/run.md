@@ -42,7 +42,8 @@ benchbox run [OPTIONS]
     alias). The deprecated `run-official` command also spells the setting
     `--streams` — see [Deprecated: `run-official`](#deprecated-run-official)
     below.
-- `--force [MODE]`: Force regeneration of data (modes: `all`, `datagen`, `upload`, or `datagen,upload`)
+- `--iterations INTEGER`: Number of measured power test iterations (default: 3, minimum 1). Each power test also runs one warm-up pass first. Power phase only; a warning is printed when no power phase is selected. An advanced option listed by `benchbox run --help-topic all`.
+- `--force [MODE]`: Force a rerun (modes: `all`, `datagen`, `upload`, or `datagen,upload`; a bare `--force` means `all`). What each value deletes is in [Forced Reruns](#forced-reruns)
 - `--non-interactive`: Use defaults for all prompts (useful for automation)
 
 **Output and Paths:**
@@ -93,7 +94,7 @@ benchbox run [OPTIONS]
 
 - `--validation TEXT`: Validation mode
   - `exact`: Exact row count validation (default)
-  - `loose`: Loose validation (±5% tolerance)
+  - `loose`: Loose validation (±50% row-count tolerance, applied to each query's expected row count)
   - `range`: Min/max bounds validation
   - `disabled`: No validation
   - `full`: All validation checks enabled (preflight, postgen, postload, platform check)
@@ -353,6 +354,16 @@ benchbox run --platform databricks --benchmark tpch --scale 1 \
 ```
 
 The commands, in order, run Databricks with Z-order clustering, with liquid clustering on specific columns, and with automatic liquid clustering.
+
+## Forced Reruns
+
+| Value | Local data | Target database |
+|---|---|---|
+| `datagen` | Regenerated, overwriting existing files | Deleted before the run, the same as `--platform-option force_recreate=true` |
+| `upload` | Untouched | Untouched; data is re-uploaded to remote storage even if a valid copy exists |
+| `all` or `datagen,upload` | As `datagen` | As `datagen`, plus the re-upload |
+
+Deleting the target database means a local database file or directory is deleted. On a remote platform the database is dropped, except Snowflake (drops this benchmark's tables and its tuning metadata and keeps the database) and Databricks (truncates every table in the schema). A platform that cannot drop a database refuses the run instead.
 
 ## Execution Control Options
 

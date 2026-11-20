@@ -5,7 +5,8 @@ generator ran at `scale_factor=1.0` with compression disabled, and the
 generator's own outputs were summed (returned table paths plus auxiliary
 corpora such as the primitives bulk-load files). Upstream staging caches
 (the TPC-DS source behind `tpcds_obt`, the TPC-H source behind
-`datavault`) are build-time scratch and are never counted. Compressed
+`datavault`) are build-time scratch and are not counted, except in the
+older `tpcds_obt` figure described in the notes. Compressed
 variants (`.gz`, `.zst`, `.bz2`), columnar Parquet footprints, and
 run-metadata files are excluded: Parquet-native benchmarks report
 on-disk footprints, not uncompressed bytes. Any run whose downloader
@@ -30,7 +31,7 @@ where available; otherwise the generator baseline.
 |-----------|----------------|--------------|-----------|--------|
 | tpch | 1,092,043,700 | 1.017 | ~1.1 GB | generated |
 | tpcds | 1,235,064,003 | 1.150 | ~1.2 GB | generated |
-| tpcdi | 160,094,804 | 0.149 | ~0.2 GB | generated |
+| tpcdi | 76,020,843 | 0.071 | ~0.1 GB | generated |
 | ssb | 609,810,151 | 0.568 | ~0.6 GB | generated |
 | tpch_skew | 1,072,122,706 | 0.998 | ~1.1 GB | generated |
 | tpchavoc | 1,092,043,700 | 1.017 | ~1.1 GB | generated (TPC-H data) |
@@ -69,9 +70,9 @@ where available; otherwise the generator baseline.
 - Row counts below come from the summed `_datagen_manifest.json`
   `row_count` entries where generators write them; generators without
   manifest row metadata report no row count.
-- `tpcds_obt` and `datavault` derive from TPC-DS and TPC-H source data;
-  the totals count only the derived tables, never the staged source
-  corpus. A run that reuses an existing source cache needs only the
-  incremental derived bytes.
+- `datavault` derives from TPC-H source data; its total counts only the derived tables, never the staged source
+  corpus. A run that reuses an existing source cache needs only the incremental derived bytes.
+- The `tpcds_obt` figure is an older total that includes the staged TPC-DS source. It was not remeasured when the
+  method changed to count derived tables only, so it is larger than the derived table alone.
 - `nyctaxi` at SF=1 samples the 2019 corpus at rate 0.1 (one month slice);
   `flightdata` at SF=1 spans ~41 months of BTS data.

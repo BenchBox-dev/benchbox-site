@@ -56,7 +56,7 @@ describe.skipIf(site === undefined)("built result summary pages", () => {
   beforeAll(async () => {
     await openResultsSnapshot(snapshotFile());
     const manifest = bundleManifest();
-    summary = await buildResultsSummary(await listResults(), getBenchmarkRanking, {
+    summary = await buildResultsSummary(await listResults(undefined, { includeHardware: true }), getBenchmarkRanking, {
       coreSha: manifest.core_sha,
       corpusSha: manifest.corpus_sha,
       packageVersion: manifest.package_version,
@@ -95,17 +95,17 @@ describe.skipIf(site === undefined)("built result summary pages", () => {
   it("renders the Explorer's values for every run of a platform", () => {
     const platform = summary.platforms.find((page) => page.id === "duckdb") ?? summary.platforms[0]!;
     const rows = tableRows(readFileSync(path.join(site!, "result-summaries", "platforms", `${platform.id}.html`), "utf-8"));
-    for (const run of platform.runs) {
+    for (const run of [...platform.ranked, ...platform.excluded]) {
       const row = rows.find((candidate) => candidate.receipt === run.receiptHref);
-      expect(row?.cells, run.resultId).toEqual([run.benchmarkLabel, run.scale, run.phase, run.version ?? "—", run.runDate.slice(0, 10), run.score, run.geomean, run.rankingStatus]);
+      expect(row?.cells, run.resultId).toEqual([run.benchmarkLabel, run.scale, run.phase, run.version ?? "—", run.runDate.slice(0, 10), run.score, run.geomean, run.rankingStatus, run.environment, run.tuningMode, run.trustLabel]);
     }
   });
 
   it("renders each ranking line of a benchmark in the Explorer's order", () => {
     const benchmark = summary.benchmarks.find((page) => page.id === "tpch") ?? summary.benchmarks[0]!;
     const rows = tableRows(readFileSync(path.join(site!, "result-summaries", "benchmarks", `${benchmark.id}.html`), "utf-8"));
-    const rendered = rows.filter((row) => row.receipt !== undefined && row.cells.length === 7).map((row) => row.receipt);
-    expect(rendered).toEqual(benchmark.cohorts.flatMap((cohort) => cohort.ranking.map((line) => line.receiptHref)));
+    const rendered = rows.filter((row) => row.receipt !== undefined && row.cells.length === 10).map((row) => row.receipt);
+    expect(rendered).toEqual(benchmark.cohorts.flatMap((cohort) => cohort.ranked.map((line) => line.receiptHref)));
   });
 });
 

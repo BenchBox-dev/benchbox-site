@@ -203,7 +203,7 @@ The `tables_info` mapping shows the expected tables and approximate row counts a
 
 The CoffeeShop benchmark has been rewritten to align with the public reference
 generator. It now produces three tables (`dim_locations`, `dim_products`, and
-`order_lines`) with an exploded fact table that averages 1.5 lines per order.
+`order_lines`) with an exploded fact table that averages 1.56 lines per order.
 
 ```python
 from benchbox import CoffeeShop
@@ -215,15 +215,14 @@ print(data_files["order_lines"])
 
 This uses the reference-aligned generator at a small scale for development. `data_files["order_lines"]` is the path to the generated CSV file.
 
-Scale factors map directly to order counts using the approved formula
-`order_count = 50_000_000 * scale_factor`. The table below outlines the
-recommended operating ranges:
+Scale factors map directly to order counts: `order_count = 8_500_000 * scale_factor`, with an average of 1.56
+lines per order. The 0.01 and 0.1 rows are measured from generated data; the 1.0 row scales them in proportion:
 
-| Scale Factor | Orders Generated | Approx. Order Lines | Approx. Size |
-|--------------|-----------------|---------------------|--------------|
-| 0.01         | 500,000         | ~750,000            | ~50 MB       |
-| 0.1          | 5,000,000       | ~7,500,000          | ~500 MB      |
-| 1.0          | 50,000,000      | ~75,000,000         | ~5 GB        |
+| Scale Factor | Orders Generated | Order Lines | Approx. Size |
+|--------------|-----------------|-------------|--------------|
+| 0.01         | 85,000          | 132,600     | ~9 MB        |
+| 0.1          | 850,000         | 1,326,000   | ~89 MB       |
+| 1.0          | 8,500,000       | ~13,260,000 | ~0.9 GB      |
 
 **CoffeeShop specific highlights:**
 

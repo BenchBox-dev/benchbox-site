@@ -72,10 +72,12 @@ uv add benchbox
 
 ## Quick Start
 
-Run the official TPC-H benchmark with the CLI. `--official` marks the run metadata; it is not a claim of TPC compliance, and QphH@Size requires the additional refresh evidence described below.
+Run the official TPC-H benchmark with the CLI. `--official` marks the run metadata; it is not a claim of TPC compliance, and QphH@Size requires the additional refresh evidence described below. `--official` refuses a partial run: it needs a `--seed`, the power and throughput phases, the refresh functions, and `--streams` of at least the minimum for the scale (2 at scale factor 1, 3 at 10, 4 at 30, 5 at 100).
 
 ```bash
-benchbox run --official --platform duckdb --benchmark tpch --scale 1 --seed 42 --output ./official_data
+benchbox run --official --platform duckdb --benchmark tpch --scale 1 --seed 42 \
+  --phases power,throughput --streams 2 --benchmark-option tpch_refresh_functions=true \
+  --output ./official_data
 ```
 
 Then read the metrics back programmatically:
@@ -90,7 +92,7 @@ print(f"Throughput@Size: {results.throughput_at_size}")
 print(f"Success: {raw['summary']['validation']}")
 ```
 
-(`results.throughput_at_size` is `None` here because the default official run covers the power phase; add `--phases throughput` for the throughput test.)
+(`results.throughput_at_size` is set because this official run covers the throughput phase; a run with only `--phases power` has `None` there.)
 
 ## Detailed Usage
 

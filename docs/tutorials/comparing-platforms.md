@@ -110,6 +110,8 @@ The first command is SQL execution, the second is DataFrame execution with Polar
 
 ## Best Practices
 
+This section applies the policy in [Benchmark Methodology](../concepts/benchmark-methodology.md), which covers scale factors, iterations, seed, tuning disclosure and when two results are comparable.
+
 ### Use Same Scale Factor
 
 ```bash

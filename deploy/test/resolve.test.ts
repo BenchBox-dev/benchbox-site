@@ -57,7 +57,7 @@ test("an unverifiable bundle is refused", () => {
 });
 
 test("candidate schema bundles verify offline and an unsupported schema is refused", () => {
-  for (const schema of [4, 5]) assert.deepEqual(verifyBundle(fixtureBundle({ schema })).errors, []);
+  for (const schema of [4, 5, 6]) assert.deepEqual(verifyBundle(fixtureBundle({ schema })).errors, []);
   assert.ok(verifyBundle(fixtureBundle({ schema: 2 })).errors.some((error: string) => error.startsWith("schema 2")));
 });
 
@@ -72,6 +72,29 @@ test("a changed corpus needs validator parity from the deployed commit", () => {
   assert.match(chainErrors(deployed, candidate("e".repeat(40)))[0], /parent_core_sha=a{40}/);
   assert.match(chainErrors(deployed, candidate(undefined))[0], /no validator_parity/);
   assert.deepEqual(chainErrors(null, candidate("e".repeat(40))), []);
+});
+
+test("a validator_parity base that is an ancestor of the deployed core is accepted", () => {
+  const strictBase = "e".repeat(40);
+  const candidate = { core_sha: "b".repeat(40), corpus_sha: "9".repeat(40), validator_parity: { result: "pass", base: strictBase } };
+  const ok = { status: 200, body: { status: "ahead" as const } };
+  assert.deepEqual(chainErrors(deployed, { ...candidate, validator_parity: { result: "pass", base: deployed.core_sha } }), []);
+  assert.deepEqual(chainErrors(deployed, candidate, { baseToDeployed: ok, deployedToCandidate: ok }), []);
+  assert.deepEqual(chainErrors(deployed, candidate, { baseToDeployed: ok, deployedToCandidate: { status: 200, body: { status: "identical" } } }), []);
+  assert.match(chainErrors(deployed, candidate, { baseToDeployed: { status: 200, body: { status: "diverged" } }, deployedToCandidate: ok })[0], /not an ancestor/);
+  assert.match(chainErrors(deployed, candidate, { baseToDeployed: { status: 200, body: { status: "behind" } }, deployedToCandidate: ok })[0], /not an ancestor/);
+  assert.match(chainErrors(deployed, candidate, { baseToDeployed: ok, deployedToCandidate: { status: 200, body: { status: "behind" } } })[0], /not a descendant/);
+  assert.match(chainErrors(deployed, candidate, { baseToDeployed: ok, deployedToCandidate: { status: 200, body: { status: "diverged" } } })[0], /not a descendant/);
+});
+
+test("unreadable ancestry refuses a validator_parity base that is not the deployed core", () => {
+  const candidate = { core_sha: "b".repeat(40), corpus_sha: "9".repeat(40), validator_parity: { result: "pass", base: "e".repeat(40) } };
+  const ok = { status: 200, body: { status: "ahead" as const } };
+  assert.match(chainErrors(deployed, candidate)[0], /could not be read/);
+  assert.match(chainErrors(deployed, candidate, { baseToDeployed: { status: 404 }, deployedToCandidate: ok })[0], /HTTP 404/);
+  assert.match(chainErrors(deployed, candidate, { baseToDeployed: { status: 0 }, deployedToCandidate: ok })[0], /could not be read/);
+  assert.match(chainErrors(deployed, candidate, { baseToDeployed: ok, deployedToCandidate: { status: 403 } })[0], /HTTP 403/);
+  assert.match(chainErrors(deployed, candidate, { baseToDeployed: ok, deployedToCandidate: { status: 200, body: {} } })[0], /could not be read/);
 });
 
 test("overlapping runs: a run that resolved before another deployed refuses to deploy", () => {

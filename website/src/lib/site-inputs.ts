@@ -43,6 +43,22 @@ export function requireSiteInputs(): string {
   return root;
 }
 
+export function docsInputsRoot(env: NodeJS.ProcessEnv = process.env): string {
+  return path.resolve(env.DOCS_INPUTS || path.join(REPO_ROOT, "release-pin"));
+}
+
+export function requireDocsInputs(env: NodeJS.ProcessEnv = process.env): string {
+  const root = docsInputsRoot(env);
+  if (!existsSync(path.join(root, "manifest.json"))) {
+    throw new Error(`Docs inputs are missing at ${root}. Run npm run docs:pin, or set DOCS_INPUTS.`);
+  }
+  return root;
+}
+
+export function releaseVersion(env: NodeJS.ProcessEnv = process.env): string {
+  return (JSON.parse(readFileSync(path.join(requireDocsInputs(env), "manifest.json"), "utf-8")) as BundleManifest).package_version;
+}
+
 export function bundleManifest(): BundleManifest {
   return JSON.parse(readFileSync(path.join(requireSiteInputs(), "manifest.json"), "utf-8")) as BundleManifest;
 }
@@ -67,7 +83,7 @@ export class DocsAssemblyError extends Error {
   }
 }
 
-export function assembleAuthoredDocs(destination: string, inputs: string = requireSiteInputs(), authored: string = repoPath("docs")): string {
+export function assembleAuthoredDocs(destination: string, inputs: string = requireDocsInputs(), authored: string = repoPath("docs")): string {
   const docsRoot = path.join(destination, "docs");
   const files = walkDocFiles(authored);
   assertNoCoreOnlyContent(files);
@@ -96,7 +112,7 @@ export function assembleAuthoredDocs(destination: string, inputs: string = requi
 }
 
 export function assembleDocsSource(destination: string): string {
-  const inputs = requireSiteInputs();
+  const inputs = requireDocsInputs();
   const docsRoot = assembleAuthoredDocs(destination, inputs);
   cpSync(repoPath("blog"), path.join(docsRoot, "blog"), { recursive: true });
   cpSync(path.join(inputs, "repo-files.json"), path.join(destination, "repo-files.json"));

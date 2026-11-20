@@ -2,9 +2,11 @@ import { queryRows } from "@/db";
 import type { BuiltQuery } from "@/lib/queryFilters";
 import { canonicalPhaseSql, type FacetWhereClause } from "@/lib/facetModel";
 import { canonicalBenchmarkSlug } from "@/lib/displayLabels";
-import { normalizePrimaryMetric, type PrimaryMetric } from "@/lib/displayEligibility";
+import { isCompositeMetric, normalizePrimaryMetric, type PrimaryMetric } from "@/lib/displayEligibility";
+import { parseJsonColumn } from "@/lib/combinedDisclosure";
 import type {
   BenchmarkSummary,
+  CombinedCohortFields,
   CostDeploymentFields,
   DetailResult,
   Environment,
@@ -116,6 +118,8 @@ export interface ResultRow extends CostDeploymentFields {
   run_date: string;
   power_score: number | null;
   throughput_at_size?: number | null;
+  qphh_at_size?: number | null;
+  qphds_at_size?: number | null;
   stream_count?: number | null;
   total_duration_s: number;
   geomean_ms: number | null;
@@ -255,6 +259,10 @@ export interface BenchmarkRankingRow extends CostDeploymentFields {
   power_score: number | null;
   power_score_source?: string | null;
   throughput_at_size: number | null;
+  qphh_at_size?: number | null;
+  qphds_at_size?: number | null;
+  load_scope?: string | null;
+  transactional_steps?: string | null;
   stream_count: number | null;
   display_geomean_ms: number | null;
   sample_geomean_ms: number | null;
@@ -288,6 +296,10 @@ export interface PlatformIndexRowRow extends CostDeploymentFields {
   run_date: string;
   power_score: number | null;
   throughput_at_size?: number | null;
+  qphh_at_size?: number | null;
+  qphds_at_size?: number | null;
+  load_scope?: string | null;
+  transactional_steps?: string | null;
   stream_count?: number | null;
   total_duration_s: number;
   geomean_ms: number | null;
@@ -658,6 +670,39 @@ function memoizedSnapshotQuery<T>(
 
 export function clearDuckdbQueryCachesForTests() {
   snapshotQueryCache.clear();
+  combinedColumnsAvailable = null;
+}
+
+const COMBINED_COLUMN_NAMES = ["qphh_at_size", "qphds_at_size", "load_scope", "transactional_steps"] as const;
+let combinedColumnsAvailable: boolean | null = null;
+
+function combinedColumnList(prefix: string): string {
+  return COMBINED_COLUMN_NAMES.map((column) => `${prefix}${column}`).join(", ");
+}
+
+function isMissingCombinedColumnError(error: unknown): boolean {
+  const message = error instanceof Error ? error.message : String(error);
+  return /Binder Error/i.test(message) && COMBINED_COLUMN_NAMES.some((column) => message.includes(column));
+}
+
+async function runQuery<T>(query: { sql: string; params?: readonly unknown[] }): Promise<T[]> {
+  return query.params && query.params.length > 0 ? queryRows<T>(query.sql, [...query.params]) : queryRows<T>(query.sql);
+}
+
+async function queryWithCombinedColumns<T>(
+  build: (withCombined: boolean) => { sql: string; params?: readonly unknown[] },
+): Promise<T[]> {
+  if (combinedColumnsAvailable !== false) {
+    try {
+      const rows = await runQuery<T>(build(true));
+      combinedColumnsAvailable = true;
+      return rows;
+    } catch (error) {
+      if (!isMissingCombinedColumnError(error)) throw error;
+      combinedColumnsAvailable = false;
+    }
+  }
+  return runQuery<T>(build(false));
 }
 
 export function memoizedSnapshotQueryRows<T>(
@@ -687,8 +732,15 @@ export async function listResults(
   const source = needsHardware
     ? "(SELECT r.*, d.arch, d.cpu_family, d.memory_gb FROM bench.results r LEFT JOIN bench.result_detail_metrics d USING (result_id))"
     : "bench.results";
-  const sql = `SELECT ${columns} FROM ${source} ${where.sql} ORDER BY run_date DESC`;
-  return memoizedSnapshotQueryRows<ResultRow>("list-results", { sql, params: where.params }, { cacheEmpty: false });
+  const build = (withCombined: boolean) => ({
+    sql: `SELECT ${columns}${withCombined ? `, ${combinedColumnList("")}` : ""} FROM ${source} ${where.sql} ORDER BY run_date DESC`,
+    params: where.params,
+  });
+  return memoizedSnapshotQuery(
+    `rows:list-results\u0000${build(false).sql}\u0000${JSON.stringify(where.params)}`,
+    () => queryWithCombinedColumns<ResultRow>(build),
+    { cacheResult: (rows) => rows.length > 0 },
+  );
 }
 
 export async function listBenchmarksWithPublicResults(): Promise<string[]> {
@@ -858,10 +910,16 @@ export interface TranslatorIdentity {
   translator_version_source: TranslatorVersionSource | null;
 }
 
-const NO_TRANSLATOR_IDENTITY: TranslatorIdentity = {
+export type ResultSupplement = TranslatorIdentity & CombinedCohortFields;
+
+const NO_RESULT_SUPPLEMENT: ResultSupplement = {
   translator_version: null,
   translator_fork_sha: null,
   translator_version_source: null,
+  qphh_at_size: null,
+  qphds_at_size: null,
+  load_scope: null,
+  transactional_steps: null,
 };
 
 const TRANSLATOR_VERSION_SOURCES: readonly string[] = ["recorded", "attested", "not_recorded", "not_applicable"];
@@ -870,16 +928,30 @@ function textOrNull(value: unknown): string | null {
   return typeof value === "string" && value !== "" ? value : null;
 }
 
-export async function getTranslatorIdentity(resultId: string): Promise<TranslatorIdentity> {
+function numberOrNull(value: unknown): number | null {
+  return typeof value === "number" && Number.isFinite(value) ? value : null;
+}
+
+export function combinedFieldsFromRow(row: Record<string, unknown>): Required<CombinedCohortFields> {
+  return {
+    qphh_at_size: numberOrNull(row.qphh_at_size),
+    qphds_at_size: numberOrNull(row.qphds_at_size),
+    load_scope: parseJsonColumn<string[]>(row.load_scope),
+    transactional_steps: parseJsonColumn<Record<string, boolean>>(row.transactional_steps),
+  };
+}
+
+export async function getResultSupplement(resultId: string): Promise<ResultSupplement> {
   const rows = await queryRows<Record<string, unknown>>("SELECT * FROM bench.results WHERE result_id = ?", [resultId]);
   const row = rows[0];
-  if (!row) return NO_TRANSLATOR_IDENTITY;
+  if (!row) return NO_RESULT_SUPPLEMENT;
   const source = textOrNull(row.translator_version_source);
   return {
     translator_version: textOrNull(row.translator_version),
     translator_fork_sha: textOrNull(row.translator_fork_sha),
     translator_version_source:
       source !== null && TRANSLATOR_VERSION_SOURCES.includes(source) ? (source as TranslatorVersionSource) : null,
+    ...combinedFieldsFromRow(row),
   };
 }
 
@@ -887,7 +959,7 @@ export function detailResultFromWideRow(
   wide: ResultDetailMetricsRow,
   executionRows: readonly QueryExecutionRow[],
   timingRows: readonly QueryDisplayTimingRow[],
-  translator: TranslatorIdentity = NO_TRANSLATOR_IDENTITY,
+  translator: ResultSupplement = NO_RESULT_SUPPLEMENT,
 ): DetailResult {
   const environment: Environment = {};
   if (wide.os !== null) environment.os = wide.os;
@@ -1014,14 +1086,14 @@ export function detailResultFromWideRow(
 }
 
 export async function getDetailResult(resultId: string): Promise<DetailResult | null> {
-  const [wide, timingRows, executionRows, translator] = await Promise.all([
+  const [wide, timingRows, executionRows, supplement] = await Promise.all([
     getResultDetailMetrics(resultId),
     getQueryDisplayTimings(resultId),
     getQueryExecutions(resultId),
-    getTranslatorIdentity(resultId),
+    getResultSupplement(resultId),
   ]);
   if (!wide) return null;
-  return detailResultFromWideRow(wide, executionRows, timingRows, translator);
+  return detailResultFromWideRow(wide, executionRows, timingRows, supplement);
 }
 
 function streamCountClause(column: string, streamCount: number | null): { sql: string; params: number[] } {
@@ -1056,8 +1128,10 @@ export async function getBenchmarkRanking(
 ): Promise<BenchmarkRankingRow[]> {
   benchmark = canonicalBenchmarkSlug(benchmark);
   const streams = streamCountClause("br.stream_count", streamCount);
-  return queryRows<BenchmarkRankingRow>(
-    `SELECT ${BENCHMARK_RANKING_COLUMNS}, r.platform_version, r.validation_status, r.override_rules,` +
+  return queryWithCombinedColumns<BenchmarkRankingRow>((withCombined) => ({
+    sql:
+      `SELECT ${BENCHMARK_RANKING_COLUMNS}${withCombined ? `, ${combinedColumnList("br.")}` : ""},` +
+      " r.platform_version, r.validation_status, r.override_rules," +
       " r.normalized_cost_usd, r.cost_model_version, r.cost_model_source," +
       " r.cost_scope, r.cost_status, r.billing_unit, r.pricing_region," +
       " r.estimated_cost_usd, r.cost_estimate_method, r.cost_estimate_source," +
@@ -1068,8 +1142,8 @@ export async function getBenchmarkRanking(
       " LEFT JOIN bench.results r USING (result_id)" +
       ` WHERE br.benchmark = ? AND br.scale_factor = ? AND br.phase = ?${streams.sql}` +
       " ORDER BY br.rank NULLS LAST, br.platform_id",
-    [benchmark, scaleFactor, phase, ...streams.params],
-  );
+    params: [benchmark, scaleFactor, phase, ...streams.params],
+  }));
 }
 
 export async function getResultPhaseDurations(resultIds: string[]): Promise<Map<string, Record<string, number>>> {
@@ -1179,6 +1253,7 @@ async function loadBenchmarkSummaryFromDuckDB(
       power_score: row.power_score,
       power_score_source: row.power_score_source ?? null,
       throughput_at_size: row.throughput_at_size,
+      ...combinedFieldsFromRow(row as unknown as Record<string, unknown>),
       display_geomean_ms: row.display_geomean_ms,
       sample_geomean_ms: row.sample_geomean_ms,
       cost_usd: row.cost_usd,
@@ -1218,7 +1293,11 @@ async function loadBenchmarkSummaryFromDuckDB(
     cell_reduction: "median_successful_measurement_ms",
     ranking: {
       primary_metric: first.primary_metric,
-      secondary_metric: normalizePrimaryMetric(first.primary_metric) === "display_geomean_ms" ? "power_score" : "display_geomean_ms",
+      secondary_metric:
+        normalizePrimaryMetric(first.primary_metric) === "display_geomean_ms" ||
+        isCompositeMetric(normalizePrimaryMetric(first.primary_metric))
+          ? "power_score"
+          : "display_geomean_ms",
       primary_order: first.primary_order,
     },
   };
@@ -1236,8 +1315,8 @@ function hasPlatformIndexData(rows: PlatformIndexRowRow[]): boolean {
   return rows.length > 0;
 }
 
-function loadPlatformIndexRows(platformId?: string): Promise<PlatformIndexRowRow[]> {
-  const sql =
+function platformIndexSql(withCombined: boolean): string {
+  return (
     "SELECT" +
     " r.result_id," +
     " COALESCE(si.short_id, '') AS short_id," +
@@ -1292,6 +1371,7 @@ function loadPlatformIndexRows(platformId?: string): Promise<PlatformIndexRowRow
     " r.cloud_region," +
     " r.instance_or_warehouse," +
     " r.storage_format," +
+    (withCombined ? ` ${combinedColumnList("r.")},` : "") +
     " e.arch," +
     " e.cpu_family," +
     " e.memory_gb," +
@@ -1301,11 +1381,17 @@ function loadPlatformIndexRows(platformId?: string): Promise<PlatformIndexRowRow
     " FROM bench.results r" +
     " LEFT JOIN bench.short_ids si ON si.result_id = r.result_id" +
     " LEFT JOIN bench.benchmark_rankings br ON br.result_id = r.result_id" +
-    " LEFT JOIN bench.result_environment e ON e.result_id = r.result_id";
-  if (platformId === undefined) {
-    return queryRows<PlatformIndexRowRow>(`${sql} ORDER BY r.run_date DESC`);
-  }
-  return queryRows<PlatformIndexRowRow>(`${sql} WHERE r.platform_id = ? ORDER BY r.run_date DESC`, [platformId]);
+    " LEFT JOIN bench.result_environment e ON e.result_id = r.result_id"
+  );
+}
+
+function loadPlatformIndexRows(platformId?: string): Promise<PlatformIndexRowRow[]> {
+  return queryWithCombinedColumns<PlatformIndexRowRow>((withCombined) => {
+    const sql = platformIndexSql(withCombined);
+    return platformId === undefined
+      ? { sql: `${sql} ORDER BY r.run_date DESC` }
+      : { sql: `${sql} WHERE r.platform_id = ? ORDER BY r.run_date DESC`, params: [platformId] };
+  });
 }
 
 export async function getCohort(cohortKey: string): Promise<CohortMetadataRow[]> {

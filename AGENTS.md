@@ -5,7 +5,8 @@ This repository builds and deploys benchbox.dev: the Astro site in
 `landing/`, the published blog in `blog/` and blog drafts in `drafts/`.
 Benchmark code and results data live in the core
 repository, `BenchBox-dev/BenchBox`. The documentation under `docs/` is
-authored here. The site builds from the repository itself plus one
+authored here. Apart from the documentation inputs
+described under "Release pin", the site builds from the repository itself plus one
 versioned core bundle; it reads nothing else from core.
 
 ## Language
@@ -16,7 +17,7 @@ versioned core bundle; it reads nothing else from core.
 - Tooling is Node and TypeScript. A third-party tool fetched at run time is
   allowed, for example a pinned `npx` package. The one Python tool the site
   runs is the published `benchbox` CLI, as an external program pinned to the
-  bundle's version, from `scripts/render-blog-charts.mjs` only.
+  release pin's version, from `scripts/render-blog-charts.mjs` only.
 
 ## The core bundle
 
@@ -25,20 +26,28 @@ versioned core bundle; it reads nothing else from core.
   `.site-inputs/` (git-ignored) and verifies its digest, schema and
   certification before anything reads it.
 - The bundle schema is an integer major version. A schema change lands in
-  core first, then the site adds support for it, then core may drop the
-  older schema. The verifier accepts exact schemas 4 and 5, each with
-  its own exact member set; schema 3 is retired. Both schemas carry
-  `docs-data/docs-data.json` and `doc-contracts.json`, validated against
-  the schemas vendored in `scripts/schemas/`. Schema 4 still carries `docs`
-  and `downloads`, which the site no longer reads; schema 5 drops them.
-  Unknown schemas, member sets and extra entries in `docs-data` fail.
+  core first, then the site adds support, then core may drop the older
+  schema. `scripts/bundle-verify.mjs` and `scripts/schemas/` define the
+  accepted schemas. The verifier accepts exact schemas 4, 5 and 6, each with
+  its exact member set. Schema 6 is schema 5 plus the top-level member
+  `result-bundle.schema.json`: a JSON Schema draft 2020-12 document whose
+  `$id` is `https://benchbox.dev/schemas/result-bundle-2.schema.json` and
+  whose top-level `result_schema_version` is a `2.x` string. The verifier
+  checks that it parses, compiles and carries those markers; it does not
+  compare its bytes with core's copy.
+- When the bundle has `result-bundle.schema.json`, the build publishes it at
+  `/schemas/result-bundle-2.schema.json` (the URL carries the result
+  bundle's major version) from `website/src/lib/result-schema.ts`, and the
+  deploy probe checksums it. The privacy gate scans it like every other JSON
+  file in the artifact, and `deploy/origin-allowlist.json` lets its production
+  `$id` pass the rehearsal origin gate.
 - `certified_by` is the numeric id of the core `trunk.yml` push run on
   `develop` for the bundle commit. Online certification requires that run
-  id for schemas 4 and 5, with the same attestations. The value
-  `candidate` is valid for schemas 4 and 5 under `--offline` verification
+  id for schemas 4, 5 and 6, with the same attestations. The value
+  `candidate` is valid for schemas 4, 5 and 6 under `--offline` verification
   only, and never passes online certification.
 - `npm run docs:check` (`docs-contracts/`, TypeScript) checks the site's
-  documentation against the `doc-contracts.json` facts core exports: registry
+  documentation against the `doc-contracts.json` facts of the docs inputs (the release pin, or the newest bundle when `DOCS_INPUTS` names it): registry
   and platform counts, the benchmark API surface, the quickstart commands,
   `--platform-option` examples, the MCP reference, SF1 sizes, sketch bounds,
   version markers, the Python API headings and the publication boundary. It
@@ -49,8 +58,8 @@ versioned core bundle; it reads nothing else from core.
   with `--docs-mode block` (the default) and only print with
   `--docs-mode report`; `ci` and the deploy build pass `block` (rollback
   restores an artifact and runs no check), so page drift fails the run
-  before the build and before publication. A bundle without
-  `doc-contracts.json` always fails. `npm run test:docs-contracts` runs the
+  before the build and before publication. Docs inputs without
+  `doc-contracts.json` always fail. `npm run test:docs-contracts` runs the
   seeded drift tests; `DOC_CONTRACTS_SCHEMA4_BUNDLE=<bundle dir>` adds a run
   against a real bundle.
 - `inventory/core-linked-paths.json` lists every core path that a relative
@@ -68,7 +77,7 @@ versioned core bundle; it reads nothing else from core.
 
 - `docs/` holds the published pages, authored here, with their original
   MIT license text in `docs/LICENSE`. The build assembles them with the
-  pages that `npm run docs:generate -w website` renders from the bundle's
+  pages that `npm run docs:generate -w website` renders from the docs inputs'
   `docs-data` (the generated scope: `benchmarks/queries/`, `compat/` and
   `reference/tuning-platform-support.md`) and with `blog/`. An authored page
   in the generated scope or under `docs/blog/` fails the assembly.
@@ -79,8 +88,6 @@ versioned core bundle; it reads nothing else from core.
   directive fence (```` ```{name} ````), a role before an inline code span
   a `(label)=` line and a `myst` front matter key. Write the plain form instead: GitHub alerts, `.md`
   links, `<span id>` anchors and bold lead-ins in place of definition lists.
-- The site publishes no `objects.inv` Sphinx inventory. Nothing consumed it,
-  and the deploy probe no longer requires it.
 - The sidebar is the tree in `docs/nav.yml`: groups with a `label` and
   `items`, where an item is a page path, `{page, label, items}` for a page
   with a label override or children, or `{label, url}` for an external link.
@@ -88,6 +95,22 @@ versioned core bundle; it reads nothing else from core.
   fails with the line in `nav.yml` for an unknown key, an empty group, a page
   that does not exist or a page listed twice under one parent. A page that is
   not listed still builds; add it to `docs/nav.yml` to put it in the sidebar.
+- The build publishes `/llms.txt` and a Markdown copy of every page under
+  `docs/` at `/docs/<page>.md`, next to `/docs/<page>.html`. The converter
+  writes both to `website/.generated/` (`markdown/`, `manifest/llms.txt`)
+  from the same converted pages, and `scripts/publish-markdown.ts` copies them
+  into `dist` after the dev-docs mount. `llms.txt` is generated, never edited:
+  the fixed sections in `website/src/lib/llms.ts` (`FEATURED_SECTIONS`: install
+  and first run, CLI, MCP, methodology, result summaries) come first, then the
+  `docs/nav.yml` groups, then an Optional section for every page that
+  `docs/nav.yml` does not list. Only generated-scope pages that a listed index
+  links to (the per-query and compatibility pages) are left out of the file,
+  and tag pages are never listed. A featured page that does not exist fails the
+  conversion. `npm run check:llms -w website` and the build fail when a link
+  in `llms.txt` or in a Markdown page points at a file that is not in `dist`.
+  The blog, result summaries, search and the Explorer have no Markdown copy.
+  The deploy probe compares `/llms.txt` and sampled `.md` files with the
+  artifact and requires a `text/plain` or `text/markdown` content type.
 - Tags are the `tags` list in front matter, which must be the first thing in
   the file. The tag pages under `/docs/_tags/` are generated from them.
 - Cross-references are relative `.md` links, for example
@@ -105,13 +128,13 @@ versioned core bundle; it reads nothing else from core.
 - The blog index is rendered by the blog template from the published posts;
   `blog/index.md` holds only the introduction.
 - `docs/README.md` is the landing page. Its `{{package_version}}` token
-  becomes the bundle manifest's `package_version`, so the release marker in
-  the page always matches the bundle.
-- Core keeps maintainer-only material (`docs/agent/`, `docs/internal/`,
+  becomes the `package_version` of the docs inputs' manifest, so the release
+  marker in the page always matches the release the docs describe.
+- Never copy core maintainer-only material (`docs/agent/`, `docs/internal/`,
   `design/future-state/`, the threat model, the workaround index, the TPC
-  licensing analysis and the publication lists). The site publishes
-  nothing from those paths: listing sources fails when the tree holds any
-  of them, in place of a publish list.
+  licensing analysis, the publication lists) here; listing sources fails if
+  any appears. A new page under `docs/development/` or `docs/operations/` also
+  needs an entry in core's `docs/publish-allowlist.txt`.
 - Edit links point at this repository. Generated pages (`benchmarks/queries/`,
   `compat/`, `reference/tuning-platform-support.md`) and renderer pages carry
   none.
@@ -119,97 +142,136 @@ versioned core bundle; it reads nothing else from core.
   findings; add a genuine word to `cspell-words.txt` instead of exempting a
   page. `ci` runs it.
 
+## Release pin
+
+- `release-pin/` holds the docs inputs of one published core release. Docs
+  assembly, `docs:check`, `docs:generate`, core-file link pinning and the blog
+  chart renderer read it.
+- The Explorer, the result summaries, the prompt catalog and the deploy gates
+  still read the newest certified bundle.
+- `DOCS_INPUTS` names the directory the docs inputs are read from. Unset or
+  empty means `release-pin/`. `ci` and the Visual workflow set it to the
+  fetched bundle for pushes to `next` and pull requests into `next`. There
+  `ci` also assembles the docs against the pin, so site code
+  that stops reading the pinned release fails before the release pull
+  request. The Visual workflow builds pull requests into `next` from the
+  deployed bundle, not the newest one; that is accepted because it is
+  advisory.
+- `ci` checks the pin with `npm run docs:pin -- --check`: the pin must be
+  well formed and its tag a published release.
+- Unreleased documentation merges to `next`, where CI checks it against the
+  newest develop bundle. Fixes to released documentation merge to `main`;
+  the Sync next workflow then opens or updates the `next-behind-main` issue
+  while `next` lacks commits that are on `main`, and closes it once `next`
+  contains them. Site code, workflows and corrections to released
+  documentation go to `main`; only documentation of unreleased behaviour goes to
+  `next`. After a merge to `main`, merge `main` into `next` by pull request
+  with `gh pr merge --merge`. The issue says whether that merge is clean or
+  names the conflicting files, which a person resolves by hand in that pull
+  request; where released text from `main` conflicts with unreleased text on
+  `next`, `next` keeps its text.
+- A merge of `main` into `next` can also remove unreleased text without a
+  conflict: when `main` drops a passage that is not true at the release and
+  `next` has not changed that passage, git applies the removal to `next`. The
+  `next-behind-main` issue lists each `docs` or `blog` file the merge would
+  delete lines from, computed by `scripts/next-deletions.mjs` from a merge that
+  writes no ref. A conflicting file is listed too when the merge deletes lines
+  from it outside the conflict markers. A listed deletion is either a correction
+  from `main` or such a removal. In the merge pull request, restore `next`'s
+  text for each passage whose removal does not also apply on `develop`, and
+  state in its description that the listed files were checked.
+- A blog post about unreleased BenchBox behaviour waits on `next` and reaches
+  `main` with the release. Nothing mechanical can tell what a post describes,
+  so the author declares it with the front matter key `requires_release:
+  X.Y.Z`, the first release that contains what the post describes.
+  `npm run lint:blog` checks the value is well formed and, only when
+  `DOCS_INPUTS` is unset or empty, fails a post whose `requires_release` is
+  above `release-pin/manifest.json`'s `package_version`. When `DOCS_INPUTS`
+  is set, as on `next`, the release gate is skipped: the develop bundle's
+  version is the last release, not the upcoming one. A post that links a core path added after
+  the pinned release must link by commit SHA or carry `requires_release`.
+- A release is automated up to two pull requests that the owner merges; no
+  workflow merges, pushes to `main` or `next`, or force-pushes. The Release
+  docs workflow (hourly, on dispatch and on the `core-release` repository
+  dispatch) runs `docs:pin -- --pending` against `next`'s pin. For a newer
+  release it creates the branch `release-pin/<tag>` from `next`, runs
+  `npm run docs:pin -- <tag>`, and opens a pull request into `next`; the
+  owner squash-merges it. A tag that already has a pull request in any state
+  is skipped, and a branch without one gets a pull request opened. A pin that fails, for example because no certified bundle
+  exists, creates no branch and comments the error on the open
+  `docs-release-pending` issue. The same workflow, on each push to `next`,
+  opens `Release documentation for <tag>` from `next` into `main` when
+  `next`'s pin tag is above `main`'s and no pull request into `main` has that
+  title in any state or names the tag while open. Its body lists the files whose
+  content differs between `main` and `next` and the documentation commits on
+  `next` since the previous pin; releases squash into `main`, so a plain
+  `main..next` log would list every commit ever made on `next`. It uses the
+  `SITE_BRIDGE_APP_ID` GitHub App, whose pushes and pull requests start `ci`
+  where the default token's would not; the app needs contents and pull-requests
+  write on this repository.
+- Hold back what is not true at the release before merging the release pull
+  request. `next` documents core `develop`, which runs ahead of the release.
+  `docs:check` against the new pin fails `ci` only on the facts core exports in
+  `doc-contracts.json`; every other passage on `next` that is not true at the
+  release passes `ci`, so review each documentation change on `next` since the
+  previous pin against the release tag's source. Automation never edits those
+  passages. The owner branches from `next`, restores the released text for each
+  such passage, and corrects passages that are false at the release on both
+  branches. The owner then closes the release pull request, opens one from that
+  branch into `main` with the same title and squash-merges it once `ci` is
+  green. Last, `main` is merged into `next` by pull request with
+  `gh pr merge --merge`. Before that merge, apply to `next` the corrections
+  that are also true on `develop`; in the conflicts, `next` keeps its text, so
+  a correction applied only on `main` would be lost there. Confirm the
+  held-back text is still on `next`. A pull request's head branch cannot
+  change, hence the replacement; the workflow opens no further release pull
+  request while one exists in any state.
+- The Nightly workflow opens or updates the `docs-release-pending` issue when
+  core has published a release newer than the pin. It remains the backstop when the Release docs workflow cannot
+  open the pin pull request, and the owner then acts on it by hand with
+  `npm run docs:pin -- <tag>`.
+- Compatibility window: site code on `main` must read the pinned release's
+  `docs-data` and `doc-contracts.json`. Code on `next` must read both the pin
+  and the newest develop bundle until the next release is pinned.
+- Never edit pinned members by hand; `npm run docs:pin` writes them.
+- `docs:pin` fetches and verifies the certified bundle of the tag's commit, so
+  a tag whose commit has no such bundle cannot be pinned. Bundles expire after
+  90 days; when one is missing, dispatch core's `site-inputs.yml` with
+  `core_sha` set to the tag to rebuild it. `--from <dir>` pins a complete bundle
+  directory, for a release whose bundle the current verifier cannot read. It
+  checks the manifest fields and core commit, the digest of every member the
+  manifest lists, `attestations.json`, and online that `certified_by` is a core
+  trunk.yml push run on develop that succeeded for that commit; it fails closed
+  on an API error and refuses `candidate`. It skips only the member schema
+  validation.
+
 ## Deploys
 
-- `.github/workflows/deploy.yml` runs on a push to `main`, on a
-  `core-bundle` dispatch from core, and by hand with `mode` set to
-  `deploy`, `redeploy` (this site commit with the core bundle that is live, fetched
-  by the deployed receipt's `core_sha` and checked against its `bundle_digest`;
-  it fails when no receipt is deployed) or `rollback` (restore the
-  artifact of the receipt run named in `receipt_run_id`).
-- A `deploy` run whose resolved core bundle is behind the deployed one does
-  not fail. If the deployed receipt's `site_sha` is this run's commit, the
-  run is superseded: it logs a notice, skips the build and the `deploy` job
-  and reports nothing. Otherwise it deploys this site commit with the
-  deployed core bundle, fetched by `core_sha` and checked against the
-  receipt's `bundle_digest`. A diverged bundle, an unknown status or a failed
-  compare still fails; divergence is class `diverged-bundle`.
+- Deploy reference is in `deploy/README.md`: trigger modes, superseded and
+  diverged-bundle runs, post-deploy probe timing, download retries, failure
+  reports, the Nightly and Visual workflows and link-check internals.
+  Deliberate negative probes set `expected_rejection`; see it there.
 - The repository variable `SITE_DEPLOY_TARGET` decides what a run does.
   Unset, it resolves, builds and gates, then stops. `rehearsal` deploys to
   `SITE_ORIGIN` with every page marked `noindex`. `production` deploys
   benchbox.dev. Only the owner decides to set `production`.
-- Nothing deploys unless every gate passes: privacy, Explorer
-  compatibility, snapshot digest, links (within
-  `inventory/known-broken-links.json`) and origin. The privacy gate also
-  rejects a `*.plans.json` plans companion in the artifact that carries a
-  local filesystem path; `deploy/README.md` lists the rule and what it does
-  not cover.
-- The snapshot digest gate fails when the corpus is unchanged but the
-  snapshot contents differ from the deployed ones, for example after a core
-  pipeline change. After reviewing the change, the owner sets the repository
-  variable `SITE_SNAPSHOT_APPROVED_CHANGE` to the exact
-  `<deployed digest>-><candidate digest>` value that the failed gate prints,
-  and `SITE_SNAPSHOT_APPROVAL_REASON` to the reason, then reruns the deploy.
-  The approval matches only that pair. Clear both variables after the deploy.
-- Each deploy writes a receipt, uploads it with the artifact, and records
-  its digest on the GitHub Pages deployment. `npm run deploy -- deployed`
-  prints the current one. If the probes fail after a deploy, the run
-  dispatches at most one rollback to the last known good receipt.
-- A rollback does not stay in place by itself: the next deploy run that
-  passes the gates replaces it. To hold one, the owner rolls back while
-  `SITE_DEPLOY_TARGET` still matches the receipt's target, waits for that run
-  to finish, then clears the variable; the steps and resume are in
-  `deploy/README.md` under "Holding a rollback".
-- The post-deploy probe compares served bytes with the artifact and repeats
-  every ten seconds for at most eleven minutes of monotonic elapsed time,
-  which covers the ten-minute `max-age` of the served pages while Pages and
-  its CDN still answer with the previous generation. The final probe runs at
-  the deadline, and a mismatch still present then fails the run.
-- A failed run opens or updates a site-local `site-deploy-failed` issue.
-  Core-dispatched failures also relay to core under `site-bundle-undeployed`,
-  classified as producer-not-concluded, contract-version-mismatch,
-  snapshot-digest, probe-mismatch or infrastructure (including unknown errors).
-  Contract mismatches require updating the Explorer for the new contract.
-  The relay comments only when the latest reported class changes; a successful
-  deploy comments and closes only issues bearing that relay label.
-- Set the boolean `expected_rejection` manual input, or the
-  `client_payload.expected_rejection` dispatch field to `true`, for deliberate
-  negative probes such as wrong digests or runs before certification.
-  The explicit marker suppresses both local and core incident writes,
-  including success closure. Error text cannot set it. Unmarked failures
-  always report. This matches the core bundle reporter's `expected_rejection`
-  input; it does not bypass any deploy gate.
-- `npm run test:deploy` includes an isolated real-process `gh` stub smoke
-  covering class transitions, unchanged creation bodies, closure and markers.
-- Bundle fetch waits at most ten minutes of monotonic elapsed time for the
-  producer to complete successfully, including API calls; an unfinished success
-  conclusion does not bypass completion. Each poll request uses the remaining
-  deadline as its fetch timeout.
-- Bundle and receipt downloads share three attempts, with delays of 5 and
-  15 seconds. Only HTTP 5xx and network failures retry. Each attempt starts
-  with an empty temporary download directory; digest, provenance and deploy
-  gates remain outside the retry boundary. Retry delays add at most 20 seconds.
-- A failed run opens or updates an issue.
-- `.github/workflows/nightly-browser.yml` runs the Explorer `@smoke` suite on
-  Firefox and WebKit daily and on dispatch. A failure opens or updates the one
-  open issue labelled `t3:browser`.
-- The Visual comparison workflow screenshots a PR's build and the deployed
-  artifact and reports the differences. It is advisory: it is not part of
-  `ci` and never fails on a difference.
-- The Nightly workflow's `links` job checks external links in `blog/`, `docs/`
-  and the site pages, including their `#fragment` anchors, with `.lychee.toml`,
-  which carries the scoped ignore policy for flaky and login-gated hosts and
-  the fragment allowlist for anchors that JavaScript builds. It then checks the published
-  documentation: every `/docs/` page in the `SITE_ORIGIN` sitemap, with
-  fragments, for links to that origin (the scoped policy's own-origin exclusion
-  yields to the check's include pattern). `scripts/check-published-links.mjs` accepts the
-  failures whose target is in `inventory/known-broken-links.json` and fails on
-  any other. Either failure opens or updates the `broken-links` issue.
+- Nothing deploys unless every gate passes: privacy, Explorer compatibility,
+  snapshot digest, links (within `inventory/known-broken-links.json`) and
+  origin (`deploy/README.md`).
+- Only the owner approves a snapshot-digest change
+  (`SITE_SNAPSHOT_APPROVED_CHANGE`, `SITE_SNAPSHOT_APPROVAL_REASON`;
+  `deploy/README.md` "Snapshot digest"). Never set these variables yourself.
+- A rollback is replaced by the next passing deploy; to hold one, the owner
+  follows `deploy/README.md` "Holding a rollback".
+- A rollback reaches back 14 days, the retention of `site-artifact-<run>`.
+  `deploy/README.md` "Artifact retention" lists every reader of the deploy
+  artifacts and their retention.
 
 ## Core and this repository
 
 Core's data and pipeline changes reach this repository through the core
-bundle and need no action here: core's `site-inputs.yml` builds the
+bundle and need no action here, apart from pinning each release as described
+under "Release pin": core's `site-inputs.yml` builds the
 `site-inputs-<sha>` artifact after each successful push to `develop` and
 dispatches `core-bundle`, and the deploy fetches and verifies it.
 
@@ -224,12 +286,15 @@ Adaptations to keep:
 - Result summary pages under `/result-summaries/` are generated at site build
   time from the bundle's `explorer/results.duckdb`, through the Explorer's own
   queries and formatters (`website/src/lib/results-summary.ts`). Keep them out
-  of `/results/`, which belongs to the Explorer's client routes. A withdrawn
+  of `/results/`, which belongs to the Explorer's client routes, with one exception:
+  `/results/r/<public_result_id>` is a static page per published result, generated
+  by `website/src/pages/results/r/[id].html.ts` from the Explorer's own `index.html`,
+  which the Explorer replaces in the browser. A withdrawn
   result disappears from the pages and the search index on the next build
   because it is gone from the snapshot. See
   `docs/design/adr-results-summary-pages.md`.
 - The site serves no copies of core files. Documentation links to files
-  outside `docs/` point at GitHub, pinned to the bundle's `core_sha`. The
+  outside `docs/` point at GitHub, pinned to the docs inputs' `core_sha`. The
   Sphinx-era URLs `/docs/_downloads/<md5>/<name>`, and the `TPC_EULA.txt`
   sidecars beside TPC query templates, are a closed set recorded in
   `inventory/legacy-downloads.json`. Each is published, also under
@@ -243,16 +308,21 @@ Adaptations to keep:
 
 ## Changes
 
-- Work on a named branch and open a pull request to `main`. `main` accepts
-  squash merges only and requires the `ci` check.
+- Work on a named branch and open a pull request to `main` (fixes to released
+  documentation and everything that is not unreleased documentation) or to
+  `next` (unreleased documentation and blog posts), as described under "Release pin". `main`
+  accepts squash merges only and requires the `ci` check.
 - Stage files by explicit path. Never run `git add -A` or `git add .`.
 - Commit identity: `Joe Harris <joeharris76@gmail.com>`. Add no agent or
   co-author trailers.
 - Commit messages, pull request text and committed files state the durable
   reason for a change. Leave out tracker ids, plan or handoff references and
   run-local state such as CI counts.
-- Merge with `gh pr merge --squash` once `ci` is green. Auto-merge is turned
-  off for this repository.
+- Merge with `gh pr merge --squash` once `ci` is green: pull requests into
+  `main` are squash-merged, and so are pull requests into `next`, except the
+  one that merges `main` into `next`. Merge that one with
+  `gh pr merge --merge` so main's commits stay in next's history. Auto-merge
+  is turned off for this repository.
 
 ## Tracker
 
@@ -260,7 +330,8 @@ Adaptations to keep:
   `.tractable/config.json` binds the `tractable` MCP server that `.mcp.json`
   starts to that branch. The server runs on the developer's machine as
   `tractable-mcp` and is not part of the site build.
-- Use tractable 1.0.0 or later. Before the first tracker write in a session,
+- Use tractable 1.1.1 or later: the store holds registered batches, which
+  older clients refuse. Before the first tracker write in a session,
   confirm the bound store by passing `BenchBox-dev/benchbox-site` as
   `expect_store`. A server bound to core's tracker refuses it.
 - Work that needs changes in both repositories is tracked in core, with

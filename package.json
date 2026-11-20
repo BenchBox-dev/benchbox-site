@@ -13,6 +13,7 @@
   "scripts": {
     "bundle:fetch": "node scripts/bundle-fetch.mjs",
     "bundle:verify": "node scripts/bundle-verify.mjs",
+    "docs:pin": "node scripts/docs-pin.mjs",
     "build": "npm run build -w explorer && npm run build -w website",
     "check": "npm run typecheck -w explorer && npm run check -w website",
     "test": "node --test scripts/*.test.mjs && npm test -w explorer && npm test -w website",

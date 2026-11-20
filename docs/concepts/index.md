@@ -12,6 +12,7 @@ Conceptual documentation explaining BenchBox architecture, terminology, and desi
 
 - [Architecture](architecture.md) - System architecture and component overview
 - [Workflow](workflow.md) - Benchmark execution workflow and lifecycle
+- [Benchmark Methodology](benchmark-methodology.md) - How to run a sound benchmark and what a result supports
 - [Data Model](data-model.md) - Data structures and relationships
 - [Glossary](glossary.md) - Terms and definitions
 

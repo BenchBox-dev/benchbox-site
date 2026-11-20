@@ -297,10 +297,37 @@ everything else for manual review, per the recovery command's normal
 
 ### Mocker validation status
 
-Mocker is for local development on Apple silicon with macOS 26 only, never
-CI (CI runs `test-docker-*` on Ubuntu with Docker). The `questdb` and
+Mocker is for local development on Apple silicon, never CI (CI runs
+`test-docker-*` on Ubuntu with Docker). It is validated on macOS 26, and for
+the single-service ClickHouse server on macOS 27.0.1 (mocker 0.7.2, container
+CLI 1.1.0, ClickHouse 25.8.33.6) as described below. The `questdb` and
 `postgresql` lifecycles and the end-to-end `test-docker-questdb` target
 (load and query) work under mocker.
+
+#### ClickHouse server on macOS 27
+
+A TPC-H SF1 A/A calibration ran on a 16 GiB Apple silicon host under macOS
+27.0.1 with a 5.25 GiB container (`mocker run -m 5376m`; guest cgroup
+`memory.max` 5637144576, `oom_kill` 0 at start and end). Three identical
+`notuning` arms, all 22 queries, 9 interleaved rounds, seed 42, through
+`scripts.tuning_evidence`:
+
+| Comparison | Geometric mean ratio | 95% interval |
+|---|---|---|
+| B vs A | 1.0335 | 0.9276 to 1.1034 |
+| C vs A | 1.0213 | 0.9287 to 1.0997 |
+
+Both intervals contain 1.0, the point estimates are inside 0.95 to 1.05, and
+no answer differed between arms (Q13 returned 42 rows in all 27 timed
+executions). Q21 fails in every arm with a memory-limit error at this rung.
+
+The host load average was 8.6 to 12 during the timed rounds (other work on the
+same machine), and the median per-query interval half-width was 0.27, so this
+is a noisy calibration: it shows the Mocker path does not bias identical arms,
+not that differences smaller than about 10% are detectable on this host. Use
+`make heavy-run` for such cells and keep the guest `memory.max` and OOM counters
+with the evidence. Only single-service ClickHouse is covered; multi-service
+stacks stay unvalidated.
 
 Multi-service stacks are not validated. `docker/databend/docker-compose.yml`
 declares three services (`minio`, `minio-setup`, `databend`). Databend stays

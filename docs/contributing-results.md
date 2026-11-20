@@ -19,10 +19,29 @@ Install the platform extra first in your project environment (for example,
 `uv add benchbox --extra duckdb`).
 
 ```bash
-uv run -- benchbox run --platform duckdb --benchmark tpch --scale 0.01
+uv run -- benchbox run --platform duckdb --benchmark tpch --official --scale 1 --seed 42 \
+  --phases power,throughput --streams 2 --benchmark-option tpch_refresh_functions=true
 ```
 
 The result JSON is written to `benchmark_runs/results/`.
+
+`benchbox submit` refuses a TPC-H or TPC-DS result whose `compliance_class` is not
+`official`, and a default `benchbox run` never records `official`:
+
+- A run below scale factor 1 is `unofficial_subscale`, so `--scale 0.01` produces a
+  result that `submit` refuses.
+- A run at scale factor 1 or above is `unofficial_nonstandard` unless it came from
+  `benchbox run --official`, which needs an official scale factor and a `--seed`.
+  TPC-H official scale factors are 1, 10, 30, 100, 300, 1000, 3000, 10000, 30000
+  and 100000; TPC-DS has the same list without 30. `--official` also refuses a
+  partial run and a query subset. TPC-H needs the power and throughput phases, the
+  refresh functions and `--streams` of at least the minimum for the scale (2 at
+  scale factor 1, 3 at 10, 4 at 30, 5 at 100). TPC-DS needs the load, power,
+  throughput and maintenance phases and an even `--streams` of at least 4.
+
+Benchmarks without a TPC compliance class, such as SSB, are not subject to that
+check. See the [TPC-H official guide](guides/tpc/tpc-h-official-guide.md) for
+official runs.
 
 One optional companion file may be written next to the result JSON. Add
 `--capture-plans` on supported platforms to create `<result>.plans.json`;
@@ -76,7 +95,7 @@ uv run -- benchbox submit --last --output ./submission
 
 uv run -- benchbox results --paths --limit 25
 
-uv run -- benchbox submit benchmark_runs/results/tpch_sf001_duckdb_20260401_120000.json --output ./submission
+uv run -- benchbox submit benchmark_runs/results/tpch_sf1_duckdb_sql_<timestamp>_<id>.json --output ./submission
 
 uv run -- benchbox submit --last --dry-run
 ```
@@ -117,6 +136,16 @@ results: <benchmark> <platform> sf<scale>
 ```
 
 Example: `results: tpch DuckDB sf1.0`
+
+### Vendor conditions for cloud platforms
+
+A result from Snowflake, BigQuery, Redshift, Athena, Databricks, ClickHouse Cloud or
+MotherDuck is subject to that vendor's publishing terms. `benchbox submit` takes
+`--plan-tier`, `--preview-feature`, `--vendor-permission`, `--vendor-notice-date`,
+`--vendor-notice-ref` and `--self-run` to record them in the manifest, and refuses
+free-tier, trial and preview results without the vendor's permission. Follow the
+[vendor publishing checklist](vendor-publishing-checklist.md) for your
+platform before you open the pull request.
 
 ### 5. CI validation
 
@@ -175,6 +204,8 @@ complete results archive. It does not automatically enter `develop` or the
 curated static Explorer snapshot.
 
 ## What Makes a Good Submission
+
+The [Benchmark Methodology](concepts/benchmark-methodology.md) page gathers what a result at a given scale factor and iteration count supports.
 
 - **Complete benchmark suite** - run the full query set, not a cherry-picked subset
 - **Stable environment** - run on a dedicated machine or instance, not a shared laptop under load

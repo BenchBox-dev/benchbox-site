@@ -74,14 +74,16 @@ The denormalized table contains columns from all TPC-DS dimensions. The [column 
 
 ### Scale Factors
 
-Measured on DuckDB. The size is the Parquet output on disk.
+Rows are the rows of the generated table: one per store, catalog and web sale that TPC-DS generates at that scale
+factor. The sizes are unverified figures for the Parquet output on disk, from an earlier run that is not recorded;
+treat them as rough.
 
 | Scale Factor | Rows | Size (Parquet) |
 |--------------|------|----------------|
-| 0.01 | 50,335 | 14.5 MB |
-| 0.1 | 503,753 | 117 MB |
-| 1 | 5,041,336 | 1.38 GB |
-| 10 | 50,399,818 | 18.2 GB |
+| 0.01 | 50,335 | ~14.5 MB (unverified) |
+| 0.1 | 503,753 | ~117 MB (unverified) |
+| 1 | 5,041,336 | ~1.4 GB (unverified) |
+| 10 | 50,399,818 | ~18 GB (unverified) |
 
 The [SF1 calibrated sizes](sf1-calibrated-sizes.md) page reports 2,406,484,046 bytes for `tpcds_obt` at SF 1.
 That figure is an uncompressed total that includes the staged TPC-DS source, so it is larger than the Parquet

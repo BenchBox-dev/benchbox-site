@@ -2,7 +2,7 @@ import { HandlerRegistry } from "../registry.ts";
 import { alertSyntax } from "./alerts.ts";
 import { colonFenceSyntax } from "./colon-fence.ts";
 import { htmlCommentSyntax } from "./comments.ts";
-import { descriptionFrontMatter, holdFrontMatter, passthroughFrontMatter, tagsFrontMatter, titleFrontMatter } from "./front-matter.ts";
+import { descriptionFrontMatter, holdFrontMatter, passthroughFrontMatter, requiresReleaseFrontMatter, tagsFrontMatter, titleFrontMatter } from "./front-matter.ts";
 import { headingSyntax } from "./headings.ts";
 import { imageSyntax } from "./images.ts";
 import { linkSyntax } from "./links.ts";
@@ -24,6 +24,7 @@ export function createDefaultRegistry(): HandlerRegistry {
     .register(linkSyntax)
     .register(passthroughFrontMatter)
     .register(holdFrontMatter)
+    .register(requiresReleaseFrontMatter)
     .register(titleFrontMatter)
     .register(descriptionFrontMatter)
     .register(tagsFrontMatter);

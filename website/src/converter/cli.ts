@@ -4,7 +4,7 @@ import { fileURLToPath } from "node:url";
 import { assertBuilt, assertOwnedOutput, buildSite, clearOutput, loadKnownBrokenLinks, UnownedOutputError, writeOutput } from "./build.ts";
 import { ConversionFailedError, constructOf } from "./errors.ts";
 import { NAV_FILE } from "./nav.ts";
-import { assembleDocsSource, repoPath } from "../lib/site-inputs.ts";
+import { assembleDocsSource, repoPath, siteOrigin } from "../lib/site-inputs.ts";
 
 const websiteRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..", "..");
 
@@ -32,7 +32,7 @@ try {
 
 const knownBrokenLinks = loadKnownBrokenLinks(repoPath("inventory", "known-broken-links.json"));
 
-const result = buildSite({ docsRoot, knownBrokenLinks });
+const result = buildSite({ docsRoot, knownBrokenLinks, origin: siteOrigin() });
 
 try {
   assertBuilt(result);

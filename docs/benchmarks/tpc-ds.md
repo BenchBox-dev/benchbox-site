@@ -343,19 +343,21 @@ queries above, so don't compare those queries one for one with newer results.
 > Derived from TPC-DS. These results do not comply with the TPC-DS Specification and must not be compared with official TPC-DS results.
 
 BenchBox exports Power@Size and Throughput@Size when the `power` and `throughput`
-phases run successfully. Values are surfaced in the JSON results.
+phases run successfully. At scale factor 1 and above only an official run
+(`--official`) exports them; a non-official run records `summary.tpc_metrics` as
+suppressed. Values are surfaced in the JSON results.
 
 | Metric | Meaning | Source |
 |--------|---------|--------|
 | **Power@Size** | Single-stream power test throughput at the given scale factor | `power_at_size` - computed from the 99-query power stream |
 | **Throughput@Size** | Multi-stream throughput at the given scale factor, scored with `Q = 99 × S` queries | `throughput_at_size` - computed across parallel streams |
 
-BenchBox does not export QphDS@Size. The specification formula is
-`SF × Q / (T_PT × T_TT × T_DM × T_LD)^(1/4)` with `Q = 99 × S`, and it needs
-the data maintenance and load times. The geometric mean of Power@Size and
-Throughput@Size that BenchBox previously exported under this name is not
-that metric. Implementing the specification formula is tracked as follow-up
-work.
+An official TPC-DS run with the load, power, throughput and maintenance phases and
+an even `--streams` of at least 4 also exports `qphds_at_size`, the specification
+formula `SF × Q / (T_PT × T_TT × T_DM × T_LD)^(1/4)` with `Q = 99 × S`, rounded
+down to a whole number, with its terms in `qphds_terms`. When a condition is not
+met, `qphds_unavailable` lists why. See the
+[TPC-DS official guide](../guides/tpc/tpc-ds-official-guide.md#qphds-size).
 
 Implementation: `benchbox/core/tpcds/power_test.py` / `TPCMetricsCalculator` (computation).
 

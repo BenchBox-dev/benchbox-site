@@ -20,6 +20,16 @@ Run `npm run test:deploy` to check mismatch evidence, receipt serialization, and
 rollback behavior. `npm run deploy -- probe` writes `deploy-work/probe.json`;
 `npm run deploy -- receipt` includes that evidence in the deployment receipt.
 
+`npm run test:deploy` also runs an isolated real-process `gh` stub smoke test
+covering class transitions, unchanged creation bodies, closure and markers.
+
+## Documentation source
+
+Deploys build the documentation from the release pin in `release-pin/`, so a
+`core-bundle` dispatch no longer changes the published documentation; the
+Explorer, result summaries and deploy gates still use the newest bundle.
+Reverting a pin is a revert pull request on `main`.
+
 ## Plans companion privacy
 
 The privacy gate scans the built artifact. Besides secrets and credentials, it
@@ -54,11 +64,13 @@ when it was first deployed. The links allowance file is not read.
 ## Rolling back past the docs removal
 
 Core no longer ships `docs` or `downloads` bundle members, and this site
-verifies only bundle schemas 4 and 5. To return to pages from before the
+verifies only bundle schemas 4, 5 and 6. To return to pages from before the
 removal, dispatch a rollback with the `receipt_run_id` of a deploy from before
-it: the run restores that built artifact and needs no bundle. A rebuild from an
-older core revision does not restore them, because the site no longer reads
-those members, and schema 3 bundles are rejected.
+it: the run restores that built artifact and needs no bundle. The artifact
+exists only inside the rollback window (see "Artifact retention"), so a deploy
+from before the removal is out of reach once it is older than that window. A
+rebuild from an older core revision does not restore them, because the site no
+longer reads those members, and schema 3 bundles are rejected.
 
 ## Holding a rollback
 
@@ -89,6 +101,25 @@ variables.
 Unsetting the variable before step 2 completes leaves the rollback run
 without a `deploy` job, so nothing is restored.
 
+## Artifact retention
+
+The rollback window is 14 days: a rollback can restore any deploy whose run is
+at most 14 days old. Each deploy run uploads three artifacts, with these
+retentions and readers:
+
+| Artifact | Retention | Readers |
+| --- | --- | --- |
+| `site-artifact-<run>` (about 126 MB) | 14 days | `build` job, step "Restore the receipt's artifact": a rollback downloads the artifact of `receipt_run_id` with `gh run download`. `deploy` job: downloads its own run's artifact moments later. `visual.yml`, step "Download the deployed artifact": downloads the live generation's artifact on each pull request run. `rollback-decision` (the "Dispatch the rollback" step): the automatic rollback targets the previous live generation, whose artifact the rollback run then restores. |
+| `deploy-work-<run>` (about 2 KB) | 14 days | `deploy` job: downloads its own run's work files. A re-run of a failed `deploy` job reads it again, and that re-run also needs `site-artifact-<run>`, so a longer retention than the artifact's would serve no reader. Nothing else reads it; the files are also kept for triage of a failed run. |
+| `site-deploy-receipt-<run>` (under 1 KB) | 90 days | `downloadReceipt` in `deploy/lib/github.ts`, through `resolve`, `recheck`, `deployed` and the rollback lookup, in every `deploy.yml` and `visual.yml` run. Each run reads the receipt of the live generation, which is as old as the last successful deploy, so no run bounds how late it is read. It is kept at 90 days and is too small to matter for storage. |
+
+The live generation's artifact is read by `visual.yml` and by an automatic
+rollback, so both need a successful deploy within the last 14 days. Deploys in
+the 40 days before this window was set were never more than two days apart.
+The `build` job's and the `deploy` job's `npm ci` both run npm and both import
+`parse5` through `deploy/cli.ts`, so both keep the `setup-node` npm cache; the
+other jobs in `deploy.yml` do not restore it.
+
 ## Deployed-generation lookup
 
 `resolve`, `recheck` and the visual workflow find the deployed generation by
@@ -100,6 +131,10 @@ fails with `ReceiptLookupBoundError` instead of reporting nothing deployed.
 Each lookup logs `deploy lookup: <n> REST calls, <n> receipt loads`. API
 failures log the route, status, rate-limit headers and the first 200 characters
 of the message, and GET requests retry network errors twice.
+
+Each deploy writes a receipt, uploads it with the artifact, and records its
+digest on the GitHub Pages deployment. `npm run deploy -- deployed` prints the
+current one.
 
 ## Choosing the core bundle
 
@@ -125,6 +160,10 @@ the run's other jobs. It proceeds once that job has succeeded and the run lists
 an unexpired bundle artifact, and fails if the job failed or was cancelled, is
 absent from a completed run, or the artifact is missing.
 
+The wait uses monotonic elapsed time and covers the API calls; an unfinished
+success conclusion does not bypass completion. Each poll request uses the
+remaining deadline as its fetch timeout.
+
 ## Bundles behind the deployed one
 
 Core's site-inputs runs finish in the order Trunk finishes, not in commit
@@ -137,8 +176,8 @@ the candidate's and acts on the result:
   the run is superseded. It logs a notice naming both core commits, sets the
   build output `superseded=true`, skips the docs check, build, gates, artifact
   uploads and the `deploy` job, and concludes success. It opens no
-  site-deploy-failed comment and neither opens nor closes a core
-  site-bundle-undeployed issue.
+  site-deploy-failed comment, closes no site-deploy-failed issue, and neither
+  opens nor closes a core site-bundle-undeployed issue.
 - `behind` and this run's commit is not the deployed one: the run deploys
   this site commit with the deployed core bundle. It fetches the bundle by the
   receipt's `core_sha` and fails closed unless its digest equals the
@@ -147,6 +186,33 @@ the candidate's and acts on the result:
   reported. A diverged candidate has its own failure class, `diverged-bundle`.
 
 A `rollback` run does not compare and behaves as before.
+
+## Validator parity chain
+
+When the corpus differs from the deployed one, the bundle's `validator_parity`
+attestation must cover the change since the deployed core commit. `resolve`
+accepts a parity `base` equal to the deployed `core_sha`, and also a `base`
+that is a strict ancestor of it, provided the bundle's core commit is the
+deployed one or a descendant of it. The parity range `base..core` then contains
+`deployed..core`, so every bundle changed since the deployed commit was
+validated. A producer that read an older deployed commit because the previous
+site deploy had not started yet therefore no longer blocks the chain.
+
+Both ancestry facts come from the core compare API with the run's token
+(`base...deployed` must be `ahead`; `deployed...core` must be `ahead` or
+`identical`). A base that is not an ancestor, a bundle core that is not a
+descendant, a failed compare or an unreadable status refuses the run, and the
+message names the recovery: dispatch core `site-inputs.yml` with
+`parent_core_sha` set to the deployed `core_sha`.
+
+## Deploy triggers
+
+`.github/workflows/deploy.yml` runs on a push to `main`, on a `core-bundle`
+dispatch from core, and by hand with `mode` set to `deploy`, `redeploy` (this
+site commit with the core bundle that is live, fetched by the deployed
+receipt's `core_sha` and checked against its `bundle_digest`; it fails when no
+receipt is deployed; see "Redeploy") or `rollback` (restore the artifact of
+the receipt run named in `receipt_run_id`).
 
 ## Redeploy
 
@@ -157,6 +223,76 @@ carries that `core_sha` and its digest equals the receipt's `bundle_digest`.
 It never picks the newest bundle and runs no freshness compare. With no
 receipt deployed for the target it fails with "redeploy needs a deployed
 receipt".
+
+## Post-deploy probe timing
+
+The post-deploy probe compares served bytes with the artifact and repeats
+every ten seconds for at most eleven minutes of monotonic elapsed time, which
+covers the ten-minute `max-age` of the served pages while Pages and its CDN
+still answer with the previous generation. The final probe runs at the
+deadline, and a mismatch still present then fails the run. If the probes fail
+after a deploy, the run dispatches at most one rollback to the last known good
+receipt.
+
+The probe also covers `/llms.txt` and the Markdown copies of the documentation
+pages under `/docs/`: `/llms.txt` joins the manifest when the artifact has it
+(an older artifact restored by a rollback has none), `.md` files are among the
+sampled files, and both must be served as `text/plain` or `text/markdown`.
+`scripts/probe-routes.mjs`, which the nightly availability check runs, requires
+`/llms.txt` and `/docs/usage/installation.md` to answer 200 with those types.
+
+## Failure reports
+
+A failed run opens or updates a site-local `site-deploy-failed` issue, and a
+later run that actually deploys successfully comments on it with the run URL
+and the deployed core and site commits, then closes every open issue bearing
+that label. A superseded run, a run with `SITE_DEPLOY_TARGET` unset and an
+`expected_rejection` run neither open nor close it. A rollback does not close
+it; the next successful deploy does.
+Core-dispatched failures also relay to core under `site-bundle-undeployed`,
+classified as producer-not-concluded, contract-version-mismatch,
+snapshot-digest, probe-mismatch or infrastructure (including unknown errors).
+Contract mismatches require updating the Explorer for the new contract. The
+relay comments only when the latest reported class changes; a successful
+deploy comments and closes only issues bearing that relay label.
+
+Set the boolean `expected_rejection` manual input, or the
+`client_payload.expected_rejection` dispatch field to `true`, for deliberate
+negative probes such as wrong digests or runs before certification. The
+explicit marker suppresses both local and core incident writes, including
+success closure. Error text cannot set it. Unmarked failures always report.
+This matches the core bundle reporter's `expected_rejection` input; it does
+not bypass any deploy gate.
+
+## Download retries
+
+Bundle and receipt downloads share three attempts, with delays of 5 and 15
+seconds. Only HTTP 5xx and network failures retry. Each attempt starts with an
+empty temporary download directory; digest, provenance and deploy gates remain
+outside the retry boundary. Retry delays add at most 20 seconds.
+
+## Other workflows
+
+`.github/workflows/nightly-browser.yml` runs the Explorer `@smoke` suite on
+Firefox and WebKit daily and on dispatch. A failure opens or updates the one
+open issue labelled `t3:browser`.
+
+The Visual comparison workflow screenshots a PR's build and the deployed
+artifact and reports the differences. It is advisory: it is not part of `ci`
+and never fails on a difference.
+
+## Link checks
+
+The Nightly workflow's `links` job checks external links in `blog/`, `docs/`
+and the site pages, including their `#fragment` anchors, with `.lychee.toml`,
+which carries the scoped ignore policy for flaky and login-gated hosts and the
+fragment allowlist for anchors that JavaScript builds. It then checks the
+published documentation: every `/docs/` page in the `SITE_ORIGIN` sitemap,
+with fragments, for links to that origin (the scoped policy's own-origin
+exclusion yields to the check's include pattern).
+`scripts/check-published-links.mjs` accepts the failures whose target is in
+`inventory/known-broken-links.json` and fails on any other. Either failure
+opens or updates the `broken-links` issue.
 
 ## Retrying a Pages-side failure
 

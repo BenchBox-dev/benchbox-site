@@ -10,7 +10,7 @@ import { siteInputsPath } from "@/test/siteInputs";
 const EXPECTED_EXPLORER_BUILD_COMMAND =
   "uv run -- python _project/scripts/explorer_publish.py build";
 const MINIMUM_READ_MODEL_VERSION = 17;
-const LATEST_READ_MODEL_VERSION = 18;
+const LATEST_READ_MODEL_VERSION = 20;
 const NEWER_READ_MODEL_POLICY = "warn-and-continue";
 
 type SnapshotConnection = Parameters<typeof _verifyReadModelVersionForTest>[0];

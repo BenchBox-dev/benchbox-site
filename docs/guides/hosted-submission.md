@@ -10,11 +10,18 @@ BenchBox results platform.
 ## 1. Run A Benchmark
 
 ```bash
-uv run -- benchbox run --platform duckdb --benchmark tpch --scale 0.01 --non-interactive
+uv run -- benchbox run --platform duckdb --benchmark tpch --official --scale 1 --seed 42 \
+  --phases power,throughput --streams 2 --benchmark-option tpch_refresh_functions=true \
+  --non-interactive
 ```
 
 BenchBox writes the result JSON under `benchmark_runs/results/`. If query plans
 or tuning were captured, companion files sit beside the primary result.
+
+`benchbox submit` refuses a TPC-H or TPC-DS result that is not `official`, which
+includes every run below scale factor 1, so `--benchmark tpch --scale 0.01` cannot
+be submitted. See [Contributing Results](../contributing-results.md#run-a-benchmark)
+for what an official TPC run needs.
 
 ## 2. Check The Result
 

@@ -57,8 +57,8 @@ async function withRun(run, body) {
   }
 }
 
-test("a candidate schema 4 or 5 bundle never passes online certification and never contacts the API", async () => {
-  for (const schema of [4, 5]) {
+test("a candidate schema 4, 5 or 6 bundle never passes online certification and never contacts the API", async () => {
+  for (const schema of [4, 5, 6]) {
     const dir = fixtureBundle({ schema });
     await withRun(trunkRun(), async (routes) => {
       const result = await verifyWithCertification(dir);
@@ -70,8 +70,8 @@ test("a candidate schema 4 or 5 bundle never passes online certification and nev
   }
 });
 
-test("a schema 4 or 5 bundle certified by a trunk run id passes online certification", async () => {
-  for (const schema of [4, 5]) {
+test("a schema 4, 5 or 6 bundle certified by a trunk run id passes online certification", async () => {
+  for (const schema of [4, 5, 6]) {
     const dir = fixtureBundle({ schema, certifiedBy: "40239821240" });
     await withRun(trunkRun(), async (routes) => {
       const result = await verifyWithCertification(dir);
@@ -82,8 +82,8 @@ test("a schema 4 or 5 bundle certified by a trunk run id passes online certifica
   }
 });
 
-test("a certified schema 4 or 5 bundle is refused when its run is not a green trunk push on the bundle commit", async () => {
-  for (const schema of [4, 5]) {
+test("a certified schema 4, 5 or 6 bundle is refused when its run is not a green trunk push on the bundle commit", async () => {
+  for (const schema of [4, 5, 6]) {
     for (const overrides of [{ conclusion: "failure" }, { head_sha: "0".repeat(40) }, { head_branch: "main" }, { path: ".github/workflows/ci.yml" }]) {
       const dir = fixtureBundle({ schema, certifiedBy: "40239821240" });
       await withRun(trunkRun(overrides), async () => {
@@ -95,8 +95,8 @@ test("a certified schema 4 or 5 bundle is refused when its run is not a green tr
   }
 });
 
-test("an API failure fails a certified schema 4 or 5 bundle closed", async () => {
-  for (const schema of [4, 5]) {
+test("an API failure fails a certified schema 4, 5 or 6 bundle closed", async () => {
+  for (const schema of [4, 5, 6]) {
     const dir = fixtureBundle({ schema, certifiedBy: "40239821240" });
     const original = globalThis.fetch;
     globalThis.fetch = async () => ({ ok: false, status: 503, json: async () => ({}) });

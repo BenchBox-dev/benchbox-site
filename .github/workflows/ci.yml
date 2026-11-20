@@ -3,7 +3,7 @@ name: CI
 on:
   pull_request:
   push:
-    branches: [main]
+    branches: [main, next]
   workflow_dispatch:
 
 permissions:
@@ -16,6 +16,7 @@ concurrency:
 env:
   SITE_INPUTS: ${{ github.workspace }}/.site-inputs
   CORE_REPO: ${{ vars.CORE_REPO || 'BenchBox-dev/BenchBox' }}
+  DOCS_INPUTS: ${{ (github.base_ref == 'next' || github.ref == 'refs/heads/next') && format('{0}/.site-inputs', github.workspace) || '' }}
 
 jobs:
   bundle:
@@ -80,8 +81,15 @@ jobs:
       - run: npm run lint:blog
       - run: npm run lint:docs
       - run: npm run bundle:verify -- --offline
-      - name: Check the site documentation against the bundle's contracts
+      - name: Check that the release pin is a published release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: npm run docs:pin -- --check
+      - name: Check the site documentation against the docs inputs' contracts
         run: npm run docs:check -- --docs-mode block
+      - name: Assemble the authored documentation against the pin
+        if: env.DOCS_INPUTS != ''
+        run: DOCS_INPUTS= npm run docs:assemble -w website
       - name: Check the inventory of core paths that the documentation links to
         run: npm run inventory:core-links -w website -- --check
       - run: npm run typecheck -w explorer
@@ -164,6 +172,7 @@ jobs:
       - run: npm run verify:parity -w website
       - run: npm run verify:not-found -w website
       - run: npm run verify:explorer -w website
+      - run: npm run verify:permalink -w website
       - run: npm run verify:results-embed -w website
       - run: npm run verify:landing -w website
       - name: Check the Pages-shaped Explorer routes against the built site
@@ -202,7 +211,7 @@ jobs:
     timeout-minutes: 5
     strategy:
       matrix:
-        schema: [4, 5]
+        schema: [4, 5, 6]
     steps:
       - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09
       - uses: actions/setup-node@a0853c24544627f65ddf259abe73b1d18a591444

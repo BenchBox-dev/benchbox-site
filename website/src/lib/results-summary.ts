@@ -3,12 +3,14 @@ import { readFileSync } from "node:fs";
 import { buildSectionEntries, indexedResults, sectionEntryHref, type SectionEntry } from "@/lib/corpusSummary";
 import { formatScaleFactor, formatScoreMetric } from "@/lib/metricFormatters";
 import { canonicalBenchmarkSlug, canonicalPhase, formatBenchmarkLabel, formatPhaseWithStreams } from "@/lib/displayLabels";
-import { formatTimingExclusion, normalizePrimaryMetric, phaseScoreValue, primaryMetricLabel, primaryMetricValue } from "@/lib/displayEligibility";
+import { formatTimingExclusion, normalizePrimaryMetric, phaseScoreValue, primaryMetricLabel, primaryMetricValue, type PrimaryMetric } from "@/lib/displayEligibility";
 import { getBenchmarkRanking, listResults, type BenchmarkRankingRow, type ResultRow } from "@/lib/duckdbQueries";
 import { resultReceiptHref } from "@/lib/resultLinks";
+import { buildReceipts, type ResultReceipt } from "./result-receipts.ts";
 import { platformVersionDisplay } from "@/lib/versionLabel";
 import { fmtGeomean } from "@/utils";
 import { closeResultsSnapshot, openResultsSnapshot, queryRows } from "./results-db.ts";
+import { runContext, scoreDefinitions, type RunContext, type ScoreDefinition } from "./result-context.ts";
 import { bundleManifest, siteInputsPath } from "./site-inputs.ts";
 
 export const SUMMARY_ROOT = "/result-summaries";
@@ -25,7 +27,8 @@ export interface SnapshotIdentity {
   resultCount: number;
 }
 
-export interface RunLine {
+export interface RunLine extends RunContext {
+  metric: PrimaryMetric;
   resultId: string;
   benchmarkId: string;
   benchmarkLabel: string;
@@ -36,11 +39,13 @@ export interface RunLine {
   metricLabel: string;
   score: string;
   geomean: string;
+  ranked: boolean;
   rankingStatus: string;
   receiptHref: string;
 }
 
-export interface RankingLine {
+export interface RankingLine extends RunContext {
+  metric: PrimaryMetric;
   rank: number | null;
   platformId: string;
   platformLabel: string;
@@ -57,7 +62,12 @@ export interface BenchmarkCohort {
   scale: string;
   phase: string;
   metricLabel: string;
-  ranking: RankingLine[];
+  ranked: RankingLine[];
+}
+
+export interface ExcludedRankingLine extends RankingLine {
+  scale: string;
+  phase: string;
 }
 
 export interface Neighbor {
@@ -75,7 +85,9 @@ export interface PlatformPage {
   resultCount: number;
   latestRun: string;
   benchmarks: Neighbor[];
-  runs: RunLine[];
+  ranked: RunLine[];
+  excluded: RunLine[];
+  scoreDefinitions: ScoreDefinition[];
 }
 
 export interface BenchmarkPage {
@@ -87,6 +99,8 @@ export interface BenchmarkPage {
   latestRun: string;
   platforms: Neighbor[];
   cohorts: BenchmarkCohort[];
+  excluded: ExcludedRankingLine[];
+  scoreDefinitions: ScoreDefinition[];
 }
 
 export interface ResultsSummary {
@@ -95,7 +109,17 @@ export interface ResultsSummary {
   benchmarks: BenchmarkPage[];
 }
 
+export interface PublishedResults extends ResultsSummary {
+  receipts: ResultReceipt[];
+}
+
 export type RankingSource = (benchmark: string, scaleFactor: number, phase: string, streamCount: number | null) => Promise<BenchmarkRankingRow[]>;
+
+export function reasonCounts(reasons: readonly string[]): { reason: string; count: number }[] {
+  const counts: Record<string, number> = {};
+  for (const reason of reasons) counts[reason] = (counts[reason] ?? 0) + 1;
+  return Object.entries(counts).map(([reason, count]) => ({ reason, count }));
+}
 
 export function summaryHref(kind: "platforms" | "benchmarks", id: string): string {
   if (!ID_PATTERN.test(id)) throw new Error(`result summary id is not a safe path segment: ${JSON.stringify(id)}`);
@@ -107,6 +131,8 @@ function runLine(row: ResultRow): RunLine {
   const metric = phase === "throughput" ? "throughput_at_size" : "power_score";
   const benchmarkId = canonicalBenchmarkSlug(row.benchmark);
   return {
+    ...runContext(row),
+    metric,
     resultId: row.result_id,
     benchmarkId,
     benchmarkLabel: formatBenchmarkLabel(benchmarkId),
@@ -117,15 +143,18 @@ function runLine(row: ResultRow): RunLine {
     metricLabel: primaryMetricLabel(metric),
     score: formatScoreMetric(metric, phaseScoreValue(row)),
     geomean: fmtGeomean(row.display_geomean_ms),
+    ranked: row.ranking_exclusion_reason === null,
     rankingStatus: row.ranking_exclusion_reason === null ? "Ranked" : formatTimingExclusion(row.ranking_exclusion_reason),
     receiptHref: resultReceiptHref(row),
   };
 }
 
-function rankingLine(row: BenchmarkRankingRow): RankingLine {
+function rankingLine(row: BenchmarkRankingRow, context: ResultRow | undefined): RankingLine {
   const metric = normalizePrimaryMetric(row.primary_metric);
   const value = primaryMetricValue(row, metric);
   return {
+    ...runContext({ ...row, ...context, trust_label: row.trust_label, tuning_mode: row.tuning_mode }),
+    metric,
     rank: row.rank,
     platformId: row.platform_id,
     platformLabel: row.platform,
@@ -176,6 +205,7 @@ export async function buildResultsSummary(
 
   const platforms = platformEntries.map((entry: SectionEntry): PlatformPage => {
     const own = rows.filter((row) => row.platform_id === entry.id);
+    const runs = own.map(runLine).sort(byRunOrder);
     return {
       id: entry.id,
       label: entry.label,
@@ -184,25 +214,29 @@ export async function buildResultsSummary(
       resultCount: entry.resultCount,
       latestRun: entry.latestRun,
       benchmarks: neighbors(own, "benchmarks", (row) => canonicalBenchmarkSlug(row.benchmark), (row) => formatBenchmarkLabel(canonicalBenchmarkSlug(row.benchmark))),
-      runs: own.map(runLine).sort(byRunOrder),
+      ranked: runs.filter((run) => run.ranked),
+      excluded: runs.filter((run) => !run.ranked),
+      scoreDefinitions: scoreDefinitions(runs.map((run) => run.metric)),
     };
   });
 
   const benchmarks: BenchmarkPage[] = [];
   for (const entry of benchmarkEntries) {
     const own = rows.filter((row) => canonicalBenchmarkSlug(row.benchmark) === entry.id);
-    const admitted = new Set(own.map((row) => row.result_id));
+    const admitted = new Map(own.map((row) => [row.result_id, row]));
     const cohorts: BenchmarkCohort[] = [];
+    const excluded: ExcludedRankingLine[] = [];
     for (const cohort of cohortsOf(own)) {
-      const ranked = (await ranking(entry.id, cohort.scaleFactor, cohort.phase, cohort.streamCount)).filter((row) => admitted.has(row.result_id));
+      const lines = (await ranking(entry.id, cohort.scaleFactor, cohort.phase, cohort.streamCount)).filter((row) => admitted.has(row.result_id));
+      if (lines.length === 0) continue;
+      const scale = formatScaleFactor(cohort.scaleFactor);
+      const phase = formatPhaseWithStreams(cohort.phase, cohort.streamCount);
+      const rendered = lines.map((line) => rankingLine(line, admitted.get(line.result_id)));
+      excluded.push(...rendered.filter((line) => line.exclusion !== null).map((line) => ({ ...line, scale, phase })));
+      const ranked = rendered.filter((line) => line.exclusion === null);
       if (ranked.length === 0) continue;
-      const metric = normalizePrimaryMetric(ranked[0]!.primary_metric);
-      cohorts.push({
-        scale: formatScaleFactor(cohort.scaleFactor),
-        phase: formatPhaseWithStreams(cohort.phase, cohort.streamCount),
-        metricLabel: primaryMetricLabel(metric),
-        ranking: ranked.map(rankingLine),
-      });
+      const metric = normalizePrimaryMetric(lines[0]!.primary_metric);
+      cohorts.push({ scale, phase, metricLabel: primaryMetricLabel(metric), ranked });
     }
     benchmarks.push({
       id: entry.id,
@@ -213,6 +247,8 @@ export async function buildResultsSummary(
       latestRun: entry.latestRun,
       platforms: neighbors(own, "platforms", (row) => row.platform_id, (row) => row.platform),
       cohorts,
+      excluded,
+      scoreDefinitions: scoreDefinitions([...cohorts.flatMap((cohort) => cohort.ranked), ...excluded].map((line) => line.metric)),
     });
   }
 
@@ -231,23 +267,28 @@ export function fileSha256(file: string): string {
   return createHash("sha256").update(readFileSync(file)).digest("hex");
 }
 
-let loaded: Promise<ResultsSummary> | undefined;
+let loaded: Promise<PublishedResults> | undefined;
 
-export function loadResultsSummary(): Promise<ResultsSummary> {
+export function loadResultsSummary(): Promise<PublishedResults> {
   loaded ??= (async () => {
     const file = snapshotFile();
     await openResultsSnapshot(file);
     try {
       const manifest = bundleManifest();
       const [{ read_model_version: readModelVersion }] = await queryRows<{ read_model_version: number }>("SELECT read_model_version FROM bench.metadata");
-      return await buildResultsSummary(await listResults(), getBenchmarkRanking, {
+      const snapshotSha256 = fileSha256(file);
+      if (!manifest.produced_at) throw new Error("The core bundle manifest has no produced_at, so the result pages cannot state a snapshot date.");
+      const results = await listResults(undefined, { includeHardware: true });
+      const summary = await buildResultsSummary(results, getBenchmarkRanking, {
         coreSha: manifest.core_sha,
         corpusSha: manifest.corpus_sha,
         packageVersion: manifest.package_version,
-        producedAt: manifest.produced_at ?? null,
-        snapshotSha256: fileSha256(file),
+        producedAt: manifest.produced_at,
+        snapshotSha256,
         readModelVersion,
       });
+      const receipts = await buildReceipts(indexedResults(results), { snapshotSha256, snapshotDate: manifest.produced_at.slice(0, 10) });
+      return { ...summary, receipts };
     } finally {
       closeResultsSnapshot();
     }

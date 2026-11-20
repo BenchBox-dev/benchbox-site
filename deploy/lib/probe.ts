@@ -5,8 +5,11 @@ import { filesUnder } from "../gates/files.ts";
 import type { ProbeMismatch } from "./receipt.ts";
 
 export const ROUTE_ROOTS = ["index.html", "docs/index.html", "docs/dev/index.html", "blog/index.html", "results/index.html", "404.html"];
+export const OPTIONAL_PATHS = ["schemas/result-bundle-2.schema.json", "llms.txt"];
 export const REQUIRED_PATHS = [...ROUTE_ROOTS, "results/data/results.duckdb"];
-const SAMPLED = /\.(html|css|js|svg|json|xml)$/;
+const SAMPLED = /\.(html|css|js|svg|json|xml|md)$/;
+const TEXT_URL = /^\/llms\.txt$|^\/docs\/.+\.md$/;
+const TEXT_TYPE = /^text\/(plain|markdown)/i;
 export const DEEP_LINK = "/results/__site_deploy_probe__/deep/link";
 const LEGACY_DOWNLOAD_PAGE = /^docs\/_downloads\/[0-9a-f]{32}\/([^/]+)\/index\.html$/;
 const LEGACY_DOWNLOAD_URL = /^\/docs\/_downloads\/[0-9a-f]{32}\/[^/]+$/;
@@ -36,9 +39,11 @@ export function checksumManifest(siteDir: string, samples = 25): Record<string, 
   if (missing.length > 0) throw new Error(`the artifact does not serve required probe paths: ${missing.join(", ")}`);
   const manifest: Record<string, string> = {};
   for (const file of REQUIRED_PATHS) manifest[servedUrl(file)] = sha(file);
-  const candidates = filesUnder(siteDir).filter((file) => SAMPLED.test(file) && !REQUIRED_PATHS.includes(file));
+  for (const file of OPTIONAL_PATHS) if (existsSync(path.join(siteDir, file))) manifest[servedUrl(file)] = sha(file);
+  const fixed = Object.keys(manifest).length;
+  const candidates = filesUnder(siteDir).filter((file) => SAMPLED.test(file) && !REQUIRED_PATHS.includes(file) && !OPTIONAL_PATHS.includes(file));
   const stride = Math.max(1, Math.floor(candidates.length / samples));
-  for (let index = 0; index < candidates.length && Object.keys(manifest).length < REQUIRED_PATHS.length + samples; index += stride) {
+  for (let index = 0; index < candidates.length && Object.keys(manifest).length < fixed + samples; index += stride) {
     manifest[servedUrl(candidates[index])] = sha(candidates[index]);
   }
   for (const file of legacyDownloadSamples(filesUnder(siteDir))) manifest[legacyDownloadUrl(file)] = sha(file);
@@ -84,6 +89,10 @@ export async function probeOnce(baseUrl: string, manifest: Record<string, string
       }
       if (LEGACY_DOWNLOAD_URL.test(url) && !(headers["content-type"] ?? "").toLowerCase().startsWith("text/html")) {
         errors.push(`${url}: content type ${headers["content-type"] ?? "missing"} is not text/html`);
+        continue;
+      }
+      if (TEXT_URL.test(url) && !TEXT_TYPE.test(headers["content-type"] ?? "")) {
+        errors.push(`${url}: content type ${headers["content-type"] ?? "missing"} is not text/plain or text/markdown`);
         continue;
       }
       const actual = createHash("sha256").update(body).digest("hex");

@@ -13,10 +13,11 @@ import { explorerAliases, explorerDatabasePlugin } from "./src/lib/explorer-alia
 import { renderRobots, renderSitemap, sitemapPathForFile } from "./src/lib/page-meta.ts";
 import { legacyRedirects, loadLegacyDownloads, publishLegacyImages, publishLegacyRedirects, REDIRECT_PAGES, type LegacyFiles } from "./src/lib/legacy-assets.ts";
 import { docutilsQuotes, SMARTYPANTS } from "./src/lib/smartypants.ts";
+import { publishResultSchema } from "./src/lib/result-schema.ts";
 import { assertMountedSnapshotMatchesBundle } from "./src/lib/snapshot-mount.ts";
 import { treeDigest } from "./src/lib/tree-digest.ts";
 import { headingIds } from "./src/plugins/heading-ids.ts";
-import { explorerSnapshotSha, siteHost, siteOrigin } from "./src/lib/site-inputs.ts";
+import { explorerSnapshotSha, requireSiteInputs, siteHost, siteOrigin } from "./src/lib/site-inputs.ts";
 
 const repoRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 
@@ -61,11 +62,13 @@ const publishStatic = (): AstroIntegration => ({
       const out = fileURLToPath(dir);
       const explorerDist = path.join(repoRoot, "explorer", "dist");
       if (!existsSync(explorerDist)) throw new Error(`Results Explorer build is missing: ${explorerDist}`);
+      if (existsSync(path.join(explorerDist, "r"))) throw new Error("The Results Explorer build has an r directory, which belongs to the result permalink pages");
       const sourceDigest = treeDigest(explorerDist);
       cpSync(explorerDist, path.join(out, "results"), { recursive: true });
-      const mountedDigest = treeDigest(path.join(out, "results")).sha256;
+      const mountedDigest = treeDigest(path.join(out, "results"), ["r"]).sha256;
       if (mountedDigest !== sourceDigest.sha256) throw new Error(`Results Explorer was altered while mounting: ${sourceDigest.sha256} became ${mountedDigest}`);
       assertMountedSnapshotMatchesBundle(out);
+      publishResultSchema(requireSiteInputs(), out);
       cpSync(path.join(repoRoot, "landing", "hero.png"), path.join(out, "hero.png"));
       const images = path.join(repoRoot, "blog", "images");
       mkdirSync(path.join(out, "_images"), { recursive: true });

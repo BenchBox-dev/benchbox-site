@@ -35,21 +35,43 @@ The TPC-DI schema models a financial services data warehouse with dimension tabl
 |-------|---------|----------|-------------------------|
 | **DimCustomer** | Customer master data | Type 2 | 5,000 |
 | **DimAccount** | Customer trading accounts | Type 2 | 5,000 |
-| **DimSecurity** | Financial instruments/stocks | Type 2 | 6,850 |
-| **DimCompany** | Public companies | Type 2 | 5,000 |
+| **DimSecurity** | Financial instruments/stocks | Type 2 | 800 |
+| **DimCompany** | Public companies | Type 2 | 500 |
 | **DimBroker** | Financial brokers | Type 1 | 100 |
-| **DimDate** | Calendar dimension | None | 2,557 |
-| **DimTime** | Time of day dimension | None | 86,400 |
+| **DimDate** | Calendar dimension | None | 5,844 |
+| **DimTime** | Time of day dimension | None | 288 |
 
 ### Fact Tables
 
-| Table | Purpose | Approximate Rows (SF 1) |
-|-------|---------|-------------------------|
-| **FactTrade** | Trading transactions | 230,000 |
-| **FactCashBalances** | Account cash positions | 46,000 |
-| **FactHoldings** | Security holdings | 460,000 |
-| **FactMarketHistory** | Daily security prices | 1,095,000 |
-| **FactWatches** | Customer watch lists | 11,500 |
+| Table | Purpose | Rows (SF 1) |
+|-------|---------|-------------|
+| **FactTrade** | Trading transactions | 130,000 |
+| **FactCashBalances** | Account cash positions | 120,300 |
+| **FactHoldings** | Security holdings | 120,470 |
+| **FactMarketHistory** | Daily security prices | 541,550 |
+| **FactWatches** | Customer watch lists | 300,000 |
+
+The five fact tables and the customer, account, security and company dimensions grow linearly with the scale
+factor. DimDate and DimTime have the same size at every scale factor. DimBroker has 100 rows up to scale
+factor 2 and then grows (`max(100, int(50 * scale factor))` rows), while FactTrade still draws broker ids from 1
+to 100.
+
+#### How the row counts relate to the TPC-DI specification
+
+One scale-factor unit is 5,000 customers, as in the specification. Companies (500 per unit) and securities (800
+per unit) use the official data generator's settings. The fact tables use the specification's historical-load
+source-file row factors: 130,000 trades, 120,300 cash transactions, 120,470 holding-history rows, 541,550
+daily-market rows and 300,000 watch-history rows per unit.
+
+BenchBox differs from the specification in these ways:
+
+- It writes the warehouse tables directly; it does not produce the official generator's source files, so a
+  warehouse table has the row count of its source file. In the specification, FactCashBalances and FactWatches
+  hold fewer rows than their source files.
+- It generates one account per customer. The official generator derives accounts from customer-management
+  actions, so its account count can differ.
+- DimBroker, DimDate, DimTime and the reference tables (Industry, StatusType, TaxRate, TradeType) are smaller
+  than the specification's.
 
 ### Key Schema Features
 
@@ -409,17 +431,19 @@ This enables parallel ETL with 4 workers.
 
 ### Scale Factor Guidelines
 
-| Scale Factor | Data Warehouse Size | ETL Complexity | Use Case |
+| Scale Factor | Generated Data Size | ETL Complexity | Use Case |
 |-------------|---------------------|----------------|----------|
-| 0.1 | ~10 MB | Simple | Development, unit testing |
-| 1.0 | ~100 MB | Standard | Integration testing |
-| 3.0 | ~300 MB | Enhanced | Performance testing |
-| 10.0 | ~1 GB | Complex | Stress testing |
-| 30.0+ | ~3+ GB | Production-like | Enterprise simulation |
+| 0.01 | ~1 MB (estimate) | Simple | Development, unit testing |
+| 0.1 | ~8 MB (estimate) | Simple | Integration testing |
+| 1.0 | ~76 MB | Standard | Standard benchmark |
+| 10.0 | ~760 MB (estimate) | Complex | Stress testing |
+| 30.0+ | ~2.3+ GB (estimate) | Production-like | Enterprise simulation |
 
-Four fact tables stop growing at fixed row caps: FactCashBalances at 100,000 rows, FactHoldings at 50,000,
-FactMarketHistory at 100,000 and FactWatches at 25,000. At large scale factors the data size therefore grows
-more slowly than the table suggests.
+The 1.0 size is measured: 76,020,843 bytes of uncompressed generated files. The other sizes are estimates that scale
+it in proportion and have not been measured. DimDate, DimTime, the reference tables and, below scale factor 2,
+DimBroker do not grow with the scale factor, so the real size at 0.01 and 0.1 is larger than the estimate. The
+standard scale factors for TPC-DI are 0.01, 0.1, 1 and 10. Other values, such as 30, run with a note that their
+results are not comparable with published results; see [Scale factors](index.md#scale-factors).
 
 ### ETL Configuration
 

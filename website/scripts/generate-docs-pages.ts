@@ -3,7 +3,7 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { loadDocsData } from "../src/lib/docs-generators/docs-data.ts";
 import { generateDocsPages } from "../src/lib/docs-generators/generate.ts";
-import { siteInputsPath } from "../src/lib/site-inputs.ts";
+import { docsInputsRoot } from "../src/lib/site-inputs.ts";
 
 const websiteRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 
@@ -12,7 +12,7 @@ function option(name: string, fallback: string): string {
   return at >= 0 && process.argv[at + 1] !== undefined && !process.argv[at + 1].startsWith("--") ? process.argv[at + 1] : fallback;
 }
 
-const docsDataFile = path.resolve(option("--docs-data", siteInputsPath("docs-data", "docs-data.json")));
+const docsDataFile = path.resolve(option("--docs-data", path.join(docsInputsRoot(), "docs-data", "docs-data.json")));
 const outRoot = path.resolve(option("--out", path.join(websiteRoot, ".generated", "docs-pages")));
 
 const data = loadDocsData(docsDataFile);

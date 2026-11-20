@@ -1,8 +1,7 @@
 import path from "node:path";
 import { parseArgs } from "node:util";
+import { docsInputsRoot } from "../website/src/lib/site-inputs.ts";
 import { runChecks, type Mode } from "./lib/run.ts";
-
-const ROOT = path.resolve(path.dirname(new URL(import.meta.url).pathname), "..");
 
 const { values } = parseArgs({
   options: {
@@ -21,7 +20,7 @@ if (mode !== "report" && mode !== "block") {
 let outcome;
 try {
   outcome = runChecks({
-    inputs: path.resolve(values.inputs ?? process.env.SITE_INPUTS ?? path.join(ROOT, ".site-inputs")),
+    inputs: path.resolve(values.inputs ?? docsInputsRoot()),
     docs: values.docs === undefined ? undefined : path.resolve(values.docs),
     mode: mode as Mode,
   });

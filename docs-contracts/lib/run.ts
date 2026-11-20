@@ -46,7 +46,7 @@ export function docsChecks(ctx: Context): Violation[] {
 
 export function runChecks(options: Options): Outcome {
   const manifestFile = path.join(options.inputs, "manifest.json");
-  if (!existsSync(manifestFile)) throw new Error(`core bundle is missing at ${options.inputs}; run npm run bundle:fetch or set SITE_INPUTS`);
+  if (!existsSync(manifestFile)) throw new Error(`docs inputs are missing at ${options.inputs}; run npm run docs:pin or set DOCS_INPUTS`);
   const manifest = JSON.parse(readFileSync(manifestFile, "utf-8")) as Manifest;
   const outcome: Outcome = { blocking: [], reported: [], notes: [] };
   const docsFailures = options.mode === "block" ? outcome.blocking : outcome.reported;

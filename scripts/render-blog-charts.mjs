@@ -5,7 +5,6 @@ import path from "node:path";
 import { pathToFileURL } from "node:url";
 import Convert from "ansi-to-html";
 import { chromium } from "@playwright/test";
-import { siteInputsDir } from "./bundle-lib.mjs";
 
 const REPO_ROOT = path.resolve(path.dirname(new URL(import.meta.url).pathname), "..");
 const CHARTS_DIR = path.join(REPO_ROOT, "drafts", "charts");
@@ -30,8 +29,12 @@ body { padding: 28px 32px; display: inline-block; min-width: 860px; }
 pre { font-family: "Fira Code", "Menlo", "JetBrains Mono", "SF Mono", "Consolas", monospace; font-size: 13.5px; line-height: 1.0; color: #d4d4d4; white-space: pre; }
 `;
 
-export function benchboxVersion() {
-  return JSON.parse(readFileSync(path.join(siteInputsDir(), "manifest.json"), "utf8")).package_version;
+export function docsInputsDir(env = process.env) {
+  return path.resolve(env.DOCS_INPUTS || path.join(REPO_ROOT, "release-pin"));
+}
+
+export function benchboxVersion(env = process.env) {
+  return JSON.parse(readFileSync(path.join(docsInputsDir(env), "manifest.json"), "utf8")).package_version;
 }
 
 export function chartCommand(chart, version, dataDir = path.join(CHARTS_DIR, "data")) {

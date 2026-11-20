@@ -31,6 +31,7 @@ export function canonicalUrl(pathname: string): string {
 export function sitemapPathForFile(file: string): string {
   if (file === "index.html") return "/";
   if (file === "results/index.html") return "/results/";
+  if (file.startsWith("results/r/")) return `/${file.slice(0, -".html".length)}`;
   return `/${file}`;
 }
 

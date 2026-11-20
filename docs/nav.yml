@@ -25,6 +25,7 @@ groups:
         items:
           - concepts/architecture.md
           - concepts/workflow.md
+          - concepts/benchmark-methodology.md
           - concepts/data-model.md
           - concepts/glossary.md
           - concepts/benchmarking-tools-compared.md
@@ -155,6 +156,7 @@ groups:
       - guides/platform-comparison.md
       - guides/cloud-storage.md
       - guides/compression.md
+      - guides/agent-readable-docs.md
       - page: advanced/index.md
         items:
           - advanced/power-run-concurrent-queries.md
@@ -183,6 +185,7 @@ groups:
   - label: Contributing
     items:
       - contributing-results.md
+      - vendor-publishing-checklist.md
   - label: Reference
     items:
       - page: reference/cli/index.md

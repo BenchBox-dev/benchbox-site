@@ -157,6 +157,50 @@ jobs:
             gh issue create --repo "$REPO" --title "Explorer contract drift" --label contract-drift --body "$BODY"
           fi
 
+  docs-release-pending:
+    name: core release not yet in the docs
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: read
+      issues: write
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09
+      - uses: actions/setup-node@a0853c24544627f65ddf259abe73b1d18a591444
+        with:
+          node-version-file: .nvmrc
+      - run: npm ci --ignore-scripts
+      - name: Compare the release pin with core's latest published release
+        id: pending
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GITHUB_TOKEN: ${{ github.token }}
+        run: |
+          set +e
+          npm run -s docs:pin -- --pending > pending.txt 2>&1
+          code=$?
+          cat pending.txt
+          echo "code=$code" >> "$GITHUB_OUTPUT"
+          if [ "$code" -ne 0 ] && [ "$code" -ne 1 ]; then
+            exit "$code"
+          fi
+      - name: Open or update the docs-release-pending issue
+        if: steps.pending.outputs.code == '1'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: |
+          set -euo pipefail
+          NUMBER="$(gh issue list --repo "$REPO" --label docs-release-pending --state open --json number --jq '.[0].number // empty')"
+          BODY="$(printf 'Core has published a release that the documentation does not yet describe.\n\nRun `npm run docs:pin -- <tag>` on `next` by pull request, then open the `next` into `main` pull request.\n\nRun: %s\n\n```\n' "$RUN_URL"; cat pending.txt; printf '```\n')"
+          if [ -n "$NUMBER" ]; then
+            gh issue comment "$NUMBER" --repo "$REPO" --body "$BODY"
+          else
+            gh label create docs-release-pending --repo "$REPO" --color FBCA04 --description "A core release is not yet published in the docs" --force
+            gh issue create --repo "$REPO" --title "A core release is not yet published in the docs" --label docs-release-pending --body "$BODY"
+          fi
+
   availability:
     name: availability probe
     if: vars.SITE_DEPLOY_TARGET != ''

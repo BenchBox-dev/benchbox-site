@@ -478,20 +478,61 @@ Neutral. If every component is removed and the cell is still Regression, the
 tuned template is deleted (`tuned` then resolves to `tuned-fallback`) and the
 deletion is recorded here.
 
-**Evidence narrative.** The 2026-10-07 sentence "The cause of the Q3, Q5 and
-Q18 slowdowns is unproven" is superseded as follows. Across two calibrated
-harness cells (SF1, ClickHouse 25.8, 5.25 GiB rung), the date-first lineitem
-order slows Q3 ~1.2x, Q5 ~1.5-1.6x and Q18 ~1.4-1.5x against `notuning`,
-while an orderkey-first lineitem order restores all three to ~1.0x but
-forfeits the Q6/Q14/Q15 date-pruning wins (Q6 1.02x, Q14 1.03x, Q15 0.99x
-against 0.32x/0.45x/0.25x date-first) and is slower overall (G 0.97 against
-0.83). Q18 is explained by lost primary-index pruning on the IN-subquery
-values. Q3 and Q5 run the identical hash-join plan at identical peak memory
-with 1.2-1.7x more user CPU on fewer input rows under date order. The Q13
-42/41 split was a session-settings artifact (`join_use_nulls` applied at load
-but lost before timed rounds), not engine behaviour; the correct answer is 42.
-No layout changes: the shipped date-first layout still wins on the overall
-geometric mean.
+**Evidence narrative (2026-11-12).** The 2026-10-10 evidence paragraph on the
+Q3, Q5 and Q18 slowdowns is replaced by the findings below. They were measured
+on 2026-11-12 with the calibrated harness (9 shuffled rounds, seed 42) on a
+16 GiB host, and are recorded in
+[BenchBox#4191](https://github.com/BenchBox-dev/BenchBox/pull/4191). Every
+verdict applies to its own tier only.
+
+*ClickHouse 25.8.33.6, 5.25 GiB container, SF1.*
+
+- **TPC-H: benefit.** The in-run A/A passed (G 1.0066). The full tuned template
+  against `notuning` has G 0.8230 over 21 queries, 95% interval 0.7803 to
+  0.8777. Load plus merge settle is 14.4 s against 10.5 s, under the 1.5x
+  bound. Q21 fails in every arm at this memory rung, so it is outside `G`. No
+  answer differs between arms and no query is both above 1.5x and above 1.0 at
+  its interval lower bound, so there is no named loser. No layout or session
+  setting is retired.
+- **Q18: the pruning loss is proven, the slowdown is not.** With the date-first
+  sort keys, the `IN (subquery)` set on `l_orderkey` and `o_orderkey` no longer
+  prunes: `lineitem` reads 740 of 740 granules against 57, and `orders` reads
+  186 of 186 against 50. Rows read grow 1.94x and the planner swaps the join
+  sides. The time ratio is 1.25 with an interval of 0.935 to 1.687, which
+  includes 1.0.
+- **Q3: the earlier 1.43x does not reproduce.** The time ratio is 0.97
+  (0.820 to 1.168), and rows read are 0.54x.
+- **Q5: the cause is unproven.** The tuned time ratio is 1.39 (1.085 to 1.741)
+  on 0.84x the rows read. The join algorithm, plan shape, join sizes, peak
+  memory and the tuned session settings are ruled out. The join-locality
+  hypothesis is not supported for Q3, which is not slower, or for Q5, whose
+  join inputs and algorithm are unchanged. Q16 (1.485, interval 1.097 to
+  2.064) is also slower, with no plan evidence; its cause is unproven.
+- **SSB: benefit.** The first 9-round cell failed its A/A and its tuned numbers
+  were withheld. The 15-round repeat passed (G 1.0070). The full tuned template
+  has G 0.7484 (0.7258 to 0.7881), and the layout-only arm has G 0.8046.
+- **TPC-DS: unmeasured.** Three attempts on the 16 GiB host were killed by the
+  memory-pressure watchdog. An unmeasured cell yields no verdict and the
+  template is not retired.
+
+The order-key-first and date-first layout comparison from the 2026-10-10
+paragraph was not re-measured. The date-first layout is kept on the SF1
+benefit above.
+
+*DuckDB v1.5.5, SF1, 16 GiB host.* Recorded in
+[BenchBox#4164](https://github.com/BenchBox-dev/BenchBox/pull/4164) and
+[BenchBox#4176](https://github.com/BenchBox-dev/BenchBox/pull/4176), each cell
+with a passing A/A, no failures and no answer mismatches.
+
+| Benchmark | Verdict | Evidence |
+|---|---|---|
+| TPC-H | Regression, every tuned arm | Full tuned G 1.0965 (1.0443 to 1.1323); sort only G 1.1235 (1.0559 to 1.1732); constraints only G 1.0087 (0.9722 to 1.0534) with load 85.7 s against 36.5 s notuning |
+| SSB | Benefit, tuned and sort only | Full tuned G 0.6687 (0.6457 to 0.6992); sort only G 0.6816 (0.6373 to 0.7405) |
+| TPC-DS | Regression | Full tuned G 1.0202 (0.9972 to 1.0542), whose interval includes 1.0; the verdict comes from the load clause, load plus settle 75.9 s against 5.6 s notuning. Sort only G 1.0258 (1.0084 to 1.0654) is a regression on query time |
+
+DuckDB SF10 is unmeasured: the TPC-H SF10 cell was killed by the memory-pressure
+watchdog during the `lineitem` load on three attempts. The DuckDB templates are
+unchanged pending SF10.
 
 ## Addendum (2026-10-17): Spark family capabilities and preview honesty
 

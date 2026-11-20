@@ -43,6 +43,8 @@ const QUERY_COLUMN_LABELS: Record<string, string> = {
   run_date: "Run date",
   power_score: "Power score (higher is better)",
   throughput_at_size: "Throughput@Size (higher is better)",
+  qphh_at_size: "QphH@Size (higher is better)",
+  qphds_at_size: "QphDS@SF (higher is better)",
   stream_count: "Streams",
   total_duration_s: "Total duration",
   geomean_ms: "Geomean latency (lower is better)",
@@ -93,6 +95,8 @@ export function formatQueryCell(column: string, value: unknown): string {
   if (value === null || value === undefined || value === "") {
     if (column === "power_score") return "No power score";
     if (column === "throughput_at_size") return "No throughput score";
+    if (column === "qphh_at_size") return "No QphH@Size";
+    if (column === "qphds_at_size") return "No QphDS@SF";
     if (column === "geomean_ms" || column === "display_geomean_ms") return "No timing recorded";
     if (column === "total_duration_s") return "No duration recorded";
     if (column === "cost_usd" || column === "normalized_cost_usd") return "No cost recorded";
@@ -100,7 +104,7 @@ export function formatQueryCell(column: string, value: unknown): string {
   }
   if (column === "run_date") return formatRunDateWithAge(typeof value === "string" ? value : null);
   if (column === "power_score") return typeof value === "number" ? formatPowerScore(value).valueText : String(value);
-  if (column === "throughput_at_size") {
+  if (column === "throughput_at_size" || column === "qphh_at_size" || column === "qphds_at_size") {
     return typeof value === "number" ? formatThroughputScore(value).valueText : String(value);
   }
   if (column === "geomean_ms" || column === "display_geomean_ms") {

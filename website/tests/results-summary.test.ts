@@ -1,9 +1,14 @@
+import { readFileSync } from "node:fs";
+import path from "node:path";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
-import { canonicalBenchmarkSlug } from "@/lib/displayLabels";
+import { canonicalBenchmarkSlug, formatTrustLabel, formatTuningMode } from "@/lib/displayLabels";
 import { getBenchmarkRanking, listResults, type ResultRow } from "@/lib/duckdbQueries";
 import { formatScoreMetric } from "@/lib/metricFormatters";
 import { fmtGeomean } from "@/utils";
 import { closeResultsSnapshot, openResultsSnapshot, queryRows } from "../src/lib/results-db.ts";
+import { docutilsMakeId } from "../src/lib/docutils-slug.ts";
+import { executionEnvironment, METHODOLOGY_PATH, NOT_RECORDED, runContext, tuningModeText } from "../src/lib/result-context.ts";
+import { buildReceipts } from "../src/lib/result-receipts.ts";
 import { buildResultsSummary, snapshotFile, summaryHref, type ResultsSummary } from "../src/lib/results-summary.ts";
 
 const identity = { coreSha: "c".repeat(40), corpusSha: "d".repeat(40), packageVersion: "0.0.0", producedAt: null, snapshotSha256: "e".repeat(64), readModelVersion: 18 };
@@ -13,7 +18,7 @@ let summary: ResultsSummary;
 
 beforeAll(async () => {
   await openResultsSnapshot(snapshotFile());
-  rows = await listResults();
+  rows = await listResults(undefined, { includeHardware: true });
   summary = await buildResultsSummary(rows, getBenchmarkRanking, identity);
 });
 
@@ -31,7 +36,42 @@ describe("summary pages and the Explorer for one snapshot", () => {
   it("counts every published run on both views of it", () => {
     expect(summary.platforms.reduce((total, page) => total + page.resultCount, 0)).toBe(rows.length);
     expect(summary.benchmarks.reduce((total, page) => total + page.resultCount, 0)).toBe(rows.length);
-    for (const page of summary.platforms) expect(page.runs).toHaveLength(page.resultCount);
+    for (const page of summary.platforms) expect(page.ranked.length + page.excluded.length).toBe(page.resultCount);
+  });
+
+  it("keeps only ranked runs in the ranked views and every other run in the excluded views", () => {
+    for (const page of summary.platforms) {
+      expect(page.ranked.every((run) => run.ranked && run.rankingStatus === "Ranked")).toBe(true);
+      expect(page.excluded.every((run) => !run.ranked && run.rankingStatus !== "Ranked")).toBe(true);
+    }
+    for (const page of summary.benchmarks) {
+      expect(page.cohorts.every((cohort) => cohort.ranked.every((line) => line.exclusion === null))).toBe(true);
+      expect(page.excluded.every((line) => line.exclusion !== null)).toBe(true);
+    }
+  });
+
+  it("loses no ranking line when a benchmark's excluded lines move to their own section", async () => {
+    const stored = await queryRows<{ benchmark: string; lines: number }>(
+      "SELECT r.benchmark AS benchmark, count(*)::INTEGER AS lines FROM bench.benchmark_rankings r JOIN bench.results s USING (result_id) WHERE s.visibility LIKE 'public-%' GROUP BY r.benchmark",
+    );
+    for (const page of summary.benchmarks) {
+      const expected = stored.filter((row) => canonicalBenchmarkSlug(row.benchmark) === page.id).reduce((total, row) => total + row.lines, 0);
+      const shown = page.cohorts.reduce((total, cohort) => total + cohort.ranked.length, 0) + page.excluded.length;
+      expect(shown, page.id).toBe(expected);
+    }
+  });
+
+  it("builds one receipt per published result, each stating the fields a reader needs", async () => {
+    const receipts = await buildReceipts(rows, { snapshotSha256: identity.snapshotSha256, snapshotDate: "2026-11-13" });
+    expect(receipts.map((receipt) => receipt.resultId).sort()).toEqual(rows.map((row) => row.result_id).sort());
+    for (const receipt of receipts) {
+      const labels = receipt.sections.flatMap((section) => section.rows.map((row) => row.label));
+      for (const label of ["Benchmark", "Platform", "Platform version", "Scale factor", "Phase", "Run date", "Geomean query time", "Ranking status", "Ranking reason", "Trust label", "Tuning mode", "Execution mode", "Bundle JSON"]) {
+        expect(labels, receipt.resultId).toContain(label);
+      }
+      expect(receipt.citeLine).toContain(identity.snapshotSha256);
+      expect(receipt.citeLine).toContain("2026-11-13");
+    }
   });
 
   it("shows the ranking values the Explorer's ranking table holds", async () => {
@@ -42,7 +82,7 @@ describe("summary pages and the Explorer for one snapshot", () => {
     for (const best of stored) {
       const page = summary.benchmarks.find((candidate) => candidate.id === canonicalBenchmarkSlug(best.benchmark));
       const cohort = page?.cohorts.find((candidate) => candidate.scale === `SF ${best.scale_factor}` && candidate.phase === "power");
-      const line = cohort?.ranking.find((candidate) => candidate.resultId === best.result_id);
+      const line = cohort?.ranked.find((candidate) => candidate.resultId === best.result_id);
       expect(line, `${best.benchmark} SF ${best.scale_factor} rank 1`).toBeDefined();
       expect(line?.rank).toBe(1);
       if (best.primary_metric === "power_score") expect(line?.score).toBe(formatScoreMetric("power_score", best.power_score));
@@ -57,7 +97,8 @@ describe("summary pages and the Explorer for one snapshot", () => {
       "SELECT result_id, platform_id, power_score, display_geomean_ms FROM bench.results WHERE test_type = 'power' AND power_score IS NOT NULL LIMIT 25",
     );
     for (const row of stored) {
-      const run = summary.platforms.find((page) => page.id === row.platform_id)?.runs.find((candidate) => candidate.resultId === row.result_id);
+      const page = summary.platforms.find((candidate) => candidate.id === row.platform_id);
+      const run = [...(page?.ranked ?? []), ...(page?.excluded ?? [])].find((candidate) => candidate.resultId === row.result_id);
       expect(run?.score).toBe(formatScoreMetric("power_score", row.power_score));
       expect(run?.geomean).toBe(fmtGeomean(row.display_geomean_ms));
     }
@@ -91,7 +132,8 @@ describe("withdrawn and unpublished results", () => {
       built.benchmarks.some(
         (page) =>
           page.platforms.some((neighbor) => neighbor.id === platformId) ||
-          page.cohorts.some((cohort) => cohort.ranking.some((line) => line.platformId === platformId || resultIds.has(line.resultId))),
+          page.cohorts.some((cohort) => cohort.ranked.some((line) => line.platformId === platformId || resultIds.has(line.resultId))) ||
+          page.excluded.some((line) => line.platformId === platformId || resultIds.has(line.resultId)),
       )
     );
   }
@@ -118,5 +160,67 @@ describe("withdrawn and unpublished results", () => {
       identity,
     );
     expect(mentions(rebuilt, platformId, hidden)).toBe(false);
+  });
+});
+
+describe("execution environment, tuning mode and trust label", () => {
+  const everyLine = () => [
+    ...summary.platforms.flatMap((page) => [...page.ranked, ...page.excluded]),
+    ...summary.benchmarks.flatMap((page) => [...page.cohorts.flatMap((cohort) => cohort.ranked), ...page.excluded]),
+  ];
+
+  it("fills all three columns for every run on both views, with Not recorded when the snapshot has no value", () => {
+    const lines = everyLine();
+    expect(lines.length).toBeGreaterThan(0);
+    for (const line of lines) {
+      expect(line.environment.trim(), line.resultId).not.toBe("");
+      expect(line.tuningMode.trim(), line.resultId).not.toBe("");
+      expect(line.trustLabel.trim(), line.resultId).not.toBe("");
+    }
+  });
+
+  it("shows the tuning mode and trust label the snapshot stores for each result", () => {
+    for (const row of rows) {
+      const page = summary.platforms.find((candidate) => candidate.id === row.platform_id);
+      const run = [...(page?.ranked ?? []), ...(page?.excluded ?? [])].find((candidate) => candidate.resultId === row.result_id);
+      expect(run?.tuningMode, row.result_id).toBe(row.tuning_mode ? formatTuningMode(row.tuning_mode) : NOT_RECORDED);
+      expect(run?.trustLabel, row.result_id).toBe(row.trust_label ? formatTrustLabel(row.trust_label) : NOT_RECORDED);
+    }
+  });
+
+  it("agrees between the platform page and the benchmark page for the same run", () => {
+    const byResult = new Map(summary.platforms.flatMap((page) => [...page.ranked, ...page.excluded]).map((run) => [run.resultId, run]));
+    for (const line of everyLine().filter((candidate) => "rank" in candidate)) {
+      const run = byResult.get(line.resultId);
+      expect(run, line.resultId).toBeDefined();
+      expect([line.environment, line.tuningMode, line.trustLabel]).toEqual([run!.environment, run!.tuningMode, run!.trustLabel]);
+    }
+  });
+
+  it("says Not recorded for a row with no environment, tuning or trust values and never turns a missing tuning mode into no tuning", () => {
+    expect(runContext({})).toEqual({ environment: NOT_RECORDED, tuningMode: NOT_RECORDED, trustLabel: NOT_RECORDED });
+    expect(runContext({ tuning_mode: "", trust_label: "", deployment_class: "unavailable" })).toEqual({ environment: NOT_RECORDED, tuningMode: NOT_RECORDED, trustLabel: NOT_RECORDED });
+    expect(tuningModeText({ tuning_mode: null })).not.toBe(formatTuningMode("notuning"));
+  });
+
+  it("describes a cloud run by provider, region and warehouse and a local run by its hardware", () => {
+    expect(executionEnvironment({ deployment_class: "cloud", cloud_provider: "aws", cloud_region: "us-east-1", instance_or_warehouse: "ra3.xlplus", arch: "x86_64", memory_gb: 16 })).toBe("Cloud, AWS us-east-1, ra3.xlplus");
+    expect(executionEnvironment({ deployment_class: "local", arch: "arm64", cpu_family: "apple_silicon", memory_gb: 64 })).toBe("Local, Arm64, Apple silicon, 64 GB");
+    expect(executionEnvironment({ cloud_provider: "gcp" })).toBe("Cloud, GCP");
+  });
+
+  it("defines every score on a page with its unit and a link to a methodology anchor that exists", () => {
+    const methodology = readFileSync(path.join(process.cwd(), "..", "docs", "concepts", "benchmark-methodology.md"), "utf-8");
+    const anchors = new Set([...methodology.matchAll(/^#{2,6} (.+)$/gm)].map((match) => docutilsMakeId(match[1]!)));
+    for (const page of [...summary.platforms, ...summary.benchmarks]) {
+      expect(page.scoreDefinitions.length, page.id).toBeGreaterThan(0);
+      expect(page.scoreDefinitions.map((definition) => definition.metric), page.id).toContain("display_geomean_ms");
+      for (const definition of page.scoreDefinitions) {
+        expect(definition.unit, definition.label).not.toBe("");
+        const [pagePath, fragment] = definition.href.split("#");
+        expect(pagePath).toBe(METHODOLOGY_PATH);
+        expect(anchors.has(fragment!), `${definition.label} -> #${fragment}`).toBe(true);
+      }
+    }
   });
 });

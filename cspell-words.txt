@@ -208,6 +208,7 @@ emailext
 emphasised
 endscript
 enginename
+esac
 espressocomputing
 estimand
 exasol
@@ -500,6 +501,7 @@ pagerank
 palo
 paradedb
 parameterised
+paramstyle
 partkey
 partkeydef
 partmethod
@@ -842,3 +844,4 @@ zstd
 Æther
 Ørsted
 Łódź
+llms

@@ -5,17 +5,17 @@ import { tmpdir } from "node:os";
 import path from "node:path";
 import { SCHEMA_DIR, SUPPORTED_SCHEMAS, memberDigest, membersFor, verifyBundle } from "./bundle-lib.mjs";
 import { certificationErrors } from "./bundle-verify.mjs";
-import { fixtureBundle, FIXTURE_CORE as CORE, FIXTURE_PARENT as PARENT } from "./fixture-bundle.mjs";
+import { fixtureBundle, FIXTURE_RESULT_SCHEMA, FIXTURE_CORE as CORE, FIXTURE_PARENT as PARENT } from "./fixture-bundle.mjs";
 
 function write(file, body) {
   mkdirSync(path.dirname(file), { recursive: true });
   writeFileSync(file, body);
 }
 
-test("schemas 4 and 5 verify and retired or unknown schemas fail", () => {
-  assert.deepEqual(SUPPORTED_SCHEMAS, [4, 5]);
+test("schemas 4, 5 and 6 verify and retired or unknown schemas fail", () => {
+  assert.deepEqual(SUPPORTED_SCHEMAS, [4, 5, 6]);
   for (const schema of SUPPORTED_SCHEMAS) assert.deepEqual(verifyBundle(fixtureBundle({ schema })).errors, []);
-  for (const schema of [1, 2, 3, 6]) {
+  for (const schema of [1, 2, 3, 7]) {
     assert.ok(verifyBundle(fixtureBundle({ schema })).errors.some((error) => error.startsWith(`schema ${schema}`)));
   }
 });
@@ -55,7 +55,7 @@ test("member sets are exact for each schema", () => {
     delete manifest.members["docs-data"];
     delete manifest.members["doc-contracts.json"];
   });
-  assert.ok(verifyBundle(schema3Members).errors.includes("schema 3 is not supported (supported: 4, 5)"));
+  assert.ok(verifyBundle(schema3Members).errors.includes("schema 3 is not supported (supported: 4, 5, 6)"));
   const schema5WithDownloads = rewriteManifest(fixtureBundle({ schema: 5 }), (manifest) => {
     manifest.members.downloads = "0".repeat(64);
   });
@@ -78,8 +78,8 @@ test("member sets are exact for each schema", () => {
   assert.ok(verifyBundle(schema4WithoutContracts).errors.some((error) => error.startsWith("member set mismatch")));
 });
 
-test("schemas 4 and 5 accept the candidate certifier or a run id", () => {
-  for (const schema of [4, 5]) {
+test("schemas 4, 5 and 6 accept the candidate certifier or a run id", () => {
+  for (const schema of [4, 5, 6]) {
     for (const certifiedBy of ["candidate", "1", "40239821240"]) {
       assert.deepEqual(verifyBundle(fixtureBundle({ schema, certifiedBy })).errors, [], `${schema} ${certifiedBy}`);
     }
@@ -94,8 +94,8 @@ test("schemas 4 and 5 accept the candidate certifier or a run id", () => {
   }
 });
 
-test("a certified schema 4 or 5 bundle fails closed on member set, tampering and invalid contracts", () => {
-  for (const schema of [4, 5]) {
+test("a certified schema 4, 5 or 6 bundle fails closed on member set, tampering and invalid contracts", () => {
+  for (const schema of [4, 5, 6]) {
     const certified = () => fixtureBundle({ schema, certifiedBy: "40239821240" });
     assert.deepEqual(verifyBundle(certified()).errors, []);
 
@@ -132,7 +132,7 @@ test("a certified schema 4 or 5 bundle fails closed on member set, tampering and
     const asSchema3 = rewriteManifest(certified(), (manifest) => {
       manifest.schema = 3;
     });
-    assert.ok(verifyBundle(asSchema3).errors.includes("schema 3 is not supported (supported: 4, 5)"));
+    assert.ok(verifyBundle(asSchema3).errors.includes("schema 3 is not supported (supported: 4, 5, 6)"));
   }
 });
 
@@ -190,7 +190,7 @@ const GENUINE = process.env.SITE_CANDIDATE_BUNDLES;
 const CORE_TREE = process.env.CORE_TREE;
 
 test("genuine core candidate bundles verify and are rejected by a consumer of the other schema", { skip: !GENUINE }, () => {
-  for (const schema of [4, 5]) {
+  for (const schema of [4, 5, 6]) {
     const dir = path.join(GENUINE, `candidate${schema}`);
     assert.ok(existsSync(dir), `${dir} is missing`);
     const result = verifyBundle(dir);
@@ -245,4 +245,65 @@ test("certification requires a successful trunk push run on the bundle commit", 
   assert.equal(certificationErrors({ ...good, event: "workflow_dispatch" }, { core_sha: CORE }).length, 1);
   assert.equal(certificationErrors({ ...good, head_sha: PARENT }, { core_sha: CORE }).length, 1);
   assert.deepEqual(certificationErrors(null, { core_sha: CORE }), ["certifying trunk run not found"]);
+});
+
+test("schema 6 is schema 5 plus the result schema member, and nothing else", () => {
+  assert.deepEqual([...membersFor(6)].sort(), [...membersFor(5), "result-bundle.schema.json"].sort());
+  assert.ok(!membersFor(5).includes("result-bundle.schema.json"));
+  assert.ok(!membersFor(4).includes("result-bundle.schema.json"));
+});
+
+test("schema 6 fails without the result schema member or with extra entries", () => {
+  const missingFromManifest = rewriteManifest(fixtureBundle({ schema: 6 }), (manifest) => {
+    delete manifest.members["result-bundle.schema.json"];
+  });
+  assert.ok(verifyBundle(missingFromManifest).errors.some((error) => error.startsWith("member set mismatch")));
+
+  const missingOnDisk = fixtureBundle({ schema: 6 });
+  rmSync(path.join(missingOnDisk, "result-bundle.schema.json"));
+  assert.ok(verifyBundle(missingOnDisk).errors.some((error) => error.includes("bundle member missing")));
+
+  const extra = rewriteManifest(fixtureBundle({ schema: 6 }), (manifest) => {
+    manifest.members.unexpected = "0".repeat(64);
+  });
+  assert.ok(verifyBundle(extra).errors.some((error) => error.startsWith("member set mismatch")));
+
+  const schema5WithSchemaFile = rewriteManifest(fixtureBundle({ schema: 5 }), (manifest) => {
+    manifest.members["result-bundle.schema.json"] = "0".repeat(64);
+  });
+  assert.ok(verifyBundle(schema5WithSchemaFile).errors.some((error) => error.startsWith("member set mismatch")));
+
+  const schema4WithSchemaFile = rewriteManifest(fixtureBundle({ schema: 4 }), (manifest) => {
+    manifest.members["result-bundle.schema.json"] = "0".repeat(64);
+  });
+  assert.ok(verifyBundle(schema4WithSchemaFile).errors.some((error) => error.startsWith("member set mismatch")));
+});
+
+test("schema 6 requires a parseable draft 2020-12 schema with the published id and a 2.x version", () => {
+  const valid = { ...FIXTURE_RESULT_SCHEMA };
+  const cases = [
+    ["not JSON", "not json\n", "is not readable JSON"],
+    ["an array", "[]\n", "is not a JSON object"],
+    ["a wrong id", JSON.stringify({ ...valid, $id: "https://example.com/x.json" }), "$id is"],
+    ["a missing id", JSON.stringify({ ...valid, $id: undefined }), "$id is"],
+    ["a wrong dialect", JSON.stringify({ ...valid, $schema: "http://json-schema.org/draft-07/schema#" }), "$schema is"],
+    ["no version marker", JSON.stringify({ ...valid, result_schema_version: undefined }), "result_schema_version is"],
+    ["a major 3 marker", JSON.stringify({ ...valid, result_schema_version: "3.0" }), "result_schema_version is"],
+    ["an invalid schema", JSON.stringify({ ...valid, type: "nonsense" }), "is not a valid JSON Schema"],
+  ];
+  for (const [label, body, expected] of cases) {
+    const errors = verifyBundle(rewriteMember(fixtureBundle({ schema: 6 }), "result-bundle.schema.json", body)).errors;
+    assert.ok(errors.some((error) => error.includes(expected)), `${label}: ${errors.join("; ")}`);
+  }
+  const reordered = rewriteMember(fixtureBundle({ schema: 6 }), "result-bundle.schema.json", `${JSON.stringify(valid, null, 4)}\n`);
+  assert.deepEqual(verifyBundle(reordered).errors, []);
+});
+
+test("schemas 5 and 6 share the certified_by rules", () => {
+  for (const schema of [5, 6]) {
+    assert.deepEqual(verifyBundle(fixtureBundle({ schema, certifiedBy: "40239821240" })).errors, []);
+    assert.deepEqual(verifyBundle(fixtureBundle({ schema, certifiedBy: "candidate" })).errors, []);
+    const errors = verifyBundle(fixtureBundle({ schema, certifiedBy: "local" })).errors;
+    assert.ok(errors.some((error) => error.startsWith(`schema ${schema} requires certified_by candidate or a run id`)));
+  }
 });

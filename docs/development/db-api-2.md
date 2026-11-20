@@ -168,28 +168,15 @@ The wrapper implements all core DB API 2.0 methods:
 
 **Location**: `benchbox/core/connection.py:33-167`
 
-### Platform-Specific Parameter Placeholders
+### Parameter Placeholders
 
-Different databases use different parameter placeholder styles. BenchBox automatically detects the appropriate style. SQLite and DuckDB use the `?` qmark style, which is the PEP 249 standard. PostgreSQL and MySQL use the `%s` format style, also a PEP 249 standard. Any other connection type defaults to the DB-API 2.0 qmark style:
+The TPC-H refresh functions bind no parameters: RF1 and RF2 write their values into the SQL as literals
+(`benchbox/core/tpch/refresh.py`). The dry-run display of the maintenance SQL shows the statements with a `?`
+placeholder (`benchbox/core/tpch/maintenance_test.py`).
 
-```python
-def _get_parameter_placeholder(self, connection: Any) -> str:
-    connection_type = type(connection).__name__.lower()
-
-    if 'sqlite' in connection_type or 'duckdb' in connection_type:
-        return '?'
-    elif 'psycopg' in connection_type or 'postgres' in connection_type:
-        return '%s'
-    elif 'mysql' in connection_type:
-        return '%s'
-    else:
-        return '?'
-```
-
-**Location**:
-
-- `benchbox/core/tpcds/maintenance_operations.py:190-208`
-- `benchbox/core/tpch/maintenance_test.py:308-325`
+Where BenchBox does bind parameters, as when it writes tuning metadata, it reads the driver's DB API 2.0
+`paramstyle` and uses `%s` for the `format` and `pyformat` styles and `?` for any other style
+(`benchbox/core/tuning/metadata.py`).
 
 ## Platform Adapter Implementations
 
