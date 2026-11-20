@@ -652,15 +652,10 @@
       "title": "Settle the documentation passages the release-pin audit left inconclusive"
     },
     "revisit-multi-warehouse-post-after-core-0-5-1": {
-      "claim": {
-        "expires_at": "2026-11-21T04:26:26Z",
-        "generation": "c2a64062a6af4ab3803bcba059d91a86",
-        "renewals": 0,
-        "worker": "mcp:omp:joe@joe-mac-mini.local:8acd5eb72a0f7b327051ca7e"
-      },
+      "claim": null,
       "needs": [],
       "priority": "high",
-      "status": "active",
+      "status": "done",
       "title": "Revisit the multi-warehouse pattern post once BenchBox v0.5.1 is released"
     },
     "rollback-gates-on-pre-allowlist-removal-artifacts-20261029": {

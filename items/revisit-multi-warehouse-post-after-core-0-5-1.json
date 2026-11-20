@@ -90,6 +90,15 @@
       "op": "update",
       "op_id": "c442e9e88d654755bfd396ff58b2adef",
       "session_id": "143dfa6708e14f018bf7cc5e3241a9ce"
+    },
+    {
+      "actor": "mcp:omp:joe@joe-mac-mini.local:8acd5eb72a0f7b327051ca7e",
+      "at": "2026-11-20T05:53:43Z",
+      "client": "omp",
+      "generation": "c2a64062a6af4ab3803bcba059d91a86",
+      "op": "finish",
+      "op_id": "b64604a8596d4211a98b9559a91ed1f0",
+      "session_id": "143dfa6708e14f018bf7cc5e3241a9ce"
     }
   ]
 }
