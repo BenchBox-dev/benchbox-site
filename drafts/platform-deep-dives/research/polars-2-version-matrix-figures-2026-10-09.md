@@ -1,6 +1,8 @@
 # Polars 2.0 version matrix: figure mapping and open checks
 
-Source for every number in `outlines/polars-2-version-matrix.md` and the post drafted from it: `polars-version-matrix-analysis.json`, produced by `scripts/analyze_polars_version_matrix.py` over the run manifest (3 rounds, shuffle seed 20261009, BenchBox commit `ecd08a9f0`, qualification SHA-256 `da8ea047afdbc880177f6a295dc8d0e9afd1b95a3f044d906e9c6a26b43d2580`). The same values are in `_project/analysis/polars-version-matrix/findings.md` and the comparison CSV.
+Superseded as the source of the post's numbers by `polars-2-version-matrix-run-2026-11-19.md`. The field mapping below still describes `polars-version-matrix-analysis.json` for the 2026-11-19 run; the "Figures used in the post" table is the 2026-10-09 run and is kept only for the reproducibility comparison.
+
+The 2026-10-09 values come from `polars-version-matrix-analysis.json`, produced by `scripts/analyze_polars_version_matrix.py` over the run manifest (3 rounds, shuffle seed 20261009, BenchBox commit `ecd08a9f0`, qualification SHA-256 `da8ea047afdbc880177f6a295dc8d0e9afd1b95a3f044d906e9c6a26b43d2580`).
 
 ## Field mapping
 
