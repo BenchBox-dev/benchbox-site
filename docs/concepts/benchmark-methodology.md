@@ -12,7 +12,7 @@ This page gathers policy that is already written down elsewhere in the documenta
 
 ## What a scale factor supports
 
-BenchBox accepts scale factors from 0.01 to 100000 (to 3000 for TPC-DS and TPC-DS-OBT), and each benchmark has a short set of standard scale factors, typically 0.01, 0.1, 1 and 10. A scale factor outside the benchmark's standard set runs with a one-line note that its results are not comparable with published results ([Benchmarks overview](../benchmarks/index.md)).
+BenchBox accepts scale factors from 0.01 to 100000, and each benchmark has a short set of standard scale factors, typically 0.01, 0.1, 1 and 10. A scale factor outside the benchmark's standard set runs with a one-line note that its results are not comparable with published results ([Benchmarks overview](../benchmarks/index.md)).
 
 | Purpose | What the existing guidance says | Source |
 |---|---|---|
