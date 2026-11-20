@@ -7,7 +7,7 @@
     "Verification rubric: a scratch repository reproduces the 2026-11-14 case (a passage present on next and deleted on main by a later commit) and the issue body names that file; a case where main only adds text names no file",
     "Until the guard ships, every main into next merge pull request description states that it was checked for deleted unreleased text (git diff origin/next <merge> -- docs blog shows no unintended deletions)"
   ],
-  "context": "Found 2026-11-14 while merging main into next after pull request #160. Guardrails: the workflow stays read-only on branches; do not auto-restore text; goes to main, then main is merged into next.\n\nReview 2026-11-17: decision gate is the 'checklist line versus file list' choice, recorded by the owner before coding. The hazard recurs on every main into next merge, including the one after the v0.5.1 release pull request.\n\n2026-11-19 owner decision: file list. The next-behind-main issue lists each docs/blog file where merging main would delete lines from next, computed in memory; a checklist line alone is not enough.\n\n2026-11-19: implemented in PR #207 (scripts/next-deletions.mjs, sync-next issue list, AGENTS.md). Independent review: no blockers; fixes applied (conflicting files now listed for deletions outside their markers; tab-safe paths). Replay on the 2026-11-14 merge names exactly the 24 hand-restored files. CI blocked by an unrelated Explorer read-model 20 mismatch (core #4305); merge pending.",
+  "context": "Found 2026-11-14 while merging main into next after pull request #160. Guardrails: the workflow stays read-only on branches; do not auto-restore text; goes to main, then main is merged into next.\n\nReview 2026-11-17: decision gate is the 'checklist line versus file list' choice, recorded by the owner before coding. The hazard recurs on every main into next merge, including the one after the v0.5.1 release pull request.\n\n2026-11-19 owner decision: file list. The next-behind-main issue lists each docs/blog file where merging main would delete lines from next, computed in memory; a checklist line alone is not enough.\n\n2026-11-19: implemented in PR #207 (scripts/next-deletions.mjs, sync-next issue list, AGENTS.md). Independent review: no blockers; fixes applied (conflicting files now listed for deletions outside their markers; tab-safe paths). Replay on the 2026-11-14 merge names exactly the 24 hand-restored files. CI blocked by an unrelated Explorer read-model 20 mismatch (core #4305); merge pending.\n\n2026-11-20 closeout. Owner decision: file list. #207 merged to main (83e5c3c): scripts/next-deletions.mjs computes the main-into-next merge with git merge-tree --write-tree (no ref written) and lists docs/blog files that lose lines on next, including lines outside conflict markers; the Sync next workflow adds the list and the remedy to the next-behind-main issue; AGENTS.md states the hazard and remedy. Permissions, rulesets and the no-push design are unchanged. Tests: scripts/next-deletions.test.mjs reproduces the 2026-11-14 case in a scratch repository (named) and a main-only-adds case (nothing named), plus conflict and scope cases. Replay on the real 2026-11-14 merge (next 90e3542, main f0a6935): the issue names exactly the 24 hand-restored files. Independent review: no blockers; fixes applied. First live use: issue #211 listed 5 files; each was checked in sync PR #213 (all deletions true on develop). Main-into-next descriptions #183, #193, #201, #213, #219 state the deletion check.",
   "description": "Problem: when a correction on main removes text that describes unreleased behaviour, the following merge of main into next applies the same removal to next without a conflict, because next still held that text unchanged. The unreleased documentation then silently disappears from next and from the next release. On 2026-11-14 the merge after the docs audit had to restore 24 files on next by hand. AGENTS.md and the next-behind-main issue text only cover conflicts ('next keeps its text'); they do not mention clean merges that delete.\n\nOutcome: the person merging main into next is told which docs files the merge would delete from or shrink on next, and AGENTS.md says what to do.",
   "links": [
     "AGENTS.md",
@@ -54,6 +54,14 @@
       "client": "omp",
       "op": "update",
       "op_id": "db813251965648eca6a8bf2bf2074f95",
+      "session_id": "143dfa6708e14f018bf7cc5e3241a9ce"
+    },
+    {
+      "actor": "mcp:omp:joe@joe-mac-mini.local:8acd5eb72a0f7b327051ca7e",
+      "at": "2026-11-20T04:11:06Z",
+      "client": "omp",
+      "op": "update",
+      "op_id": "b30f8ad10c8242a7b333aa36c2f8ebf7",
       "session_id": "143dfa6708e14f018bf7cc5e3241a9ce"
     }
   ]
