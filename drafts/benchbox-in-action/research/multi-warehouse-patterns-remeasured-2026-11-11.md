@@ -2,46 +2,55 @@
 
 Source for the tables in the draft
 `drafts/benchbox-in-action/drafts/06-platform-specific-optimization-patterns.md`.
-Captured 2026-11-11 on an Apple M4 (10 cores, 16 GB RAM), macOS 27.0.1,
-Python 3.12, OpenJDK 21 for PySpark. It supersedes the February 2026
-measurements in `platform-optimization-patterns.md`, which were taken on
-an Apple M1 Mac Mini with Polars 1.37.1, DataFusion 51.0.0 and PySpark
-4.1.1 and are kept as the record of the original finding.
+First captured 2026-11-11 on an Apple M4 (10 cores, 16 GB RAM), macOS
+27.0.1, Python 3.12, OpenJDK 21 for PySpark, while other jobs shared the
+machine. Rerun on 2026-11-19 and 2026-11-20 on the same machine with no
+other jobs; every table below is from the rerun. It supersedes the
+February 2026 measurements in `platform-optimization-patterns.md`, which
+were taken on an Apple M1 Mac Mini with Polars 1.37.1, DataFusion 51.0.0
+and PySpark 4.1.1 and are kept as the record of the original finding.
 
-## Caveat: the workstation was shared
+## Machine state
 
-Other jobs ran on the machine throughout. The 1-minute load average at
-the start of each engine run was between 24 and 57 in the first counted
-pass and between 13 and 19 in the second, on 10 cores. Two earlier attempts
-under load averages of up to 113 were discarded. Because of this:
+**2026-11-19/20 rerun (the tables below).** No other benchmark or build
+job ran. The 1-minute load average was about 3 before the run started and
+3.5 to 14.5 at the start of each engine run, consistent with the
+benchmark's own threads on 10 cores. The two counted passes took 25 and
+24 minutes. Of the 350 ratios of a pattern's median time to the median
+time of `n_unique`, the two passes differed by a median of 1.3%; 91%
+agreed within 5% and all within 11%. For the ratios of best times, which
+the tables below use, the median difference was 1.7%, 87% agreed within
+5% and all within 21%. Every pattern returned the same answers as on
+2026-11-11.
 
-- Every table reports the best (minimum) wall time over all timed runs
-  in the two counted passes, then the median of the quieter second pass.
-  The best time is the statistic least inflated by other jobs.
-- The patterns were interleaved inside each iteration, so the patterns
-  of one engine version saw the same conditions. Ratios between patterns
-  of one engine version are the reliable quantity. Of the 350 ratios of
-  a pattern to `n_unique`, the two passes differed by a median of 4%.
-  90% agreed within 15% and all but one within 33%. The exception is
-  DuckDB 2.0.0 `exists` on SF10 `web_sales` (14.2x in the first pass,
-  6.2x in the second).
-- Absolute times, and comparisons of absolute times between versions,
-  carry more error than the ratios. Rerun on an idle machine before
-  quoting an absolute time as an engine's speed.
+**2026-11-11 run (superseded).** Other jobs ran on the machine
+throughout, with load averages of 13 to 57 at the start of each engine
+run. Its ratios agreed between passes within 15% for 90% of them and
+within 33% for all but one. Its absolute times were inflated, most of all
+DuckDB 2.0.0 `exists` on SF10 `catalog_sales`: 5,063 ms then, 540 ms on
+the idle machine. The fastest pattern on each current release and the
+39-of-40 count did not change.
+
+Each table reports the best (minimum) wall time over all timed runs in
+the two counted passes, then the median of the second pass. The patterns
+were interleaved inside each iteration, so the patterns of one engine
+version saw the same conditions.
 
 ## Versions
 
-| Engine | February 2026 release | Last 1.x | Latest on 2026-11-11 |
+| Engine | February 2026 release | Last 1.x | Latest on 2026-11-20 |
 | --- | --- | --- | --- |
 | Polars | 1.37.1 (2026-01-12) | 1.44.2 (2026-09-09) | 2.1.0 (2026-10-25) |
 | DuckDB | 1.4.4 (2026-01-26) | 1.5.6 (2026-09-28) | 2.0.0 (2026-10-21) |
 | DataFusion (Python) | 51.0.0 (2026-01-09) | n/a | 55.0.0 (2026-10-12) |
 | PySpark | 4.1.1 (2026-01-09) | n/a | 4.3.0 (2026-10-30) |
 
-Release dates are the PyPI upload dates. DuckDB was not part of the
-February test; 1.4.4 was the stable release on 2026-02-04. BenchBox
-0.5.0 requires `duckdb>=1.5.0,<2.0.0`, `datafusion>=54.0.0` and
-`polars>=1.35.2`, so DuckDB 2.0.0 is outside what BenchBox runs today.
+Release dates are the PyPI upload dates; the latest releases were the
+same on 2026-11-11 and 2026-11-20. DuckDB was not part of the February
+test; 1.4.4 was the stable release on 2026-02-04. BenchBox 0.5.0 requires
+`duckdb>=1.5.0,<2.0.0`; BenchBox 0.5.1 requires `duckdb>=1.5.0,<3.0.0` and
+so accepts DuckDB 2.0.0. Both require `datafusion>=54.0.0` and
+`polars>=1.35.2`.
 
 ## Data
 
@@ -115,196 +124,196 @@ over both counted passes, then the median of the second pass.
 
 | Dataset | self_join | n_unique | n_unique_nonnull | min_max | Timed runs, both passes |
 | --- | --- | --- | --- | --- | --- |
-| Synthetic 10K | 0.66 / 0.84 | 0.28 / 0.38 | 0.27 / 0.37 | 0.44 / 1.33 | 600 |
-| Synthetic 50K | 1.78 / 2.03 | 0.81 / 0.96 | 0.74 / 0.94 | 1.20 / 2.40 | 600 |
-| Synthetic 100K | 3.19 / 3.47 | 1.21 / 1.54 | 1.17 / 1.45 | 2.07 / 3.28 | 600 |
-| Synthetic 250K | 8.26 / 9.13 | 2.61 / 3.13 | 2.62 / 3.08 | 4.07 / 6.36 | 600 |
-| Synthetic 500K | 18.9 / 20.6 | 5.71 / 6.59 | 5.74 / 6.61 | 7.77 / 10.9 | 437 |
-| Synthetic 1M | 45.3 / 49.8 | 15.0 / 17.2 | 15.6 / 17.3 | 20.0 / 24.2 | 169 |
-| TPC-DS SF1 web_sales | 16.4 / 18.4 | 3.81 / 4.67 | 5.13 / 5.94 | 4.20 / 6.18 | 438 |
-| TPC-DS SF1 catalog_sales | 57.0 / 76.0 | 11.0 / 15.6 | 12.4 / 18.5 | 11.0 / 16.2 | 153 |
-| TPC-DS SF10 web_sales | 1,291 / 1,351 | 58.9 / 71.0 | 64.2 / 74.9 | 55.8 / 64.9 | 19 |
-| TPC-DS SF10 catalog_sales | 3,210 / 3,784 | 138 / 206 | 148 / 207 | 128 / 163 | 18 |
+| Synthetic 10K | 0.65 / 0.81 | 0.29 / 0.39 | 0.28 / 0.38 | 0.60 / 1.62 | 600 |
+| Synthetic 50K | 1.76 / 1.96 | 0.78 / 0.89 | 0.69 / 0.86 | 1.25 / 3.09 | 600 |
+| Synthetic 100K | 3.12 / 3.40 | 1.15 / 1.37 | 1.08 / 1.32 | 1.86 / 3.83 | 600 |
+| Synthetic 250K | 8.12 / 8.70 | 2.53 / 2.82 | 2.54 / 2.84 | 3.65 / 6.42 | 600 |
+| Synthetic 500K | 17.3 / 18.3 | 5.38 / 5.89 | 5.41 / 5.94 | 7.06 / 10.1 | 600 |
+| Synthetic 1M | 39.0 / 41.4 | 13.5 / 14.5 | 13.8 / 14.8 | 18.3 / 21.5 | 314 |
+| TPC-DS SF1 web_sales | 14.4 / 15.5 | 3.59 / 3.88 | 4.50 / 5.00 | 3.97 / 5.66 | 600 |
+| TPC-DS SF1 catalog_sales | 39.9 / 42.2 | 7.79 / 8.32 | 9.00 / 9.57 | 8.46 / 10.8 | 410 |
+| TPC-DS SF10 web_sales | 552 / 565 | 43.0 / 44.8 | 47.9 / 50.0 | 41.0 / 44.5 | 45 |
+| TPC-DS SF10 catalog_sales | 1,339 / 1,404 | 97.0 / 103 | 110 / 121 | 89.9 / 101 | 18 |
 
 ### Polars 1.37.1, streaming engine
 
 | Dataset | self_join | n_unique | n_unique_nonnull | min_max | Timed runs, both passes |
 | --- | --- | --- | --- | --- | --- |
-| Synthetic 10K | 0.92 / 1.52 | 0.36 / 0.54 | 0.33 / 0.52 | 0.34 / 0.60 | 600 |
-| Synthetic 50K | 2.29 / 2.56 | 0.92 / 1.08 | 0.85 / 1.04 | 0.71 / 0.91 | 600 |
-| Synthetic 100K | 3.42 / 3.67 | 1.38 / 1.65 | 1.33 / 1.58 | 1.10 / 1.22 | 600 |
-| Synthetic 250K | 6.59 / 7.29 | 2.84 / 3.32 | 2.77 / 3.26 | 1.92 / 2.17 | 600 |
-| Synthetic 500K | 13.6 / 14.9 | 5.95 / 6.72 | 5.97 / 6.83 | 3.76 / 4.18 | 437 |
-| Synthetic 1M | 27.9 / 30.4 | 16.0 / 18.1 | 16.0 / 18.3 | 7.89 / 8.73 | 169 |
-| TPC-DS SF1 web_sales | 13.0 / 14.3 | 4.17 / 4.87 | 5.42 / 6.25 | 2.00 / 2.27 | 438 |
-| TPC-DS SF1 catalog_sales | 33.5 / 44.1 | 11.3 / 17.2 | 11.6 / 18.5 | 4.90 / 6.97 | 153 |
-| TPC-DS SF10 web_sales | 262 / 285 | 54.9 / 85.6 | 59.3 / 91.3 | 20.6 / 31.9 | 19 |
-| TPC-DS SF10 catalog_sales | 796 / 1,096 | 207 / 275 | 211 / 302 | 59.0 / 82.3 | 18 |
+| Synthetic 10K | 1.14 / 1.40 | 0.38 / 0.52 | 0.36 / 0.50 | 0.46 / 0.57 | 600 |
+| Synthetic 50K | 2.29 / 2.52 | 0.85 / 1.00 | 0.81 / 0.95 | 0.66 / 0.89 | 600 |
+| Synthetic 100K | 3.33 / 3.61 | 1.23 / 1.50 | 1.20 / 1.43 | 1.02 / 1.19 | 600 |
+| Synthetic 250K | 6.39 / 6.82 | 2.72 / 3.01 | 2.66 / 2.97 | 1.88 / 2.10 | 600 |
+| Synthetic 500K | 12.4 / 13.1 | 5.61 / 6.09 | 5.53 / 6.10 | 3.39 / 3.70 | 600 |
+| Synthetic 1M | 25.0 / 27.1 | 14.2 / 15.2 | 14.1 / 15.5 | 6.97 / 7.58 | 314 |
+| TPC-DS SF1 web_sales | 11.7 / 12.4 | 3.77 / 4.05 | 4.62 / 5.15 | 1.88 / 2.05 | 600 |
+| TPC-DS SF1 catalog_sales | 25.2 / 26.8 | 7.89 / 8.44 | 9.24 / 9.92 | 4.17 / 4.50 | 410 |
+| TPC-DS SF10 web_sales | 194 / 200 | 40.7 / 43.3 | 47.9 / 50.2 | 17.0 / 17.9 | 45 |
+| TPC-DS SF10 catalog_sales | 456 / 482 | 92.5 / 98.2 | 110 / 117 | 40.8 / 43.9 | 18 |
 
 ### Polars 1.44.2, in-memory engine
 
 | Dataset | self_join | n_unique | n_unique_nonnull | min_max | Timed runs, both passes |
 | --- | --- | --- | --- | --- | --- |
-| Synthetic 10K | 0.78 / 1.08 | 0.30 / 0.45 | 0.30 / 0.44 | 0.31 / 0.57 | 600 |
-| Synthetic 50K | 2.06 / 3.56 | 0.86 / 1.45 | 0.78 / 1.34 | 1.05 / 1.88 | 600 |
-| Synthetic 100K | 3.46 / 4.08 | 1.19 / 1.53 | 1.12 / 1.45 | 1.63 / 2.08 | 600 |
-| Synthetic 250K | 9.25 / 11.2 | 2.59 / 3.18 | 2.56 / 3.26 | 3.52 / 4.39 | 594 |
-| Synthetic 500K | 20.6 / 26.1 | 5.34 / 6.48 | 5.24 / 6.64 | 7.08 / 8.50 | 430 |
-| Synthetic 1M | 48.4 / 59.0 | 13.9 / 15.5 | 13.8 / 15.1 | 18.0 / 19.7 | 186 |
-| TPC-DS SF1 web_sales | 17.0 / 20.3 | 4.03 / 4.82 | 5.24 / 6.02 | 3.44 / 4.08 | 453 |
-| TPC-DS SF1 catalog_sales | 46.5 / 53.6 | 8.61 / 9.38 | 9.98 / 11.0 | 7.93 / 8.77 | 240 |
-| TPC-DS SF10 web_sales | 770 / 830 | 45.5 / 48.2 | 49.8 / 52.8 | 39.5 / 41.0 | 25 |
-| TPC-DS SF10 catalog_sales | 2,069 / 2,561 | 111 / 130 | 124 / 143 | 93.4 / 99.7 | 18 |
+| Synthetic 10K | 0.70 / 0.85 | 0.30 / 0.42 | 0.28 / 0.40 | 0.47 / 0.64 | 600 |
+| Synthetic 50K | 1.88 / 2.12 | 0.80 / 0.93 | 0.72 / 0.88 | 1.03 / 1.29 | 600 |
+| Synthetic 100K | 3.29 / 3.67 | 1.13 / 1.36 | 1.07 / 1.27 | 1.51 / 1.86 | 600 |
+| Synthetic 250K | 8.96 / 9.45 | 2.42 / 2.65 | 2.33 / 2.63 | 3.19 / 3.63 | 600 |
+| Synthetic 500K | 18.6 / 20.1 | 4.62 / 5.40 | 4.83 / 5.50 | 6.51 / 7.31 | 600 |
+| Synthetic 1M | 42.3 / 44.0 | 12.5 / 13.7 | 12.5 / 13.6 | 16.9 / 17.9 | 305 |
+| TPC-DS SF1 web_sales | 16.2 / 16.9 | 3.95 / 4.31 | 5.03 / 5.43 | 3.58 / 3.92 | 600 |
+| TPC-DS SF1 catalog_sales | 41.5 / 44.1 | 7.72 / 8.30 | 9.05 / 9.79 | 7.42 / 8.16 | 367 |
+| TPC-DS SF10 web_sales | 555 / 619 | 41.7 / 44.1 | 47.7 / 50.2 | 37.3 / 39.9 | 41 |
+| TPC-DS SF10 catalog_sales | 1,388 / 1,413 | 100 / 104 | 113 / 118 | 87.5 / 91.2 | 18 |
 
 ### Polars 1.44.2, streaming engine
 
 | Dataset | self_join | n_unique | n_unique_nonnull | min_max | Timed runs, both passes |
 | --- | --- | --- | --- | --- | --- |
-| Synthetic 10K | 1.19 / 1.76 | 0.81 / 1.23 | 0.96 / 1.44 | 0.41 / 0.66 | 600 |
-| Synthetic 50K | 2.41 / 3.82 | 1.74 / 2.71 | 1.96 / 3.47 | 0.79 / 1.32 | 600 |
-| Synthetic 100K | 3.26 / 3.87 | 2.38 / 2.71 | 2.77 / 3.20 | 1.08 / 1.31 | 600 |
-| Synthetic 250K | 6.61 / 7.90 | 4.25 / 4.98 | 4.98 / 6.03 | 1.89 / 2.30 | 594 |
-| Synthetic 500K | 13.3 / 15.7 | 7.78 / 9.14 | 9.14 / 11.1 | 3.39 / 4.04 | 430 |
-| Synthetic 1M | 27.1 / 29.9 | 15.3 / 17.0 | 18.4 / 20.5 | 6.63 / 7.41 | 186 |
-| TPC-DS SF1 web_sales | 11.8 / 13.2 | 6.79 / 7.74 | 7.40 / 8.51 | 1.93 / 2.18 | 453 |
-| TPC-DS SF1 catalog_sales | 26.6 / 28.2 | 13.9 / 14.9 | 15.1 / 16.8 | 3.87 / 4.14 | 240 |
-| TPC-DS SF10 web_sales | 193 / 203 | 90.5 / 101 | 96.7 / 124 | 14.3 / 15.4 | 25 |
-| TPC-DS SF10 catalog_sales | 474 / 544 | 278 / 336 | 253 / 321 | 34.4 / 37.7 | 18 |
+| Synthetic 10K | 1.15 / 1.38 | 0.85 / 1.07 | 1.02 / 1.22 | 0.47 / 0.59 | 600 |
+| Synthetic 50K | 2.26 / 2.55 | 1.59 / 1.90 | 1.94 / 2.17 | 0.75 / 0.92 | 600 |
+| Synthetic 100K | 3.33 / 3.65 | 2.40 / 2.63 | 2.70 / 2.97 | 1.03 / 1.22 | 600 |
+| Synthetic 250K | 6.59 / 6.90 | 4.31 / 4.55 | 4.92 / 5.25 | 1.93 / 2.06 | 600 |
+| Synthetic 500K | 12.5 / 13.5 | 7.66 / 8.37 | 8.83 / 9.61 | 3.25 / 3.59 | 600 |
+| Synthetic 1M | 26.0 / 27.7 | 14.9 / 16.2 | 18.1 / 19.2 | 6.61 / 7.08 | 305 |
+| TPC-DS SF1 web_sales | 11.8 / 12.3 | 6.84 / 7.30 | 7.39 / 7.92 | 1.96 / 2.09 | 600 |
+| TPC-DS SF1 catalog_sales | 24.8 / 26.4 | 13.3 / 14.3 | 14.6 / 15.8 | 3.73 / 3.97 | 367 |
+| TPC-DS SF10 web_sales | 189 / 201 | 85.8 / 97.6 | 94.6 / 104 | 13.7 / 14.9 | 41 |
+| TPC-DS SF10 catalog_sales | 451 / 476 | 218 / 232 | 230 / 244 | 32.1 / 33.9 | 18 |
 
 ### Polars 2.1.0, in-memory engine
 
 | Dataset | self_join | n_unique | n_unique_nonnull | min_max | Timed runs, both passes |
 | --- | --- | --- | --- | --- | --- |
-| Synthetic 10K | 0.70 / 0.86 | 0.29 / 0.40 | 0.29 / 0.39 | 0.24 / 0.33 | 600 |
-| Synthetic 50K | 1.96 / 2.22 | 0.83 / 1.03 | 0.79 / 0.98 | 0.70 / 0.86 | 600 |
-| Synthetic 100K | 3.44 / 3.92 | 1.23 / 1.46 | 1.15 / 1.36 | 1.06 / 1.25 | 600 |
-| Synthetic 250K | 9.10 / 10.2 | 2.66 / 3.02 | 2.60 / 2.97 | 2.44 / 2.83 | 600 |
-| Synthetic 500K | 20.2 / 22.9 | 5.29 / 6.01 | 5.21 / 6.09 | 5.38 / 5.98 | 477 |
-| Synthetic 1M | 44.0 / 58.3 | 13.6 / 16.1 | 13.6 / 15.8 | 15.1 / 17.9 | 227 |
-| TPC-DS SF1 web_sales | 16.0 / 19.7 | 4.05 / 4.82 | 5.11 / 6.11 | 3.12 / 3.74 | 594 |
-| TPC-DS SF1 catalog_sales | 48.0 / 55.5 | 9.21 / 10.4 | 10.7 / 12.2 | 7.58 / 8.73 | 291 |
-| TPC-DS SF10 web_sales | 862 / 933 | 52.3 / 54.7 | 54.4 / 57.8 | 39.1 / 41.5 | 25 |
-| TPC-DS SF10 catalog_sales | 1,754 / 2,102 | 117 / 131 | 121 / 141 | 96.8 / 116 | 18 |
+| Synthetic 10K | 0.63 / 0.80 | 0.25 / 0.41 | 0.27 / 0.40 | 0.23 / 0.32 | 600 |
+| Synthetic 50K | 1.84 / 2.01 | 0.80 / 0.96 | 0.71 / 0.89 | 0.60 / 0.76 | 600 |
+| Synthetic 100K | 3.06 / 3.47 | 1.14 / 1.33 | 1.09 / 1.26 | 0.91 / 1.09 | 600 |
+| Synthetic 250K | 8.42 / 8.85 | 2.43 / 2.61 | 2.38 / 2.55 | 2.26 / 2.38 | 600 |
+| Synthetic 500K | 18.1 / 18.7 | 4.64 / 5.01 | 4.83 / 5.11 | 4.77 / 5.09 | 600 |
+| Synthetic 1M | 40.3 / 41.3 | 12.2 / 12.9 | 12.3 / 12.9 | 13.7 / 14.3 | 357 |
+| TPC-DS SF1 web_sales | 15.4 / 15.9 | 3.78 / 3.99 | 4.93 / 5.13 | 2.99 / 3.15 | 600 |
+| TPC-DS SF1 catalog_sales | 40.6 / 41.9 | 7.64 / 8.02 | 8.97 / 9.33 | 6.57 / 6.91 | 450 |
+| TPC-DS SF10 web_sales | 557 / 575 | 39.6 / 44.1 | 45.7 / 50.5 | 33.0 / 36.0 | 48 |
+| TPC-DS SF10 catalog_sales | 1,401 / 1,431 | 95.5 / 98.2 | 108 / 115 | 84.5 / 90.6 | 18 |
 
 ### Polars 2.1.0, streaming engine
 
 | Dataset | self_join | n_unique | n_unique_nonnull | min_max | Timed runs, both passes |
 | --- | --- | --- | --- | --- | --- |
-| Synthetic 10K | 0.87 / 1.02 | 0.33 / 0.41 | 0.34 / 0.42 | 0.28 / 0.34 | 600 |
-| Synthetic 50K | 1.84 / 2.17 | 0.77 / 0.99 | 0.75 / 0.97 | 0.65 / 0.80 | 600 |
-| Synthetic 100K | 2.71 / 3.16 | 1.18 / 1.52 | 1.18 / 1.51 | 0.98 / 1.24 | 600 |
-| Synthetic 250K | 5.18 / 5.82 | 2.32 / 2.87 | 2.42 / 2.83 | 1.99 / 2.31 | 600 |
-| Synthetic 500K | 10.4 / 11.5 | 4.66 / 5.68 | 4.68 / 5.55 | 3.73 / 4.25 | 477 |
-| Synthetic 1M | 21.5 / 25.6 | 10.3 / 13.3 | 9.89 / 12.9 | 7.42 / 9.73 | 227 |
-| TPC-DS SF1 web_sales | 9.95 / 11.4 | 3.06 / 3.56 | 3.15 / 3.60 | 1.59 / 1.83 | 594 |
-| TPC-DS SF1 catalog_sales | 23.9 / 25.7 | 6.84 / 7.61 | 7.29 / 7.85 | 3.30 / 3.66 | 291 |
-| TPC-DS SF10 web_sales | 189 / 200 | 36.0 / 39.6 | 37.5 / 40.7 | 12.3 / 13.6 | 25 |
-| TPC-DS SF10 catalog_sales | 433 / 472 | 79.3 / 86.2 | 76.3 / 87.3 | 27.9 / 31.6 | 18 |
+| Synthetic 10K | 0.85 / 0.95 | 0.34 / 0.43 | 0.35 / 0.43 | 0.26 / 0.36 | 600 |
+| Synthetic 50K | 1.76 / 1.91 | 0.77 / 0.87 | 0.78 / 0.87 | 0.64 / 0.76 | 600 |
+| Synthetic 100K | 2.65 / 2.79 | 1.21 / 1.28 | 1.19 / 1.26 | 0.98 / 1.06 | 600 |
+| Synthetic 250K | 5.07 / 5.26 | 2.34 / 2.59 | 2.37 / 2.55 | 1.98 / 2.12 | 600 |
+| Synthetic 500K | 9.44 / 9.75 | 4.30 / 4.84 | 4.32 / 4.78 | 3.49 / 3.79 | 600 |
+| Synthetic 1M | 20.0 / 21.1 | 9.23 / 10.7 | 9.28 / 10.6 | 7.15 / 8.26 | 357 |
+| TPC-DS SF1 web_sales | 9.49 / 9.77 | 2.84 / 2.96 | 2.84 / 2.94 | 1.53 / 1.60 | 600 |
+| TPC-DS SF1 catalog_sales | 21.0 / 21.4 | 6.17 / 6.33 | 6.47 / 6.61 | 3.08 / 3.16 | 450 |
+| TPC-DS SF10 web_sales | 171 / 176 | 32.6 / 34.0 | 33.4 / 35.0 | 11.6 / 12.1 | 48 |
+| TPC-DS SF10 catalog_sales | 392 / 395 | 69.0 / 73.6 | 69.2 / 72.7 | 26.0 / 27.0 | 18 |
 
 ### DuckDB 1.4.4
 
 | Dataset | exists | self_join | n_unique | min_max | Timed runs, both passes |
 | --- | --- | --- | --- | --- | --- |
-| Synthetic 10K | 0.54 / 0.64 | 0.88 / 1.00 | 0.66 / 0.79 | 0.44 / 0.50 | 600 |
-| Synthetic 50K | 1.95 / 2.12 | 2.68 / 2.90 | 1.80 / 2.02 | 1.56 / 1.71 | 600 |
-| Synthetic 100K | 3.65 / 4.01 | 4.57 / 5.16 | 3.12 / 3.66 | 3.53 / 3.88 | 600 |
-| Synthetic 250K | 5.73 / 6.58 | 7.82 / 9.20 | 4.77 / 5.68 | 3.87 / 4.60 | 600 |
-| Synthetic 500K | 10.5 / 13.1 | 14.9 / 18.3 | 8.42 / 12.0 | 6.50 / 8.37 | 600 |
-| Synthetic 1M | 14.0 / 16.4 | 23.3 / 27.5 | 16.2 / 19.5 | 11.2 / 13.7 | 482 |
-| TPC-DS SF1 web_sales | 11.8 / 13.5 | 11.3 / 13.1 | 4.80 / 6.18 | 2.46 / 3.07 | 600 |
-| TPC-DS SF1 catalog_sales | 12.5 / 13.8 | 23.8 / 25.5 | 9.24 / 10.3 | 3.82 / 4.26 | 588 |
-| TPC-DS SF10 web_sales | 52.2 / 55.6 | 177 / 195 | 62.1 / 66.1 | 15.8 / 16.9 | 103 |
-| TPC-DS SF10 catalog_sales | 112 / 122 | 414 / 439 | 131 / 138 | 36.6 / 39.0 | 42 |
+| Synthetic 10K | 0.53 / 0.63 | 0.81 / 0.99 | 0.51 / 0.72 | 0.41 / 0.48 | 600 |
+| Synthetic 50K | 1.89 / 2.04 | 2.53 / 2.76 | 1.74 / 1.88 | 1.54 / 1.65 | 600 |
+| Synthetic 100K | 3.57 / 3.81 | 4.51 / 4.75 | 3.10 / 3.30 | 3.51 / 3.70 | 600 |
+| Synthetic 250K | 5.54 / 5.87 | 7.58 / 7.95 | 4.72 / 4.84 | 3.79 / 3.93 | 600 |
+| Synthetic 500K | 10.4 / 11.0 | 14.4 / 15.0 | 8.14 / 9.02 | 6.41 / 6.89 | 600 |
+| Synthetic 1M | 13.0 / 13.4 | 21.1 / 21.8 | 15.2 / 16.0 | 10.6 / 11.1 | 587 |
+| TPC-DS SF1 web_sales | 11.1 / 11.6 | 10.4 / 10.7 | 4.73 / 4.95 | 2.38 / 2.54 | 600 |
+| TPC-DS SF1 catalog_sales | 12.2 / 12.8 | 23.7 / 24.5 | 9.25 / 9.63 | 3.83 / 3.99 | 600 |
+| TPC-DS SF10 web_sales | 48.0 / 49.7 | 170 / 176 | 57.2 / 59.2 | 14.8 / 15.2 | 123 |
+| TPC-DS SF10 catalog_sales | 102 / 103 | 388 / 393 | 122 / 125 | 31.5 / 34.0 | 54 |
 
 ### DuckDB 1.5.6
 
 | Dataset | exists | self_join | n_unique | min_max | Timed runs, both passes |
 | --- | --- | --- | --- | --- | --- |
-| Synthetic 10K | 0.50 / 0.57 | 0.78 / 0.88 | 0.51 / 0.64 | 0.40 / 0.45 | 600 |
-| Synthetic 50K | 1.81 / 1.91 | 2.45 / 2.55 | 1.61 / 1.76 | 1.48 / 1.55 | 600 |
-| Synthetic 100K | 3.51 / 3.67 | 4.33 / 4.55 | 3.00 / 3.18 | 3.35 / 3.52 | 600 |
-| Synthetic 250K | 5.56 / 5.77 | 7.59 / 7.82 | 4.69 / 4.78 | 3.78 / 3.87 | 600 |
-| Synthetic 500K | 10.3 / 10.8 | 14.3 / 14.9 | 8.19 / 8.95 | 6.43 / 6.79 | 600 |
-| Synthetic 1M | 13.1 / 13.8 | 21.5 / 22.5 | 15.3 / 16.3 | 10.8 / 11.5 | 528 |
-| TPC-DS SF1 web_sales | 11.0 / 11.6 | 10.5 / 10.9 | 4.65 / 5.02 | 2.32 / 2.52 | 600 |
-| TPC-DS SF1 catalog_sales | 12.4 / 13.7 | 23.6 / 25.9 | 9.10 / 10.8 | 3.79 / 4.32 | 594 |
-| TPC-DS SF10 web_sales | 51.7 / 52.9 | 174 / 178 | 50.9 / 51.8 | 15.8 / 16.2 | 112 |
-| TPC-DS SF10 catalog_sales | 111 / 116 | 380 / 395 | 116 / 123 | 34.0 / 36.5 | 43 |
+| Synthetic 10K | 0.49 / 0.57 | 0.80 / 0.91 | 0.51 / 0.66 | 0.40 / 0.45 | 600 |
+| Synthetic 50K | 1.84 / 1.96 | 2.47 / 2.62 | 1.70 / 1.78 | 1.52 / 1.59 | 600 |
+| Synthetic 100K | 3.55 / 3.78 | 4.45 / 4.58 | 3.03 / 3.16 | 3.43 / 3.53 | 600 |
+| Synthetic 250K | 5.51 / 5.66 | 7.49 / 7.71 | 4.67 / 4.76 | 3.78 / 3.85 | 600 |
+| Synthetic 500K | 10.3 / 10.8 | 14.1 / 14.7 | 8.15 / 8.77 | 6.05 / 6.57 | 600 |
+| Synthetic 1M | 12.7 / 13.0 | 20.6 / 21.1 | 14.8 / 15.4 | 10.1 / 10.7 | 598 |
+| TPC-DS SF1 web_sales | 10.9 / 11.3 | 10.1 / 10.4 | 4.58 / 4.83 | 2.33 / 2.47 | 600 |
+| TPC-DS SF1 catalog_sales | 12.1 / 12.3 | 23.1 / 23.5 | 9.00 / 9.19 | 3.73 / 3.80 | 600 |
+| TPC-DS SF10 web_sales | 48.9 / 50.6 | 171 / 176 | 48.7 / 51.0 | 14.7 / 15.5 | 127 |
+| TPC-DS SF10 catalog_sales | 104 / 109 | 366 / 377 | 110 / 115 | 31.9 / 33.6 | 56 |
 
 ### DuckDB 2.0.0
 
 | Dataset | exists | self_join | n_unique | min_max | Timed runs, both passes |
 | --- | --- | --- | --- | --- | --- |
-| Synthetic 10K | 0.70 / 0.76 | 0.89 / 1.01 | 0.60 / 0.70 | 0.52 / 0.57 | 600 |
-| Synthetic 50K | 2.08 / 2.19 | 2.63 / 2.75 | 1.75 / 1.87 | 1.68 / 1.76 | 600 |
-| Synthetic 100K | 3.82 / 3.99 | 4.51 / 4.68 | 3.05 / 3.25 | 3.55 / 3.70 | 600 |
-| Synthetic 250K | 6.29 / 6.51 | 7.89 / 8.22 | 4.76 / 4.97 | 4.08 / 4.28 | 600 |
-| Synthetic 500K | 11.9 / 12.4 | 14.9 / 15.6 | 7.94 / 8.45 | 6.71 / 7.20 | 600 |
-| Synthetic 1M | 14.3 / 14.9 | 22.0 / 22.8 | 14.8 / 15.3 | 11.2 / 11.6 | 518 |
-| TPC-DS SF1 web_sales | 24.7 / 26.0 | 10.5 / 11.0 | 4.77 / 5.08 | 2.39 / 2.51 | 600 |
-| TPC-DS SF1 catalog_sales | 44.3 / 49.4 | 23.5 / 26.0 | 9.04 / 10.1 | 3.79 / 4.22 | 393 |
-| TPC-DS SF10 web_sales | 314 / 606 | 202 / 266 | 50.8 / 68.3 | 14.6 / 17.9 | 24 |
-| TPC-DS SF10 catalog_sales | 5,063 / 7,177 | 682 / 791 | 169 / 230 | 46.5 / 62.5 | 18 |
+| Synthetic 10K | 0.69 / 0.77 | 0.90 / 1.02 | 0.62 / 0.70 | 0.52 / 0.59 | 600 |
+| Synthetic 50K | 2.11 / 2.30 | 2.63 / 2.86 | 1.78 / 1.93 | 1.71 / 1.87 | 600 |
+| Synthetic 100K | 3.88 / 4.30 | 4.47 / 4.90 | 3.03 / 3.37 | 3.62 / 3.96 | 600 |
+| Synthetic 250K | 6.32 / 6.78 | 7.77 / 8.33 | 4.74 / 5.14 | 4.09 / 4.45 | 600 |
+| Synthetic 500K | 11.9 / 12.7 | 14.5 / 15.5 | 7.87 / 8.61 | 6.36 / 7.08 | 600 |
+| Synthetic 1M | 13.8 / 14.6 | 21.2 / 21.9 | 14.1 / 14.8 | 10.5 / 11.2 | 600 |
+| TPC-DS SF1 web_sales | 24.3 / 26.3 | 10.2 / 10.9 | 4.77 / 5.16 | 2.34 / 2.54 | 600 |
+| TPC-DS SF1 catalog_sales | 43.0 / 44.1 | 23.1 / 23.6 | 8.83 / 9.09 | 3.73 / 3.85 | 464 |
+| TPC-DS SF10 web_sales | 266 / 272 | 173 / 175 | 46.4 / 47.5 | 12.8 / 13.3 | 73 |
+| TPC-DS SF10 catalog_sales | 540 / 606 | 378 / 399 | 108 / 114 | 30.3 / 32.2 | 25 |
 
 ### DataFusion 51.0.0
 
 | Dataset | self_join | n_unique | min_max | Timed runs, both passes |
 | --- | --- | --- | --- | --- |
-| Synthetic 10K | 1.29 / 1.45 | 3.05 / 3.68 | 0.50 / 0.62 | 600 |
-| Synthetic 50K | 2.58 / 2.80 | 10.5 / 16.3 | 0.95 / 1.09 | 600 |
-| Synthetic 100K | 4.17 / 4.52 | 17.9 / 26.7 | 1.42 / 1.58 | 600 |
-| Synthetic 250K | 8.27 / 8.82 | 45.6 / 57.3 | 2.90 / 3.19 | 544 |
-| Synthetic 500K | 17.0 / 18.0 | 101 / 118 | 6.17 / 6.79 | 267 |
-| Synthetic 1M | 34.9 / 37.1 | 221 / 245 | 13.0 / 14.3 | 124 |
-| TPC-DS SF1 web_sales | 11.1 / 11.6 | 14.4 / 17.4 | 1.81 / 1.94 | 600 |
-| TPC-DS SF1 catalog_sales | 29.2 / 31.1 | 30.9 / 38.3 | 3.68 / 3.89 | 498 |
-| TPC-DS SF10 web_sales | 242 / 260 | 126 / 137 | 15.4 / 18.0 | 84 |
-| TPC-DS SF10 catalog_sales | 865 / 905 | 412 / 425 | 39.3 / 42.4 | 21 |
+| Synthetic 10K | 1.26 / 1.37 | 2.86 / 3.46 | 0.50 / 0.56 | 600 |
+| Synthetic 50K | 2.53 / 2.63 | 14.2 / 16.0 | 0.95 / 1.01 | 600 |
+| Synthetic 100K | 4.08 / 4.30 | 22.4 / 26.5 | 1.35 / 1.50 | 600 |
+| Synthetic 250K | 8.12 / 8.72 | 49.7 / 59.2 | 2.82 / 3.14 | 564 |
+| Synthetic 500K | 16.4 / 18.4 | 96.2 / 120 | 5.87 / 6.85 | 276 |
+| Synthetic 1M | 34.0 / 36.3 | 227 / 246 | 12.7 / 13.8 | 132 |
+| TPC-DS SF1 web_sales | 10.6 / 11.2 | 15.2 / 17.1 | 1.71 / 1.83 | 600 |
+| TPC-DS SF1 catalog_sales | 27.9 / 29.6 | 32.7 / 38.5 | 3.45 / 3.69 | 549 |
+| TPC-DS SF10 web_sales | 223 / 235 | 124 / 137 | 14.5 / 15.5 | 99 |
+| TPC-DS SF10 catalog_sales | 651 / 671 | 364 / 387 | 36.4 / 38.2 | 33 |
 
 ### DataFusion 55.0.0
 
 | Dataset | self_join | n_unique | min_max | Timed runs, both passes |
 | --- | --- | --- | --- | --- |
-| Synthetic 10K | 1.12 / 1.25 | 0.72 / 0.81 | 0.41 / 0.47 | 600 |
-| Synthetic 50K | 2.14 / 2.33 | 1.40 / 1.52 | 0.81 / 0.92 | 600 |
-| Synthetic 100K | 3.18 / 3.47 | 2.00 / 2.23 | 1.16 / 1.32 | 600 |
-| Synthetic 250K | 10.0 / 10.4 | 7.40 / 7.63 | 3.89 / 4.01 | 600 |
-| Synthetic 500K | 16.9 / 17.6 | 11.8 / 12.2 | 6.06 / 6.26 | 600 |
-| Synthetic 1M | 32.1 / 35.0 | 20.1 / 22.1 | 10.2 / 11.3 | 536 |
-| TPC-DS SF1 web_sales | 9.28 / 9.89 | 3.62 / 4.09 | 1.72 / 1.84 | 600 |
-| TPC-DS SF1 catalog_sales | 23.3 / 25.4 | 8.15 / 8.68 | 3.40 / 3.93 | 600 |
-| TPC-DS SF10 web_sales | 179 / 192 | 50.5 / 55.4 | 13.7 / 14.9 | 128 |
-| TPC-DS SF10 catalog_sales | 518 / 652 | 161 / 221 | 37.4 / 56.4 | 32 |
+| Synthetic 10K | 1.11 / 1.18 | 0.71 / 0.76 | 0.41 / 0.44 | 600 |
+| Synthetic 50K | 2.18 / 2.33 | 1.40 / 1.52 | 0.83 / 0.91 | 600 |
+| Synthetic 100K | 3.20 / 3.51 | 1.98 / 2.14 | 1.13 / 1.32 | 600 |
+| Synthetic 250K | 10.1 / 10.4 | 7.48 / 7.70 | 3.91 / 4.04 | 600 |
+| Synthetic 500K | 16.7 / 17.3 | 11.9 / 12.1 | 6.07 / 6.24 | 600 |
+| Synthetic 1M | 31.1 / 32.1 | 19.8 / 20.6 | 10.2 / 10.5 | 600 |
+| TPC-DS SF1 web_sales | 8.79 / 9.07 | 3.34 / 3.49 | 1.58 / 1.67 | 600 |
+| TPC-DS SF1 catalog_sales | 22.9 / 24.2 | 7.98 / 8.36 | 3.35 / 3.84 | 600 |
+| TPC-DS SF10 web_sales | 166 / 170 | 47.1 / 49.4 | 13.0 / 13.5 | 167 |
+| TPC-DS SF10 catalog_sales | 455 / 469 | 148 / 152 | 32.1 / 33.3 | 58 |
 
 ### PySpark 4.1.1
 
 | Dataset | self_join | n_unique | min_max | Timed runs, both passes |
 | --- | --- | --- | --- | --- |
-| Synthetic 10K | 124 / 136 | 100 / 110 | 62.8 / 70.3 | 18 |
-| Synthetic 50K | 140 / 176 | 117 / 134 | 76.1 / 90.9 | 18 |
-| Synthetic 100K | 191 / 208 | 153 / 171 | 93.8 / 100 | 18 |
-| Synthetic 250K | 304 / 328 | 228 / 248 | 141 / 147 | 18 |
-| Synthetic 500K | 500 / 574 | 353 / 386 | 216 / 246 | 18 |
-| Synthetic 1M | 1,000 / 1,052 | 629 / 684 | 394 / 408 | 18 |
-| TPC-DS SF1 web_sales | 312 / 342 | 224 / 239 | 91.1 / 95.8 | 18 |
-| TPC-DS SF1 catalog_sales | 598 / 649 | 418 / 492 | 183 / 195 | 18 |
-| TPC-DS SF10 web_sales | 2,607 / 2,786 | 1,635 / 1,872 | 338 / 341 | 18 |
-| TPC-DS SF10 catalog_sales | 4,523 / 6,085 | 2,593 / 3,282 | 499 / 566 | 18 |
+| Synthetic 10K | 113 / 125 | 92.7 / 101 | 62.6 / 72.0 | 18 |
+| Synthetic 50K | 136 / 139 | 109 / 112 | 70.0 / 71.7 | 18 |
+| Synthetic 100K | 170 / 175 | 140 / 147 | 86.0 / 89.0 | 18 |
+| Synthetic 250K | 276 / 280 | 215 / 218 | 129 / 133 | 18 |
+| Synthetic 500K | 445 / 455 | 313 / 326 | 198 / 203 | 18 |
+| Synthetic 1M | 730 / 829 | 501 / 540 | 333 / 340 | 18 |
+| TPC-DS SF1 web_sales | 272 / 273 | 207 / 210 | 87.5 / 89.2 | 18 |
+| TPC-DS SF1 catalog_sales | 467 / 515 | 365 / 367 | 160 / 162 | 18 |
+| TPC-DS SF10 web_sales | 1,699 / 1,777 | 1,233 / 1,254 | 290 / 294 | 18 |
+| TPC-DS SF10 catalog_sales | 3,007 / 3,123 | 1,821 / 1,918 | 381 / 398 | 18 |
 
 ### PySpark 4.3.0
 
 | Dataset | self_join | n_unique | min_max | Timed runs, both passes |
 | --- | --- | --- | --- | --- |
-| Synthetic 10K | 121 / 139 | 99.5 / 112 | 65.0 / 70.8 | 18 |
-| Synthetic 50K | 142 / 151 | 114 / 126 | 74.7 / 79.1 | 18 |
-| Synthetic 100K | 173 / 179 | 149 / 152 | 88.8 / 91.5 | 18 |
-| Synthetic 250K | 295 / 307 | 223 / 232 | 131 / 140 | 18 |
-| Synthetic 500K | 488 / 494 | 343 / 347 | 207 / 218 | 18 |
-| Synthetic 1M | 854 / 927 | 561 / 621 | 372 / 404 | 18 |
-| TPC-DS SF1 web_sales | 308 / 343 | 213 / 243 | 91.7 / 96.5 | 18 |
-| TPC-DS SF1 catalog_sales | 605 / 665 | 438 / 483 | 180 / 192 | 18 |
-| TPC-DS SF10 web_sales | 2,855 / 3,264 | 1,816 / 1,959 | 370 / 416 | 18 |
-| TPC-DS SF10 catalog_sales | 4,861 / 5,983 | 2,970 / 3,529 | 536 / 594 | 18 |
+| Synthetic 10K | 124 / 138 | 95.4 / 111 | 64.2 / 74.1 | 18 |
+| Synthetic 50K | 137 / 143 | 111 / 115 | 73.2 / 75.2 | 18 |
+| Synthetic 100K | 173 / 179 | 146 / 149 | 89.5 / 91.8 | 18 |
+| Synthetic 250K | 283 / 293 | 220 / 224 | 128 / 134 | 18 |
+| Synthetic 500K | 453 / 460 | 326 / 334 | 204 / 208 | 18 |
+| Synthetic 1M | 753 / 813 | 521 / 580 | 343 / 350 | 18 |
+| TPC-DS SF1 web_sales | 280 / 283 | 207 / 211 | 89.6 / 91.0 | 18 |
+| TPC-DS SF1 catalog_sales | 495 / 540 | 369 / 376 | 165 / 166 | 18 |
+| TPC-DS SF10 web_sales | 1,734 / 1,779 | 1,242 / 1,275 | 301 / 304 | 18 |
+| TPC-DS SF10 catalog_sales | 2,827 / 2,886 | 1,864 / 1,899 | 393 / 409 | 18 |
 
 ## Ratios from the best times
 
@@ -315,51 +324,52 @@ version and dataset. Below 1 means faster than `n_unique`.
 
 | Engine | 10K | 50K | 100K | 250K | 500K | 1M | SF1 web | SF1 catalog | SF10 web | SF10 catalog |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| Polars 1.37.1 in-memory | 2.38 | 2.21 | 2.65 | 3.16 | 3.32 | 3.02 | 4.31 | 5.19 | 21.92 | 23.33 |
-| Polars 1.37.1 streaming | 2.55 | 2.49 | 2.48 | 2.32 | 2.29 | 1.74 | 3.12 | 2.97 | 4.77 | 3.84 |
-| Polars 1.44.2 in-memory | 2.57 | 2.40 | 2.91 | 3.57 | 3.86 | 3.47 | 4.23 | 5.40 | 16.92 | 18.71 |
-| Polars 1.44.2 streaming | 1.48 | 1.38 | 1.37 | 1.55 | 1.71 | 1.77 | 1.73 | 1.91 | 2.13 | 1.71 |
-| Polars 2.1.0 in-memory | 2.39 | 2.36 | 2.79 | 3.43 | 3.81 | 3.24 | 3.96 | 5.20 | 16.48 | 15.02 |
-| Polars 2.1.0 streaming | 2.59 | 2.39 | 2.30 | 2.23 | 2.23 | 2.08 | 3.26 | 3.50 | 5.25 | 5.46 |
-| DuckDB 1.4.4 | 1.33 | 1.48 | 1.46 | 1.64 | 1.77 | 1.44 | 2.35 | 2.57 | 2.86 | 3.15 |
-| DuckDB 1.5.6 | 1.52 | 1.53 | 1.44 | 1.62 | 1.75 | 1.40 | 2.25 | 2.59 | 3.42 | 3.29 |
-| DuckDB 2.0.0 | 1.47 | 1.50 | 1.48 | 1.66 | 1.88 | 1.48 | 2.19 | 2.60 | 3.97 | 4.04 |
-| DataFusion 51.0.0 | 0.42 | 0.25 | 0.23 | 0.18 | 0.17 | 0.16 | 0.77 | 0.95 | 1.92 | 2.10 |
-| DataFusion 55.0.0 | 1.56 | 1.53 | 1.58 | 1.35 | 1.43 | 1.59 | 2.56 | 2.86 | 3.55 | 3.22 |
-| PySpark 4.1.1 | 1.23 | 1.19 | 1.25 | 1.33 | 1.42 | 1.59 | 1.40 | 1.43 | 1.59 | 1.74 |
-| PySpark 4.3.0 | 1.22 | 1.24 | 1.16 | 1.32 | 1.42 | 1.52 | 1.45 | 1.38 | 1.57 | 1.64 |
+| Polars 1.37.1 in-memory | 2.28 | 2.27 | 2.73 | 3.20 | 3.21 | 2.90 | 4.02 | 5.13 | 12.82 | 13.81 |
+| Polars 1.37.1 streaming | 2.99 | 2.68 | 2.71 | 2.35 | 2.20 | 1.75 | 3.10 | 3.20 | 4.75 | 4.93 |
+| Polars 1.44.2 in-memory | 2.31 | 2.37 | 2.92 | 3.70 | 4.02 | 3.37 | 4.10 | 5.38 | 13.31 | 13.84 |
+| Polars 1.44.2 streaming | 1.35 | 1.42 | 1.39 | 1.53 | 1.63 | 1.74 | 1.72 | 1.86 | 2.21 | 2.07 |
+| Polars 2.1.0 in-memory | 2.56 | 2.30 | 2.69 | 3.46 | 3.91 | 3.30 | 4.07 | 5.31 | 14.06 | 14.66 |
+| Polars 2.1.0 streaming | 2.51 | 2.30 | 2.20 | 2.16 | 2.20 | 2.17 | 3.34 | 3.40 | 5.26 | 5.68 |
+| DuckDB 1.4.4 | 1.57 | 1.45 | 1.46 | 1.61 | 1.76 | 1.39 | 2.19 | 2.56 | 2.98 | 3.18 |
+| DuckDB 1.5.6 | 1.56 | 1.45 | 1.47 | 1.60 | 1.73 | 1.39 | 2.20 | 2.56 | 3.51 | 3.32 |
+| DuckDB 2.0.0 | 1.46 | 1.48 | 1.47 | 1.64 | 1.84 | 1.50 | 2.13 | 2.62 | 3.73 | 3.49 |
+| DataFusion 51.0.0 | 0.44 | 0.18 | 0.18 | 0.16 | 0.17 | 0.15 | 0.70 | 0.85 | 1.80 | 1.79 |
+| DataFusion 55.0.0 | 1.57 | 1.56 | 1.61 | 1.35 | 1.41 | 1.57 | 2.63 | 2.87 | 3.53 | 3.07 |
+| PySpark 4.1.1 | 1.22 | 1.24 | 1.21 | 1.28 | 1.42 | 1.46 | 1.32 | 1.28 | 1.38 | 1.65 |
+| PySpark 4.3.0 | 1.30 | 1.23 | 1.18 | 1.28 | 1.39 | 1.45 | 1.35 | 1.34 | 1.40 | 1.52 |
 
 ### `min_max` relative to `n_unique`
 
 | Engine | 10K | 50K | 100K | 250K | 500K | 1M | SF1 web | SF1 catalog | SF10 web | SF10 catalog |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| Polars 1.37.1 in-memory | 1.60 | 1.49 | 1.72 | 1.56 | 1.36 | 1.33 | 1.10 | 1.00 | 0.95 | 0.93 |
-| Polars 1.37.1 streaming | 0.95 | 0.77 | 0.80 | 0.68 | 0.63 | 0.49 | 0.48 | 0.43 | 0.37 | 0.28 |
-| Polars 1.44.2 in-memory | 1.02 | 1.23 | 1.37 | 1.36 | 1.33 | 1.29 | 0.85 | 0.92 | 0.87 | 0.84 |
-| Polars 1.44.2 streaming | 0.51 | 0.45 | 0.45 | 0.45 | 0.44 | 0.43 | 0.28 | 0.28 | 0.16 | 0.12 |
-| Polars 2.1.0 in-memory | 0.83 | 0.85 | 0.86 | 0.92 | 1.02 | 1.11 | 0.77 | 0.82 | 0.75 | 0.83 |
-| Polars 2.1.0 streaming | 0.83 | 0.84 | 0.83 | 0.86 | 0.80 | 0.72 | 0.52 | 0.48 | 0.34 | 0.35 |
-| DuckDB 1.4.4 | 0.67 | 0.86 | 1.13 | 0.81 | 0.77 | 0.69 | 0.51 | 0.41 | 0.25 | 0.28 |
-| DuckDB 1.5.6 | 0.79 | 0.92 | 1.12 | 0.81 | 0.79 | 0.70 | 0.50 | 0.42 | 0.31 | 0.29 |
-| DuckDB 2.0.0 | 0.86 | 0.96 | 1.16 | 0.86 | 0.85 | 0.75 | 0.50 | 0.42 | 0.29 | 0.27 |
-| DataFusion 51.0.0 | 0.16 | 0.09 | 0.08 | 0.06 | 0.06 | 0.06 | 0.12 | 0.12 | 0.12 | 0.10 |
-| DataFusion 55.0.0 | 0.56 | 0.58 | 0.58 | 0.53 | 0.51 | 0.51 | 0.48 | 0.42 | 0.27 | 0.23 |
-| PySpark 4.1.1 | 0.62 | 0.65 | 0.61 | 0.62 | 0.61 | 0.63 | 0.41 | 0.44 | 0.21 | 0.19 |
-| PySpark 4.3.0 | 0.65 | 0.65 | 0.60 | 0.59 | 0.60 | 0.66 | 0.43 | 0.41 | 0.20 | 0.18 |
+| Polars 1.37.1 in-memory | 2.10 | 1.62 | 1.63 | 1.44 | 1.31 | 1.36 | 1.10 | 1.09 | 0.95 | 0.93 |
+| Polars 1.37.1 streaming | 1.20 | 0.77 | 0.83 | 0.69 | 0.60 | 0.49 | 0.50 | 0.53 | 0.42 | 0.44 |
+| Polars 1.44.2 in-memory | 1.56 | 1.29 | 1.33 | 1.32 | 1.41 | 1.35 | 0.91 | 0.96 | 0.90 | 0.87 |
+| Polars 1.44.2 streaming | 0.55 | 0.47 | 0.43 | 0.45 | 0.42 | 0.44 | 0.29 | 0.28 | 0.16 | 0.15 |
+| Polars 2.1.0 in-memory | 0.93 | 0.75 | 0.80 | 0.93 | 1.03 | 1.12 | 0.79 | 0.86 | 0.83 | 0.88 |
+| Polars 2.1.0 streaming | 0.78 | 0.84 | 0.81 | 0.84 | 0.81 | 0.77 | 0.54 | 0.50 | 0.36 | 0.38 |
+| DuckDB 1.4.4 | 0.80 | 0.89 | 1.13 | 0.80 | 0.79 | 0.70 | 0.50 | 0.41 | 0.26 | 0.26 |
+| DuckDB 1.5.6 | 0.78 | 0.89 | 1.13 | 0.81 | 0.74 | 0.68 | 0.51 | 0.41 | 0.30 | 0.29 |
+| DuckDB 2.0.0 | 0.83 | 0.96 | 1.20 | 0.86 | 0.81 | 0.75 | 0.49 | 0.42 | 0.28 | 0.28 |
+| DataFusion 51.0.0 | 0.18 | 0.07 | 0.06 | 0.06 | 0.06 | 0.06 | 0.11 | 0.11 | 0.12 | 0.10 |
+| DataFusion 55.0.0 | 0.58 | 0.59 | 0.57 | 0.52 | 0.51 | 0.51 | 0.47 | 0.42 | 0.28 | 0.22 |
+| PySpark 4.1.1 | 0.68 | 0.64 | 0.61 | 0.60 | 0.63 | 0.66 | 0.42 | 0.44 | 0.24 | 0.21 |
+| PySpark 4.3.0 | 0.67 | 0.66 | 0.61 | 0.58 | 0.62 | 0.66 | 0.43 | 0.45 | 0.24 | 0.21 |
 
 ### DuckDB `exists` relative to `n_unique`
 
 | Engine | 10K | 50K | 100K | 250K | 500K | 1M | SF1 web | SF1 catalog | SF10 web | SF10 catalog |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| DuckDB 1.4.4 | 0.83 | 1.08 | 1.17 | 1.20 | 1.25 | 0.86 | 2.46 | 1.35 | 0.84 | 0.85 |
-| DuckDB 1.5.6 | 0.99 | 1.13 | 1.17 | 1.18 | 1.25 | 0.85 | 2.37 | 1.36 | 1.01 | 0.96 |
-| DuckDB 2.0.0 | 1.15 | 1.19 | 1.25 | 1.32 | 1.50 | 0.97 | 5.17 | 4.90 | 6.17 | 29.95 |
+| DuckDB 1.4.4 | 1.02 | 1.09 | 1.15 | 1.18 | 1.27 | 0.85 | 2.34 | 1.32 | 0.84 | 0.83 |
+| DuckDB 1.5.6 | 0.96 | 1.08 | 1.17 | 1.18 | 1.26 | 0.86 | 2.38 | 1.34 | 1.00 | 0.94 |
+| DuckDB 2.0.0 | 1.12 | 1.19 | 1.28 | 1.33 | 1.51 | 0.98 | 5.09 | 4.87 | 5.73 | 4.98 |
 
 DuckDB 2.0.1.dev2611101550, the newest development build on 2026-11-11,
-was run once on three datasets to see whether the `exists` behaviour had
-already changed. Best times in milliseconds: SF1 `catalog_sales` 45.8
-(`n_unique` 9.3), SF10 `web_sales` 306 (50.3), SF10 `catalog_sales` 4,417
-(142). It behaves like 2.0.0.
+was run once on three datasets on the shared machine to see whether the
+`exists` behaviour had already changed. Best times in milliseconds: SF1
+`catalog_sales` 45.8 (`n_unique` 9.3), SF10 `web_sales` 306 (50.3), SF10
+`catalog_sales` 4,417 (142). It behaved like 2.0.0 did on that machine.
+It was not rerun.
 
 ## The full TPC-DS queries on DuckDB
 
@@ -368,38 +378,74 @@ real queries filter the outer side first. To see whether the 2.0.0
 `exists` times carry over, Q16, Q94 and Q95 from the `tpcds` extension
 (`tpcds_queries()`) were run against one database file per scale factor,
 generated with DuckDB 1.4.4 and opened read-only by each version. Two
-warm-up runs, then nine timed runs. Best / median in milliseconds:
+warm-up runs, then nine timed runs (`fullsql.py` under Harness).
+Best / median in milliseconds, 2026-11-20:
 
 | Scale | Query | DuckDB 1.4.4 | DuckDB 1.5.6 | DuckDB 2.0.0 |
 | --- | --- | --- | --- | --- |
-| SF1 | Q16 | 6.77 / 7.40 | 6.27 / 6.63 | 5.10 / 5.46 |
-| SF1 | Q94 | 4.74 / 5.06 | 3.95 / 4.24 | 4.59 / 4.82 |
-| SF1 | Q95 | 55.3 / 58.7 | 56.1 / 58.5 | 20.6 / 21.0 |
-| SF10 | Q16 | 7.44 / 7.85 | 7.23 / 7.36 | 7.40 / 7.75 |
-| SF10 | Q94 | 15.9 / 16.8 | 14.1 / 16.1 | 10.6 / 11.0 |
-| SF10 | Q95 | 372 / 387 | 383 / 405 | 69.4 / 74.2 |
+| SF1 | Q16 | 6.35 / 6.67 | 6.11 / 6.42 | 4.50 / 4.58 |
+| SF1 | Q94 | 4.01 / 4.14 | 3.93 / 4.02 | 4.62 / 4.70 |
+| SF1 | Q95 | 53.1 / 53.8 | 51.2 / 52.9 | 18.3 / 18.7 |
+| SF10 | Q16 | 7.04 / 7.40 | 6.93 / 7.21 | 7.59 / 7.99 |
+| SF10 | Q94 | 12.9 / 13.1 | 13.1 / 13.4 | 9.99 / 10.2 |
+| SF10 | Q95 | 329 / 336 | 332 / 342 | 60.3 / 61.2 |
 
 All three versions returned identical answers for each query. On
-DuckDB 2.0.0, Q16 and Q94 are within 20% of their 1.5.6 times in either
-direction, and Q95 is 2.7 times faster at SF1 and 5.5 times faster at
-SF10. The slow `exists` times
-belong to the isolated statement, not to these queries.
+DuckDB 2.0.0, Q16 and Q94 are within 27% of their 1.5.6 times in either
+direction, and Q95 is 2.8 times faster at SF1 and 5.5 times faster at
+SF10. The slow `exists` times belong to the isolated statement, not to
+these queries. The 2026-11-11 run gave the same picture.
 
-The DataFrame engines were not run on the full queries in this test. The
-platform branch in BenchBox 0.5.0 never ran, because it compared the
-platform name with "datafusion" and the DataFusion adapter reports
-"DataFusion", so Q16 and Q95 used the distinct count on every platform and
-Q94 used the self-join. BenchBox now uses min/max for Q16, Q94 and Q95 on
-every platform. Complete-query timings before and after that change
-(TPC-DS SF1, Polars 1.44.2 and DataFusion 54.0.0, best of 5 alternating
-runs, ms; differences under about 10% are noise) are in the draft: Polars
-Q16 30.3 to 30.2, Q94 30.2 to 23.8, Q95 24.4 to 22.8; DataFusion Q16 89.0
-to 61.4, Q94 68.9 to 35.5, Q95 66.6 to 41.3. SF10 would not run on that
-host and PySpark was refused by BenchBox's memory guard.
+## The complete DataFrame queries, BenchBox 0.5.0 and 0.5.1
+
+BenchBox 0.5.0 chose the pattern with a platform branch that never ran:
+it compared the platform name with "datafusion" and the DataFusion
+adapter reports "DataFusion", so Q16 and Q95 used the distinct count on
+every platform and Q94 used the self-join. BenchBox 0.5.1 (core pull
+request 4169) uses min/max for Q16, Q94 and Q95 on every platform.
+
+The complete DataFrame Q16, Q94 and Q95 ran through `benchbox run` from
+the PyPI releases of BenchBox 0.5.0 and 0.5.1, with the same engine
+versions on both: Polars 2.1.0, DataFusion 55.0.0 and PySpark 4.3.0.
+TPC-DS SF1 data was generated once with BenchBox 0.5.1 and read by both.
+Each run did one warm-up pass and five timed passes, the three queries in
+turn. Three rounds alternated which BenchBox version ran first, so each
+cell has 15 timed runs. Best / median in milliseconds, 2026-11-19:
+
+| Query | Engine | BenchBox 0.5.0 | BenchBox 0.5.1 | Median ratio |
+| --- | --- | --- | --- | --- |
+| Q16 | Polars 2.1.0 | 28.8 / 30.2 | 24.7 / 25.3 | 0.84 |
+| Q94 | Polars 2.1.0 | 25.9 / 27.2 | 18.4 / 19.1 | 0.70 |
+| Q95 | Polars 2.1.0 | 19.9 / 20.7 | 18.1 / 19.0 | 0.92 |
+| Q16 | DataFusion 55.0.0 | 32.2 / 76.1 | 26.6 / 57.2 | 0.75 |
+| Q94 | DataFusion 55.0.0 | 61.3 / 63.2 | 31.7 / 32.5 | 0.51 |
+| Q95 | DataFusion 55.0.0 | 47.7 / 48.3 | 30.8 / 31.4 | 0.65 |
+| Q16 | PySpark 4.3.0 | 1,407 / 1,508 | 688 / 748 | 0.50 |
+| Q94 | PySpark 4.3.0 | 1,049 / 1,094 | 500 / 532 | 0.49 |
+| Q95 | PySpark 4.3.0 | 1,005 / 1,148 | 627 / 680 | 0.59 |
+
+The ratio is the 0.5.1 median divided by the 0.5.0 median, so below 1 is
+faster. On DataFusion, Q16 ran faster in the first timed pass of every
+run than in the four after it (26 to 34 ms against 56 to 78 ms), in all
+three rounds and on both versions; the median is the steady-state time.
+Each query returned one row on both versions; BenchBox does not record
+the values, so the answers were not compared.
+
+SF10 did not run. BenchBox's memory check refused every SF10 run on this
+16 GB machine, estimating 18 GB (DataFusion), 20 GB (Polars) and 30 GB
+(PySpark) for a TPC-DS run against 7 GB available. The check was not
+overridden.
+
+An earlier test of the same change, on a shared 16 GiB host with Polars
+1.44.2 and DataFusion 54.0.0 and the core commits before and after the
+change, best of 5 alternating runs, gave Polars Q16 30.3 to 30.2, Q94
+30.2 to 23.8, Q95 24.4 to 22.8 and DataFusion Q16 89.0 to 61.4, Q94 68.9
+to 35.5, Q95 66.6 to 41.3 ms.
 
 ## Query plans
 
-Captured on the synthetic 1M dataset unless stated.
+Captured on the synthetic 1M dataset unless stated, in the 2026-11-11
+run. Plans do not depend on machine load.
 
 ### DataFusion 51.0.0
 
@@ -976,5 +1022,80 @@ for v in 4.1.1 4.3.0; do run pyspark "pyspark==$v" 0 --with pandas; done
 
 Each run appends one JSON line per dataset and pattern to
 `out/<engine>-<version>.jsonl` and writes the plans to
-`out/<engine>-<version>.plans.txt`. The two counted passes took 35 and 30
-minutes.
+`out/<engine>-<version>.plans.txt`. On the idle machine the two counted
+passes took 25 and 24 minutes; each pass writes to its own output
+directory.
+
+Complete DuckDB queries (`fullsql.py`). One database per scale factor is
+generated with DuckDB 1.4.4, then each version opens it read-only:
+
+```python
+import json
+import statistics
+import sys
+import time
+from pathlib import Path
+
+import duckdb
+
+MODE, DB = sys.argv[1], Path(sys.argv[2])
+if MODE == "generate":
+    sf = int(sys.argv[3])
+    con = duckdb.connect(str(DB))
+    con.execute("INSTALL tpcds; LOAD tpcds")
+    con.execute(f"CALL dsdgen(sf={sf})")
+    con.close()
+    sys.exit(0)
+
+con = duckdb.connect(str(DB), read_only=True)
+con.execute("INSTALL tpcds; LOAD tpcds")
+for qid in (16, 94, 95):
+    sql = con.execute("SELECT query FROM tpcds_queries() WHERE query_nr = ?", [qid]).fetchone()[0]
+    for _ in range(2):
+        con.execute(sql).fetchall()
+    times = []
+    for _ in range(9):
+        start = time.perf_counter()
+        rows = con.execute(sql).fetchall()
+        times.append((time.perf_counter() - start) * 1000)
+    print(json.dumps({"version": duckdb.__version__, "db": DB.name, "query": qid, "best_ms": round(min(times), 2),
+                      "median_ms": round(statistics.median(times), 2), "answer": [list(map(str, r)) for r in rows]}))
+```
+
+```bash
+for sf in 1 10; do
+  uv run --no-project --python 3.12 --with duckdb==1.4.4 python fullsql.py generate sf$sf.duckdb $sf
+  for v in 1.4.4 1.5.6 2.0.0; do
+    uv run --no-project --python 3.12 --with duckdb==$v python fullsql.py run sf$sf.duckdb >> fullsql.jsonl
+  done
+done
+```
+
+Complete DataFrame queries through BenchBox. TPC-DS SF1 data is generated
+once with BenchBox 0.5.1; each round runs both BenchBox versions per
+engine, alternating which goes first:
+
+```bash
+export JAVA_HOME=/opt/homebrew/opt/openjdk@21
+bb() {
+  local v=$1 extra=$2 pin=$3; shift 3
+  uv run --no-project --python 3.12 --with "benchbox[$extra]==$v" --with "$pin" \
+    --with pyarrow --with pandas benchbox "$@"
+}
+bb 0.5.1 polars polars==2.1.0 run --platform polars-df --benchmark tpcds --scale 1 \
+  --queries Q16 --phases generate --non-interactive
+for round in 1 2 3; do
+  for p in "polars-df polars polars==2.1.0" "datafusion-df datafusion datafusion==55.0.0" \
+           "pyspark-df pyspark pyspark==4.3.0"; do
+    set -- $p
+    if [ $((round % 2)) -eq 1 ]; then order="0.5.0 0.5.1"; else order="0.5.1 0.5.0"; fi
+    for v in $order; do
+      bb $v $2 $3 run --platform $1 --benchmark tpcds --scale 1 --queries Q16,Q94,Q95 \
+        --phases load,power --iterations 5 --non-interactive
+    done
+  done
+done
+```
+
+Each run writes its result to `benchmark_runs/results/`; the timed runs
+are the `queries[]` entries with `run_type` `measurement`.

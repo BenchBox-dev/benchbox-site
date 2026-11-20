@@ -1,6 +1,6 @@
 # Post outline: BenchBox in action, when the same query needs different code
 
-**Series**: BenchBox in Action | **Post #6**
+**Series**: BenchBox in Action | **Post #7**
 **Target length**: 2,400-2,800 words
 **Status**: Drafted February 2026; thesis revised 2026-11-11 after remeasurement (see "Revision" below)
 
@@ -23,7 +23,7 @@ What changed:
   on DataFusion 55.0.0 the distinct count is faster on every dataset.
 - A third pattern (`min` and `max` per order) is the fastest in 39 of 40
   tests on the current releases.
-- The isolated `EXISTS` statement is up to 45x slower on DuckDB 2.0.0
+- The isolated `EXISTS` statement is up to 5.4x slower on DuckDB 2.0.0
   than on 1.5.6, but the complete Q16, Q94 and Q95 are not slower.
 
 Reframed problem: the February question was "which of two patterns does
@@ -37,15 +37,14 @@ Revised thesis:
 > measured on. Rerun nine months later, the split between Polars and
 > DataFusion is gone, and one pattern is fastest on all four engines.
 
-Open before publication:
+Settled on 2026-11-20:
 
-- Rerun the timings on an idle machine. The November run shared the
-  machine with other jobs, so the draft reports best times and ratios.
-- Complete DataFrame Q16, Q94 and Q95 were timed before and after the
-  move to min/max at scale factor 1 on Polars and DataFusion; PySpark and
-  larger scale factors were not timed.
-- Set `post_number`. The series plan lists this post as 7 and the file
-  name says 06.
+- The timings were rerun on an idle machine. The tables in the draft and
+  the research note come from that run.
+- Complete DataFrame Q16, Q94 and Q95 were timed on BenchBox 0.5.0 and
+  0.5.1 at scale factor 1 on Polars, DataFusion and PySpark. Scale factor
+  10 was refused by BenchBox's memory check on the 16 GB machine.
+- `post_number` is 7, as in the series plan.
 
 ---
 
