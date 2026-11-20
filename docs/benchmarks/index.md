@@ -30,10 +30,8 @@ separate from public discovery visibility and from DataFrame capability.
 ## Scale factors
 
 Each benchmark has a short set of standard scale factors, typically 0.01, 0.1, 1 and 10. BenchBox accepts any
-value from 0.01 to 100000, with whole numbers from 1 upward (1, 2, 10, but not 1.5). `tpcds` and `tpcds_obt` stop
-at 3000, because above that the bundled `dsqgen` cannot generate query 9 in reasonable time or memory. A value that
-is not in the benchmark's standard set runs with a one-line note that its results are not comparable with published
-results.
+value from 0.01 to 100000, with whole numbers from 1 upward (1, 2, 10, but not 1.5). A value that is not in the
+benchmark's standard set runs with a one-line note that its results are not comparable with published results.
 `joinorder` and `metadata_primitives` are fixed at 1 and accept no other value.
 
 ## Contents
@@ -67,7 +65,7 @@ Planned platform and benchmark additions, including DataFrame support expansion 
 - **Purpose**: Complex analytical workloads with advanced SQL features
 - **Queries**: 99 complex analytical queries with CTEs, window functions
 - **Schema**: 24 tables modeling a retail data warehouse
-- **Scale**: Standard values from 0.01 to 3000; see [Scale factors](#scale-factors)
+- **Scale**: Standard values from 0.01 to 100000; see [Scale factors](#scale-factors)
 - **Use Cases**: Advanced-level analytics, complex query optimization, modern SQL feature testing
 
 #### [TPC-DI](tpc-di.md)
