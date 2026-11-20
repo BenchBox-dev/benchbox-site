@@ -58,12 +58,14 @@ to 100.
 
 #### How the row counts relate to the TPC-DI specification
 
-One scale-factor unit is 5,000 customers, as in the specification. Companies (500 per unit) and securities (800
-per unit) use the official data generator's settings. The fact tables use the specification's historical-load
-source-file row factors: 130,000 trades, 120,300 cash transactions, 120,470 holding-history rows, 541,550
-daily-market rows and 300,000 watch-history rows per unit.
+The TPC-DI specification gives no row counts; the figures below come from the design paper by the specification's
+authors ("TPC-DI: The First Industry Benchmark for Data Integration", PVLDB 7(13), 2014). One
+scale-factor unit is 5,000 customers, as in the paper. BenchBox generates 500 companies and 800 securities per
+unit. The fact tables use the paper's historical-load source-file row factors (Table 3): 130,000 trades, 120,300
+cash transactions, 120,470 holding-history rows, 541,550 daily-market rows and 300,000 watch-history rows per
+unit.
 
-BenchBox differs from the specification in these ways:
+BenchBox differs from the specification and the official generator in these ways:
 
 - It writes the warehouse tables directly; it does not produce the official generator's source files, so a
   warehouse table has the row count of its source file. In the specification, FactCashBalances and FactWatches
@@ -74,15 +76,15 @@ BenchBox differs from the specification in these ways:
   actions, so its account count can differ. One account per customer keeps generation simple and
   deterministic; deriving accounts from customer-management actions would change join fan-out and every
   published result.
-- DimBroker, DimDate, DimTime and the reference tables are smaller than the specification's: DimBroker has 100
-  rows up to scale factor 2 and `int(50 * scale factor)` rows above that, yet trades draw broker ids 1 to 100 at
-  every scale factor (the specification gives about 1,500 brokers per unit), DimDate has
-  5,844 days (2010 to 2025; the specification covers 1950 to 2021), DimTime has 288 rows (the specification
-  has 86,400), Industry has 12 rows (102), StatusType 4 (6), TaxRate 10 (320) and TradeType 6 (5). The queries
+- DimBroker, DimDate, DimTime and three reference tables are smaller than the official generator's source files,
+  whose row counts are in Table 2 of the design paper: DimBroker has 100 rows up to scale factor 2 and
+  `int(50 * scale factor)` rows above that, yet trades draw broker ids 1 to 100 at every scale factor (the
+  specification takes brokers from the HR file, which grows with the scale factor), DimDate has 5,844 days,
+  2010 to 2025 (the paper's Date.txt has 25,933 rows), DimTime has 288 rows (86,400), Industry has 12 rows
+  (102), StatusType 4 (6) and TaxRate 10 (320). TradeType is larger: 6 rows where the paper has 5. The queries
   and fact generators use these fixed key ranges, and enlarging them touches every fact generator and query.
-- FactMarketHistory has the design paper's 541,550 rows per unit. The official generator's configuration (about
-  two years of trading days times 800 securities) gives about 584,800, roughly 8% more. The cause of the gap
-  was not investigated, and BenchBox keeps the paper's figure.
+- FactMarketHistory has 541,550 rows per unit, the DailyMarket.txt factor in Table 3 of the design paper. The
+  official generator's actual row count has not been measured for this page.
 
 ### Key Schema Features
 
