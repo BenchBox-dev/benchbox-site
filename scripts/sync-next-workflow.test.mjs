@@ -51,6 +51,13 @@ test("conflicting files are named from a merge that writes no ref", () => {
   assert.ok(script.includes("git merge-tree --write-tree --name-only --no-messages origin/next origin/main"));
 });
 
+test("the issue lists the files the merge deletes lines from on next", () => {
+  assert.ok(script.includes('DELETED="$(node scripts/next-deletions.mjs)"'));
+  assert.ok(script.indexOf("node scripts/next-deletions.mjs") > script.indexOf("git merge-tree"));
+  assert.ok(script.includes("restore the text of `next` for each passage whose removal does not also apply on `develop`"));
+  assert.ok(/BODY="\$\(printf '[^']*%s\\n\\n%s\\n\\n[^']*' "\$BEHIND" "\$OUTCOME" "\$DELETIONS"/.test(script));
+});
+
 test("a repository without a next branch exits quietly before fetching", () => {
   const probe = "git ls-remote --exit-code origin refs/heads/next > /dev/null || exit 0";
   assert.ok(script.includes(probe));
