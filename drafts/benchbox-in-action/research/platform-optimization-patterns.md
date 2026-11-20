@@ -2,6 +2,11 @@
 
 Research notes for blog post #6: "BenchBox in action: when the same query needs different code"
 
+These are the February 2026 measurements. They were rerun on newer engine
+releases and on TPC-DS data in
+`multi-warehouse-patterns-remeasured-2026-11-11.md`, which the draft now
+cites.
+
 ---
 
 ## Primary Sources
