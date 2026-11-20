@@ -51,6 +51,7 @@ Location is the one maintained copy: published posts link their `blog/` canonica
 | 20  | Why BenchBox ships its own SQLGlot fork | [Article](../../../blog/2026-11-07-why-benchbox-ships-its-own-sqlglot-fork.md) | Translation bugs changed benchmark answers, so v0.5.0 bundles a permanent SQLGlot fork proven on ten real engines; the published results that ran the old SQL are flagged and rerun |
 | 21  | BenchBox v0.5.0: one SQL translator, execution engines, and tuning that fails loudly | [Article](../../../blog/2026-11-06-v0-5-0-release-overview.md) | Bundled SQLGlot in every install, runs record deployment and execution engine, unapplicable tuning fails, TPC-H refresh functions and QphH@Size, and a long rerun list |
 | 22  | TPC-DS One-Big-Table: a more demanding test of denormalized data modelling | [Article](../../../blog/2026-11-10-tpcds-one-big-table.md) | TPC-DS OBT is a BenchBox-original benchmark with a normalized twin in TPC-DS, so one engine can show what a flat design costs or saves; in v0.5.0 its 90 query templates are pinned to the TPC-DS templates and checked against TPC-DS answers, and nine queries are recorded as incompatible |
+| 23  | Three memory checks that measured the wrong thing | [Draft](../drafts/23-memory-checks-that-measured-the-wrong-thing.md) | A benchmark runner's memory, swap and spill rules each produced a plausible number that described the host or an empty directory, not the benchmark process; a resource rule needs testing against a known answer like any other measurement |
 
 ---
 
@@ -66,4 +67,4 @@ Location is the one maintained copy: published posts link their `blog/` canonica
 ---
 
 *Series created: 2026-02-13*
-*Last updated: 2026-11-10 (post 22 published)*
+*Last updated: 2026-11-20 (post 23 drafted)*

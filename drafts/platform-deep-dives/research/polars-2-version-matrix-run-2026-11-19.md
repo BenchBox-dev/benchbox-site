@@ -33,7 +33,7 @@ apply.
   and compares as a set where it has none, so the row-order question in the
   2026-11-12 note is settled for this run.
 - The SF10 DuckDB reference row counts were regenerated from fresh data and
-  match the previous reference on all 207 queries.
+  match the previous reference on all 181 queries.
 - TPC-DS query 41 still returns 10 rows on Polars against 12 on DuckDB,
   rechecked on 1.44.2 and 2.1.0.
 
