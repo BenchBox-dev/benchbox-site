@@ -566,15 +566,10 @@
       "title": "Place the 65 uncategorised docs and blog tags so tag browsing reaches them"
     },
     "document-main-removals-reaching-next": {
-      "claim": {
-        "expires_at": "2026-11-20T12:56:44Z",
-        "generation": "77d251aac74c415388c3ce8ae67595a0",
-        "renewals": 0,
-        "worker": "mcp:omp:joe@joe-mac-mini.local:8acd5eb72a0f7b327051ca7e"
-      },
+      "claim": null,
       "needs": [],
       "priority": "medium",
-      "status": "active",
+      "status": "done",
       "title": "Document and guard that a removal on main also removes the text from next at the next merge"
     },
     "explorer-cost-label-not-comparable-gateway": {
