@@ -186,9 +186,11 @@ run by the swap limit.
   - Safety monitor (6 GiB swap or sustained critical pressure): the runner's
     only stopping rule, checked about every 5 seconds.
   - The host's own heavy-work sentinel also stopped eight runs at critical
-    memory pressure (R18). All were in cells already failing on memory, so it
-    changed no result. One sentence is enough; it shows that the machine's
-    guards, not just ours, shape what a benchmark can finish.
+    memory pressure (R18). Each had already passed the 1 GiB swap limit when
+    stopped (1.98-7.50 GiB), and the counter only grows, so it changed no
+    result. TPC-DS 1.40.1 default lost all three rounds to it. One sentence
+    is enough; it shows that the machine's guards, not just ours, shape what
+    a benchmark can finish.
 - 6c. Spill, measured properly this time:
   - 2.0.0 turns out-of-core execution on by default (R9) and spills under the
     process temp directory, not `POLARS_TEMP_DIR` (R10, R11). Our first run

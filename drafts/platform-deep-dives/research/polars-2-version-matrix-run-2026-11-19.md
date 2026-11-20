@@ -101,9 +101,12 @@ What this supports:
 
 - The host sentinel (kill mode, outside the heavy-work lock) stopped eight
   TPC-DS runs at critical memory pressure (R18). The heavy-work watchdog was
-  in warn mode for this run, with owner approval. All eight were in cells
-  already failing on memory in other rounds, so no qualified cell was lost.
-  The runner records them as `execution-failure`, exit 143.
+  in warn mode for this run, with owner approval. Each of the eight had
+  already passed the 1 GiB swap limit when it was stopped (swap growth 1.98
+  to 7.50 GiB), and the swap-out counter only grows, so each would have been
+  ruled out anyway and no qualified cell was lost. TPC-DS 1.40.1 default lost
+  all three rounds to the sentinel (7.50, 5.31 and 3.41 GiB). The runner
+  records these runs as `execution-failure`, exit 143.
 - The host was not idle. Other agent sessions were active on the machine,
   and two earlier attempts at this run were stopped by SIGTERMs whose sender
   was not found. The sentinel log shows no signal at those times.
