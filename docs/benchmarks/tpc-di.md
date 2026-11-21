@@ -4,7 +4,12 @@ tags: [intermediate, concept, tpc-di]
 
 <!-- Copyright 2026 Joe Harris / BenchBox Project. Licensed under the MIT License. -->
 
+<!-- markdownlint-disable MD028 -->
+
 # TPC-DI Benchmark
+
+> [!IMPORTANT]
+> TPC-DI in BenchBox is being reworked. Earlier results were withdrawn because they did not measure the TPC-DI workload.
 
 > **CLI name:** `tpcdi` - use `benchbox run --benchmark tpcdi`
 
@@ -157,81 +162,6 @@ The TPC-DI benchmark focuses on the complete ETL pipeline rather than just final
 - **Fact loading**: Load fact tables with proper foreign key resolution
 - **Incremental processing**: Handle updates and new records efficiently
 - **Audit trail**: Maintain data lineage and processing metadata
-
-## Query Characteristics
-
-TPC-DI ships **38 queries** that exercise the integration output: 8 base
-queries (in `benchbox/core/tpcdi/queries.py`) plus 30 extended queries
-spread across `query_validation.py` (12), `query_analytics.py` (10), and
-`query_etl.py` (8).
-
-> [!TIP]
-> Each query has a [query template](queries/tpcdi/index.md) with a representative
-> SQL rendering, plus how to extract the exact statement for your platform and
-> scale.
-
-### Base Validation Queries (V1-V3)
-
-| Query | Purpose | Validation Focus |
-|-------|---------|------------------|
-| **[V1](queries/tpcdi/v1.md)** | Customer Dimension Validation | SCD Type 2 implementation, `IsCurrent` flag counts on `DimCustomer` |
-| **[V2](queries/tpcdi/v2.md)** | Account Dimension Validation | Status tracking, current-flag counts on `DimAccount` |
-| **[V3](queries/tpcdi/v3.md)** | Trade Fact Validation | Aggregate quality check on `FactTrade` (counts, totals, fees) |
-
-### Base Analytical Queries (A1-A5)
-
-| Query | Purpose | Business Value |
-|-------|---------|----------------|
-| **[A1](queries/tpcdi/a1.md)** | Customer Trading Analysis | Customer segmentation by trading activity |
-| **[A2](queries/tpcdi/a2.md)** | Company Performance Analysis | Security performance by industry/rating |
-| **[A3](queries/tpcdi/a3.md)** | Broker Commission Analysis | Broker performance and commission tracking |
-| **[A4](queries/tpcdi/a4.md)** | Portfolio Analysis | Customer portfolio composition and risk |
-| **[A5](queries/tpcdi/a5.md)** | Market Trend Analysis | Historical price trends and volatility |
-
-### Extended Data Quality Queries (VQ1-VQ12)
-
-12 validation queries covering referential integrity, completeness, SCD
-Type 2 chain checks, cross-dimension consistency, and business-rule
-compliance. See `benchbox/core/tpcdi/query_validation.py`.
-
-### Extended Analytical Queries (AQ1-AQ10)
-
-10 analytical queries covering customer profitability, security
-performance, broker analysis, market trends, and portfolio analysis.
-See `benchbox/core/tpcdi/query_analytics.py`.
-
-### ETL Validation Queries (EQ1-EQ8)
-
-8 queries covering batch processing, incremental loads, transformation
-correctness, and quality scoring. See `benchbox/core/tpcdi/query_etl.py`.
-
-### SCD Type 2 Validation
-
-The data-quality validator (`benchbox/core/tpcdi/validation.py`) treats
-Slowly Changing Dimension Type 2 correctness as a dedicated rule category
-(`category="scd_type2"`). Four dimensions carry the SCD Type 2 trio of
-columns - `IsCurrent` (BOOLEAN), `EffectiveDate` (DATE), and `EndDate`
-(DATE) - defined in `benchbox/core/tpcdi/schema.py`:
-
-- `DimCustomer`
-- `DimAccount`
-- `DimSecurity`
-- `DimCompany`
-
-The validator enforces the **"exactly one current row per business key"**
-invariant by scanning for duplicate `IsCurrent = TRUE` rows:
-
-| Rule | Table | Invariant |
-|------|-------|-----------|
-| `Customer SCD Type 2 Integrity` | `DimCustomer` | `GROUP BY CustomerID HAVING COUNT(*) > 1 WHERE IsCurrent = TRUE` returns zero rows |
-| `Account SCD Type 2 Integrity` | `DimAccount` | `GROUP BY AccountID HAVING COUNT(*) > 1 WHERE IsCurrent = TRUE` returns zero rows |
-
-`DimSecurity` and `DimCompany` carry the same SCD Type 2 columns but do
-not yet have dedicated validation rules registered; register custom rules
-via `TPCDIValidator.add_validation_rule()` if you need to cover them.
-The validator does not (currently) assert date-chain continuity between
-`EffectiveDate` and `EndDate` - extend `validation.py` if you need that
-level of rigour.
 
 ## Usage Examples
 
@@ -393,20 +323,6 @@ This is a simplified example of the transformation logic for SCD Type 2 processi
 - **Simple transformations**: Basic data type conversions, formatting
 - **Complex transformations**: Business rule application, derived calculations
 - **SCD processing**: Most complex, requires historical tracking logic
-
-### Query Performance Patterns
-
-**Validation Queries:**
-
-- **Fast (< 1s)**: [V1](queries/tpcdi/v1.md), [V2](queries/tpcdi/v2.md) - Simple dimension counts and aggregations
-- **Medium (1-10s)**: [V3](queries/tpcdi/v3.md) - Fact table aggregations
-- **Slower (> 10s)**: VQ-series queries with cross-dimension joins
-
-**Analytical Queries:**
-
-- **Interactive (< 5s)**: [A1](queries/tpcdi/a1.md), [A3](queries/tpcdi/a3.md) - Customer and broker analysis
-- **Reporting (5-30s)**: [A2](queries/tpcdi/a2.md), [A4](queries/tpcdi/a4.md) - Company and portfolio analysis
-- **Analytical (> 30s)**: [A5](queries/tpcdi/a5.md), AQ-series - Historical trend analysis
 
 ## Configuration Options
 

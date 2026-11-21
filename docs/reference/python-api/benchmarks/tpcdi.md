@@ -6,6 +6,9 @@ tags: [reference, python-api, tpc-di]
 
 # TPC-DI Benchmark API
 
+> [!IMPORTANT]
+> TPC-DI in BenchBox is being reworked. Earlier results were withdrawn because they did not measure the TPC-DI workload.
+
 Python API reference for the TPC-DI (Data Integration) benchmark.
 
 ## Overview
