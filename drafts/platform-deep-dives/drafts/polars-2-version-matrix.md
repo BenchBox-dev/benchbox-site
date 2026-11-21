@@ -12,7 +12,7 @@ meta_description: "Is Polars 2.x worth the upgrade? We ported 181 benchmark quer
 
 > You will get the most lift from Polars 2.x if you currently rely on defaults. 2.x now uses `streaming` by default instead of `in-memory`, and that change significantly improves performance in our tests.
 
-**TL;DR**: Polars 2.0 runs lazy queries on the streaming engine by default, no longer guarantees row order through joins and group-bys, and removes deprecated APIs. Porting our 181 queries took three small fixes. With default settings, 2.x took 36% to 53% less time than 1.44 on three benchmarks, and finished a fourth that 1.44 could not fit in 16 GiB. The gain is smaller if you already use the streaming engine, and we measured none on the in-memory engine. One query needed far more memory on 2.1 than on 2.0.
+**TL;DR**: With default settings, Polars 2.x took 36% to 53% less time than 1.44 on three benchmarks, and porting our 181 queries took three small fixes. Much of the gain comes from the new default engine, so it is smaller if you already use the streaming engine, and we measured none on the in-memory engine. Before you upgrade, check any code that relies on row order, and test large group-bys on 2.1 if you run close to your memory limit.
 
 ---
 
