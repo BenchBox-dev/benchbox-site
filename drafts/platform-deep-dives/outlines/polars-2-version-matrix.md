@@ -1,4 +1,4 @@
-# Outline: Upgrading to Polars 2.x: Changes, Costs and Measured Gains
+# Outline: Polars 2.x is up to 2x faster. Should you upgrade?
 
 **Reader:** someone running Polars 1.x who wants to know what is different in
 2.x and whether the upgrade is worth the effort. They are not a benchmark
@@ -48,8 +48,11 @@ test first, each with a number or a named condition.
 
 ## Title and frontmatter
 
-- Title: "Upgrading to Polars 2.x: Changes, Costs and Measured Gains"
-  (58 chars).
+- Title: "Polars 2.x is up to 2x faster. Should you upgrade?" (50 chars).
+  "Up to 2x" is the best case (ClickBench, 2.1x). The range, 1.6x to 2.1x,
+  must appear in the first section that gives results.
+- Pull quote: the reader gains most if they rely on the defaults, because
+  lazy queries now run on the streaming engine.
 - tags: polars, dataframe, upgrade, tpc-h, tpc-ds, ssb, clickbench,
   benchmarking.
 
