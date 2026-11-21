@@ -1,10 +1,10 @@
 # Polars version matrix: the 2026-11-19 run with 2.1.0
 
-Companion to `outlines/polars-2-version-matrix.md`. This run supersedes the
-2026-10-09 matrix as the source of every timing in the post. Where this note
-disagrees with `polars-2-version-matrix-figures-2026-10-09.md` or the two
-verification notes, this note wins. Their source descriptions (R1-R15) still
-apply.
+Superseded as the source of the posts' figures by
+`polars-2-version-matrix-run-2026-11-20.md`, a rerun on a quiet host. This
+run shared the machine with other work. Three of its results did not repeat
+and must not be cited; the later note lists them. It is kept for the
+comparison between runs. The source descriptions R1-R15 still apply.
 
 ## Sources
 

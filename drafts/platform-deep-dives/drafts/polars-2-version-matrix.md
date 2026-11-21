@@ -12,7 +12,7 @@ meta_description: "What changed in Polars 2.x, what porting four benchmark suite
 
 > Polars 2.x runs lazy queries on the streaming engine by default. We ported four benchmark suites to it and ran six releases side by side to see what the upgrade costs and what it returns.
 
-**TL;DR**: Polars 2.0 changes the default engine for lazy queries to streaming, stops guaranteeing row order for joins and group-bys, and removes long-deprecated APIs. Porting BenchBox's four benchmark suites took three small fixes. With default settings, 2.0.0 and 2.1.0 took 36% to 53% less time than 1.44.2 on TPC-H, SSB and ClickBench at scale factor 10, and 2.0.0 finished TPC-DS on a 16 GiB machine where no 1.x default run did. If you already pass `engine="streaming"` on 1.44.2, the step is smaller: 8% to 28% less time. If you stay on the in-memory engine, 2.0.0 was no faster.
+**TL;DR**: Polars 2.0 changes the default engine for lazy queries to streaming, stops guaranteeing row order for joins and group-bys, and removes long-deprecated APIs. Porting BenchBox's four benchmark suites took three small fixes. With default settings, 2.0.0 and 2.1.0 took 36% to 53% less time than 1.44.2 on TPC-H, SSB and ClickBench at scale factor 10, and 2.0.0 finished TPC-DS on a 16 GiB machine where no 1.x default run did. If you already pass `engine="streaming"` on 1.44.2, the step is smaller: 14% to 29% less time. If you stay on the in-memory engine, 2.x was within 8% of 1.44.2. On TPC-DS, 2.1.0 used more memory than 2.0.0 and ran about 12% slower on our machine.
 
 ---
 
@@ -71,9 +71,9 @@ We ran each release at scale factor 10 (SF10; for TPC-H, about 10 GB of raw data
 | Your situation | What we measured |
 |---|---|
 | Lazy queries with a bare `collect()` | 2.x took 36% to 53% less time than 1.44.2 on TPC-H, SSB and ClickBench |
-| Already passing `engine="streaming"` on 1.44.2 | 2.x took 8% to 28% less time on those three; 2.0.0 took 41% less on TPC-DS |
-| Keeping the in-memory engine | 2.0.0 was 4% to 16% slower with overlapping ranges; 2.1.0 ranged from 2% slower to 13% faster |
-| Memory-bound on a 16 GiB machine | No 1.x default run finished TPC-DS; 2.0.0 finished every round without spilling |
+| Already passing `engine="streaming"` on 1.44.2 | 2.x took 14% to 29% less time on those three; 2.0.0 took 45% less on TPC-DS |
+| Keeping the in-memory engine | 2.x was within 8% of 1.44.2, faster on some benchmarks and slower on others |
+| Memory-bound on a 16 GiB machine | No 1.x default run finished TPC-DS; 2.0.0 finished every round without swapping or spilling |
 | Code that relies on row order | Not measured |
 
 ### A bare `collect()`: 36% to 53% less time
@@ -82,34 +82,34 @@ This is what you get by upgrading and changing nothing. Times are in seconds, as
 
 | Benchmark | 1.44.2 | 2.0.0 | 2.1.0 | 2.0.0 change | 2.1.0 change |
 |---|---|---|---|---|---|
-| TPC-H | 11.20 (10.64-13.28) | 6.53 (6.06-7.59) | 6.16 (6.04-6.73) | -41.7% | -45.0% |
-| SSB | 5.61 (5.15-7.07) | 3.58 (3.30-4.08) | 3.31 (3.31-3.94) | -36.2% | -41.0% |
-| ClickBench | 4.58 (4.34-4.67) | 2.31 (2.17-2.33) | 2.16 (2.02-2.37) | -49.6% | -52.8% |
+| TPC-H | 11.17 (10.68-12.23) | 6.11 (6.02-6.13) | 5.75 (5.54-6.05) | -45.3% | -48.5% |
+| SSB | 5.18 (5.01-6.60) | 3.28 (3.20-3.47) | 3.32 (3.25-3.38) | -36.8% | -36.0% |
+| ClickBench | 4.32 (4.29-4.70) | 2.10 (2.10-2.27) | 2.05 (2.03-2.11) | -51.4% | -52.5% |
 
 That is 1.6x to 2.1x faster. In every pair the ranges do not overlap. TPC-DS is covered under [memory](#memory-on-a-16-gib-machine), because 1.44.2 did not finish it on the default engine.
 
 ### Already on streaming in 1.x: a smaller step
 
-Most of that gain comes from the engine, and the streaming engine was already available in 1.x. On 1.44.2, passing `engine="streaming"` took 27% to 42% less time than the in-memory default:
+Most of that gain comes from the engine, and the streaming engine was already available in 1.x. On 1.44.2, passing `engine="streaming"` took 19% to 41% less time than the in-memory default:
 
 | Benchmark | 1.44.2 in-memory | 1.44.2 streaming | Change |
 |---|---|---|---|
-| TPC-H | 11.20 (10.64-13.28) | 8.06 (8.02-8.28) | -28.1% |
-| SSB | 5.61 (5.15-7.07) | 4.11 (4.05-4.69) | -26.8% |
-| ClickBench | 4.58 (4.34-4.67) | 2.64 (2.57-3.09) | -42.4% |
+| TPC-H | 11.17 (10.68-12.23) | 7.75 (7.49-8.16) | -30.7% |
+| SSB | 5.18 (5.01-6.60) | 4.19 (4.18-4.47) | -19.1% |
+| ClickBench | 4.32 (4.29-4.70) | 2.55 (2.42-2.69) | -41.0% |
 
-Measured this way, the engine switch alone accounts for about two-thirds to most of the default-settings gain: 62% to 86% of the time saved, depending on the benchmark and on whether the target is 2.0.0 or 2.1.0.
+Measured this way, the engine switch alone accounts for about half to four-fifths of the default-settings gain: 52% to 80% of the time saved, depending on the benchmark and on whether the target is 2.0.0 or 2.1.0.
 
 So the step from 1.44.2 streaming to 2.x streaming is smaller:
 
 | Benchmark | 1.44.2 streaming | 2.0.0 streaming | 2.1.0 streaming |
 |---|---|---|---|
-| TPC-H | 8.06 (8.02-8.28) | 6.32 (6.12-7.61), -21.5% | 5.83 (5.75-6.55), -27.7% |
-| SSB | 4.11 (4.05-4.69) | 3.79 (3.31-4.02), -7.8% | 3.45 (3.45-3.93), -15.9% |
-| ClickBench | 2.64 (2.57-3.09) | 2.21 (2.20-2.44), -16.1% | 2.30 (2.12-2.39), -12.6% |
-| TPC-DS | 62.27 (59.91-66.54) | 36.53 (33.85-44.86), -41.4% | not reported |
+| TPC-H | 7.75 (7.49-8.16) | 6.05 (5.96-6.62), -21.9% | 5.51 (5.43-5.87), -28.8% |
+| SSB | 4.19 (4.18-4.47) | 3.35 (3.26-3.50), -20.2% | 3.31 (3.23-3.31), -21.2% |
+| ClickBench | 2.55 (2.42-2.69) | 2.19 (2.11-2.23), -14.2% | 2.07 (2.01-2.15), -19.0% |
+| TPC-DS | 57.21 (56.48-60.54) | 31.26 (30.40-33.14), -45.4% | not reported |
 
-The streaming engine itself got faster between 1.44.2 and 2.x, most of all on TPC-DS. There is no 2.1.0 figure for TPC-DS; the [memory section](#memory-on-a-16-gib-machine) explains why.
+The streaming engine itself got faster between 1.44.2 and 2.x, most of all on TPC-DS. There is no qualified 2.1.0 figure for TPC-DS; the [memory section](#memory-on-a-16-gib-machine) explains why and gives its run times.
 
 ### Staying on the in-memory engine
 
@@ -117,33 +117,44 @@ If you pin `engine="in-memory"` after upgrading, or your code is eager, this is 
 
 | Benchmark | 1.44.2 in-memory | 2.0.0 in-memory | 2.1.0 in-memory |
 |---|---|---|---|
-| TPC-H | 11.20 (10.64-13.28) | 12.94 (11.47-13.28), +15.5% | 10.58 (10.21-12.71), -5.6% |
-| SSB | 5.61 (5.15-7.07) | 5.97 (5.56-7.60), +6.3% | 5.73 (5.18-6.90), +2.2% |
-| ClickBench | 4.58 (4.34-4.67) | 4.77 (4.54-4.99), +4.2% | 3.99 (3.90-4.30), -12.9% |
+| TPC-H | 11.17 (10.68-12.23) | 10.39 (9.78-10.61), -7.0% | 10.85 (9.71-13.36), -2.9% |
+| SSB | 5.18 (5.01-6.60) | 5.23 (4.93-5.33), +0.9% | 5.44 (4.96-5.63), +4.9% |
+| ClickBench | 4.32 (4.29-4.70) | 4.25 (4.18-4.55), -1.8% | 3.97 (3.80-4.06), -8.1% |
 
-On 2.0.0 the medians are 4% to 16% higher than on 1.44.2, with overlapping ranges, so we cannot call it slower or faster. On 2.1.0 the in-memory engine is within 6% on TPC-H and SSB and 12.9% faster on ClickBench, where the ranges do not overlap.
+Every difference is under 10%, which is below what three rounds can separate from noise. On the in-memory engine we saw no clear change in speed from upgrading.
 
 ### 2.0.0 or 2.1.0
 
-On the default and streaming engines the two releases are close: 2.1.0's medians run from 8.8% lower to 4.1% higher than 2.0.0's, and every pair of ranges overlaps. In memory, 2.1.0 is faster on all three benchmarks, by 3.9% to 18.3%.
+On TPC-H, SSB and ClickBench the two releases are close on every engine setting: 2.1.0's medians run from 8.8% lower to 4.4% higher than 2.0.0's. They differ on TPC-DS, which the next section covers.
 
 ## Memory on a 16 GiB machine
 
-The announcement expects "huge improvements in memory usage"[^2] from the streaming default. We saw that in two ways.
+The announcement expects "huge improvements in memory usage"[^2] from the streaming default. We saw that in two ways, and one exception.
 
-**Peak memory fell on the default engine.** This table shows peak resident memory in GiB, summed over the process tree, for the largest of three rounds. Host swap growth during these runs was at most 0.22 GiB, so the readings are comparable.
+**Peak memory fell on the default engine.** This table shows peak resident memory in GiB, summed over the process tree, for the largest of three rounds. The machine swapped at most 0.11 GiB during these runs.
 
 | Benchmark | 1.44.2 default | 1.44.2 streaming | 2.0.0 default | 2.1.0 default |
 |---|---|---|---|---|
-| TPC-H | 6.73 | 5.00 | 5.45 | 3.20 |
-| SSB | 5.36 | 2.28 | 2.33 | 2.17 |
-| ClickBench | 2.86 | 2.84 | 2.36 | 1.94 |
+| TPC-H | 5.77 | 3.15 | 4.62 | 4.59 |
+| SSB | 5.06 | 2.23 | 2.23 | 1.93 |
+| ClickBench | 2.89 | 2.85 | 2.20 | 2.17 |
 
-As with time, part of the saving was already available on 1.44.2 by choosing the streaming engine: all of it on SSB, none of it on ClickBench. Pinned to the in-memory engine, 2.x peaks stayed near 1.x levels: 5.23 and 6.01 GiB on TPC-H for 2.0.0 and 2.1.0, 5.71 and 6.08 GiB on SSB, and 3.12 and 3.04 GiB on ClickBench.
+Treat these as a rough guide. A single peak reading for the same configuration moved by up to 1.9 GiB between two runs of our matrix. The direction was the same both times: on each benchmark, 2.x on its default engine peaked lower than 1.44.2 on its default. As with time, part of that saving was already available on 1.44.2 by choosing the streaming engine. Pinned to the in-memory engine, 2.x peaks were 5.67 to 7.20 GiB on TPC-H and SSB and 2.43 to 3.62 GiB on ClickBench, no clear improvement on 1.44.2.
 
-**TPC-DS finished where it had not.** TPC-DS at SF10 is the heaviest workload we ran. On the default engine, every run on 1.31.0, 1.35.2, 1.40.1 and 1.44.2 was stopped as the machine went into swap; the largest swap growth for each release was 6.8 to 7.9 GiB. On 2.0.0 the default engine finished all three rounds in 34.13 s (30.91-36.43), with at most 0.09 GiB of host swap growth and nothing spilled to disk. Streaming on 1.44.2 also finished, in 62.27 s (59.91-66.54).
+**TPC-DS finished where it had not.** TPC-DS at SF10 is the heaviest workload we ran. On the default engine, every run on 1.31.0, 1.35.2, 1.40.1 and 1.44.2 was stopped as the machine went into swap; the largest swap growth for each release was 4.6 to 8.8 GiB. On 2.0.0 the default engine finished all three rounds in 30.47 s (29.68-32.83), with no swap growth and nothing spilled to disk. Streaming on 1.44.2 also finished, in 57.21 s (56.48-60.54).
 
-**We cannot report 2.1.0 on TPC-DS.** Its default and streaming runs finished every round with every query successful, in 34.67 to 42.13 s and 36.26 to 40.74 s per run, and each spilled about 0.5 GiB to disk. The machine also swapped 1.0 to 5.9 GiB while they ran. Our rule discards any run during which the host swaps more than 1 GiB, and it counts swap for the whole machine, on which other work was running. We do not know whether 2.1.0 caused that swap, so we draw no conclusion about its TPC-DS speed or memory use.
+**The exception: 2.1.0 needed more memory than 2.0.0 on TPC-DS.** Its default and streaming runs finished every round with every query successful. But each run spilled 0.47 to 0.49 GiB to disk, and the machine swapped 0.25 to 4.25 GiB while each one ran. In the same matrix, 2.0.0 spilled nothing and the machine swapped at most 0.014 GiB.
+
+| TPC-DS, default engine | Round 1 | Round 2 | Round 3 | Spilled per run | Swap while running |
+|---|---|---|---|---|---|
+| 2.0.0 | 29.68 s | 30.47 s | 32.83 s | none | none |
+| 2.1.0 | 33.69 s | 34.08 s | 35.72 s | 0.47 GiB | 0.25 to 1.31 GiB |
+
+Every 2.1.0 run was slower than every 2.0.0 run, by about 12% at the middle round.
+
+We do not publish a median for a benchmark unless all three rounds stay under 1 GiB of swap, because swapping distorts timings. Four of the six 2.1.0 runs went over, so 2.1.0 has no qualified TPC-DS figure in our tables. Our swap reading covers the whole machine, not only the benchmark. We saw the same pattern in an earlier run while other work was active, and reran the whole matrix with nothing else running to check it. The pattern held. We did not test why; the 2.1.0 release notes list several changes to out-of-core execution[^5].
+
+On a machine with more memory this may not happen at all. On 16 GiB, with a workload near the limit, 2.0.0 was the better release for TPC-DS in our runs.
 
 ## What we could not measure: row order
 
@@ -159,16 +170,20 @@ For that, test your own code. Run it on 2.x once with the default engine and onc
 - **Configuration**: `POLARS_MAX_THREADS=10`, no tuning
 - **Methodology**: one warm-up pass and one measured pass per query; three rounds, 156 runs, with run order shuffled in each round
 - **Correctness**: every version and engine setting first passed a value-level check against DuckDB SQL results at a small scale factor; at SF10 each run had to match DuckDB's row count on every query
+- **Host**: no other benchmark or agent work was running when the matrix started; we did not monitor the machine for other activity while it ran
 
 A result is reported only when all three rounds finished within our memory rules. Three rounds cannot support a significance test, so we treat a difference as worth following up when the median moves by at least 10% and the two ranges do not overlap. The engine-switch shares, the 2.1.0-against-2.0.0 comparisons and the memory table are computed from the published per-benchmark medians and peaks.
 
-The [findings](https://github.com/BenchBox-dev/BenchBox/blob/9d78af081b861c064f60b1a8d6965d21ae8d34db/_project/analysis/polars-version-matrix/findings.md) list every result, including the 1.x releases and the runs that did not qualify. The [methodology](https://github.com/BenchBox-dev/BenchBox/blob/9d78af081b861c064f60b1a8d6965d21ae8d34db/_project/analysis/polars-version-matrix/methodology.md) gives the rules in full, and the [analysis JSON](https://github.com/BenchBox-dev/BenchBox/blob/9d78af081b861c064f60b1a8d6965d21ae8d34db/_project/analysis/polars-version-matrix/polars-version-matrix-analysis.json) holds the numbers.
+We ran this matrix three times. The figures here are from the third run, made on 2026-11-20 on a quiet machine. The default-settings result for 2.0.0 was within 4 percentage points on every benchmark across all three.
+
+The [findings](https://github.com/BenchBox-dev/BenchBox/blob/3e09d4f43bbfb823acd82dc1402dd4db9663c634/_project/analysis/polars-version-matrix/findings.md) list every result, including the 1.x releases, the runs that did not qualify and a comparison of the three runs. The [methodology](https://github.com/BenchBox-dev/BenchBox/blob/3e09d4f43bbfb823acd82dc1402dd4db9663c634/_project/analysis/polars-version-matrix/methodology.md) gives the rules in full, and the [analysis JSON](https://github.com/BenchBox-dev/BenchBox/blob/3e09d4f43bbfb823acd82dc1402dd4db9663c634/_project/analysis/polars-version-matrix/polars-version-matrix-analysis.json) holds the numbers.
 
 ## Limits
 
-- **One machine, one scale.** A 16 GiB laptop at SF10. With more memory, the in-memory engine may not hit the limits that stopped it here.
+- **One machine, one scale.** A 16 GiB laptop at SF10. With more memory, the in-memory engine may not hit the limits that stopped it here, and 2.1.0 may not swap on TPC-DS.
 - **Analytical queries over Parquet.** Lazy scans, joins and aggregations. We did not measure the eager API, CSV input, cloud storage or writes.
-- **A busy host.** Other work ran on the machine. The 1-minute load average before each run was 10.8 to 43.1 (median 16.8). The 2.0.0 default-settings results matched a run we made a month earlier to within 2.1 percentage points.
+- **Small differences are noise.** In an earlier run on a busy machine, 2.0.0 looked up to 16% slower than 1.44.2 on the in-memory engine. That did not repeat on a quiet machine. We would not act on any difference here below 10%.
+- **Swap is measured for the whole machine.** Our rule cannot tell the benchmark's swap from another process's. That is why the 2.1.0 TPC-DS result rests on two runs showing the same pattern, not on a direct measurement.
 - **Row counts at SF10.** Values were checked at small scale factors only. TPC-DS query 41 returns 10 rows on Polars and 12 on DuckDB on every version.
 - **Requested engine.** We recorded the engine each run asked for, not whether streaming operators fell back to in-memory execution.
 - **The 5x expectation.** The announcement says: "In aggregate we expect the streaming engine to be easily 5x faster."[^2] Our four benchmarks on one small machine showed 1.6x to 2.1x at default settings. That neither confirms nor contradicts an aggregate over other workloads.
@@ -199,9 +214,10 @@ Change `--execution-engine` to `default` or `in-memory` for the other settings, 
 - **What changes:** lazy queries move to the streaming engine, row order is no longer guaranteed through joins and group-bys, silent coercions now raise, and long-deprecated APIs are gone.
 - **What it cost us:** three mechanical fixes for 181 queries. The row-order change needs a code audit, because it raises no error.
 - **What it returned:** with a bare `collect()`, 36% to 53% less time on three benchmarks, lower peak memory, and a TPC-DS run that finishes on 16 GiB.
-- **How much depends on where you start:** if you already use the streaming engine on 1.44.2, the gain is 8% to 28% on those benchmarks. If you stay in memory, 2.0.0 was no faster and 2.1.0 was faster on one benchmark of three.
+- **How much depends on where you start:** if you already use the streaming engine on 1.44.2, the gain is 14% to 29% on those benchmarks. If you stay in memory, we saw no clear change.
+- **2.0.0 or 2.1.0:** close on three benchmarks. On TPC-DS at the edge of our machine's memory, 2.1.0 spilled, swapped and ran about 12% slower than 2.0.0.
 
-Two things remain open on our side: whether 2.1.0 or the rest of our machine caused the swap in its TPC-DS runs, and why 1.31.0 crashes on streaming TPC-DS. If you have measured the upgrade on other hardware or other workloads, we would like to hear what you found.
+Two things remain open on our side: why 2.1.0 needs more memory than 2.0.0 for TPC-DS, and why 1.31.0 crashes on streaming TPC-DS. If you have measured the upgrade on other hardware or other workloads, we would like to hear what you found.
 
 ---
 
@@ -211,7 +227,7 @@ Two things remain open on our side: whether 2.1.0 or the rest of our machine cau
 [^2]: [Pre-release of Polars 2.0](https://pola.rs/posts/announcing-polars-2/) - Polars, published September 2, 2026, accessed November 2026
 [^3]: [Version 2.0 upgrade guide](https://docs.pola.rs/releases/upgrade/2/) - Polars documentation, accessed November 2026
 [^4]: [Polars 2.0.0 release notes](https://github.com/pola-rs/polars/releases/tag/py-2.0.0) - "Enable OOC by default with 80% of available RAM as threshold" (#29741), accessed November 2026
-[^5]: [Polars 2.1.0 release notes](https://github.com/pola-rs/polars/releases/tag/py-2.1.0) - "Streaming OOC group-by with shuffles" (#29911), accessed November 2026
+[^5]: [Polars 2.1.0 release notes](https://github.com/pola-rs/polars/releases/tag/py-2.1.0) - "Streaming OOC group-by with shuffles" (#29911) and "Wait for spills while over the out-of-core memory budget" (#30294), accessed November 2026
 
 ---
 
