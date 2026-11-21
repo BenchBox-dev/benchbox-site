@@ -21,8 +21,9 @@ benchmark results. This post carries no Polars performance claims.
   rules were applied in the first run; RSS and swap maxima).
 - `polars-2-version-matrix-reverification-2026-11-12.md` (R9-R11: the
   out-of-core default, the spill directory, the two-directory test).
-- `polars-2-version-matrix-run-2026-11-19.md` (R16-R19: the second run, the
-  sentinel stops, spill as measured after the fix).
+- `polars-2-version-matrix-run-2026-11-19.md` (R16-R19: the second run, on a
+  busy host) and `polars-2-version-matrix-run-2026-11-20.md` (R24-R26: the
+  third run, on a quiet host; spill as measured after the fix).
 - Core `_project/analysis/polars-version-matrix/methodology.md` and PRs
   #4168 (claims corrected) and #4204 (spill measurement fixed).
 
@@ -32,15 +33,16 @@ benchmark results. This post carries no Polars performance claims.
 2. **The rules as written.** Table: memory limit, swap limit, safety
    monitor, plus the spill recording.
 3. **Check 1: a memory limit that could not fire.** 14 GiB RSS limit; largest
-   reading 8.9 GiB across 276 runs while the host swapped up to 10.4 GiB;
+   reading 8.9 GiB across 432 runs while the host swapped up to 10.4 GiB;
    why RSS on macOS falls under pressure.
 4. **Check 2: a swap limit that measured the machine.** `vm_stat` is
    host-wide; the narrow TPC-H discards in the first run; 2.1.0 on TPC-DS in
-   the second. Not fixed; how we report it now.
+   the second; the full rerun on a quiet host that it took to attribute the
+   swap. Rule not fixed; how we report it now.
 5. **Check 3: a spill measurement in the wrong directory.** The out-of-core
    default; zero for 120 runs; the claim we published; the source reading;
-   the two-directory test (0 bytes against 1.12 GB); the fix; what the second
-   run then showed.
+   the two-directory test (0 bytes against 1.12 GB); the fix; what the later
+   runs then showed.
 6. **A fourth, smaller one.** The stop rule evaluated every fifth sample.
 7. **What the checks had in common.** Plausible numbers; never tested
    against a known answer; name a rule by what it reads.

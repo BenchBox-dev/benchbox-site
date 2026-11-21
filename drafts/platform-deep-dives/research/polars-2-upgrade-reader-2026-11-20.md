@@ -63,18 +63,10 @@ Write that all four suites passed the value comparison.
 
 ## Peak memory (R22)
 
-Peak resident set size in GiB, summed over the process tree, largest of
-three rounds. Host swap growth in every cell below is at most 0.22 GiB, so
-the readings are not distorted by swapped pages.
-
-| Benchmark | 1.44.2 default | 1.44.2 streaming | 2.0.0 default | 2.1.0 default | 2.0.0 in-memory | 2.1.0 in-memory |
-|---|---|---|---|---|---|---|
-| TPC-H | 6.727 | 5.004 | 5.445 | 3.200 | 5.229 | 6.006 |
-| SSB | 5.355 | 2.278 | 2.325 | 2.170 | 5.705 | 6.079 |
-| ClickBench | 2.864 | 2.842 | 2.355 | 1.944 | 3.120 | 3.035 |
-
-TPC-DS peaks are not comparable: the cells that did not qualify swapped
-3 to 8 GiB, and resident memory leaves swapped pages out.
+Superseded. The peak-memory table for the post is in
+`polars-2-version-matrix-run-2026-11-20.md`, from the rerun on a quiet host.
+The values first recorded here came from the 2026-11-19 run and differ from
+the rerun by up to 1.85 GiB for the same cell.
 
 ## Correction to an earlier note
 

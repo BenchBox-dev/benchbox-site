@@ -39,7 +39,7 @@ It also recorded how much the engine spilled to disk, so that a run that finishe
 
 The memory limit compared 14 GiB with peak resident set size (RSS), summed over the process tree.
 
-Across two full runs of the matrix, 276 benchmark runs in all, the largest RSS reading was 8.9 GiB. The limit never fired. Yet in the same runs the machine swapped out as much as 10.4 GiB during a single benchmark run.
+Across three full runs of the matrix, 432 benchmark runs in all, the largest RSS reading was 8.9 GiB. The limit never fired. Yet in the same runs the machine swapped out as much as 10.4 GiB during a single benchmark run.
 
 RSS counts pages that are resident in physical memory. On macOS, pages that have been swapped out or compressed are not resident, so they drop out of the reading at exactly the moment a process is under memory pressure. The harder a run pressed against the machine's memory, the less of it RSS showed. A 14 GiB RSS limit on a 16 GiB machine was a rule that could not be reached.
 
@@ -54,9 +54,11 @@ The swap limit read the `Swapouts` counter from `vm_stat` before and after each 
 - In our first run, TPC-H on two Polars releases was discarded by narrow margins: swap growth of 1.36 GiB in one round for one release, and 1.77 and 1.42 GiB in two rounds for another. The same releases completed their other rounds under the limit.
 - In our second run, Polars 2.1.0 finished TPC-DS in every round, with every query successful, while the machine swapped 1.0 to 5.9 GiB. All six runs were discarded. Other work was running on the machine at the time.
 
-In the second case we cannot say whether the benchmark or the rest of the machine caused the swap. The rule did its job in one sense: a run that overlaps heavy swapping is not a clean timing, whoever caused it. But the outcome reads as "this release failed the memory rule", and that is a statement about a process, made from a measurement of a host.
+In the second case we could not say whether the benchmark or the rest of the machine caused the swap. The rule did its job in one sense: a run that overlaps heavy swapping is not a clean timing, whoever caused it. But the outcome reads as "this release failed the memory rule", and that is a statement about a process, made from a measurement of a host.
 
-We have not fixed this. Our published findings now say which results were decided by the host-wide counter, and we report those runs as "not reported", not as failures.
+The only way we had to separate the two was to remove the other work and run all 156 benchmarks again. On the quiet machine, Polars 2.0.0 ran TPC-DS with at most 0.014 GiB of swap growth. Polars 2.1.0 still swapped 0.25 to 4.25 GiB in every round, and four of its six runs were discarded. So the rule had pointed at something real about 2.1.0. We could only say so after a two-hour rerun, and even then by comparison, not by measurement.
+
+We have not fixed the rule itself. Our published findings now say which results were decided by the host-wide counter, and we report those results as "not reported", not as failures.
 
 ## Check 3: a spill measurement in the wrong directory
 
@@ -75,13 +77,13 @@ We confirmed it with a small test. We pointed `POLARS_TEMP_DIR` and `TMPDIR` at 
 
 Our measurement had been watching an empty directory. We withdrew the claim, then [changed the runner](https://github.com/BenchBox-dev/BenchBox/pull/4204): each run now gets its own `TMPDIR` as well, the recorded spill is the Polars temp directory plus the `polars-*/spill` directory under it, and spill is sampled every second, because spill files exist only while a query runs.
 
-The second matrix gave an answer the first could not. Polars 2.0.0 did not spill on TPC-DS at scale factor 10 on this machine. Polars 2.1.0 spilled 0.47 to 0.57 GiB in every default and streaming round.
+The later runs gave an answer the first could not. Polars 2.0.0 did not spill on TPC-DS at scale factor 10 on this machine. Polars 2.1.0 spilled about 0.5 GiB in every default and streaming round, in both runs.
 
 ## A fourth, smaller one: a stop rule that sampled slowly
 
 The safety monitor was meant to stop a run at 6 GiB of swap growth. It evaluated its conditions on every fifth one-second sample, so "three consecutive critical readings" took about 15 seconds, and a run could swap well past the limit before it was stopped. In the first matrix, runs reached 10.4 GiB.
 
-This did not change any result, because those runs were being stopped either way. It did mean the rule's stated threshold and its real behavior differed, and our methodology page described the threshold.
+This did not change any result, because those runs were being stopped either way. It did mean the rule's stated threshold and its real behavior differed, and our methodology page described the threshold. In our third run the monitor stopped nothing at all: a separate guard on the development machine, which stops the largest benchmark process at critical memory pressure, acted first all twelve times.
 
 ## What the checks had in common
 
@@ -108,7 +110,7 @@ Still open:
 - **Swap attributed to the benchmark process.** Until we have it, a result discarded by the swap rule says that the machine was swapping, not that the benchmark caused it.
 - **A memory reading that includes swapped and compressed pages.** Without it, the memory limit cannot distinguish a run that fit from one that was pushed out to swap.
 - **A stop rule that checks every sample.**
-- **An idle host.** The second matrix ran while other work was active, and a host-wide counter makes that everyone's problem.
+- **A host we can vouch for.** We checked that the machine was quiet before the third run started. We did not monitor it during the run, and with a host-wide counter any other work becomes part of the result.
 
 ## Conclusions
 
