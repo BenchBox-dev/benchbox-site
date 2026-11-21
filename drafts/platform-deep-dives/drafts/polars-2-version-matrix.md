@@ -5,12 +5,12 @@ author: Joe Harris
 series: platform-deep-dives
 type: benchbox-in-action
 tags: polars, dataframe, upgrade, tpc-h, tpc-ds, ssb, clickbench, benchmarking
-meta_description: "Polars 2.x changes the default engine and its row-order rules. We ported 181 benchmark queries and measured speed and memory against 1.44 on a 16 GiB machine."
+meta_description: "Is Polars 2.x worth the upgrade? We ported 181 benchmark queries and measured speed and memory against 1.44: up to 2x faster, with two things to check first."
 ---
 
-# Upgrading to Polars 2.x: Changes, Costs and Measured Gains
+# Polars 2.x is up to 2x faster. Should you upgrade?
 
-> Polars 2.x runs lazy queries on a different engine by default. We ported 181 benchmark queries and timed them against 1.44 to see what the upgrade costs and what it returns.
+> You will get the most lift from Polars 2.x if you currently rely on defaults. For lazy queries, 2.x now uses `streaming` by default instead of `in-memory`, and that change significantly improves performance in our tests.
 
 **TL;DR**: Polars 2.0 runs lazy queries on the streaming engine by default, no longer guarantees row order through joins and group-bys, and removes deprecated APIs. Porting our 181 queries took three small fixes. With default settings, 2.x took 36% to 53% less time than 1.44 on three benchmarks, and finished a fourth that 1.44 could not fit in 16 GiB. The gain is smaller if you already use the streaming engine, and we measured none on the in-memory engine. One query needed far more memory on 2.1 than on 2.0.
 
