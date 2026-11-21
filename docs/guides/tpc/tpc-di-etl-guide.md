@@ -6,6 +6,9 @@ tags: [advanced, guide, tpc-di]
 
 # TPC-DI ETL Implementation Guide
 
+> [!IMPORTANT]
+> TPC-DI in BenchBox is being reworked. Earlier results were withdrawn because they did not measure the TPC-DI workload.
+
 ## Overview
 
 The TPC-DI ETL implementation in BenchBox provides a systematic framework for testing Extract, Transform, and Load (ETL) processes in data warehousing scenarios. Unlike traditional benchmarks that focus solely on query performance, TPC-DI emphasizes the complete data integration pipeline, including data transformation, quality validation, and loading of both historical and incremental data.
