@@ -44,6 +44,7 @@ benchbox run [OPTIONS]
     below.
 - `--iterations INTEGER`: Number of measured power test iterations (default: 3, minimum 1). Each power test also runs one warm-up pass first. Power phase only; a warning is printed when no power phase is selected. An advanced option listed by `benchbox run --help-topic all`.
 - `--force [MODE]`: Force a rerun (modes: `all`, `datagen`, `upload`, or `datagen,upload`; a bare `--force` means `all`). What each value deletes is in [Forced Reruns](#forced-reruns)
+- `--timeout SECONDS`: Stop the whole run (generate, load and execute) after this many seconds. Exits with code 124 and keeps a partial result marked `timed_out`. Unset means no limit and `0` also means no limit; a negative or fractional value is a usage error. When omitted, `execution.timeout_seconds` from the config file applies. Details in [Run Time Limit](#run-time-limit)
 - `--non-interactive`: Use defaults for all prompts (useful for automation)
 
 **Output and Paths:**
@@ -418,6 +419,59 @@ When the installed driver differs from the requested version and no isolated run
 
 Deleting the target database means a local database file or directory is deleted. On a remote platform the database is dropped, except Snowflake (drops this benchmark's tables and its tuning metadata and keeps the database) and Databricks (truncates every table in the schema). A platform that cannot drop a database refuses the run instead.
 
+## Run Time Limit
+
+`--timeout SECONDS` bounds one invocation of `benchbox run`, `benchbox run-official` or `benchbox datagen` (see [datagen](datagen.md)). It is optional: BenchBox sets no limit unless you ask for one.
+
+```bash
+benchbox run --platform duckdb --benchmark tpch --scale 10 --timeout 3600
+```
+
+**Setting the limit**
+
+- Unset means no limit. `0` also means no limit, so the command line can switch off a value set in the config file.
+- A negative or fractional value is a usage error, as is an invalid `execution.timeout_seconds` in the config file.
+- The command line wins over the config file: `--timeout` overrides `execution.timeout_seconds` ([Configuration](configuration.md#execution)).
+- The same setting exists as `timeout_seconds` on the MCP `run_benchmark` and `start_benchmark` tools ([MCP Server Reference](../mcp.md#run-surface-contract)), and as `timeout_seconds=` on `benchmark.generate_data()` and `adapter.run_benchmark()` in Python.
+
+**What the clock covers**
+
+- One clock covers the whole invocation: generation, loading and execution share it.
+- The clock starts when the command starts running the benchmark. Time spent waiting for the host lock does not count.
+- Container start-up, health checks, credential checks and the generator `-h` probes keep their own limits. Query plan capture keeps its own 30-second limit (`plan_capture_timeout_seconds`).
+- Throughput streams no longer stop after 3600 seconds (TPC-H) or 7200 seconds (TPC-DS) unless you set a limit. See `stream_timeout_seconds` in [Configuration](configuration.md#execution).
+
+**What happens at the limit**
+
+- BenchBox checks the limit between phases and between queries, never inside a timed query. A query cut short by the limit is reported with status `TIMEOUT`; on GizmoSQL the limit also tells the server how long a query may run.
+- A running TPC generator (`dsdgen`, `dbgen`, `dsqgen`, `qgen`) or TPC tool build is ended at the limit, together with its process group.
+- If the run has not stopped 30 seconds after the limit, BenchBox writes the partial result, prints its path, ends every child process it started and exits. The hard bound is therefore the limit plus 30 seconds. The 30 seconds is fixed, not a setting.
+- The command exits with code 124, the value `timeout(1)` uses. A run that failed, errored or was interrupted keeps that verdict and its exit code even if it also passed the limit; the timeout is recorded beside it.
+
+**The partial result**
+
+- The result keeps the queries that finished and is marked `timed_out` (`summary.validation`). `execution.timeout` records `timeout_seconds`, `phase` and `query_id`, the query that was about to start when the run stopped. `query_id` is absent when the run stopped between phases, finished its work after the limit, or was ended by the hard stop. Result schema 2.6 adds `execution.timeout`.
+- A timed-out result is never official, published, submitted or ranked. It loses an official compliance class, and publish and submit refuse it.
+- A power test stopped at the limit is not a success and reports no Power@Size.
+
+**Cloud platforms**
+
+When a limit is set, BenchBox warns once for every platform in the registry category `cloud`; no warning is printed without a limit or for a local platform. Cleanup of remote work is implemented for Onehouse Quanton, Google BigQuery, Amazon EMR Serverless, AWS Glue and Google Dataproc, which print:
+
+> A run time limit is set. If the run times out, BenchBox will try to cancel the work it started on {platform}. This cleanup has not been checked against the live service, so work may keep running and billing.
+
+Every other cloud platform prints:
+
+> A run time limit is set. If the run times out, work BenchBox started on {platform} may keep running and billing: BenchBox cannot cancel it on this platform.
+
+Remote cleanup has not been checked against live services. It is verified only with stubbed clients: no cloud run was made and no credentials were used. Work may keep running and billing after a timeout.
+
+A failed cleanup does not change exit code 124 or the `timed_out` result. Its error is printed to standard error as `Remote cleanup failed: ...` and recorded in `validation_details["timeout"]["cleanup_errors"]` of the result. The cleanup cancels only work this run started; it never stops a warehouse, application, cluster or session that existed before the run.
+
+**Python**
+
+`adapter.run_benchmark(benchmark, timeout_seconds=...)` raises `RunTimeoutError`, which carries the partial result as `partial_result`; it never exits the caller's process, and Python has no hard stop. `benchmark.generate_data(timeout_seconds=...)` raises `RunTimeoutError` when the limit has passed, with the generated paths as `partial_result`. Each call has its own clock; a call made inside an already bounded run uses that run's clock.
+
 ## Execution Control Options
 
 These flags control monitoring, progress display, memory handling, and caching behavior. They are advanced options - use `--help-topic all` to see them in the CLI help.
@@ -501,6 +555,7 @@ benchbox run-official {tpch|tpcds} [OPTIONS]
 - `--output PATH`: Output directory
 - `-v`, `--verbose`: Enable verbose logging
 - `--validate-results`: Enable result validation
+- `--timeout SECONDS`: Stop the whole run after this many seconds (exit code 124). A timed-out run is not an official result. `0` means no limit; the default is no limit. See [Run Time Limit](#run-time-limit)
 
 **Note:** plain `run` (including `run --official`) accepts `--streams N` (with
 `--concurrency N` as an alias), an advanced option that sets

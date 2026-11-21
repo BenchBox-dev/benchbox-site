@@ -130,6 +130,33 @@ tables = benchmark.generate_data()
 
 This regenerates the data even if valid data exists, and prints `Force regeneration requested, generating data...`.
 
+### Run Time Limit
+
+Generating a large scale factor can take a long time. Both ways to generate data accept an optional limit in seconds, and neither sets one for you.
+
+```bash
+benchbox datagen --benchmark tpcds --scale 100 --timeout 7200
+```
+
+```python
+from benchbox import TPCH
+from benchbox.utils.run_deadline import RunTimeoutError
+
+benchmark = TPCH(scale_factor=10, output_dir="./data")
+try:
+    tables = benchmark.generate_data(timeout_seconds=3600)
+except RunTimeoutError as error:
+    print(error.partial_result)
+```
+
+- Unset means no limit and `0` also means no limit. A negative or fractional value is rejected.
+- On the command line the limit exits with code 124 and keeps a partial result marked `timed_out`. If the command has not stopped 30 seconds after the limit, BenchBox writes that result and exits. `execution.timeout_seconds` in the config file applies when `--timeout` is omitted, and `--timeout` wins.
+- A running TPC generator (`dsdgen`, `dbgen`, `dsqgen`, `qgen`) is ended at the limit together with its process group; the error names the limit and the tool. Other generators stop at the next check.
+- `generate_data(timeout_seconds=...)` raises `RunTimeoutError` and never exits your process. When generation finished after the limit, `partial_result` holds the generated paths. A call made inside an already bounded run uses that run's clock.
+- Data from a generator that was stopped part way is not reused. The generator writes `.benchbox-generation-in-progress` into the data directory before it starts and removes it when it finishes; while the file exists, BenchBox regenerates the data.
+
+See [Run Time Limit](../reference/cli/run.md#run-time-limit) for the full contract.
+
 ### Verbose Validation Reports
 
 Enable detailed validation information:
