@@ -444,7 +444,7 @@ benchbox run --platform duckdb --benchmark tpch --scale 10 --timeout 3600
 **What happens at the limit**
 
 - BenchBox checks the limit between phases and between queries, never inside a timed query. A query cut short by the limit is reported with status `TIMEOUT`; on GizmoSQL the limit also tells the server how long a query may run.
-- A running TPC generator (`dsdgen`, `dbgen`, `dsqgen`, `qgen`) or TPC tool build is ended at the limit, together with its process group.
+- The external TPC programs a run starts are ended at the limit: `dbgen` and `dsdgen` (data generation, including parallel and streaming generation), `qgen` and `dsqgen` (query generation), and the `make` builds of the TPC tools. Each is stopped together with its process group; on a platform without process groups, only the process BenchBox started is ended. The error names the limit and the tool. Generators that start no such program, such as the Python generators of the other benchmarks, are not interrupted: they finish, and the run stops at the next check or at the 30-second hard stop below. The `-h` start-up probes keep their short limits.
 - If the run has not stopped 30 seconds after the limit, BenchBox writes the partial result, prints its path, ends every child process it started and exits. The hard bound is therefore the limit plus 30 seconds. The 30 seconds is fixed, not a setting.
 - The command exits with code 124, the value `timeout(1)` uses. A run that failed, errored or was interrupted keeps that verdict and its exit code even if it also passed the limit; the timeout is recorded beside it.
 
@@ -470,7 +470,7 @@ A failed cleanup does not change exit code 124 or the `timed_out` result. Its er
 
 **Python**
 
-`adapter.run_benchmark(benchmark, timeout_seconds=...)` raises `RunTimeoutError`, which carries the partial result as `partial_result`; it never exits the caller's process, and Python has no hard stop. `benchmark.generate_data(timeout_seconds=...)` raises `RunTimeoutError` when the limit has passed, with the generated paths as `partial_result`. Each call has its own clock; a call made inside an already bounded run uses that run's clock.
+`adapter.run_benchmark(benchmark, timeout_seconds=...)` raises `RunTimeoutError`, which carries the partial result as `partial_result`; it never exits the caller's process, and Python has no hard stop. `benchmark.generate_data(timeout_seconds=...)` raises `RunTimeoutError` at the limit: when a TPC generator was stopped, `partial_result` is `None`; when generation finished after the limit, it holds the generated paths. Each call has its own clock; a call made inside an already bounded run uses that run's clock.
 
 ## Execution Control Options
 
@@ -555,7 +555,7 @@ benchbox run-official {tpch|tpcds} [OPTIONS]
 - `--output PATH`: Output directory
 - `-v`, `--verbose`: Enable verbose logging
 - `--validate-results`: Enable result validation
-- `--timeout SECONDS`: Stop the whole run after this many seconds (exit code 124). A timed-out run is not an official result. `0` means no limit; the default is no limit. See [Run Time Limit](#run-time-limit)
+- `--timeout SECONDS`: Stop the whole run after this many seconds (exit code 124). A timed-out run is not an official result. `0` means no limit. When omitted, `execution.timeout_seconds` from the config file applies, as for `run`; with neither set there is no limit. See [Run Time Limit](#run-time-limit)
 
 **Note:** plain `run` (including `run --official`) accepts `--streams N` (with
 `--concurrency N` as an alias), an advanced option that sets
