@@ -79,7 +79,7 @@ helper = ExecutionConfigHelper(config_manager=config)
 helper.enable_power_run_iterations(iterations=3, warm_up_iterations=1)
 
 helper.enable_concurrent_queries(max_concurrent=4)
-helper.optimize_for_system(cpu_cores=16, memory_gb=64)
+helper.optimize_for_system(cpu_cores=16)
 config.save_config()
 ```
 

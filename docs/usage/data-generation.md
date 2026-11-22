@@ -140,7 +140,7 @@ benchbox datagen --benchmark tpcds --scale 100 --timeout 7200
 
 ```python
 from benchbox import TPCH
-from benchbox.utils.run_deadline import RunTimeoutError
+from benchbox.core.exceptions import RunTimeoutError
 
 benchmark = TPCH(scale_factor=10, output_dir="./data")
 try:

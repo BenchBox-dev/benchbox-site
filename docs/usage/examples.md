@@ -360,7 +360,7 @@ memory_gb = psutil.virtual_memory().total / (1024**3)
 print(f"System specs: {cpu_cores} CPU cores, {memory_gb:.1f}GB RAM")
 
 print("Optimizing configuration for system resources...")
-config_helper.optimize_for_system(cpu_cores=cpu_cores, memory_gb=memory_gb)
+config_helper.optimize_for_system(cpu_cores=cpu_cores)
 
 summary = config_helper.get_execution_summary()
 
@@ -448,8 +448,7 @@ config_helper.apply_performance_profile('standard')
 
 import psutil
 cpu_cores = psutil.cpu_count()
-memory_gb = psutil.virtual_memory().total / (1024**3)
-config_helper.optimize_for_system(cpu_cores, memory_gb)
+config_helper.optimize_for_system(cpu_cores)
 
 tpch = TPCH(scale_factor=0.01, output_dir="./tpch_data")
 connection = duckdb.connect(":memory:")
