@@ -54,7 +54,7 @@ The top level is closed: a key that is not listed here fails validation.
 | `config` | no | Run configuration: phases, query subset, platform options. |
 | `phases` | no | Duration and status of data generation, loading, power and throughput phases. |
 | `tables` | no | Table statistics. |
-| `execution` | no | Driver, translation and tuning-mode metadata. |
+| `execution` | no | Driver, translation and tuning-mode metadata. From 2.6, `execution.timeout` records the run time limit (`timeout_seconds`, `phase`, optional `query_id`) of a run that stopped at its limit; such a run has `summary.validation` set to `timed_out`. |
 | `tuning` | no | Tuning configuration applied to the run. |
 | `cost` | no | Cost information. |
 | `normalized_cost` | no | Cost normalized to a common model. |
@@ -132,6 +132,7 @@ When `host_load` is present, `start` and `end` are both required and each carrie
 
 | Version | Change |
 | --- | --- |
+| 2.6 | Optional `execution.timeout` (`timeout_seconds`, `phase`, `query_id`) for a run that stopped at its run time limit. |
 | 2.4 | Optional per-query `request_count`, `result_bytes` and `platform_timing`; run-level `timing_method`, `platform_timing` and `net_estimate_status`; `environment.client_link`; `environment.host_load`. |
 | 2.3 | Optional execution-engine receipts, compute size, deployment, gateway and variant identity. |
 | 2.2 | Per-query `row_count_validation`; the version key is `result_schema_version`, with `version` as the legacy spelling. |
@@ -161,7 +162,7 @@ What this means for consumers:
 
 - **Ignore keys you do not recognize** inside blocks, and do not rely on key order. A later 2.x bundle can carry keys that 2.5 does not know.
 - **The schema's top level is closed.** The published schema is the newest 2.x, and it sets `additionalProperties: false` for the top level, as BenchBox's validator rejects unknown top-level keys. A bundle from a newer BenchBox that adds a top-level block validates against the schema published with that release. Fetch the schema again when you upgrade BenchBox, or pin the schema file you validated against.
-- **Older BenchBox releases reject newer minors.** The runtime accepts only the versions it knows (currently 2.0 to 2.5) and fails closed on others, so a 2.6 bundle needs a BenchBox release that knows 2.6 to be read. Only the public submission check accepts any numeric 2.x version.
+- **Older BenchBox releases reject newer minors.** The runtime accepts only the versions it knows (currently 2.0 to 2.6) and fails closed on others, so a 2.7 bundle needs a BenchBox release that knows 2.7 to be read. Only the public submission check accepts any numeric 2.x version.
 
 ## Legacy
 

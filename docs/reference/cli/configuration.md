@@ -359,6 +359,7 @@ Performance and execution control settings.
 | `max_workers` | integer | `4` | Maximum worker threads for parallel execution |
 | `memory_limit_gb` | integer | `0` | Memory cap in GB; `0` means no limit (auto) |
 | `verbose` | boolean | `true` | Enable verbose progress output |
+| `timeout_seconds` | integer | unset | Run time limit in seconds for the whole of `benchbox run` and `benchbox datagen`: generation, loading and execution share one clock. Unset or `0` means no limit; a negative or fractional value is rejected as a usage error. The `--timeout SECONDS` option overrides it. See [Run Time Limit](run.md#run-time-limit) |
 
 **`execution.power_run`** - settings for multi-iteration power runs:
 
@@ -377,7 +378,7 @@ Performance and execution control settings.
 | `enabled` | boolean | `false` | Enable concurrent query streams |
 | `max_concurrent` | integer | `2` | Number of concurrent query streams |
 | `query_timeout_seconds` | integer | `300` | Per-query timeout in concurrent mode |
-| `stream_timeout_seconds` | integer | unset | Timeout in seconds for each throughput stream in `benchbox run`. Unset keeps the benchmark default (3600 for TPC-H, 7200 for TPC-DS) |
+| `stream_timeout_seconds` | integer | unset | Timeout in seconds for each throughput stream in `benchbox run`. Unset means no per-stream timeout; a run time limit (`--timeout`) still applies. Throughput streams no longer stop at 3600 seconds (TPC-H) or 7200 seconds (TPC-DS) unless you set a limit |
 | `cancel_on_timeout` | boolean | `false` | Signal a timed-out throughput stream to stop before its next query |
 | `retry_failed_queries` | boolean | `true` | Retry failed queries in concurrent streams |
 | `max_retries` | integer | `3` | Maximum retry attempts per query |
