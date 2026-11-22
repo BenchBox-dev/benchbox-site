@@ -27,6 +27,19 @@ test first, each with a number or a named condition.
   mover", "pinned", "spill", "resident memory", "out-of-core", "SF10". Say
   "runs", "written to disk", "peak memory", "scale factor 10". Define swap
   once.
+- **No "lazy queries".** Explain eager code and `collect()` queries once, in
+  the introduction, with an example of each. After that write "`collect()`
+  queries". Explain "engine" in the same place. Keep these terms out of the
+  title, pull quote and TL;DR, which come before the explanation.
+- **Say why before what.** We tested because we wanted to know how 2.x
+  performs and what the upgrade takes. Do not present the test as a side
+  effect of something BenchBox does.
+- **Do not understate BenchBox.** Write "the four benchmarks we used" and
+  "the 181 queries we tested". BenchBox runs more benchmarks on Polars than
+  these four.
+- **One word per thing.** "Benchmark", not "suite". "Fails with an error",
+  not "raises". "Stacks", not "unions". Label each table column with the
+  engine it used.
 - **Headings** name the section's point. None begins with "What". None is in
   the first person (`STYLE_GUIDE.md`, Headings).
 - **No open questions that a search or a small test could answer.** Find the
