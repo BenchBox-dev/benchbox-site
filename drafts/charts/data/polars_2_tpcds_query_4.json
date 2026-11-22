@@ -1,0 +1,4 @@
+[
+  {"label": "2.0", "segments": [{"phase_name": "Query 4", "value": 4.67}, {"phase_name": "The other 102 queries", "value": 25.80}]},
+  {"label": "2.1", "segments": [{"phase_name": "Query 4", "value": 10.28}, {"phase_name": "The other 102 queries", "value": 23.80}]}
+]

@@ -14,6 +14,7 @@ posts and their images live in `blog/`.
 | `building-benchbox/research/tpch-benchbox-measurements-2026-03-02.json` | keep | Measurement data behind the DuckDB TPC-H extension comparison post; `tpch-extension-vs-benchbox-implementation.md` cites it. |
 | `building-benchbox/research/tpch-extension-vs-benchbox-measurements-2026-03-02.json` | keep | Measurement data behind the same post; the validation note cites it. |
 | `charts/charts.json`, `charts/data/*.json` | keep | Chart definitions and inputs for `scripts/render-blog-charts.mjs`, moved from core's chart scripts. |
+| `platform-deep-dives/images/polars_2_*.png` (2 files) | keep | Charts for the Polars 2.x upgrade draft, rendered by `npm run charts -- <name> --out-dir drafts/platform-deep-dives/images` from the figures in the draft's tables. They stand in until the results are in the Results Explorer. |
 
 ## Not carried over
 
