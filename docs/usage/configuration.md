@@ -92,6 +92,27 @@ in-memory provider; its changes stay local to that helper and are not persisted.
 Later provider registrations do not replace an existing helper's captured
 provider. Pass a `ConfigManager` explicitly when you intend to save the settings.
 
+## Run Time Limit
+
+An optional run time limit stops one invocation after a number of seconds. Set it in the config file or on the command line:
+
+```yaml
+execution:
+  timeout_seconds: 3600
+```
+
+```bash
+uv run -- benchbox run --benchmark tpch --platform duckdb --timeout 1800
+```
+
+- There is no limit unless one is set. `0` also means no limit, so `--timeout 0` switches off a value from the config file.
+- A negative or fractional value, in the file or on the command line, is a usage error.
+- The command line wins over the config file: `--timeout` overrides `execution.timeout_seconds`.
+- One clock covers the whole invocation (generation, loading and execution). Time spent waiting for the host lock does not count.
+- A run that reaches the limit exits with code 124 and keeps a partial result marked `timed_out`. That result is never official, published, submitted or ranked.
+
+[Run Time Limit](../reference/cli/run.md#run-time-limit) lists what is and is not covered, the 30-second hard stop and the cloud platform warnings. The same limit applies to `benchbox datagen` ([Data Generation](data-generation.md#run-time-limit)) and to MCP runs ([MCP Server Reference](../reference/mcp.md#run-surface-contract)).
+
 ## Environment Overrides
 
 Some tuning settings can be toggled at deploy time without editing files. The default mapping is stored under `tuning.environment_overrides`:

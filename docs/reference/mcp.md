@@ -236,9 +236,11 @@ modes remain available because they do not hold the request for execution.
 | `platform_options` | object or null | No | `null` | Typed, bounded, non-secret settings approved for the selected platform; credentials, endpoints, paths, and package-install controls are rejected. |
 | `seed` | integer or null | No | `null` | RNG seed for query parameter generation, 0 to 2147483647; equivalent to the CLI `--seed` flag. The effective value is reported in `mcp_metadata.seed`. |
 | `iterations` | integer or null | No | `null` | Power test measurement iterations, at least 1 (the shared default is 3); equivalent to the CLI `--iterations` flag and applies to the power or standard phase. `mcp_metadata.iterations` reports the count the result bundle recorded. Remote servers bound it with `max_iterations`. |
+| `timeout_seconds` | integer or null | No | `null` | Run time limit in seconds for the whole run (generate, load and execute); equivalent to the CLI `--timeout` flag. Unset or `0` means no limit; a negative, fractional or boolean value is rejected with a validation error. Both `run_benchmark` and `start_benchmark` accept it. |
 
 **Behavior:**
 
+- `timeout_seconds` bounds the whole run on one clock; the limit is checked between phases and between queries, never inside a timed query. A run that reaches it returns an error result (`isError` set) whose `mcp_metadata.status` is `timed_out` and whose `mcp_metadata.timeout` records `timeout_seconds` and `phase` and, when a query was about to start, `query_id`. The partial result is written and marked `timed_out`; it must not be published, compared or ranked, and the run should not be retried unchanged. A `start_benchmark` job that times out is recorded as incomplete and is not retried. The server process is never exited. When a limit is set on a cloud platform, the `warnings` list of the response carries the cleanup warning quoted in [Run Time Limit](cli/run.md#run-time-limit).
 - `validate_only=true` returns configuration validity, resolved execution mode,
   errors, and warnings.
 - `dry_run=true` uses the core dry-run executor and returns the plan/resources
