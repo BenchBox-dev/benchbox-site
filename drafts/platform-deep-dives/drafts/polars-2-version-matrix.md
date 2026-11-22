@@ -158,6 +158,7 @@ Our benchmarks cannot make this check for you. Each query either sorts its outpu
 - **Benchmarks**: TPC-H, TPC-DS, SSB and ClickBench at scale factor 10, read from Parquet files
 - **Method**: 10 threads. Each query ran once to warm up and once for timing. We ran each benchmark three times, in random order.
 - **Checks**: at a small data size we compared query results with DuckDB. At scale factor 10 we compared row counts.
+- **TPC**: the TPC-H and TPC-DS figures are derived from those benchmarks. They do not comply with the TPC specifications, are not official TPC results, and must not be compared with official TPC results.
 
 We also ran three older 1.x releases. The [findings](https://github.com/BenchBox-dev/BenchBox/blob/3e09d4f43bbfb823acd82dc1402dd4db9663c634/_project/analysis/polars-version-matrix/findings.md) list every result. The [methodology](https://github.com/BenchBox-dev/BenchBox/blob/3e09d4f43bbfb823acd82dc1402dd4db9663c634/_project/analysis/polars-version-matrix/methodology.md) explains the rules. The [analysis JSON](https://github.com/BenchBox-dev/BenchBox/blob/3e09d4f43bbfb823acd82dc1402dd4db9663c634/_project/analysis/polars-version-matrix/polars-version-matrix-analysis.json) holds the numbers.
 
