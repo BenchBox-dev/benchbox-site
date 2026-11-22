@@ -422,9 +422,8 @@ The categories are sorted by total time to identify bottlenecks.
 | 10.0 (xlarge) | ~11 GB | 10s-60s | Stress testing |
 
 The 1.0 size is the measured uncompressed size from [SF1 calibrated sizes](sf1-calibrated-sizes.md); the other
-sizes are estimates that scale it in proportion. The standard scale factors for Read Primitives are 0.01 and
-0.1. The 1.0 and 10.0 rows run with a note that their results are not comparable with published results; see
-[Scale factors](index.md#scale-factors).
+sizes are estimates that scale it in proportion. The standard scale factors for Read Primitives are 0.01, 0.1, 1 and
+10.
 
 ## Configuration Options
 

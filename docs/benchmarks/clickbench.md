@@ -797,8 +797,8 @@ estimates that scale in proportion.
 | 1.0 | 1,000,000 | ~0.55 GB (measured) | Standard benchmark |
 | 10.0 | 10,000,000 | ~5.5 GB (estimate) | Large-scale testing |
 
-The standard scale factor for ClickBench is 1. The other rows run with a note that their results are not comparable
-with published results; see [Scale factors](index.md#scale-factors).
+The standard scale factors for ClickBench are 0.1, 1 and 10. The 0.01 row runs with a note that its results are not
+comparable with published results; see [Scale factors](index.md#scale-factors).
 
 ### Advanced-level Configuration
 
