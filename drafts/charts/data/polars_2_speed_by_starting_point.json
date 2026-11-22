@@ -1,0 +1,14 @@
+[
+  {"label": "TPC-H       1.44 default  ", "value": 11.17, "group": "TPC-H"},
+  {"label": "TPC-H       1.44 streaming", "value": 7.75,  "group": "TPC-H"},
+  {"label": "TPC-H       2.0 default",    "value": 6.11,  "group": "TPC-H"},
+  {"label": "TPC-H       2.1 default",    "value": 5.75,  "group": "TPC-H"},
+  {"label": "SSB         1.44 default  ", "value": 5.18,  "group": "SSB"},
+  {"label": "SSB         1.44 streaming", "value": 4.19,  "group": "SSB"},
+  {"label": "SSB         2.0 default",    "value": 3.28,  "group": "SSB"},
+  {"label": "SSB         2.1 default",    "value": 3.32,  "group": "SSB"},
+  {"label": "ClickBench  1.44 default  ", "value": 4.32,  "group": "ClickBench"},
+  {"label": "ClickBench  1.44 streaming", "value": 2.55,  "group": "ClickBench"},
+  {"label": "ClickBench  2.0 default",    "value": 2.10,  "group": "ClickBench"},
+  {"label": "ClickBench  2.1 default",    "value": 2.05,  "group": "ClickBench"}
+]

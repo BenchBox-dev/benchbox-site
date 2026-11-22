@@ -101,6 +101,8 @@ The table shows the total time, in seconds, to run all the queries in each bench
 | SSB | 5.18 | 4.19 | 3.28 | 3.32 |
 | ClickBench | 4.32 | 2.55 | 2.10 | 2.05 |
 
+![Bar chart of the table above. For TPC-H, SSB and ClickBench, the 1.44 default bar is the longest, 1.44 streaming is shorter, and the 2.0 and 2.1 default bars are the shortest and nearly equal.](../images/polars_2_speed_by_starting_point.png)
+
 **If you use the defaults.** 2.x roughly halved the time for TPC-H and ClickBench, and cut SSB by over a third. That is 1.6x to 2.1x faster.
 
 **If you already use streaming.** Much of that gain was already available in 1.44. Switching 1.44 to the streaming engine took 19% to 41% off the time. Moving from there to 2.x took off another 14% to 29%.
@@ -132,6 +134,8 @@ TPC-DS is the largest of the four benchmarks. It shows the difference most clear
 |---|---|---|
 | Query 4 | 4.67 s | 10.28 s |
 | The other 102 queries | 25.80 s | 23.80 s |
+
+![Stacked bar chart of the table above. The query 4 part of the bar more than doubles from 2.0 to 2.1, and the part for the other 102 queries gets slightly shorter.](../images/polars_2_tpcds_query_4.png)
 
 On the other 102 queries, 2.1 took 8% less time than 2.0.
 
