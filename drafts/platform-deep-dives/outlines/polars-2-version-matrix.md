@@ -24,9 +24,9 @@ test first, each with a number or a named condition.
   line each.
 - **Short sentences.** One point per sentence. No semicolons joining clauses.
 - **Plain words.** Not "matrix", "cell", "qualified", "rounds", "candidate
-  mover", "pinned", "spill", "resident memory", "out-of-core", "SF10". Say
-  "runs", "written to disk", "peak memory", "scale factor 10". Define swap
-  once.
+  mover", "pinned", "resident memory", "out-of-core", "SF10". Say "runs",
+  "peak memory", "scale factor 10". "Spills to disk" is allowed once the
+  disk section has introduced it. Define swap once.
 - **No "lazy queries".** Explain eager code and `collect()` queries once, in
   the introduction, with an example of each. After that write "`collect()`
   queries". Explain "engine" in the same place. Keep these terms out of the
@@ -78,7 +78,7 @@ test first, each with a number or a named condition.
 3. **Breaking changes in 2.0.** Streaming default; row order with the guide's
    warning and a `maintain_order` example; conversions that now fail;
    removed APIs; how to keep the in-memory engine.
-4. **Polars can now use disk when memory runs out.** Its own section, because
+4. **Memory is no longer a hard limit.** Its own section, because
    it is the change that matters most for scheduled pipelines. On by default
    at 80% of available memory, up to 64 GB of disk (2.0.0 release notes).
    Covers sorting in 2.0, `group_by` and window functions in 2.1; joins are
@@ -86,7 +86,7 @@ test first, each with a number or a named condition.
    sort under a 200 MB limit (R11) and TPC-DS on 2.1. Two cautions: the
    threshold is not a hard limit, and the disk files need room. Report what
    Polars states and what we measured; do not predict fewer failures.
-5. **Porting 181 queries: three fixes.** The three fixes; no query changed;
+5. **Benchmark updates required.** The three fixes; no query changed;
    every benchmark passed the DuckDB check.
 6. **Speed by starting point.** One table of medians: 1.44 default, 1.44
    streaming, 2.0 default, 2.1 default. Then three short paragraphs: default

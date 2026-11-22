@@ -62,13 +62,13 @@ pl.Config.set_engine_affinity("in-memory")   # whole process
 lf.collect(engine="in-memory")               # one query
 ```
 
-## Polars can now use disk when memory runs out
+## Memory is no longer a hard limit
 
-This change breaks nothing. It matters most if you run Polars pipelines on a schedule, where a run that outgrows memory fails with nobody watching.
+Polars now spills to disk when memory runs out. A query that exceeds available memory can still finish, more slowly, instead of failing. This change matters most if you run Polars pipelines on a schedule, where an overnight run that outgrows memory fails with nobody watching.
 
-In 2.0, the streaming engine tracks how much memory it is using. When that passes 80% of the memory available, it moves part of its working data to disk and reads it back when needed[^4]. Inside a container, "available" means the container's limit. This is on by default, and Polars will use up to 64 GB of disk for it[^4].
+From 2.0, the streaming engine tracks how much memory it is using. When that passes 80% of the memory available, it moves part of its working data to disk and reads it back when needed[^4]. Inside a container, "available" means the container's limit. This is on by default, and Polars will use up to 64 GB of disk for it[^4].
 
-The aim is that a query which has outgrown memory finishes more slowly instead of failing. So far it covers these operations:
+So far disk spill covers these operations:
 
 - **In 2.0:** sorting[^4]
 - **In 2.1:** `group_by` and window functions[^5]
@@ -78,10 +78,10 @@ We forced it with a small test. We sorted 12 million rows while allowing Polars 
 
 Two things to know before you rely on it:
 
-- **The threshold is not a hard limit.** One of our queries used 7.6 GiB with the limit set to 4 GB. The memory section below has the details.
+- **Polars can still go past the threshold.** One of our queries used 7.6 GiB with the limit set to 4 GB. The memory section below has the details.
 - **The disk files need room.** On our machine they went to `polars-<user>/spill` under the system temporary directory. You can change the two limits with `POLARS_OOC_MEMORY_BUDGET_MB` and `POLARS_OOC_DISK_BUDGET_MB`.
 
-## Porting 181 queries: three fixes
+## Benchmark updates required
 
 The four benchmarks have 181 queries between them. To run them on 2.0 we made [three fixes](https://github.com/BenchBox-dev/BenchBox/pull/2771):
 
