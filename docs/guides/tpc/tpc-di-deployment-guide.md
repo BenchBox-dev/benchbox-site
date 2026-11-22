@@ -6,6 +6,9 @@ tags: [advanced, guide, tpc-di, cloud-platform]
 
 # TPC-DI Deployment Guide
 
+> [!IMPORTANT]
+> TPC-DI in BenchBox is being reworked. Earlier results were withdrawn because they did not measure the TPC-DI workload.
+
 ## Overview
 
 The TPC-DI (Transaction Processing Performance Council - Data Integration) benchmark implementation in BenchBox provides a systematic ETL testing framework for data warehousing scenarios. This guide covers deployment options from development environments to production-grade installations.

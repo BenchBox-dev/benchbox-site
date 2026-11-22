@@ -2,7 +2,7 @@
 
 > The BenchBox blog publication queue: one row per unpublished
 > actionable article.
-> **Last updated:** 2026-11-12
+> **Last updated:** 2026-11-20
 
 ## How this queue works
 
@@ -63,6 +63,8 @@
 | What we built on top of SQLGlot | [Draft](building-benchbox/drafts/11-what-we-built-on-top-of-sqlglot.md) | Unset (Joe) | Joe / author | Human editorial check and review | - | - |
 | SCD Type 2: declarative CDC vs portable SQL MERGE | [Draft](platform-deep-dives/drafts/apply-changes-into-vs-standard-sql.md) | Unset (Joe) | Joe / author | Human editorial check and review | - | Evidence lives in `drafts/platform-deep-dives/research/`; verify claims against it |
 | DuckDB architecture claim notes | [Claim notes](platform-deep-dives/drafts/duckdb-architecture.md) | Unset (Joe) | Joe / author | Shape into a post draft or attach to its post; human editorial check | - | Supporting note, not a post draft; corrects an "under 10 seconds" TPC-H SF10 claim with measured M4 wall times; evidence in [verification notes](platform-deep-dives/research/duckdb-architecture-verification-2026-02-20.md) |
+| Polars 2.x is up to 2x faster. Should you upgrade? | [Draft](platform-deep-dives/drafts/polars-2-version-matrix.md) | Unset (Joe) | Joe / author | Human editorial check and review; set publication date | 2026-11-21 | Time-sensitive: a Polars release after 2.1.0 dates the post and may change the query 4 memory result; Polars issues #30608 and #30981 were open on 2026-11-21. Evidence lives in `drafts/platform-deep-dives/research/`; verify claims against it |
+| Three memory checks that measured the wrong thing | [Draft](building-benchbox/drafts/23-memory-checks-that-measured-the-wrong-thing.md) | Unset (Joe) | Joe / author | Human editorial check and review; set publication date | - | Split from the Polars 2.x upgrade post; publish after it so this post can link to it. Evidence lives in `drafts/platform-deep-dives/research/` |
 
 ---
 
@@ -80,7 +82,6 @@ planning value, not queued for publication.
 | Vector search across six engines | [Outline](benchbox-in-action/outlines/02-vector-search-recall-latency.md) | Outlined; needs drafting |
 | Discovering the SQL vs DataFrame optimization gap | BenchBox in action idea, no draft | Research notes in series plan; 9.4x gap reveals decorrelation architecture |
 | Rewriting TPC-DS Q10 and Q35 for ClickHouse | [Outline](platform-deep-dives/outlines/clickhouse-tpcds-q10-q35-semijoin-rewrites.md) | Plan only; do not draft until the listed experiments run |
-| Naming the engine in a Polars 2.x upgrade comparison | [Outline](platform-deep-dives/outlines/polars-2-version-matrix.md) | Ready to draft once the core analysis pages for the 2026-11-19 run (with 2.1.0) are merged; see the outline's "Before drafting" |
 | Spark Adaptive Query Execution | [Outline](platform-deep-dives/outlines/spark-adaptive-query-execution.md) | Outlined; BenchBox measurements are future work |
 | TPC binary wrangling (building-benchbox idea) | Series plan idea, no file | Cross-platform binary distribution for TPC data generation |
 | DataFrame benchmarking: SQL to Polars/Pandas (building-benchbox idea) | Series plan idea, no file | Faithful TPC-H translation challenges |
