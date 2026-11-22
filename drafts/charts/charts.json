@@ -58,46 +58,6 @@
         "--sort-by",
         "value"
       ]
-    },
-    {
-      "name": "polars_2_speed_by_starting_point",
-      "command": [
-        "textcharts",
-        "bar",
-        "-f",
-        "{data}/polars_2_speed_by_starting_point.json",
-        "--title",
-        "Polars 1.44, 2.0 and 2.1: median time to run each benchmark",
-        "--subtitle",
-        "Default: in-memory on 1.44, streaming on 2.x  |  Derived from TPC-H; not an official TPC result",
-        "--metric-label",
-        "seconds",
-        "--theme",
-        "dark",
-        "--width",
-        "100",
-        "--sort-by",
-        "none"
-      ]
-    },
-    {
-      "name": "polars_2_tpcds_query_4",
-      "command": [
-        "textcharts",
-        "stacked",
-        "-f",
-        "{data}/polars_2_tpcds_query_4.json",
-        "--title",
-        "TPC-DS on Polars 2.0 and 2.1: query 4 and the other 102 queries",
-        "--subtitle",
-        "Median of three runs, default engine  |  Derived from TPC-DS; not an official TPC result",
-        "--metric-label",
-        "s",
-        "--theme",
-        "dark",
-        "--width",
-        "100"
-      ]
     }
   ]
 }
