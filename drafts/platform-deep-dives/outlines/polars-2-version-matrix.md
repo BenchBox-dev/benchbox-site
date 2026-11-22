@@ -73,27 +73,35 @@ test first, each with a number or a named condition.
 
 1. **Introduction.** Release dates; the "boring experience" quote; the engine
    default in three sentences; scope in one sentence.
-2. **Upgrade or wait.** Four bullets by starting point, each with a number or
+2. **Upgrade or wait.** Five bullets by starting point, each with a number or
    condition.
 3. **Breaking changes in 2.0.** Streaming default; row order with the guide's
-   warning and a `maintain_order` example; silent conversions now raise;
-   removed APIs; writes to disk by default; how to keep the in-memory engine.
-4. **Porting 181 queries: three fixes.** The three fixes; no query changed;
-   every suite passed the DuckDB comparison.
-5. **Speed by starting point.** One table of medians: 1.44 default, 1.44
+   warning and a `maintain_order` example; conversions that now fail;
+   removed APIs; how to keep the in-memory engine.
+4. **Polars can now use disk when memory runs out.** Its own section, because
+   it is the change that matters most for scheduled pipelines. On by default
+   at 80% of available memory, up to 64 GB of disk (2.0.0 release notes).
+   Covers sorting in 2.0, `group_by` and window functions in 2.1; joins are
+   merged but unreleased (Polars #30679). Our evidence: the 12-million-row
+   sort under a 200 MB limit (R11) and TPC-DS on 2.1. Two cautions: the
+   threshold is not a hard limit, and the disk files need room. Report what
+   Polars states and what we measured; do not predict fewer failures.
+5. **Porting 181 queries: three fixes.** The three fixes; no query changed;
+   every benchmark passed the DuckDB check.
+6. **Speed by starting point.** One table of medians: 1.44 default, 1.44
    streaming, 2.0 default, 2.1 default. Then three short paragraphs: default
    settings (36% to 53%), already on streaming (14% to 29%), staying in
    memory (within about 8%).
-6. **Memory on a 16 GiB machine.** Peak memory in one sentence with one
+7. **Memory on a 16 GiB machine.** Peak memory in one sentence with one
    example. A four-row TPC-DS table. Subsection "One query explains the 2.1
    result": query 4 against the other 102 queries, its shape, the run on its
    own, the rewritten group-by and the two upstream reports.
-7. **Row order: test your own code.** Why benchmarks say little; a test the
+8. **Row order: test your own code.** Why benchmarks say little; a test the
    reader can run.
-8. **Test setup.** Five lines and three links.
-9. **Limits.** Five bullets.
-10. **Try it on your own workload.** Two commands.
-11. **Conclusions.** Three short paragraphs. No open questions.
+9. **Test setup.** Five lines and three links.
+10. **Limits.** Five bullets.
+11. **Try it on your own workload.** Two commands.
+12. **Conclusions.** Three short paragraphs. No open questions.
 
 ## Before publishing
 

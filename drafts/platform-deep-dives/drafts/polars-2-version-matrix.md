@@ -37,6 +37,7 @@ All our tests are `collect()` queries.
 - **You already pass `engine="streaming"`:** a smaller gain, 14% to 29%.
 - **You keep the in-memory engine:** we measured no change in speed. Eager code uses this engine too, but we did not test eager code.
 - **You run large `group_by` queries close to your memory limit:** test on 2.1 before you move. One of our queries needed far more memory on 2.1 than on 2.0.
+- **Your pipelines sometimes run out of memory:** 2.x can use disk as overflow, and this is on by default. In 2.1 it covers sorting, `group_by` and window functions.
 
 ## Breaking changes in 2.0
 
@@ -54,14 +55,31 @@ left.join(right, on="k", how="left", maintain_order="left").collect()
 
 **Old APIs are removed.** Examples are `melt`, `with_row_count`, `LazyFrame.fetch` and the `rechunk=` argument of the file readers[^3]. The error message tells you what to use instead[^2].
 
-One more change does not break code. When memory runs short, Polars 2.0 writes some of its working data to disk. This is on by default[^4].
-
 To keep the in-memory engine after you upgrade[^3]:
 
 ```python
 pl.Config.set_engine_affinity("in-memory")   # whole process
 lf.collect(engine="in-memory")               # one query
 ```
+
+## Polars can now use disk when memory runs out
+
+This change breaks nothing. It matters most if you run Polars pipelines on a schedule, where a run that outgrows memory fails with nobody watching.
+
+In 2.0, the streaming engine tracks how much memory it is using. When that passes 80% of the memory available, it moves part of its working data to disk and reads it back when needed[^4]. Inside a container, "available" means the container's limit. This is on by default, and Polars will use up to 64 GB of disk for it[^4].
+
+The aim is that a query which has outgrown memory finishes more slowly instead of failing. So far it covers these operations:
+
+- **In 2.0:** sorting[^4]
+- **In 2.1:** `group_by` and window functions[^5]
+- **Not yet released:** joins[^6]
+
+We forced it with a small test. We sorted 12 million rows while allowing Polars 200 MB of memory. Polars 2.0 finished the sort and wrote 1.12 GB to disk on the way. In our TPC-DS runs, 2.1 wrote 0.47 GiB to disk and finished every run.
+
+Two things to know before you rely on it:
+
+- **The threshold is not a hard limit.** One of our queries used 7.6 GiB with the limit set to 4 GB. The memory section below has the details.
+- **The disk files need room.** On our machine they went to `polars-<user>/spill` under the system temporary directory. You can change the two limits with `POLARS_OOC_MEMORY_BUDGET_MB` and `POLARS_OOC_DISK_BUDGET_MB`.
 
 ## Porting 181 queries: three fixes
 
@@ -121,7 +139,7 @@ Query 4 adds up what each customer spent per year in three sales tables. It stac
 
 We ran query 4 by itself to check. On 2.0 it finished in 7 seconds and did not use disk. On 2.1 its memory grew to 7.6 GiB, and a safety limit on our machine stopped it. We had told Polars to use no more than 4 GB.
 
-Polars 2.1 has a new implementation of `group_by` for the streaming engine[^5]. Two open Polars bug reports describe memory problems with two things this query does. One is stacking tables with `pl.concat`, where the report measures four times the memory of 2.0[^6]. The other is using one result in several places[^7]. We did not confirm which of these affects query 4. Polars has changed how `group_by` uses memory since 2.1, but those changes are not in a release yet[^8].
+Polars 2.1 has a new implementation of `group_by` for the streaming engine[^7]. Two open Polars bug reports describe memory problems with two things this query does. One is stacking tables with `pl.concat`, where the report measures four times the memory of 2.0[^8]. The other is using one result in several places[^9]. We did not confirm which of these affects query 4. Polars has changed how `group_by` uses memory since 2.1, but those changes are not in a release yet[^10].
 
 ## Row order: test your own code
 
@@ -183,11 +201,13 @@ You gain less if you already use the streaming engine. We measured no gain on th
 [^1]: [polars release history](https://pypi.org/project/polars/#history) - PyPI, accessed November 2026
 [^2]: [Pre-release of Polars 2.0](https://pola.rs/posts/announcing-polars-2/) - Polars, published September 2, 2026, accessed November 2026
 [^3]: [Version 2.0 upgrade guide](https://docs.pola.rs/releases/upgrade/2/) - Polars documentation, accessed November 2026
-[^4]: [Polars 2.0.0 release notes](https://github.com/pola-rs/polars/releases/tag/py-2.0.0) - "Enable OOC by default with 80% of available RAM as threshold" (#29741), accessed November 2026
-[^5]: [Streaming OOC group-by with shuffles](https://github.com/pola-rs/polars/pull/29911) - Polars pull request #29911, merged October 21, 2026, accessed November 2026
-[^6]: [Semi-join before a union of per-partition scan_iceberg reads uses ~4x the memory of 2.0.0](https://github.com/pola-rs/polars/issues/30608) - Polars issue #30608, open, accessed November 21, 2026
-[^7]: [Streaming multiplexer spills a separate copy of each buffered morsel per output port](https://github.com/pola-rs/polars/issues/30981) - Polars issue #30981, open, accessed November 21, 2026
-[^8]: [Count pre-aggregates in memory when choosing the number of streaming group-by partitions](https://github.com/pola-rs/polars/pull/30405) - Polars pull request #30405, merged October 29, 2026, accessed November 2026
+[^4]: [Polars 2.0.0 release notes](https://github.com/pola-rs/polars/releases/tag/py-2.0.0) - "Enable OOC by default with 80% of available RAM as threshold" (#29741), "Set default OOC disk budget to 64 GB" (#29734) and "Add streaming (out-of-core) sort" (#29657), accessed November 2026
+[^5]: [Polars 2.1.0 release notes](https://github.com/pola-rs/polars/releases/tag/py-2.1.0) - "Streaming OOC group-by with shuffles" (#29911) and "Evaluate the streaming window node out of core" (#30282), accessed November 2026
+[^6]: [Out-of-core joins](https://github.com/pola-rs/polars/pull/30679) - Polars pull request #30679, merged November 10, 2026, not in a release on November 22, 2026
+[^7]: [Streaming OOC group-by with shuffles](https://github.com/pola-rs/polars/pull/29911) - Polars pull request #29911, merged October 21, 2026, accessed November 2026
+[^8]: [Semi-join before a union of per-partition scan_iceberg reads uses ~4x the memory of 2.0.0](https://github.com/pola-rs/polars/issues/30608) - Polars issue #30608, open, accessed November 21, 2026
+[^9]: [Streaming multiplexer spills a separate copy of each buffered morsel per output port](https://github.com/pola-rs/polars/issues/30981) - Polars issue #30981, open, accessed November 21, 2026
+[^10]: [Count pre-aggregates in memory when choosing the number of streaming group-by partitions](https://github.com/pola-rs/polars/pull/30405) - Polars pull request #30405, merged October 29, 2026, accessed November 2026
 
 ---
 
