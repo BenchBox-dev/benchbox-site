@@ -61,7 +61,11 @@ versioned core bundle; it reads nothing else from core.
   before the build and before publication. Docs inputs without
   `doc-contracts.json` always fail. `npm run test:docs-contracts` runs the
   seeded drift tests; `DOC_CONTRACTS_SCHEMA4_BUNDLE=<bundle dir>` adds a run
-  against a real bundle.
+  against a real bundle. The command first prints which inputs it uses (release
+  pin, fetched bundle or other, with version and core commit). On a branch
+  based on `next` with `DOCS_INPUTS` unset it also says that CI checks `next`
+  against the fetched bundle and prints the command that reproduces CI:
+  `npm run bundle:fetch && DOCS_INPUTS=.site-inputs npm run docs:check`.
 - `inventory/core-linked-paths.json` lists every core path that a relative
   link in `docs/` or `blog/` points at, with its kind and the
   `file:line` of each link. It is generated through the converter's own link

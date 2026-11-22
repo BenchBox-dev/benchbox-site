@@ -45,8 +45,9 @@ a canonical query set, and result-integrity coverage.
 | `deprecated` | Migration path documented. | Retained until the removal window. | Frozen at the last supported set. | Frozen. | Frozen. | Frozen. | Listed with a deprecation label or hidden after the warning window; removal follows a registry target. |
 | `document_only` | Docs must state it is not executable. | None. | None (no runtime). | None. | None. | None. | Not listed as runnable; not exposed over MCP. |
 
-`deprecated` and `document_only` have **no current benchmark members**; the rows
-above define the bar a future entry would have to meet.
+`deprecated` has **no current benchmark members**; `document_only` currently has
+one (`tpcdi`). The `deprecated` row above defines the bar a future entry would
+have to meet.
 
 ## Benchmark Status Rationale
 
@@ -63,7 +64,7 @@ integrity spec, query count, dataset/source, scales, and DataFrame capability.
 | `ssb` | `stable` | 13-query Star Schema Benchmark; generated; integrity spec; full docs; scales to SF10; DataFrame-capable. | None — maintain. |
 | `clickbench` | `stable` | 43-query industry-standard analytics; external `hits` dataset; integrity spec; full docs; DataFrame-capable. | None — maintain. |
 | `joinorder` | `stable` | 113-query Join Order Benchmark; canonical IMDb 2013 JOB data; integrity spec; full docs; fixed `--scale 1`; DataFrame-capable. | None — maintain. |
-| `tpcdi` | `beta` | 38-query data-integration workload; generated; integrity spec; docs; scales to SF10; DataFrame-capable. | Confirm canonical transform/query completeness and a maintenance commitment before `stable`. |
+| `tpcdi` | `document_only` | 0-query workload while the TPC-DI implementation is reworked; not executable and not listed as runnable (see the [TPC-DI page](tpc-di.md)); DataFrame-capable flag unchanged. | Return to `beta` or higher when the reworked implementation lands with a canonical query set and integrity spec. |
 | `h2odb` | `beta` | 10-query data-science groupby/join; generated; integrity spec; docs; DataFrame-capable. | Broaden cross-platform coverage evidence before `stable`. |
 | `amplab` | `beta` | 8-query big-data subset; generated; integrity spec; docs; DataFrame-capable. | Small canonical subset; confirm dataset contract breadth before `stable`. |
 | `read_primitives` | `beta` | 157-query read-primitive matrix; derived from TPC-H data; integrity spec; docs; DataFrame-capable. | Pin the derived-from-`tpch` dataset contract and confirm DataFrame parity before `stable`. |
