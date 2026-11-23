@@ -120,7 +120,23 @@ export async function producingRun(runId, env = process.env, options = {}) {
   }
 }
 
+export async function developProductions(coreSha, env = process.env) {
+  const name = `${ARTIFACT_PREFIX}${coreSha}`;
+  const { artifacts } = await githubJson(`repos/${CORE_REPO}/actions/artifacts?name=${name}&per_page=100`, env);
+  return artifacts.filter((item) => !item.expired && item.workflow_run?.head_branch === "develop");
+}
+
 export async function newestBundle(env = process.env, options = {}) {
+  if (env.SITE_INPUTS_CORE_SHA) {
+    const productions = await developProductions(env.SITE_INPUTS_CORE_SHA, env);
+    const artifact = env.SITE_INPUTS_RUN_ID ? productions.find((item) => String(item.workflow_run.id) === env.SITE_INPUTS_RUN_ID) : productions[0];
+    if (!artifact) {
+      const run = env.SITE_INPUTS_RUN_ID ? ` from run ${env.SITE_INPUTS_RUN_ID}` : "";
+      throw new Error(`no unexpired develop bundle${run} is named ${ARTIFACT_PREFIX}${env.SITE_INPUTS_CORE_SHA}`);
+    }
+    await producingRun(artifact.workflow_run.id, env, options);
+    return { runId: String(artifact.workflow_run.id), artifact };
+  }
   if (env.SITE_INPUTS_RUN_ID) {
     await producingRun(env.SITE_INPUTS_RUN_ID, env, options);
     const { artifacts } = await githubJson(`repos/${CORE_REPO}/actions/runs/${env.SITE_INPUTS_RUN_ID}/artifacts`, env);
@@ -138,14 +154,6 @@ export async function newestBundle(env = process.env, options = {}) {
       `::notice::core bundle ${dispatchedSha} has a newer descendant bundle ${newest.coreSha}; deploying ${newest.coreSha} (run ${newest.runId}) instead`,
     );
     return { runId: newest.runId, artifact: newest.artifact, replaced: dispatchedSha };
-  }
-  if (env.SITE_INPUTS_CORE_SHA) {
-    const name = `${ARTIFACT_PREFIX}${env.SITE_INPUTS_CORE_SHA}`;
-    const { artifacts } = await githubJson(`repos/${CORE_REPO}/actions/artifacts?name=${name}&per_page=10`, env);
-    const artifact = artifacts.find((item) => !item.expired && item.workflow_run?.head_branch === "develop");
-    if (!artifact) throw new Error(`no unexpired develop bundle is named ${name}`);
-    await producingRun(artifact.workflow_run.id, env, options);
-    return { runId: String(artifact.workflow_run.id), artifact };
   }
   const bundles = await recentBundles(env);
   if (bundles.length === 0) throw new Error("no successful site-inputs run on develop has an unexpired bundle");
