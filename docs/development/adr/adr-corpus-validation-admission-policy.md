@@ -158,9 +158,9 @@ refused.
    `summary.validation = "passed"` only if at least one measurement query
    carries `row_count_validation.status = "PASSED"` and no measurement query
    is `UNVALIDATED`. The writers record `no_reference` instead when that
-   evidence is absent. 407 of the 411 stored `passed` results carry no such
-   evidence; they are not edited. The label is derived from the file
-   (below), never from the stored status.
+   evidence is absent. Stored results recorded as `passed` without such
+   evidence keep their status and are not edited; they get the label below.
+   The label is derived from the file, never from the stored status.
 3. **Admission allowlists.**
    - Public submissions (`PUBLIC_CLEAN_VALIDATION_STATUS` plus the new
      `PUBLIC_NO_REFERENCE_VALIDATION_STATUS`, together
