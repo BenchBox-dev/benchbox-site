@@ -153,7 +153,7 @@ Platform-specific metadata lives in `platform`: `driver_package`, resolved and a
 
 ## Validation Results
 
-Correctness verification is the run-level `summary.validation` verdict (`passed`, `failed`, or `partial`), computed by comparing per-query row counts against expected values. Per-query entries carry the outcome as `status` (`SUCCESS`, `ERROR`, or `TIMEOUT`); a failed query includes an error message.
+Correctness verification is the run-level `summary.validation` verdict (`passed`, `failed`, or `partial`). Only TPC-H, TPC-DS and SSB compare per-query row counts against expected values; for every other benchmark `passed` means the data loaded and the queries ran without error ([What PASSED means for each benchmark](benchmark-methodology.md#what-passed-means-for-each-benchmark)). Per-query entries carry the outcome as `status` (`SUCCESS`, `ERROR`, or `TIMEOUT`); a failed query includes an error message.
 
 ## Serialization Formats
 

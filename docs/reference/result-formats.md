@@ -615,6 +615,8 @@ Each query execution record contains:
 per-query evidence behind the run-level validation status; `SKIPPED` or
 `ERROR` evidence cannot support a clean validation pass.
 
+Row-count evidence exists only for TPC-H, TPC-DS and SSB. For every other benchmark a `passed` run-level status means the data loaded and the queries ran without error, and no answers are checked ([What PASSED means for each benchmark](../concepts/benchmark-methodology.md#what-passed-means-for-each-benchmark)).
+
 ## CSV Format
 
 CSV export provides tabular query-level data for spreadsheet analysis.
