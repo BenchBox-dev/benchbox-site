@@ -310,7 +310,7 @@ An `ExecutionConfigHelper` with the provider in `config_manager`. Its methods re
 | `enable_power_run_iterations(iterations: int = 3, warm_up_iterations: int = 1)` | `None`. Sets the two counts. |
 | `enable_concurrent_queries(max_concurrent: int = 2)` | `None`. Sets `enabled` to `True` and `max_concurrent`. |
 | `disable_concurrent_queries()` | `None`. Sets `enabled` to `False`. |
-| `optimize_for_system(cpu_cores: int, memory_gb: float)` | `None`. Sets `max_concurrent` to `cpu_cores // 4`, at least 2 and at most 8. Below 8 GB it sets the iteration timeout to 120 minutes and the query timeout to 600 seconds; above 16 GB, to 45 minutes and 180 seconds. From 8 to 16 GB the timeouts stay as they are. It never writes a stream timeout. |
+| `optimize_for_system(cpu_cores: int)` | `None`. Sets `max_concurrent` to `cpu_cores // 4`, at least 2 and at most 8. It changes no timeout. |
 | `create_performance_profile(profile_name: str)` | `dict` with `name`, `power_run` and `concurrent_queries`, without changing any setting. The profiles are `quick`, `standard`, `thorough` and `stress`, see below. |
 | `apply_performance_profile(profile_name: str)` | `None`. Writes the profile's settings to the provider. Profiles do not set a stream timeout. |
 | `get_execution_summary()` | `dict` with `power_run` (`enabled`, `total_iterations`, `estimated_duration_minutes`, `settings`), `concurrent_queries` (`enabled`, `max_streams`, `estimated_stream_duration_minutes`, which is `None` when no stream timeout is set or it is 0, and `settings`) and `general` (`max_workers`, `memory_limit_gb`, `parallel_queries`). |
@@ -345,7 +345,7 @@ print(helper.get_power_run_settings().iterations, helper.get_concurrent_queries_
 helper.apply_performance_profile("thorough")
 print(helper.get_power_run_settings().to_dict())
 
-helper.optimize_for_system(cpu_cores=16, memory_gb=32)
+helper.optimize_for_system(cpu_cores=16)
 print(helper.get_power_run_settings().timeout_per_iteration_minutes, helper.get_concurrent_queries_settings().max_concurrent)
 
 summary = helper.get_execution_summary()
@@ -2131,7 +2131,7 @@ A `SimpleConfigProvider`. Keys are flat dotted strings, not nested-path lookups.
 <span id="benchbox.utils.config_interface.SimpleConfigProvider.update"></span>
 `update(config_dict)` stores several values without validation or persistence.
 
-The built-in `execution.power_run` defaults are `iterations=4`, `warm_up_iterations=0`, `timeout_per_iteration_minutes=60` and `concurrent_streams=1`. They apply only to a plain Python process that has registered no provider. The `benchbox` CLI registers its own provider at start-up, and under it `iterations` is 3 and `warm_up_iterations` is 1, the values that [`execution.power_run`](../cli/configuration.md) documents. The `execution.throughput_test` defaults are `duration_minutes=60`, `concurrent_streams=4` and `warm_up_minutes=5`. The other execution defaults are `timeout_minutes=120`, `memory_limit_gb=8` and `enable_profiling=False`.
+The built-in `execution.power_run` defaults are `iterations=4`, `warm_up_iterations=0`, `timeout_per_iteration_minutes=60` and `concurrent_streams=1`. They apply only to a plain Python process that has registered no provider. The `benchbox` CLI registers its own provider at start-up, and under it `iterations` is 3 and `warm_up_iterations` is 1, the values that [`execution.power_run`](../cli/configuration.md) documents. The `execution.throughput_test` defaults are `duration_minutes=60`, `concurrent_streams=4` and `warm_up_minutes=5`. The other execution defaults are `memory_limit_gb=8` and `enable_profiling=False`.
 
 #### Raises
 

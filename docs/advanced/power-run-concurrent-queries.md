@@ -289,17 +289,15 @@ from benchbox.utils import ExecutionConfigHelper
 config_helper = ExecutionConfigHelper()
 
 cpu_cores = psutil.cpu_count()
-memory_gb = psutil.virtual_memory().total / (1024**3)
-
-config_helper.optimize_for_system(cpu_cores=cpu_cores, memory_gb=memory_gb)
+config_helper.optimize_for_system(cpu_cores=cpu_cores)
 
 summary = config_helper.get_execution_summary()
-print(f"Optimized for {cpu_cores} cores, {memory_gb:.1f}GB RAM:")
+print(f"Optimized for {cpu_cores} cores:")
 print(f"- Max concurrent streams: {summary['concurrent_queries']['max_streams']}")
 print(f"- Power run timeout: {summary['power_run']['settings']['timeout_per_iteration_minutes']} min")
 ```
 
-`optimize_for_system` tunes settings automatically from the system specs, and `get_execution_summary` shows the configured settings.
+`optimize_for_system` sets the number of concurrent streams from the CPU count, and `get_execution_summary` shows the configured settings.
 
 ### Optimization Rules
 
@@ -308,18 +306,6 @@ print(f"- Power run timeout: {summary['power_run']['settings']['timeout_per_iter
 - `max_concurrent = min(8, max(2, cpu_cores // 4))`
 - Prevents over-subscription of CPU resources
 - Scales appropriately from 2-core to 32+ core systems
-
-**Memory Optimization:**
-
-- **< 8GB**: Extended timeouts (120min power, 600s queries)
-- **8-16GB**: Standard timeouts (60min power, 300s queries)
-- **> 16GB**: Reduced timeouts (45min power, 180s queries)
-
-**Storage Optimization:**
-
-- SSD systems: Higher concurrency, shorter timeouts
-- HDD systems: Lower concurrency, longer timeouts
-- Network storage: Conservative settings with retries
 
 ## Comprehensive Testing Workflow
 
@@ -339,10 +325,7 @@ config_helper = ExecutionConfigHelper()
 config_helper.apply_performance_profile('thorough')
 
 import psutil
-config_helper.optimize_for_system(
-    cpu_cores=psutil.cpu_count(),
-    memory_gb=psutil.virtual_memory().total / (1024**3)
-)
+config_helper.optimize_for_system(cpu_cores=psutil.cpu_count())
 
 tpch = TPCH(scale_factor=1.0)
 connection = duckdb.connect("production_test.db")

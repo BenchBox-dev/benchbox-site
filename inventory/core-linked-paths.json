@@ -108,7 +108,7 @@
       "kind": "directory",
       "sources": [
         "docs/usage/examples-directory.md:15",
-        "docs/usage/examples.md:1002"
+        "docs/usage/examples.md:1001"
       ]
     },
     {
@@ -124,14 +124,14 @@
       "path": "examples/features/multi_platform.py",
       "kind": "file",
       "sources": [
-        "docs/usage/examples.md:1523"
+        "docs/usage/examples.md:1522"
       ]
     },
     {
       "path": "examples/features/result_analysis.py",
       "kind": "file",
       "sources": [
-        "docs/usage/examples.md:1144"
+        "docs/usage/examples.md:1143"
       ]
     },
     {
@@ -147,7 +147,7 @@
       "sources": [
         "docs/usage/examples-directory.md:13",
         "docs/usage/examples-directory.md:14",
-        "docs/usage/examples.md:1002"
+        "docs/usage/examples.md:1001"
       ]
     },
     {
@@ -163,28 +163,28 @@
       "path": "examples/getting_started/cloud",
       "kind": "directory",
       "sources": [
-        "docs/usage/examples.md:905"
+        "docs/usage/examples.md:904"
       ]
     },
     {
       "path": "examples/getting_started/local/duckdb_nyctaxi.py",
       "kind": "file",
       "sources": [
-        "docs/usage/examples.md:841"
+        "docs/usage/examples.md:840"
       ]
     },
     {
       "path": "examples/getting_started/local/duckdb_tpch_power.py",
       "kind": "file",
       "sources": [
-        "docs/usage/examples.md:837"
+        "docs/usage/examples.md:836"
       ]
     },
     {
       "path": "examples/getting_started/local/duckdb_tsbs_devops.py",
       "kind": "file",
       "sources": [
-        "docs/usage/examples.md:842"
+        "docs/usage/examples.md:841"
       ]
     },
     {
@@ -216,7 +216,7 @@
       "path": "examples/tunings",
       "kind": "directory",
       "sources": [
-        "docs/usage/examples.md:905"
+        "docs/usage/examples.md:904"
       ]
     },
     {
@@ -256,15 +256,15 @@
       "path": "examples/use_cases/ci_regression_test.py",
       "kind": "file",
       "sources": [
-        "docs/usage/examples.md:1327",
-        "docs/usage/examples.md:1712"
+        "docs/usage/examples.md:1326",
+        "docs/usage/examples.md:1711"
       ]
     },
     {
       "path": "examples/use_cases/platform_evaluation.py",
       "kind": "file",
       "sources": [
-        "docs/usage/examples.md:1523"
+        "docs/usage/examples.md:1522"
       ]
     },
     {
