@@ -148,7 +148,12 @@ refused.
    differs. A `no_reference` claim is valid only where no reference exists:
    the validator refuses it for a benchmark and scale that have a recorded
    row-count reference (`row_count_reference_exists`), because such a run
-   records `passed` with per-query evidence.
+   records `passed` with per-query evidence. A reference that exists but
+   whose answer files are not installed (for example a wheel install without
+   the TPC answer sets) is not "no reference": the registry reports
+   `LoadOutcome.ANSWER_FILES_MISSING`, the row-count checks are recorded as
+   skipped, and the run records `not_validated`, so it never receives the
+   no-reference admission.
 2. **`passed` requires per-query evidence in the file.** A result may record
    `summary.validation = "passed"` only if at least one measurement query
    carries `row_count_validation.status = "PASSED"` and no measurement query
@@ -185,8 +190,7 @@ refused.
    has no per-query evidence (no measurement query with a `PASSED` row-count
    check, or any `UNVALIDATED`), unless the result is held or its class is
    undetermined; a held result keeps its hold reason instead. The label does
-   not change class, lane, score or rank: all 252 stored results that get it
-   keep their recorded outcome (snapshot diff is label-only).
+   not change class, lane, score or rank.
 
 ### Why this is not a loosening
 
