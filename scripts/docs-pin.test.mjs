@@ -1,6 +1,6 @@
 import { test, afterEach } from "node:test";
 import assert from "node:assert/strict";
-import { cpSync, existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
+import { cpSync, existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, symlinkSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import path from "node:path";
 import { memberDigest, membersFor } from "./bundle-lib.mjs";
@@ -16,11 +16,27 @@ afterEach(() => {
   globalThis.fetch = realFetch;
 });
 
-function stubApi({ release = { draft: false, prerelease: false, tag_name: "v1.2.3" }, commit = COMMIT, releases = [{ tag_name: "v1.2.3" }], fail = false, run = { path: ".github/workflows/trunk.yml", event: "push", head_branch: "develop", conclusion: "success", head_sha: COMMIT }, runFails = false } = {}) {
+const SOURCE_RUN = 7001;
+const production = (coreSha, id = SOURCE_RUN, createdAt = "2026-11-05T21:41:30Z") => ({
+  name: `site-inputs-${coreSha}`,
+  expired: false,
+  created_at: createdAt,
+  workflow_run: { id, head_branch: "develop" },
+});
+const sameManifest = (bundle) => () => readFileSync(path.join(bundle, "manifest.json"));
+const SITE_INPUTS_RUN = { path: ".github/workflows/site-inputs.yml", event: "workflow_run", head_branch: "develop", conclusion: "success", repository: { full_name: "BenchBox-dev/benchbox" } };
+
+function stubApi({ release = { draft: false, prerelease: false, tag_name: "v1.2.3" }, commit = COMMIT, releases = [{ tag_name: "v1.2.3" }], fail = false, run = { path: ".github/workflows/trunk.yml", event: "push", head_branch: "develop", conclusion: "success", head_sha: COMMIT }, runFails = false, productions = [], runs = {}, runArtifacts = [] } = {}) {
+  const knownRuns = { [SOURCE_RUN]: SITE_INPUTS_RUN, 7002: SITE_INPUTS_RUN, ...runs };
   globalThis.fetch = async (url) => {
     const route = String(url).replace("https://api.github.com/", "");
     if (fail) return { ok: false, status: 500, json: async () => ({}) };
-    if (route.includes("/actions/runs/")) return runFails ? { ok: false, status: 500, json: async () => ({}) } : { ok: true, json: async () => run };
+    if (route.includes("/actions/artifacts?name=")) return { ok: true, json: async () => ({ artifacts: productions }) };
+    if (route.includes("/actions/runs/")) {
+      if (runFails) return { ok: false, status: 500, json: async () => ({}) };
+      const [, id, artifacts] = route.match(/\/actions\/runs\/(\d+)(\/artifacts)?/);
+      return { ok: true, json: async () => (artifacts ? { artifacts: runArtifacts } : (knownRuns[id] ?? run)) };
+    }
     if (route.includes("/releases/tags/")) {
       return release ? { ok: true, json: async () => release } : { ok: false, status: 404, json: async () => ({}) };
     }
@@ -56,18 +72,19 @@ function fixtureDir(prefix, { coreSha = COMMIT, version = "1.2.3", docsData = "{
 const newPinDir = () => path.join(mkdtempSync(path.join(tmpdir(), "docs-pin-test-")), "release-pin");
 
 async function pinned() {
-  stubApi();
+  stubApi({ productions: [production(COMMIT)] });
   const pinDir = newPinDir();
-  await pinRelease("v1.2.3", { from: fixtureDir("bundle-"), pinDir });
+  const bundle = fixtureDir("bundle-");
+  await pinRelease("v1.2.3", { from: bundle, pinDir, readManifest: sameManifest(bundle) });
   return pinDir;
 }
 
 test("pinning writes the pin layout and the manifest byte for byte", async () => {
   const bundle = fixtureDir("bundle-");
-  stubApi();
+  stubApi({ productions: [production(COMMIT)] });
   const pinDir = newPinDir();
-  const pin = await pinRelease("v1.2.3", { from: bundle, pinDir });
-  assert.deepEqual(pin, { tag: "v1.2.3", core_sha: COMMIT });
+  const pin = await pinRelease("v1.2.3", { from: bundle, pinDir, readManifest: sameManifest(bundle) });
+  assert.deepEqual(pin, { tag: "v1.2.3", core_sha: COMMIT, site_inputs_run: String(SOURCE_RUN) });
   assert.deepEqual(JSON.parse(readFileSync(path.join(pinDir, "pin.json"), "utf8")), pin);
   assert.equal(readFileSync(path.join(pinDir, "manifest.json"), "utf8"), readFileSync(path.join(bundle, "manifest.json"), "utf8"));
   assert.ok(existsSync(path.join(pinDir, "docs-data", "docs-data.json")));
@@ -148,8 +165,9 @@ test("a member digest mismatch is refused and leaves the existing pin intact", a
 
 test("repinning replaces the pin", async () => {
   const pinDir = await pinned();
-  stubApi({ commit: OTHER, run: { path: ".github/workflows/trunk.yml", event: "push", head_branch: "develop", conclusion: "success", head_sha: OTHER } });
-  await pinRelease("v1.2.3", { from: fixtureDir("bundle-", { coreSha: OTHER }), pinDir });
+  stubApi({ commit: OTHER, productions: [production(OTHER)], run: { path: ".github/workflows/trunk.yml", event: "push", head_branch: "develop", conclusion: "success", head_sha: OTHER } });
+  const bundle = fixtureDir("bundle-", { coreSha: OTHER });
+  await pinRelease("v1.2.3", { from: bundle, pinDir, readManifest: sameManifest(bundle) });
   assert.equal(JSON.parse(readFileSync(path.join(pinDir, "pin.json"), "utf8")).core_sha, OTHER);
 });
 
@@ -233,12 +251,16 @@ test("--pending exits 2 on an API error", async () => {
   assert.equal((await pendingStatus(pinDir)).code, 2);
 });
 
-test("the tag is read with and without --from, in either order", () => {
-  assert.deepEqual(pinArguments(["v1.2.3"]), { tag: "v1.2.3", from: undefined, valid: true });
-  assert.deepEqual(pinArguments(["v1.2.3", "--from", "dir"]), { tag: "v1.2.3", from: "dir", valid: true });
-  assert.deepEqual(pinArguments(["--from", "dir", "v1.2.3"]), { tag: "v1.2.3", from: "dir", valid: true });
+test("the tag is read with and without --from and --expired-run, in any order", () => {
+  assert.deepEqual(pinArguments(["v1.2.3"]), { tag: "v1.2.3", from: undefined, expiredRun: undefined, valid: true });
+  assert.deepEqual(pinArguments(["v1.2.3", "--from", "dir"]), { tag: "v1.2.3", from: "dir", expiredRun: undefined, valid: true });
+  assert.deepEqual(pinArguments(["--from", "dir", "v1.2.3"]), { tag: "v1.2.3", from: "dir", expiredRun: undefined, valid: true });
+  assert.deepEqual(pinArguments(["--expired-run", "6001", "--from", "dir", "v1.2.3"]), { tag: "v1.2.3", from: "dir", expiredRun: "6001", valid: true });
   assert.equal(pinArguments(["--from", "dir"]).valid, false);
   assert.equal(pinArguments(["v1.2.3", "--from"]).valid, false);
+  assert.equal(pinArguments(["v1.2.3", "--expired-run", "6001"]).valid, false);
+  assert.equal(pinArguments(["v1.2.3", "--from", "dir", "--expired-run"]).valid, false);
+  assert.equal(pinArguments(["v1.2.3", "--from", "--expired-run", "6001"]).valid, false);
   assert.equal(pinArguments([]).valid, false);
 });
 
@@ -308,14 +330,98 @@ test("--from refuses a directory without the full member set", async () => {
   await assert.rejects(pinRelease("v1.2.3", { from: bundle, pinDir: newPinDir() }), /member set mismatch/);
 });
 
+test("--from refuses each missing or malformed manifest field", async () => {
+  const cases = [
+    ...["core_sha", "parent_core_sha", "corpus_sha", "package_version", "certified_by"].map((field) => [
+      `missing ${field}`,
+      (manifest) => delete manifest[field],
+      `manifest field ${field} is missing`,
+    ]),
+    ...["core_sha", "parent_core_sha"].map((field) => [
+      `short ${field}`,
+      (manifest) => (manifest[field] = manifest[field].slice(0, 7)),
+      `${field} is not a full commit SHA`,
+    ]),
+    ["unsupported schema", (manifest) => (manifest.schema = 99), "schema 99 is not supported"],
+  ];
+  for (const [name, corrupt, refusal] of cases) {
+    stubApi();
+    const bundle = fixtureDir("bundle-");
+    const manifest = JSON.parse(readFileSync(path.join(bundle, "manifest.json"), "utf8"));
+    corrupt(manifest);
+    writeFileSync(path.join(bundle, "manifest.json"), JSON.stringify(manifest));
+    await assert.rejects(pinRelease("v1.2.3", { from: bundle, pinDir: newPinDir() }), (error) => error.message.includes(refusal), name);
+  }
+});
+
 test("--from fails closed when the certification lookup errors", async () => {
   stubApi({ runFails: true });
   await assert.rejects(pinRelease("v1.2.3", { from: fixtureDir("bundle-"), pinDir: newPinDir() }), /failed closed/);
 });
 
 test("--from accepts a certified complete directory whose doc-contracts would fail schema validation", async () => {
-  stubApi();
-  const pinDir = newPinDir();
-  const pin = await pinRelease("v1.2.3", { from: fixtureDir("bundle-"), pinDir });
-  assert.deepEqual(pin, { tag: "v1.2.3", core_sha: COMMIT });
+  stubApi({ productions: [production(COMMIT)] });
+  const bundle = fixtureDir("bundle-");
+  const pin = await pinRelease("v1.2.3", { from: bundle, pinDir: newPinDir(), readManifest: sameManifest(bundle) });
+  assert.deepEqual(pin, { tag: "v1.2.3", core_sha: COMMIT, site_inputs_run: String(SOURCE_RUN) });
+});
+
+test("--from refuses a directory whose manifest is not that of core's bundle, and records the bundle it matches", async () => {
+  const bundle = fixtureDir("bundle-");
+  const other = Buffer.from("{}");
+  const productions = [production(COMMIT, 7002, "2026-11-13T20:12:45Z"), production(COMMIT, 7001)];
+  stubApi({ productions });
+  await assert.rejects(pinRelease("v1.2.3", { from: bundle, pinDir: newPinDir(), readManifest: () => other }), /not byte for byte the manifest of core's bundle of d+ from run 7001, 7002/);
+  const read = [];
+  const second = (item) => (read.push(item.workflow_run.id), item.workflow_run.id === 7002 ? readFileSync(path.join(bundle, "manifest.json")) : other);
+  const pin = await pinRelease("v1.2.3", { from: bundle, pinDir: newPinDir(), readManifest: second });
+  assert.equal(pin.site_inputs_run, "7002");
+  assert.deepEqual(read, [7001, 7002]);
+});
+
+test("--from needs --expired-run once core's bundles have expired, and checks the named run", async () => {
+  const bundle = fixtureDir("bundle-");
+  const sourceRun = SITE_INPUTS_RUN;
+  const produced = [{ name: `site-inputs-${COMMIT}`, expired: true }];
+  const attempt = (stub, expiredRun) => {
+    stubApi({ productions: [], ...stub });
+    return pinRelease("v1.2.3", { from: bundle, pinDir: newPinDir(), expiredRun, readManifest: () => assert.fail("an expired bundle cannot be downloaded") });
+  };
+  await assert.rejects(attempt({}), /have expired.*--expired-run <id>/);
+  await assert.rejects(attempt({ runs: { 6001: sourceRun }, runArtifacts: produced }, "latest"), /--expired-run latest is not a run id/);
+  await assert.rejects(attempt({ runs: { 6001: { ...sourceRun, conclusion: "failure" } }, runArtifacts: produced }, "6001"), /run 6001: producing run concluded failure/);
+  await assert.rejects(attempt({ runs: { 6001: sourceRun }, runArtifacts: [{ name: `site-inputs-${OTHER}`, expired: true }] }, "6001"), /run 6001 produced no bundle named site-inputs-d+/);
+  const pin = await attempt({ runs: { 6001: sourceRun }, runArtifacts: produced }, "6001");
+  assert.equal(pin.site_inputs_run, "6001");
+  stubApi({ productions: [production(COMMIT)] });
+  await assert.rejects(
+    pinRelease("v1.2.3", { from: bundle, pinDir: newPinDir(), expiredRun: "6001", readManifest: sameManifest(bundle) }),
+    /has not expired; --expired-run is only for/,
+  );
+});
+
+test("--from skips a bundle whose run is not a successful site-inputs run", async () => {
+  const bundle = fixtureDir("bundle-");
+  const read = [];
+  const readManifest = (item) => (read.push(item.workflow_run.id), readFileSync(path.join(bundle, "manifest.json")));
+  const productions = [production(COMMIT, 7001), production(COMMIT, 7002, "2026-11-13T20:12:45Z")];
+  stubApi({ productions, runs: { 7001: { ...SITE_INPUTS_RUN, conclusion: "failure" } } });
+  const pin = await pinRelease("v1.2.3", { from: bundle, pinDir: newPinDir(), readManifest });
+  assert.equal(pin.site_inputs_run, "7002");
+  assert.deepEqual(read, [7002]);
+  stubApi({ productions: [production(COMMIT, 7001)], runs: { 7001: { ...SITE_INPUTS_RUN, conclusion: "failure" } } });
+  await assert.rejects(
+    pinRelease("v1.2.3", { from: bundle, pinDir: newPinDir(), readManifest }),
+    /^Error: no unexpired bundle of d+ comes from a successful develop site-inputs run; run 7001: producing run concluded failure$/,
+  );
+});
+
+test("--from refuses a symlink inside a pinned member", async () => {
+  const bundle = fixtureDir("bundle-");
+  symlinkSync(path.join(bundle, "repo-files.json"), path.join(bundle, "docs-data", "extra.json"));
+  stubApi({ productions: [production(COMMIT)] });
+  await assert.rejects(
+    pinRelease("v1.2.3", { from: bundle, pinDir: newPinDir(), readManifest: sameManifest(bundle) }),
+    /docs-data\/extra\.json is not a regular file or directory/,
+  );
 });

@@ -32,7 +32,14 @@ jobs:
           RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
         run: |
           set -euo pipefail
-          git ls-remote --exit-code origin refs/heads/next > /dev/null || exit 0
+          NEXT_STATUS=0
+          git ls-remote --exit-code origin refs/heads/next > /dev/null || NEXT_STATUS=$?
+          if [ "$NEXT_STATUS" -eq 2 ]; then
+            exit 0
+          elif [ "$NEXT_STATUS" -ne 0 ]; then
+            echo "::error::git ls-remote for next failed with status $NEXT_STATUS"
+            exit "$NEXT_STATUS"
+          fi
           git fetch --no-tags origin '+refs/heads/main:refs/remotes/origin/main' '+refs/heads/next:refs/remotes/origin/next'
           BEHIND="$(git rev-list --count origin/next..origin/main)"
           NUMBER="$(gh issue list --repo "$REPO" --label next-behind-main --state open --json number --jq '.[0].number // empty')"
