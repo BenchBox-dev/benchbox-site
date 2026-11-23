@@ -241,7 +241,12 @@ versioned core bundle; it reads nothing else from core.
 - `docs:pin` fetches and verifies the certified bundle of the tag's commit, so
   a tag whose commit has no such bundle cannot be pinned. Bundles expire after
   90 days; when one is missing, dispatch core's `site-inputs.yml` with
-  `core_sha` set to the tag to rebuild it. `--from <dir>` pins a complete bundle
+  `core_sha` set to the tag to rebuild it. A commit can then have more than one
+  unexpired bundle. Their docs inputs are identical, but `manifest.json`
+  differs (`produced_at`, `parent_source`, member digests), so `docs:pin` takes
+  the earliest one by creation time, then by run id, and re-pinning writes the
+  same files. It records that site-inputs run as `site_inputs_run` in
+  `release-pin/pin.json`. `--from <dir>` pins a complete bundle
   directory, for a release whose bundle the current verifier cannot read. It
   checks the manifest fields and core commit, the digest of every member the
   manifest lists, `attestations.json`, and online that `certified_by` is a core
