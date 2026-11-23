@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 import { execFileSync } from "node:child_process";
-import { cpSync, copyFileSync, existsSync, mkdirSync, mkdtempSync, readFileSync, readdirSync, renameSync, rmSync, writeFileSync } from "node:fs";
+import { cpSync, copyFileSync, existsSync, lstatSync, mkdirSync, mkdtempSync, readFileSync, readdirSync, renameSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import path from "node:path";
 import { pathToFileURL } from "node:url";
@@ -73,8 +73,15 @@ export function memberErrors(root, manifest) {
   return errors;
 }
 
+function irregularEntries(root, relative) {
+  const stat = lstatSync(path.join(root, relative), { throwIfNoEntry: false });
+  if (!stat || stat.isFile()) return [];
+  if (stat.isDirectory()) return readdirSync(path.join(root, relative)).flatMap((name) => irregularEntries(root, `${relative}/${name}`));
+  return [relative];
+}
+
 export function directoryErrors(root, manifest) {
-  const errors = [];
+  const errors = PIN_MEMBERS.flatMap((member) => irregularEntries(root, member)).map((entry) => `${entry} is not a regular file or directory`);
   for (const field of ["core_sha", "parent_core_sha", "corpus_sha", "package_version", "certified_by"]) {
     if (!manifest[field]) errors.push(`manifest field ${field} is missing`);
   }
@@ -143,12 +150,15 @@ export async function sourceRun(bundle, commit, { expiredRun, env = process.env,
   if (productions.length) {
     if (expiredRun) throw new Error(`core's bundle of ${commit} has not expired; --expired-run is only for a commit whose bundles have all expired`);
     const local = readFileSync(path.join(bundle, "manifest.json"));
-    const match = productions.find((production) => readManifest(production).equals(local));
-    if (!match) {
-      const runs = productions.map((production) => production.workflow_run.id).join(", ");
-      throw new Error(`manifest.json is not byte for byte the manifest of core's bundle of ${commit} from run ${runs}`);
+    const refusals = [];
+    for (const production of productions) {
+      const id = production.workflow_run.id;
+      const runErrors = producingRunErrors(await githubJson(`repos/${CORE_REPO}/actions/runs/${id}`, env));
+      if (runErrors.length) refusals.push(...runErrors.map((error) => `run ${id}: ${error}`));
+      else if (readManifest(production).equals(local)) return String(id);
     }
-    return String(match.workflow_run.id);
+    const runs = productions.map((production) => production.workflow_run.id).join(", ");
+    throw new Error([`manifest.json is not byte for byte the manifest of core's bundle of ${commit} from run ${runs}`, ...refusals].join("; "));
   }
   if (!expiredRun) {
     throw new Error(`core's bundles of ${commit} have expired, so the directory cannot be compared with them; name the site-inputs run it came from with --expired-run <id>`);
@@ -277,7 +287,8 @@ export async function pendingStatus(pinDir = PIN_DIR, env = process.env) {
 
 export function pinArguments(argv) {
   const valued = ["--from", "--expired-run"].map((flag) => argv.indexOf(flag));
-  const [from, expiredRun] = valued.map((index) => (index === -1 ? undefined : (argv[index + 1] ?? "")));
+  const valueAt = (index) => (argv[index]?.startsWith("--") ? "" : (argv[index] ?? ""));
+  const [from, expiredRun] = valued.map((index) => (index === -1 ? undefined : valueAt(index + 1)));
   const tag = argv.find((arg, index) => !arg.startsWith("--") && !valued.some((flag) => flag !== -1 && index === flag + 1));
   const valid = Boolean(tag) && from !== "" && expiredRun !== "" && (expiredRun === undefined || from !== undefined);
   return { tag, from, expiredRun, valid };

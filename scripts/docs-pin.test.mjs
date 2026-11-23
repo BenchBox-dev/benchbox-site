@@ -1,6 +1,6 @@
 import { test, afterEach } from "node:test";
 import assert from "node:assert/strict";
-import { cpSync, existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
+import { cpSync, existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, symlinkSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import path from "node:path";
 import { memberDigest, membersFor } from "./bundle-lib.mjs";
@@ -24,16 +24,18 @@ const production = (coreSha, id = SOURCE_RUN, createdAt = "2026-11-05T21:41:30Z"
   workflow_run: { id, head_branch: "develop" },
 });
 const sameManifest = (bundle) => () => readFileSync(path.join(bundle, "manifest.json"));
+const SITE_INPUTS_RUN = { path: ".github/workflows/site-inputs.yml", event: "workflow_run", head_branch: "develop", conclusion: "success", repository: { full_name: "BenchBox-dev/benchbox" } };
 
-function stubApi({ release = { draft: false, prerelease: false, tag_name: "v1.2.3" }, commit = COMMIT, releases = [{ tag_name: "v1.2.3" }], fail = false, run = { path: ".github/workflows/trunk.yml", event: "push", head_branch: "develop", conclusion: "success", head_sha: COMMIT }, runFails = false, productions, runs = {}, runArtifacts = [] } = {}) {
+function stubApi({ release = { draft: false, prerelease: false, tag_name: "v1.2.3" }, commit = COMMIT, releases = [{ tag_name: "v1.2.3" }], fail = false, run = { path: ".github/workflows/trunk.yml", event: "push", head_branch: "develop", conclusion: "success", head_sha: COMMIT }, runFails = false, productions = [], runs = {}, runArtifacts = [] } = {}) {
+  const knownRuns = { [SOURCE_RUN]: SITE_INPUTS_RUN, 7002: SITE_INPUTS_RUN, ...runs };
   globalThis.fetch = async (url) => {
     const route = String(url).replace("https://api.github.com/", "");
     if (fail) return { ok: false, status: 500, json: async () => ({}) };
-    if (route.includes("/actions/artifacts?name=")) return { ok: true, json: async () => ({ artifacts: productions ?? [production(commit)] }) };
+    if (route.includes("/actions/artifacts?name=")) return { ok: true, json: async () => ({ artifacts: productions }) };
     if (route.includes("/actions/runs/")) {
       if (runFails) return { ok: false, status: 500, json: async () => ({}) };
       const [, id, artifacts] = route.match(/\/actions\/runs\/(\d+)(\/artifacts)?/);
-      return { ok: true, json: async () => (artifacts ? { artifacts: runArtifacts } : (runs[id] ?? run)) };
+      return { ok: true, json: async () => (artifacts ? { artifacts: runArtifacts } : (knownRuns[id] ?? run)) };
     }
     if (route.includes("/releases/tags/")) {
       return release ? { ok: true, json: async () => release } : { ok: false, status: 404, json: async () => ({}) };
@@ -70,7 +72,7 @@ function fixtureDir(prefix, { coreSha = COMMIT, version = "1.2.3", docsData = "{
 const newPinDir = () => path.join(mkdtempSync(path.join(tmpdir(), "docs-pin-test-")), "release-pin");
 
 async function pinned() {
-  stubApi();
+  stubApi({ productions: [production(COMMIT)] });
   const pinDir = newPinDir();
   const bundle = fixtureDir("bundle-");
   await pinRelease("v1.2.3", { from: bundle, pinDir, readManifest: sameManifest(bundle) });
@@ -79,7 +81,7 @@ async function pinned() {
 
 test("pinning writes the pin layout and the manifest byte for byte", async () => {
   const bundle = fixtureDir("bundle-");
-  stubApi();
+  stubApi({ productions: [production(COMMIT)] });
   const pinDir = newPinDir();
   const pin = await pinRelease("v1.2.3", { from: bundle, pinDir, readManifest: sameManifest(bundle) });
   assert.deepEqual(pin, { tag: "v1.2.3", core_sha: COMMIT, site_inputs_run: String(SOURCE_RUN) });
@@ -163,7 +165,7 @@ test("a member digest mismatch is refused and leaves the existing pin intact", a
 
 test("repinning replaces the pin", async () => {
   const pinDir = await pinned();
-  stubApi({ commit: OTHER, run: { path: ".github/workflows/trunk.yml", event: "push", head_branch: "develop", conclusion: "success", head_sha: OTHER } });
+  stubApi({ commit: OTHER, productions: [production(OTHER)], run: { path: ".github/workflows/trunk.yml", event: "push", head_branch: "develop", conclusion: "success", head_sha: OTHER } });
   const bundle = fixtureDir("bundle-", { coreSha: OTHER });
   await pinRelease("v1.2.3", { from: bundle, pinDir, readManifest: sameManifest(bundle) });
   assert.equal(JSON.parse(readFileSync(path.join(pinDir, "pin.json"), "utf8")).core_sha, OTHER);
@@ -258,6 +260,7 @@ test("the tag is read with and without --from and --expired-run, in any order", 
   assert.equal(pinArguments(["v1.2.3", "--from"]).valid, false);
   assert.equal(pinArguments(["v1.2.3", "--expired-run", "6001"]).valid, false);
   assert.equal(pinArguments(["v1.2.3", "--from", "dir", "--expired-run"]).valid, false);
+  assert.equal(pinArguments(["v1.2.3", "--from", "--expired-run", "6001"]).valid, false);
   assert.equal(pinArguments([]).valid, false);
 });
 
@@ -357,7 +360,7 @@ test("--from fails closed when the certification lookup errors", async () => {
 });
 
 test("--from accepts a certified complete directory whose doc-contracts would fail schema validation", async () => {
-  stubApi();
+  stubApi({ productions: [production(COMMIT)] });
   const bundle = fixtureDir("bundle-");
   const pin = await pinRelease("v1.2.3", { from: bundle, pinDir: newPinDir(), readManifest: sameManifest(bundle) });
   assert.deepEqual(pin, { tag: "v1.2.3", core_sha: COMMIT, site_inputs_run: String(SOURCE_RUN) });
@@ -378,7 +381,7 @@ test("--from refuses a directory whose manifest is not that of core's bundle, an
 
 test("--from needs --expired-run once core's bundles have expired, and checks the named run", async () => {
   const bundle = fixtureDir("bundle-");
-  const sourceRun = { path: ".github/workflows/site-inputs.yml", event: "workflow_run", head_branch: "develop", conclusion: "success", repository: { full_name: "BenchBox-dev/benchbox" } };
+  const sourceRun = SITE_INPUTS_RUN;
   const produced = [{ name: `site-inputs-${COMMIT}`, expired: true }];
   const attempt = (stub, expiredRun) => {
     stubApi({ productions: [], ...stub });
@@ -390,9 +393,32 @@ test("--from needs --expired-run once core's bundles have expired, and checks th
   await assert.rejects(attempt({ runs: { 6001: sourceRun }, runArtifacts: [{ name: `site-inputs-${OTHER}`, expired: true }] }, "6001"), /run 6001 produced no bundle named site-inputs-d+/);
   const pin = await attempt({ runs: { 6001: sourceRun }, runArtifacts: produced }, "6001");
   assert.equal(pin.site_inputs_run, "6001");
-  stubApi();
+  stubApi({ productions: [production(COMMIT)] });
   await assert.rejects(
     pinRelease("v1.2.3", { from: bundle, pinDir: newPinDir(), expiredRun: "6001", readManifest: sameManifest(bundle) }),
     /has not expired; --expired-run is only for/,
+  );
+});
+
+test("--from skips a bundle whose run is not a successful site-inputs run", async () => {
+  const bundle = fixtureDir("bundle-");
+  const read = [];
+  const readManifest = (item) => (read.push(item.workflow_run.id), readFileSync(path.join(bundle, "manifest.json")));
+  const productions = [production(COMMIT, 7001), production(COMMIT, 7002, "2026-11-13T20:12:45Z")];
+  stubApi({ productions, runs: { 7001: { ...SITE_INPUTS_RUN, conclusion: "failure" } } });
+  const pin = await pinRelease("v1.2.3", { from: bundle, pinDir: newPinDir(), readManifest });
+  assert.equal(pin.site_inputs_run, "7002");
+  assert.deepEqual(read, [7002]);
+  stubApi({ productions: [production(COMMIT, 7001)], runs: { 7001: { ...SITE_INPUTS_RUN, conclusion: "failure" } } });
+  await assert.rejects(pinRelease("v1.2.3", { from: bundle, pinDir: newPinDir(), readManifest }), /run 7001: producing run concluded failure/);
+});
+
+test("--from refuses a symlink inside a pinned member", async () => {
+  const bundle = fixtureDir("bundle-");
+  symlinkSync(path.join(bundle, "repo-files.json"), path.join(bundle, "docs-data", "extra.json"));
+  stubApi({ productions: [production(COMMIT)] });
+  await assert.rejects(
+    pinRelease("v1.2.3", { from: bundle, pinDir: newPinDir(), readManifest: sameManifest(bundle) }),
+    /docs-data\/extra\.json is not a regular file or directory/,
   );
 });

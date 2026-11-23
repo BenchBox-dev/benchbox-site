@@ -1,7 +1,7 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { spawnSync } from "node:child_process";
-import { chmodSync, mkdtempSync, readFileSync, writeFileSync } from "node:fs";
+import { chmodSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import path from "node:path";
 import { parse } from "yaml";
@@ -66,8 +66,9 @@ test("the issue tells a person to merge with gh pr merge --merge and next keeps 
   assert.ok(script.includes("`next` keeps its text"));
 });
 
-test("a missing next ends the run quietly and a failed ls-remote fails it", () => {
+test("a missing next ends the run quietly and a failed ls-remote fails it", (context) => {
   const bin = mkdtempSync(path.join(tmpdir(), "sync-next-git-"));
+  context.after(() => rmSync(bin, { recursive: true, force: true }));
   writeFileSync(path.join(bin, "git"), '#!/bin/sh\necho "git $*" >&2\nexit "$LS_REMOTE_STATUS"\n');
   chmodSync(path.join(bin, "git"), 0o755);
   const guard = `${script.slice(0, script.indexOf("git fetch"))}echo reached-fetch\n`;
