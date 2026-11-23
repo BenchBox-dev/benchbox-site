@@ -5,6 +5,19 @@ import "../../styles/results-embed.css";
 
 export type LiveCheck = { status: "pending" } | { status: "loading" } | { status: "failed" } | { status: "ready"; results: readonly EmbedResult[] };
 
+function EmbedLabels({ labels, label }: { labels: readonly string[] | undefined; label: string }) {
+  if (labels === undefined || labels.length === 0) return null;
+  return (
+    <ul class="result-embed__labels" aria-label={label} data-testid="embed-corpus-labels">
+      {labels.map((text) => (
+        <li key={text} data-testid="embed-corpus-label">
+          {text}
+        </li>
+      ))}
+    </ul>
+  );
+}
+
 const SHORT_SHA_LENGTH = 12;
 
 export function shortSha(sha: string): string {
@@ -68,6 +81,7 @@ export function CitedResultView({ citation, live }: { citation: Citation; live: 
           <p class="result-embed__meta">
             Run on <time datetime={citation.runDate}>{citation.runDate}</time>
           </p>
+          {current?.state === "published" ? <EmbedLabels labels={current.corpusLabels} label="Corpus labels in the current snapshot" /> : null}
         </>
       )}
       <SnapshotIdentity sha={citation.snapshot} label="Cited snapshot" />
@@ -122,6 +136,7 @@ function CurrentRow({ resultId, result, pending }: { resultId: string; result: E
       <td>
         <span class="result-embed__value">{result.metric.text}</span> <span class="result-embed__metric-label">{result.metric.label}</span>
         {result.displayNote ? <span class="result-embed__note">{result.displayNote}</span> : null}
+        <EmbedLabels labels={result.corpusLabels} label="Corpus labels" />
       </td>
       <td>{result.ranked ? "Ranked" : <span class="result-embed__note">{result.rankingNote}</span>}</td>
     </tr>

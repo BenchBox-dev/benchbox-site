@@ -9,6 +9,8 @@ import {
   type PrimaryMetric,
 } from "@/lib/displayEligibility";
 import { detailResultFromWideRow, getPrimaryMetricForBenchmark, getResultDetailMetrics, type ResultDetailMetricsRow } from "@/lib/duckdbQueries";
+import { loadCorpusLabels } from "@/lib/corpusLabelQueries";
+import { corpusLabelTexts, type CorpusLabels } from "@/lib/corpusLabels";
 import { formatScaleFactor } from "@/lib/metricFormatters";
 import { resultDetailHref } from "@/lib/resultLinks";
 import { formatRunDate } from "@/lib/runAge";
@@ -34,6 +36,7 @@ export interface PublishedEmbedResult {
   rankingNote: string | null;
   displayNote: string | null;
   href: string;
+  corpusLabels?: readonly string[];
 }
 
 export interface WithdrawnEmbedResult {
@@ -51,10 +54,16 @@ export function embedFacts(result: PublishedEmbedResult): EmbedFacts {
   return { platform, benchmark, scale, runDate, metric };
 }
 
-export function presentEmbedResult(resultId: string, row: ResultDetailMetricsRow | null, primaryMetric: PrimaryMetric): EmbedResult {
+export function presentEmbedResult(
+  resultId: string,
+  row: ResultDetailMetricsRow | null,
+  primaryMetric: PrimaryMetric,
+  corpusLabels?: CorpusLabels,
+): EmbedResult {
   if (row === null) return { state: "withdrawn", resultId, cause: "absent" };
   if (!isPublishedVisibility(row.visibility)) return { state: "withdrawn", resultId, cause: "not-public" };
   const detail = detailResultFromWideRow(row, [], []);
+  const labelTexts = corpusLabelTexts(corpusLabels);
   const ranked = isRankable(detail);
   return {
     state: "published",
@@ -74,6 +83,7 @@ export function presentEmbedResult(resultId: string, row: ResultDetailMetricsRow
     rankingNote: ranked ? null : formatTimingExclusion(detail.ranking_exclusion_reason, "This result is not included in rankings."),
     displayNote: isTimingDisplayable(detail) ? null : formatTimingExclusion(detail.display_exclusion_reason, "Display timing is unavailable."),
     href: resultDetailHref(resultId),
+    ...(labelTexts.length > 0 ? { corpusLabels: labelTexts } : {}),
   };
 }
 
@@ -81,7 +91,8 @@ export async function loadEmbedResult(resultId: string): Promise<EmbedResult> {
   const row = await getResultDetailMetrics(resultId);
   if (row === null) return presentEmbedResult(resultId, null, "display_geomean_ms");
   const primaryMetric = await getPrimaryMetricForBenchmark(row.benchmark, canonicalPhase(row.test_type));
-  return presentEmbedResult(resultId, row, primaryMetric);
+  const labels = (await loadCorpusLabels()).get(resultId);
+  return presentEmbedResult(resultId, row, primaryMetric, labels);
 }
 
 export async function loadEmbedResults(resultIds: readonly string[]): Promise<EmbedResult[]> {

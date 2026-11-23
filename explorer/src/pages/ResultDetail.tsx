@@ -20,6 +20,8 @@ import { TuningBadge } from "@/components/TuningBadge";
 import { StatusBadge } from "@/components/StatusBadge";
 import { MethodologyDisclosure } from "@/components/MethodologyDisclosure";
 import { RunReceipt, planDownloadUrl } from "@/components/RunReceipt";
+import { CorpusLabelList } from "@/components/CorpusLabelList";
+import { useCorpusLabels } from "@/lib/useCorpusLabels";
 import { CapturedPlanViewer } from "@/components/CapturedPlanViewer";
 import { ChartPanel } from "@/components/ChartPanel";
 import { useDocumentTitle } from "@/lib/useDocumentTitle";
@@ -76,6 +78,7 @@ export function ResultDetail({ resultId = "", source = "public" }: ResultDetailP
     direction: "asc",
   });
   const localResultState = useLocalResultState();
+  const corpusLabels = useCorpusLabels(source !== "local");
   const isLocal = source === "local";
   const detail = detailState?.detail ?? null;
   const primaryMetric = detailState?.primaryMetric ?? "display_geomean_ms";
@@ -351,6 +354,7 @@ export function ResultDetail({ resultId = "", source = "public" }: ResultDetailP
       />
 
       <section aria-label="Result summary" class="mb-8">
+        <CorpusLabelList state={corpusLabels} resultId={detail.result_id} testId="detail-corpus-labels" class="mb-3" reportFailure />
         <div class="grid grid-cols-1 gap-3 sm:grid-cols-2 md:grid-cols-[repeat(auto-fit,minmax(12rem,1fr))]">
           {hasPrimaryMetric && (
             <ResultMetricCard
@@ -404,6 +408,7 @@ export function ResultDetail({ resultId = "", source = "public" }: ResultDetailP
             isRankingEligible={isLocal ? false : null}
             reproduceCommand={isLocal ? null : undefined}
             plansUrl={plansUrl}
+            corpusLabels={corpusLabels}
           />
 
           {hasTimings && (

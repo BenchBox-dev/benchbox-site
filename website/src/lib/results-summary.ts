@@ -5,6 +5,8 @@ import { formatScaleFactor, formatScoreMetric } from "@/lib/metricFormatters";
 import { canonicalBenchmarkSlug, canonicalPhase, formatBenchmarkLabel, formatPhaseWithStreams } from "@/lib/displayLabels";
 import { formatTimingExclusion, normalizePrimaryMetric, phaseScoreValue, primaryMetricLabel, primaryMetricValue, type PrimaryMetric } from "@/lib/displayEligibility";
 import { getBenchmarkRanking, listResults, type BenchmarkRankingRow, type ResultRow } from "@/lib/duckdbQueries";
+import { loadCorpusLabels } from "@/lib/corpusLabelQueries";
+import { corpusLabelTexts, type CorpusLabels } from "@/lib/corpusLabels";
 import { resultReceiptHref } from "@/lib/resultLinks";
 import { buildReceipts, type ResultReceipt } from "./result-receipts.ts";
 import { platformVersionDisplay } from "@/lib/versionLabel";
@@ -42,6 +44,7 @@ export interface RunLine extends RunContext {
   ranked: boolean;
   rankingStatus: string;
   receiptHref: string;
+  corpusLabels?: readonly string[];
 }
 
 export interface RankingLine extends RunContext {
@@ -56,6 +59,7 @@ export interface RankingLine extends RunContext {
   geomean: string;
   exclusion: string | null;
   receiptHref: string;
+  corpusLabels?: readonly string[];
 }
 
 export interface BenchmarkCohort {
@@ -126,7 +130,12 @@ export function summaryHref(kind: "platforms" | "benchmarks", id: string): strin
   return `${SUMMARY_ROOT}/${kind}/${id}.html`;
 }
 
-function runLine(row: ResultRow): RunLine {
+function labelFields(labels: CorpusLabels | undefined): { corpusLabels?: readonly string[] } {
+  const texts = corpusLabelTexts(labels);
+  return texts.length > 0 ? { corpusLabels: texts } : {};
+}
+
+function runLine(row: ResultRow, corpusLabels: CorpusLabels | undefined): RunLine {
   const phase = canonicalPhase(row.test_type);
   const metric = phase === "throughput" ? "throughput_at_size" : "power_score";
   const benchmarkId = canonicalBenchmarkSlug(row.benchmark);
@@ -146,10 +155,11 @@ function runLine(row: ResultRow): RunLine {
     ranked: row.ranking_exclusion_reason === null,
     rankingStatus: row.ranking_exclusion_reason === null ? "Ranked" : formatTimingExclusion(row.ranking_exclusion_reason),
     receiptHref: resultReceiptHref(row),
+    ...labelFields(corpusLabels),
   };
 }
 
-function rankingLine(row: BenchmarkRankingRow, context: ResultRow | undefined): RankingLine {
+function rankingLine(row: BenchmarkRankingRow, context: ResultRow | undefined, corpusLabels: CorpusLabels | undefined): RankingLine {
   const metric = normalizePrimaryMetric(row.primary_metric);
   const value = primaryMetricValue(row, metric);
   return {
@@ -165,6 +175,7 @@ function rankingLine(row: BenchmarkRankingRow, context: ResultRow | undefined): 
     geomean: fmtGeomean(row.display_geomean_ms),
     exclusion: row.ranking_exclusion_reason === null ? null : formatTimingExclusion(row.ranking_exclusion_reason),
     receiptHref: resultReceiptHref(row),
+    ...labelFields(corpusLabels),
   };
 }
 
@@ -198,6 +209,7 @@ export async function buildResultsSummary(
   allRows: readonly ResultRow[],
   ranking: RankingSource,
   snapshot: Omit<SnapshotIdentity, "resultCount">,
+  labels: ReadonlyMap<string, CorpusLabels> = new Map(),
 ): Promise<ResultsSummary> {
   const rows = indexedResults(allRows);
   const platformEntries = buildSectionEntries(rows, "platforms");
@@ -205,7 +217,7 @@ export async function buildResultsSummary(
 
   const platforms = platformEntries.map((entry: SectionEntry): PlatformPage => {
     const own = rows.filter((row) => row.platform_id === entry.id);
-    const runs = own.map(runLine).sort(byRunOrder);
+    const runs = own.map((row) => runLine(row, labels.get(row.result_id))).sort(byRunOrder);
     return {
       id: entry.id,
       label: entry.label,
@@ -231,7 +243,7 @@ export async function buildResultsSummary(
       if (lines.length === 0) continue;
       const scale = formatScaleFactor(cohort.scaleFactor);
       const phase = formatPhaseWithStreams(cohort.phase, cohort.streamCount);
-      const rendered = lines.map((line) => rankingLine(line, admitted.get(line.result_id)));
+      const rendered = lines.map((line) => rankingLine(line, admitted.get(line.result_id), labels.get(line.result_id)));
       excluded.push(...rendered.filter((line) => line.exclusion !== null).map((line) => ({ ...line, scale, phase })));
       const ranked = rendered.filter((line) => line.exclusion === null);
       if (ranked.length === 0) continue;
@@ -279,15 +291,21 @@ export function loadResultsSummary(): Promise<PublishedResults> {
       const snapshotSha256 = fileSha256(file);
       if (!manifest.produced_at) throw new Error("The core bundle manifest has no produced_at, so the result pages cannot state a snapshot date.");
       const results = await listResults(undefined, { includeHardware: true });
-      const summary = await buildResultsSummary(results, getBenchmarkRanking, {
-        coreSha: manifest.core_sha,
-        corpusSha: manifest.corpus_sha,
-        packageVersion: manifest.package_version,
-        producedAt: manifest.produced_at,
-        snapshotSha256,
-        readModelVersion,
-      });
-      const receipts = await buildReceipts(indexedResults(results), { snapshotSha256, snapshotDate: manifest.produced_at.slice(0, 10) });
+      const labels = await loadCorpusLabels();
+      const summary = await buildResultsSummary(
+        results,
+        getBenchmarkRanking,
+        {
+          coreSha: manifest.core_sha,
+          corpusSha: manifest.corpus_sha,
+          packageVersion: manifest.package_version,
+          producedAt: manifest.produced_at,
+          snapshotSha256,
+          readModelVersion,
+        },
+        labels,
+      );
+      const receipts = await buildReceipts(indexedResults(results), { snapshotSha256, snapshotDate: manifest.produced_at.slice(0, 10) }, labels);
       return { ...summary, receipts };
     } finally {
       closeResultsSnapshot();

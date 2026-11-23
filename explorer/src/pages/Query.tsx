@@ -1,5 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from "preact/hooks";
 import type { RoutableProps } from "preact-router";
+import { CorpusLabelList } from "@/components/CorpusLabelList";
+import { useCorpusLabels } from "@/lib/useCorpusLabels";
 import { DUCKDB_USER_QUERY_TIMEOUT_MS, queryRows } from "@/db";
 import { CompareCta, isCompareAllAvailable } from "@/components/CompareCta";
 import { EmptyState } from "@/components/EmptyState";
@@ -145,6 +147,7 @@ export function Query({ url }: QueryProps) {
   const [dateWindow, setDateWindowFacet] = useFacetField("date_window");
   const setDateWindow = (value: string) => setDateWindowFacet(toDateWindowFacet(value));
   const [schema, setSchema] = useState<SchemaColumn[]>([]);
+  const corpusLabels = useCorpusLabels();
   const [visibleColumns, setVisibleColumns] = useState<string[]>([]);
   const [rows, setRows] = useState<ResultRow[]>([]);
   const [resultTotal, setResultTotal] = useState(0);
@@ -1147,7 +1150,17 @@ export function Query({ url }: QueryProps) {
                                       {column === "run_date" ? (
                                         <RunDateChip runDate={typeof row.run_date === "string" ? row.run_date : null} />
                                       ) : (
-                                        formatQueryRowCell(column, row[column])
+                                        <>
+                                          {formatQueryRowCell(column, row[column])}
+                                          {column === "power_score" && (
+                                            <CorpusLabelList
+                                              state={corpusLabels}
+                                              resultId={id}
+                                              testId={`query-corpus-labels-${id}`}
+                                              class="mt-1 whitespace-normal font-sans"
+                                            />
+                                          )}
+                                        </>
                                       )}
                                     </td>
                                   ))}

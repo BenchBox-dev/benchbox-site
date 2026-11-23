@@ -70,6 +70,8 @@ import { TimeSeries } from "@/components/TimeSeries";
 import { ProvenanceLegend } from "@/components/ProvenanceLegend";
 import { TableScrollHint } from "@/components/TableScrollHint";
 import { DataTable } from "@/components/DataTable";
+import { CorpusLabelList } from "@/components/CorpusLabelList";
+import { useCorpusLabels, type CorpusLabelState } from "@/lib/useCorpusLabels";
 import { CompareCta, isCompareAllAvailable } from "@/components/CompareCta";
 import { CompareTray } from "@/components/CompareTray";
 import { TrayAnnouncer } from "@/components/TrayAnnouncer";
@@ -253,6 +255,7 @@ function platformCompareGuidanceMessage(
 
 export function PlatformIndex({ platform = "" }: PlatformIndexProps) {
   const resultsScrollerRef = useRef<HTMLDivElement>(null);
+  const corpusLabels = useCorpusLabels();
   const [rows, setRows] = useState<PlatformIndexRowRow[] | null>(null);
   const [basis, setBasis] = useUrlState(BASIS_URL_KEY, DEFAULT_BASIS, basisSerde);
   const basisCache = useRef(new Map<string, DetailResult>());
@@ -1051,6 +1054,7 @@ export function PlatformIndex({ platform = "" }: PlatformIndexProps) {
                       checked={selected.has(r.result_id)}
                       onToggle={() => toggleSelect(r.result_id)}
                       showMetricContract={showMetricContract}
+                      corpusLabels={corpusLabels}
                       disabledReason={
                         comparisonExclusionReason(r) ??
                         cohortLockReason(r) ??
@@ -1081,6 +1085,7 @@ export function PlatformIndex({ platform = "" }: PlatformIndexProps) {
                             checked={selected.has(r.result_id)}
                             onToggle={() => toggleSelect(r.result_id)}
                             showMetricContract={showMetricContract}
+                            corpusLabels={corpusLabels}
                             disabledReason={
                               comparisonExclusionReason(r) ??
                               cohortLockReason(r) ??
@@ -1453,9 +1458,10 @@ interface PlatformRowProps {
   onToggle: () => void;
   showMetricContract: boolean;
   disabledReason?: string;
+  corpusLabels: CorpusLabelState;
 }
 
-function PlatformRow({ entry, runIdentityLabel, versionLabel, checked, onToggle, showMetricContract, disabledReason }: PlatformRowProps) {
+function PlatformRow({ entry, runIdentityLabel, versionLabel, checked, onToggle, showMetricContract, disabledReason, corpusLabels }: PlatformRowProps) {
   const disabledCopy = describeCompareExclusionReason(disabledReason);
   const entryOverrideRules = parseOverrideRules(entry.override_rules);
   const reasonId = disabledCopy ? `platform-compare-reason-${entry.result_id}` : undefined;
@@ -1502,6 +1508,12 @@ function PlatformRow({ entry, runIdentityLabel, versionLabel, checked, onToggle,
             />
           </div>
         )}
+        <CorpusLabelList
+          state={corpusLabels}
+          resultId={entry.result_id}
+          testId={`platform-corpus-labels-${entry.result_id}`}
+          class="mt-1 whitespace-normal"
+        />
         <PlatformCompareReasonStatus id={reasonId} copy={disabledCopy} />
       </td>
       <td class="table-td font-medium" aria-colindex={platformTableColumnIndex("benchmark", showMetricContract)}>{humanizeBenchmark(entry.benchmark)}</td>

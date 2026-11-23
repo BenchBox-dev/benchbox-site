@@ -35,6 +35,22 @@ function writeContract(overrides = {}) {
   return file;
 }
 
+describe("accepted read-model versions", () => {
+  it("are 17 through 21, one more than before", () => {
+    expect(MINIMUM_READ_MODEL_VERSION).toBe(17);
+    expect(LATEST_READ_MODEL_VERSION).toBe(21);
+  });
+
+  it.each([20, 21])("accepts read model %i", (version) => {
+    expect(readExplorerBuildContract(writeContract({ read_model_version: version })).read_model_version).toBe(version);
+  });
+
+  it("rejects read model 22 and read model 16", () => {
+    expect(() => readExplorerBuildContract(writeContract({ read_model_version: 22 }))).toThrow(/17 through 21 expected, got 22/);
+    expect(() => readExplorerBuildContract(writeContract({ read_model_version: 16 }))).toThrow(/17 through 21 expected, got 16/);
+  });
+});
+
 describe("readExplorerBuildContract", () => {
   it("accepts a contract equal to the minimum pin", () => {
     expect(readExplorerBuildContract(writeContract()).read_model_version).toBe(MINIMUM_READ_MODEL_VERSION);

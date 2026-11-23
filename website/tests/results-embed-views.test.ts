@@ -128,3 +128,29 @@ describe("current results", () => {
     await waitFor(() => expect(screen.getByRole("status").textContent).toContain("could not be loaded"));
   });
 });
+
+describe("corpus labels in embeds", () => {
+  const ids = [CITATION.result, "tpch-spark-sf1.0-20261007-9c57f2ae"];
+  const LABELS = ["Derived from TPC-H, not an official TPC result", "Power test only", "Row counts not checked", "Single iteration"];
+
+  it("lists every label of a published current result", async () => {
+    const { container } = current(ids, resolvesTo(published({ corpusLabels: LABELS }), published({ resultId: ids[1]!, platform: "Spark" })));
+    await waitFor(() => expect(container.querySelectorAll("tbody tr[data-state=published]")).toHaveLength(2));
+    const rows = [...container.querySelectorAll("tbody tr")];
+    expect([...rows[0]!.querySelectorAll("[data-testid=embed-corpus-label]")].map((item) => item.textContent)).toEqual(LABELS);
+    expect(rows[1]!.querySelector("[data-testid=embed-corpus-labels]")).toBeNull();
+  });
+
+  it("shows the labels of the current snapshot beside a cited result", async () => {
+    const { container } = cited(resolvesTo(published({ corpusLabels: LABELS })));
+    await waitFor(() => expect(container.querySelector("[data-testid=embed-corpus-labels]")).not.toBeNull());
+    expect([...container.querySelectorAll("[data-testid=embed-corpus-label]")].map((item) => item.textContent)).toEqual(LABELS);
+    expect(container.querySelector("[data-testid=embed-corpus-labels]")!.getAttribute("aria-label")).toBe("Corpus labels in the current snapshot");
+  });
+
+  it("adds nothing when the result carries no labels", async () => {
+    const { container } = cited(resolvesTo(published()));
+    await waitFor(() => expect(screen.getByRole("status").textContent).toContain("same value"));
+    expect(container.querySelector("[data-testid=embed-corpus-labels]")).toBeNull();
+  });
+});

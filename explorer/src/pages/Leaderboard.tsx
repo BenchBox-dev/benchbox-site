@@ -41,6 +41,8 @@ import { useDocumentTitle } from "@/lib/useDocumentTitle";
 import { useOptionalPickingState } from "@/lib/pickingState";
 import { formatTimingExclusion } from "@/lib/displayEligibility";
 import { DerivedResultsNotice, SubscaleBadge } from "@/components/SubscaleNotice";
+import { CorpusLabelList } from "@/components/CorpusLabelList";
+import { useCorpusLabels } from "@/lib/useCorpusLabels";
 import { isSubscaleTpc, subscaleCohortNote, subscaleTpcName } from "@/lib/subscale";
 import {
   buildCompareUrl,
@@ -1187,6 +1189,7 @@ function LeaderboardComparePicker({
   const picking = useOptionalPickingState();
   const [localPickedIds, setLocalPickedIds] = useState<string[]>([]);
   const [selectedCohortKey, setSelectedCohortKey] = useState("");
+  const corpusLabels = useCorpusLabels();
   const pickedIds = picking?.pickedIds ?? localPickedIds;
   const filteredComparableResults = results.filter(
     (result) => result.comparison_exclusion_reason === null && matchesFacetRow(result, facets),
@@ -1387,6 +1390,12 @@ function LeaderboardComparePicker({
                       View receipt
                     </a>
                   </p>
+                  <CorpusLabelList
+                    state={corpusLabels}
+                    resultId={result.result_id}
+                    testId={`leaderboard-corpus-labels-${result.result_id}`}
+                    class="mt-2"
+                  />
                 </li>
               );
             })}
