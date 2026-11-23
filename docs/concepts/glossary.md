@@ -223,7 +223,7 @@ Comprehensive reference for benchmarking, database, and BenchBox-specific termin
 ## V
 
 **Validation**
-: Process of verifying benchmark results correctness by checking row counts, result sets, or checksums against expected values.
+: Process of verifying benchmark results correctness by checking row counts, result sets, or checksums against expected values. A `passed` validation status means checked row counts only for TPC-H, TPC-DS and SSB; for every other benchmark it means the data loaded and the queries ran without error ([What PASSED means for each benchmark](benchmark-methodology.md#what-passed-means-for-each-benchmark)).
 
 **Variant**
 : TPC-DS query variation with different parameter seeds or substitution values. Used to test optimizer across diverse workload patterns.
