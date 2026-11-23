@@ -166,6 +166,8 @@ report `summary.validation=passed` with no failed measurement evidence.
 Truthful partial results are accepted only from the trusted maintainer mirror
 path and remain excluded from rankings.
 
+`passed` checks row counts only for TPC-H, TPC-DS and SSB. For every other benchmark it means the data loaded and the queries ran without error; no answers are checked ([What PASSED means for each benchmark](concepts/benchmark-methodology.md#what-passed-means-for-each-benchmark)).
+
 ### 5a. Plausibility overrides
 
 Timing-plausibility findings (`timing-plateau`, `scale-invariant`,
