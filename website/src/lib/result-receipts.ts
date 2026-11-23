@@ -7,6 +7,7 @@ import { embedFacts, presentEmbedResult } from "@/lib/resultEmbed";
 import { visibleResultIdForRow } from "@/lib/resultLinks";
 import { formatRunDate } from "@/lib/runAge";
 import { complianceBadge, derivedResultsDisclaimer, derivedTpcName, isDerivedPowerScore, isSubscaleTpc, powerScoreTitle } from "@/lib/subscale";
+import type { CorpusLabels } from "@/lib/corpusLabels";
 import { platformVersionDisplay } from "@/lib/versionLabel";
 import { fmtGeomean } from "@/utils";
 import { formatCitationBlock } from "./results-embed.ts";
@@ -36,6 +37,7 @@ export interface ResultReceipt {
   headline: string;
   rankingStatus: string;
   derivedNotice: string | null;
+  corpusLabels?: readonly string[];
   sections: ReceiptSection[];
   citeLine: string;
   citation: string | null;
@@ -70,7 +72,13 @@ export function citationLineFor(row: Pick<ResultRow, "result_id"> & HardwareFiel
   });
 }
 
-export function buildReceipt(wide: ResultDetailMetricsRow, primaryMetric: PrimaryMetric, snapshot: ReceiptSnapshot, hardware: HardwareFields = {}): ResultReceipt {
+export function buildReceipt(
+  wide: ResultDetailMetricsRow,
+  primaryMetric: PrimaryMetric,
+  snapshot: ReceiptSnapshot,
+  hardware: HardwareFields = {},
+  corpusLabels?: CorpusLabels,
+): ResultReceipt {
   const detail = detailResultFromWideRow(wide, [], []);
   const benchmarkId = canonicalBenchmarkSlug(detail.benchmark);
   const benchmark = formatBenchmarkLabel(benchmarkId);
@@ -80,7 +88,7 @@ export function buildReceipt(wide: ResultDetailMetricsRow, primaryMetric: Primar
   const platformWithVersion = version === null ? detail.platform : `${detail.platform} ${version}`;
   const runDate = formatRunDate(detail.run_date);
   const metric = normalizePrimaryMetric(primaryMetric);
-  const embedded = presentEmbedResult(detail.result_id, wide, metric);
+  const embedded = presentEmbedResult(detail.result_id, wide, metric, corpusLabels);
   if (embedded.state !== "published") throw new Error(`result ${detail.result_id} is not published, so it cannot get a permalink page`);
   const facts = embedFacts(embedded);
   const metricValue = facts.metric.text;
@@ -176,6 +184,7 @@ export function buildReceipt(wide: ResultDetailMetricsRow, primaryMetric: Primar
     headline,
     rankingStatus,
     derivedNotice,
+    ...(embedded.corpusLabels === undefined ? {} : { corpusLabels: embedded.corpusLabels }),
     sections,
     citation: citationLineFor({ result_id: detail.result_id, ...hardware }, snapshot.accessedOn),
     citeLine: `Cite as: ${platformWithVersion}, ${benchmark}, ${scale}, run ${runDate}, result ${detail.result_id}, BenchBox results snapshot sha256:${snapshot.snapshotSha256} of ${snapshot.snapshotDate}.`,
@@ -184,7 +193,11 @@ export function buildReceipt(wide: ResultDetailMetricsRow, primaryMetric: Primar
   };
 }
 
-export async function buildReceipts(rows: readonly ResultRow[], snapshot: ReceiptSnapshot): Promise<ResultReceipt[]> {
+export async function buildReceipts(
+  rows: readonly ResultRow[],
+  snapshot: ReceiptSnapshot,
+  labels: ReadonlyMap<string, CorpusLabels> = new Map(),
+): Promise<ResultReceipt[]> {
   const receipts: ResultReceipt[] = [];
   const metrics = new Map<string, PrimaryMetric>();
   for (const row of rows) {
@@ -197,7 +210,7 @@ export async function buildReceipts(rows: readonly ResultRow[], snapshot: Receip
       metric = await getPrimaryMetricForBenchmark(wide.benchmark, phase);
       metrics.set(key, metric);
     }
-    receipts.push(buildReceipt(wide, metric, snapshot, await getResultSupplement(row.result_id)));
+    receipts.push(buildReceipt(wide, metric, snapshot, await getResultSupplement(row.result_id), labels.get(row.result_id)));
   }
   return receipts.sort((left, right) => left.resultId.localeCompare(right.resultId));
 }
@@ -218,6 +231,8 @@ function renderSection(section: ReceiptSection): string {
 
 const STYLE = `<style>.bb-static-receipt{max-width:56rem;margin:0 auto;padding:1.5rem 1rem}.bb-static-receipt table{border-collapse:collapse;width:100%;margin:0 0 1rem}.bb-static-receipt th,.bb-static-receipt td{text-align:left;padding:.35rem .5rem;border-bottom:1px solid rgba(128,128,128,.35);vertical-align:top;overflow-wrap:anywhere}.bb-static-receipt th{width:14rem;font-weight:600}.bb-static-receipt pre{overflow-x:auto;padding:.75rem;border:1px solid rgba(128,128,128,.35)}</style>`;
 
+const LABELS_STYLE = `<style>.bb-static-corpus-labels{display:flex;flex-wrap:wrap;gap:.25rem;margin:0 0 1rem;padding:0;list-style:none}.bb-static-corpus-labels li{padding:.125rem .375rem;border:1px solid rgba(128,128,128,.35);border-radius:.25rem;font-size:.875rem}</style>`;
+
 export function renderReceiptMain(receipt: ResultReceipt): string {
   const summaries = receipt.summaryHrefs.map((entry) => `<a href="${escapeHtml(entry.href)}">${escapeHtml(entry.label)}</a>`).join(", ");
   return [
@@ -226,6 +241,9 @@ export function renderReceiptMain(receipt: ResultReceipt): string {
     `<h1>${escapeHtml(receipt.title)}</h1>`,
     `<p>${escapeHtml(receipt.headline)}. ${escapeHtml(receipt.rankingStatus)}.</p>`,
     receipt.derivedNotice === null ? "" : `<p><strong>${escapeHtml(receipt.derivedNotice)}</strong></p>`,
+    receipt.corpusLabels === undefined
+      ? ""
+      : `<ul class="bb-static-corpus-labels" aria-label="Corpus labels" data-testid="static-corpus-labels">${receipt.corpusLabels.map((label) => `<li>${escapeHtml(label)}</li>`).join("")}</ul>`,
     `<section id="run-receipt" aria-label="Run receipt"><h2>Run receipt</h2>`,
     receipt.sections.map(renderSection).join(""),
     `</section>`,
@@ -258,6 +276,6 @@ export function renderReceiptPage(template: string, receipt: ResultReceipt, orig
   html = setMeta(html, "property", "og:url", url);
   html = setMeta(html, "name", "twitter:title", title);
   html = setMeta(html, "name", "twitter:description", receipt.description);
-  html = replaceOnce(html, /<\/head>/, `${STYLE}</head>`, "head end");
+  html = replaceOnce(html, /<\/head>/, `${STYLE}${receipt.corpusLabels === undefined ? "" : LABELS_STYLE}</head>`, "head end");
   return replaceOnce(html, /<main id="main"[^>]*>[\s\S]*?<\/main>/, renderReceiptMain(receipt), "main element");
 }

@@ -2,6 +2,7 @@ node_modules/
 dist/
 .astro/
 .site-inputs/
+.site-inputs-read-model/
 /captures/
 explorer/public/data/
 explorer/test-fixtures/.generated/

@@ -15,6 +15,8 @@ import { formatAverageRank, formatCoverage, formatRank, formatSpeedup, MISSING_V
 import { fmtGeomean, fmtScoreCompact, fmtScoreExact } from "@/utils";
 import { TrustBadge, ValidationBadge } from "@/components/TrustBadge";
 import { FundingChip } from "@/components/FundingChip";
+import { CorpusLabelList } from "@/components/CorpusLabelList";
+import { useCorpusLabels } from "@/lib/useCorpusLabels";
 import { formatPhaseWithStreams, parseOverrideRules } from "@/lib/displayLabels";
 import { SegmentedControl } from "@/components/SegmentedControl";
 import { TableScrollHint } from "@/components/TableScrollHint";
@@ -91,6 +93,7 @@ export function MetaLeaderboard({
   const [sortKey, setSortKey] = useState<MetaLeaderboardSort>("avg_rank");
   const [visiblePlatformLimit, setVisiblePlatformLimit] = useState(PLATFORM_RENDER_LIMIT);
   const [showUnrankedPlatforms, setShowUnrankedPlatforms] = useState(false);
+  const corpusLabels = useCorpusLabels();
 
   const columnMins = useMemo(() => {
     const mins = new Map<string, number | null>();
@@ -487,6 +490,14 @@ export function MetaLeaderboard({
                               );
                             })()}
                           </div>
+                        )}
+                        {receiptState?.result && (
+                          <CorpusLabelList
+                            state={corpusLabels}
+                            resultId={receiptState.result.result_id}
+                            testId={`meta-corpus-labels-${receiptState.result.result_id}`}
+                            class="mt-0.5 justify-center whitespace-normal font-sans"
+                          />
                         )}
                       </td>
                     );

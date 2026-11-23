@@ -26,6 +26,9 @@ import { VersionLabel } from "@/components/VersionLabel";
 import { SITE_ORIGIN } from "@/components/siteOrigin";
 import { complianceBadge, isDerivedPowerScore } from "@/lib/subscale";
 import { formatCitationLine, formatHardwareBasis, formatHardwareClass, MANAGED_HARDWARE_CLASS } from "@/lib/hardwareClass";
+import { CorpusLabelList } from "@/components/CorpusLabelList";
+import { corpusLabelTexts } from "@/lib/corpusLabels";
+import type { CorpusLabelState } from "@/lib/useCorpusLabels";
 
 interface RunReceiptProps {
   detail: DetailResult;
@@ -34,6 +37,7 @@ interface RunReceiptProps {
   reproduceCommand?: string | null;
   plansUrl?: string | null;
   accessedOn?: Date;
+  corpusLabels?: CorpusLabelState;
 }
 
 interface ReceiptRow {
@@ -247,6 +251,7 @@ export function RunReceipt({
   reproduceCommand = buildReproduceCommand(detail),
   plansUrl: plansUrlOverride,
   accessedOn = new Date(),
+  corpusLabels,
 }: RunReceiptProps) {
   const [showMissing, setShowMissing] = useState(false);
   const plansUrl = plansUrlOverride === undefined ? planDownloadUrl(detail) : plansUrlOverride;
@@ -256,6 +261,9 @@ export function RunReceipt({
   const clientLocalityRow = buildClientLocalityRow(detail);
   const publicResultId = shortId ?? visibleResultIdForRow(detail);
   const citation = citationRow(detail, publicResultId, accessedOn);
+  const showsCorpusLabels =
+    corpusLabels !== undefined &&
+    (corpusLabels.status === "failed" || corpusLabelTexts(corpusLabels.labels.get(detail.result_id)).length > 0);
 
   const sections = [
     {
@@ -324,6 +332,19 @@ export function RunReceipt({
         rowFromString("Compliance", detail.compliance_class, (raw) => complianceBadge(raw) ?? raw),
         ...(isDerivedPowerScore(detail.power_score_source)
           ? [recordedRow("Power@Size source", "Derived from exported query timings")]
+          : []),
+        ...(showsCorpusLabels
+          ? [
+              recordedRow(
+                "Corpus labels",
+                <CorpusLabelList
+                  state={corpusLabels}
+                  resultId={detail.result_id}
+                  testId="receipt-corpus-labels"
+                  reportFailure
+                />,
+              ),
+            ]
           : []),
         rankingEligibilityRow(isRankingEligible),
       ],

@@ -25,6 +25,27 @@ and then invoke Playwright, which starts the static server in
 `scripts/serve-browser-tests.mjs`. The server mounts `dist/` at `/results/`
 and routes `/results/data/` to `test-fixtures/.generated/data/`.
 
+## Read-model 21 labels
+
+`read-model-21/` checks the corpus labels that read-model 21 adds to every
+score surface. It skips itself unless `SITE_INPUTS` holds the inputs that
+`npm run inputs:read-model -- --out <directory>` stages: a copy of the core
+bundle whose snapshots are widened with the columns of
+`test-fixtures/next-read-model/next_read_model_contract.json`, a verbatim copy
+of the contract fixture that core publishes (`provenance.json` names its path,
+core commit and digest). Run it with:
+
+```bash
+npm run inputs:read-model -- --out .site-inputs-read-model
+export SITE_INPUTS="$PWD/.site-inputs-read-model"
+npm run test:e2e:fixtures -w explorer && npm run build
+(cd explorer && npx playwright test --project=chromium e2e/read-model-21)
+npm run verify:corpus-labels -w website
+```
+
+Run the whole suite the same way to check the rest of the Explorer against
+read-model 21. The `read-model-labels` job of `ci` does the first part.
+
 ## Nightly Firefox and WebKit run
 
 `.github/workflows/nightly-browser.yml` runs the `@smoke` tests on Firefox and
