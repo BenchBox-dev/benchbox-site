@@ -6,6 +6,7 @@ import path from "node:path";
 import { pathToFileURL } from "node:url";
 import { checkAttestations, memberDigest, membersFor, readJson } from "./bundle-lib.mjs";
 import { CORE_REPO, certificationErrors, githubJson } from "./bundle-verify.mjs";
+import { developProductions } from "./bundle-fetch.mjs";
 
 export const PIN_DIR = path.resolve(import.meta.dirname, "..", "release-pin");
 export const PIN_MEMBERS = ["docs-data", "doc-contracts.json", "repo-files.json"];
@@ -113,10 +114,16 @@ export async function certifiedErrors(manifest, env = process.env) {
   }
 }
 
-export function fetchBundleDir(destination, commit, env = process.env) {
+export function earliestProduction(productions) {
+  return [...productions].sort((a, b) => a.created_at.localeCompare(b.created_at) || a.workflow_run.id - b.workflow_run.id)[0];
+}
+
+export async function fetchBundleDir(destination, commit, env = process.env) {
+  const production = earliestProduction(await developProductions(commit, env));
+  if (!production) throw new Error(`no unexpired develop bundle exists for ${commit}`);
   execFileSync(process.execPath, [FETCH_SCRIPT], {
     stdio: "inherit",
-    env: { ...env, SITE_INPUTS: destination, SITE_INPUTS_CORE_SHA: commit, SITE_INPUTS_RUN_ID: "", SITE_INPUTS_DIGEST: "" },
+    env: { ...env, SITE_INPUTS: destination, SITE_INPUTS_CORE_SHA: commit, SITE_INPUTS_RUN_ID: String(production.workflow_run.id), SITE_INPUTS_DIGEST: "" },
   });
 }
 
@@ -143,7 +150,7 @@ export async function pinRelease(tag, { from, pinDir = PIN_DIR, env = process.en
   const staged = mkdtempSync(path.join(parent, ".release-pin-new-"));
   try {
     const bundle = from ? path.resolve(from) : path.join(scratch, "bundle");
-    if (!from) fetchBundle(bundle, commit, env);
+    if (!from) await fetchBundle(bundle, commit, env);
     const manifest = readJson(path.join(bundle, "manifest.json"));
     const problems = [];
     if (manifest.core_sha !== commit) problems.push(`manifest core_sha ${manifest.core_sha} is not the ${tag} commit ${commit}`);
@@ -151,11 +158,12 @@ export async function pinRelease(tag, { from, pinDir = PIN_DIR, env = process.en
     problems.push(...memberErrors(bundle, manifest));
     if (from) problems.push(...directoryErrors(bundle, manifest), ...(await certifiedErrors(manifest, env)));
     if (problems.length) throw new Error(problems.join("; "));
-    writeFileSync(path.join(staged, "pin.json"), `${JSON.stringify({ tag, core_sha: commit }, null, 2)}\n`);
+    const pin = from ? { tag, core_sha: commit } : { tag, core_sha: commit, site_inputs_run: readJson(path.join(bundle, ".fetched.json")).runId };
+    writeFileSync(path.join(staged, "pin.json"), `${JSON.stringify(pin, null, 2)}\n`);
     copyFileSync(path.join(bundle, "manifest.json"), path.join(staged, "manifest.json"));
     for (const member of PIN_MEMBERS) cpSync(path.join(bundle, member), path.join(staged, member), { recursive: true });
     swapDirectory(staged, pinDir);
-    return { tag, core_sha: commit };
+    return pin;
   } catch (error) {
     rmSync(staged, { recursive: true, force: true });
     throw error;
@@ -172,6 +180,7 @@ export function checkPinOffline(pinDir = PIN_DIR) {
   const manifest = readJson(path.join(pinDir, "manifest.json"));
   if (typeof pin.tag !== "string" || !TAG_PATTERN.test(pin.tag)) errors.push(`pin tag ${pin.tag} is not of the form vX.Y.Z`);
   if (pin.core_sha !== manifest.core_sha) errors.push(`pin core_sha ${pin.core_sha} differs from manifest core_sha ${manifest.core_sha}`);
+  if ("site_inputs_run" in pin && !/^\d+$/.test(String(pin.site_inputs_run))) errors.push(`pin site_inputs_run ${pin.site_inputs_run} is not a run id`);
   if (typeof pin.tag === "string" && manifest.package_version !== versionOf(pin.tag)) {
     errors.push(`manifest package_version ${manifest.package_version} is not ${versionOf(pin.tag)}`);
   }
