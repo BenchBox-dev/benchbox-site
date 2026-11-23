@@ -4,7 +4,7 @@ import { cpSync, existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, write
 import { tmpdir } from "node:os";
 import path from "node:path";
 import { memberDigest, membersFor } from "./bundle-lib.mjs";
-import { checkPin, checkPinOffline, pendingStatus, pinArguments, pinRelease } from "./docs-pin.mjs";
+import { checkPin, checkPinOffline, earliestProduction, pendingStatus, pinArguments, pinRelease } from "./docs-pin.mjs";
 
 const COMMIT = "d".repeat(40);
 const OTHER = "e".repeat(40);
@@ -74,19 +74,39 @@ test("pinning writes the pin layout and the manifest byte for byte", async () =>
   assert.deepEqual(checkPinOffline(pinDir).errors, []);
 });
 
-test("pinning without --from fetches the bundle for the tag commit", async () => {
+test("pinning without --from fetches the bundle for the tag commit and records its run", async () => {
   stubApi();
   const calls = [];
   const pinDir = newPinDir();
-  await pinRelease("v1.2.3", {
+  const pin = await pinRelease("v1.2.3", {
     pinDir,
     fetchBundle: (destination, commit) => {
       calls.push(commit);
       cpSync(fixtureDir("bundle-"), destination, { recursive: true });
+      writeFileSync(path.join(destination, ".fetched.json"), JSON.stringify({ runId: "5001" }));
     },
   });
   assert.deepEqual(calls, [COMMIT]);
+  assert.deepEqual(pin, { tag: "v1.2.3", core_sha: COMMIT, site_inputs_run: "5001" });
+  assert.deepEqual(JSON.parse(readFileSync(path.join(pinDir, "pin.json"), "utf8")), pin);
   assert.deepEqual(checkPinOffline(pinDir).errors, []);
+  assert.ok(!existsSync(path.join(pinDir, ".fetched.json")));
+});
+
+test("the earliest production of a commit is pinned whatever the listing order", () => {
+  const automatic = { created_at: "2026-11-05T21:41:00Z", workflow_run: { id: 42114319044 } };
+  const dispatched = { created_at: "2026-11-13T20:12:00Z", workflow_run: { id: 43498628032 } };
+  const sameTime = { created_at: "2026-11-05T21:41:00Z", workflow_run: { id: 42114319050 } };
+  assert.equal(earliestProduction([automatic, dispatched]), automatic);
+  assert.equal(earliestProduction([dispatched, automatic]), automatic);
+  assert.equal(earliestProduction([sameTime, dispatched, automatic]), automatic);
+  assert.equal(earliestProduction([]), undefined);
+});
+
+test("a pin whose site_inputs_run is not a run id fails the check", async () => {
+  const pinDir = await pinned();
+  writeFileSync(path.join(pinDir, "pin.json"), JSON.stringify({ tag: "v1.2.3", core_sha: COMMIT, site_inputs_run: "latest" }));
+  assert.deepEqual(checkPinOffline(pinDir).errors, ["pin site_inputs_run latest is not a run id"]);
 });
 
 test("a draft release is refused", async () => {

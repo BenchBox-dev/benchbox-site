@@ -400,3 +400,26 @@ test("a dispatched bundle that is the newest, or whose neighbours are behind or 
   const kept = await newestBundle({ SITE_INPUTS_RUN_ID: "1000" }, { compare: orderCompare(order, [order[2]]), maxWaitMs: 1000 });
   assert.equal(kept.runId, "1001");
 });
+
+function stubProductions(productions) {
+  globalThis.fetch = async (url) => {
+    const route = String(url).replace("https://api.github.com/", "");
+    if (route.includes("/artifacts?name=")) return { ok: true, json: async () => ({ artifacts: productions }) };
+    if (route.includes("/jobs?")) return { ok: true, json: async () => ({ jobs: [BUNDLE_JOB] }) };
+    if (route.includes("/actions/runs/")) return { ok: true, json: async () => RUN };
+    throw new Error(`unexpected route ${route}`);
+  };
+}
+
+test("a core sha with a run id fetches that production of the commit and never a descendant", async () => {
+  const production = (id) => ({ ...ARTIFACT, workflow_run: { id, head_branch: "develop" } });
+  const env = { SITE_INPUTS_CORE_SHA: RUN.head_sha, SITE_INPUTS_RUN_ID: "1001" };
+  for (const productions of [[production(1001), production(1002)], [production(1002), production(1001)]]) {
+    stubProductions(productions);
+    const found = await newestBundle(env, { maxWaitMs: 1000 });
+    assert.equal(found.runId, "1001");
+    assert.equal(found.replaced, undefined);
+  }
+  stubProductions([production(1002), { ...production(1001), expired: true }]);
+  await assert.rejects(newestBundle(env, { maxWaitMs: 1000 }), /no unexpired develop bundle from run 1001/);
+});
