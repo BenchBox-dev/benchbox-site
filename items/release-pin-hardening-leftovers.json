@@ -6,7 +6,7 @@
     "(4) The sync workflow distinguishes 'next does not exist' (exit 0) from a failed ls-remote (fail the job), with a shape test",
     "`node --test scripts/*.test.mjs`, `node scripts/check-yaml.mjs .github/workflows/*.yml` and `npm run lint:comments` pass; each new test is shown to fail against a deliberately broken check (state that it was tried)"
   ],
-  "context": "Decision gate: item (1) only. Guardrails: no change to bundle-fetch, bundle-verify or scripts/schemas; the sync workflow stays read-only on branches; goes to main. Merge targets: site code, workflows and corrections to released documentation go to main, then main is merged into next with `gh pr merge --merge`; only documentation of unreleased behaviour goes to next.",
+  "context": "Decision gate: item (1) only. Guardrails: no change to bundle-fetch, bundle-verify or scripts/schemas; the sync workflow stays read-only on branches; goes to main. Merge targets: site code, workflows and corrections to released documentation go to main, then main is merged into next with `gh pr merge --merge`; only documentation of unreleased behaviour goes to next.\n\n2026-11-23 closeout. PR #252 squash-merged to main (30ab804) with ci green. (1) Owner chose enforce. --from checks each unexpired develop bundle of the commit, earliest first: the run must pass producingRunErrors, then its manifest.json must equal the directory's byte for byte; the match is recorded as site_inputs_run. Symlinks and other non-regular entries inside pinned members are refused, because member digests cover regular files only. Once all bundles have expired, --from requires --expired-run <id>, a successful develop site-inputs run that produced site-inputs-<core_sha>; --expired-run is refused while a bundle exists. AGENTS.md documents this, including that expired bundles cannot be byte-compared. (2) Table-driven test over missing core_sha/parent_core_sha/corpus_sha/package_version/certified_by, short SHAs and an unsupported schema. (3) Evaluator test: !=, ! and < throw 'unrecognised characters'; the same characters inside quotes are accepted. (4) sync-next.yml exits 0 only for ls-remote status 2 and otherwise fails with ::error::; a behavioural test runs the step's own lines with a stub git (0/2/128). It replaced the old text-pinning test. Verification: 211 script tests pass; mutation checks (corpus_sha check, parent SHA format, evaluator check, workflow failure exit, symlink check, run check, --expired-run refusal) each fail a test. Live against v0.5.0: each original directory pins its own run (42114319044, 43498628032); an edited manifest is refused; --expired-run is refused while unexpired. The expired path is covered by unit tests only. Independent review: 2 should-fix (symlinks, unchecked candidate run) and 3 nits, all fixed; the re-review's one message nit was also fixed.",
   "description": "Problem: independent reviews of pull request #159 left four optional gaps. (1) `docs:pin --from` proves core certified the commit, not that core produced the directory: a candidate bundle with recomputed digests and a real certified_by run id passes. (2) No test covers the new manifest field checks on --from (missing parent_core_sha, corpus_sha or certified_by, a short SHA, an unsupported schema); deleting them fails nothing. (3) The DOCS_INPUTS expression evaluator in scripts/docs-release-pin-workflow.test.mjs now fails on unrecognised characters, but no test feeds it one. (4) .github/workflows/sync-next.yml exits 0 silently when `git ls-remote` for next fails, which would also hide a private-repository or authentication failure.\n\nOutcome: each check fails when it should, with a test.",
   "links": [
     "scripts/docs-pin.mjs",
@@ -31,6 +31,14 @@
       "generation": "ec2505d681a24c3387bb8dd82454dd86",
       "op": "take",
       "op_id": "09196804486743069999a408ba0ac7a9",
+      "session_id": "207db25decce4101b2bc5c3976fe654d"
+    },
+    {
+      "actor": "mcp:omp:joe@joe-mac-mini.local:326d7a1b53869a1b8140313f",
+      "at": "2026-11-23T15:24:30Z",
+      "client": "omp",
+      "op": "update",
+      "op_id": "bbb172be888442d39771cdf0fe0ff9a1",
       "session_id": "207db25decce4101b2bc5c3976fe654d"
     }
   ]
