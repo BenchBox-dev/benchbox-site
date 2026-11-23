@@ -55,6 +55,24 @@ The integrity validator reads a result file and reports structural, completeness
 
 Submissions also run timing-plausibility checks (`timing-plateau`, `small-scale-floor`, `scale-invariant` and the informational `floor-outlier`). The first three block community publication until a committed override covers them, and sub-millisecond rows are excluded from that evidence as timer noise ([Contributing results](../contributing-results.md)).
 
+### What PASSED means for each benchmark
+
+A run's validation status defaults to `passed`. For SQL runs it comes from the load checks: every expected table exists, has rows and can be queried. What else sits behind a `passed` depends on the benchmark:
+
+| Benchmark | What `passed` means | Reference answers |
+|---|---|---|
+| TPC-H | The data loaded, the queries ran, and per-query row counts matched the reference where one exists. | Answer set at scale factor 1; recorded row counts at 0.01 and 0.1. |
+| TPC-DS | The data loaded, the queries ran, and per-query row counts matched the reference where one exists. | Answer files at scale factor 1; recorded row counts at 0.01 and 0.1. |
+| SSB | The data loaded, the queries ran, and per-query row counts matched the reference where one exists. | Recorded row counts at scale factors 0.01, 0.1, 1 and 10. |
+| Every other benchmark | The data loaded and the queries ran without error. No answers are checked. | None. |
+
+- TPC-H and TPC-DS power runs check row counts. On the other run paths, including SSB, row counts are checked only with `--validation postload` or `--validation full`.
+- With validation on, a benchmark with no reference reads `not_validated`.
+- Outside TPC-H, TPC-DS and SSB, `passed` is an execution result, not a correctness check. Even for those three it is a row-count check, not a comparison of result values.
+- This section does not cover TPC-DI.
+
+See [Result integrity validation](../development/result-integrity-validation.md) for the integrity validator and [Row count validation](../guides/row-count-validation.md) for the per-query statuses.
+
 ## When two results are comparable
 
 Comparisons are meaningful only when the workload, scale, phase, configuration, tuning, hardware and evidence are compatible; a shared benchmark name alone is not enough ([README](../../README.md)). The existing sources name these facts:

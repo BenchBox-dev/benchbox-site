@@ -61,7 +61,11 @@ versioned core bundle; it reads nothing else from core.
   before the build and before publication. Docs inputs without
   `doc-contracts.json` always fail. `npm run test:docs-contracts` runs the
   seeded drift tests; `DOC_CONTRACTS_SCHEMA4_BUNDLE=<bundle dir>` adds a run
-  against a real bundle.
+  against a real bundle. The command first prints which inputs it uses (release
+  pin, fetched bundle or other, with version and core commit). On a branch
+  based on `next` with `DOCS_INPUTS` unset it also says that CI checks `next`
+  against the fetched bundle and prints the command that reproduces CI:
+  `npm run bundle:fetch && DOCS_INPUTS=.site-inputs npm run docs:check`.
 - `inventory/core-linked-paths.json` lists every core path that a relative
   link in `docs/` or `blog/` points at, with its kind and the
   `file:line` of each link. It is generated through the converter's own link
@@ -237,7 +241,12 @@ versioned core bundle; it reads nothing else from core.
 - `docs:pin` fetches and verifies the certified bundle of the tag's commit, so
   a tag whose commit has no such bundle cannot be pinned. Bundles expire after
   90 days; when one is missing, dispatch core's `site-inputs.yml` with
-  `core_sha` set to the tag to rebuild it. `--from <dir>` pins a complete bundle
+  `core_sha` set to the tag to rebuild it. A commit can then have more than one
+  unexpired bundle. Their docs inputs are identical, but `manifest.json`
+  differs (`produced_at`, `parent_source`, member digests), so `docs:pin` takes
+  the earliest one by creation time, then by run id, and re-pinning writes the
+  same files. It records that site-inputs run as `site_inputs_run` in
+  `release-pin/pin.json`. `--from <dir>` pins a complete bundle
   directory, for a release whose bundle the current verifier cannot read. It
   checks the manifest fields and core commit, the digest of every member the
   manifest lists, `attestations.json`, and online that `certified_by` is a core
