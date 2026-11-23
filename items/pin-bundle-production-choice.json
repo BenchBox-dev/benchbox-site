@@ -6,7 +6,7 @@
     "A test shows two productions of one commit in the artifact list and asserts the rule picks the same one regardless of listing order",
     "If the members differ because core's exporters are not deterministic, a core-tracker prompt is written for the owner and linked here; no site code works around it"
   ],
-  "context": "Found 2026-11-14 while reproducing the v0.5.0 pin. Decision gate: the selection rule, after the diff is understood. Guardrails: do not change bundle-fetch selection for deploys (Explorer and deploy gates); do not re-pin v0.5.0; never edit release-pin/ by hand. If first-default-docs-pin-run lands first, check which v0.5.1 production it pinned and record it here.",
+  "context": "Found 2026-11-14 while reproducing the v0.5.0 pin. Decision gate: the selection rule, after the diff is understood. Guardrails: do not change bundle-fetch selection for deploys (Explorer and deploy gates); do not re-pin v0.5.0; never edit release-pin/ by hand. If first-default-docs-pin-run lands first, check which v0.5.1 production it pinned and record it here.\n\n2026-11-23 diff of the two v0.5.0 productions (core commit dfe585e). Run 42114319044: event workflow_run, 2026-11-05, workflow code at dfe585e. Run 43498628032: event workflow_dispatch from develop head d971220 with core_sha dfe585e, 2026-11-13. Byte-identical: docs-data, doc-contracts.json, repo-files.json, api-public-symbols.json and every other member except four. Differ: manifest.json (parent_source bundle vs dispatch, produced_at, three member digests); attestations.json (workflow code change between dfe585e and d971220: relative vs absolute paths, results-data and publication paths moved under target/, ages in the freshness log); explorer/results.duckdb and explorer/fixtures/results.duckdb. The two results.duckdb files have identical content: all 12 tables compared row by row with EXCEPT ALL both ways, zero differing rows; read_model_version 18 in both. The byte difference is DuckDB's storage layout, not data. Cause: timestamps, provenance fields and the producing workflow's code, not exporter nondeterminism in the docs members. No core-tracker prompt needed. v0.5.1 (91d357a) has exactly one production, run 43451420021 (2026-11-13), which is the pinned one. Current selection: bundle-fetch with SITE_INPUTS_CORE_SHA takes the first unexpired develop artifact from actions/artifacts?name=...&per_page=10, whose order the API does not promise; pin.json records only tag and core_sha.",
   "description": "Problem: core can now build a bundle for a given commit (site-inputs.yml dispatch with core_sha), so one release commit can have several certified bundles. v0.5.0 (commit dfe585e) has two: site-inputs run 42114319044 (2026-11-05, the one pinned) and run 43498628032 (2026-11-13). Pinning from the second changed release-pin/manifest.json: parent_source, produced_at and three member digests differ. `npm run docs:pin -- <tag>` fetches through bundle-fetch with SITE_INPUTS_CORE_SHA, which takes the first unexpired develop artifact of that name, so which production is pinned depends on listing order, and re-running the pin can change the published docs inputs without any core change.\n\nOutcome: the pin is reproducible, and it is known whether two productions of the same commit can differ in docs-data, doc-contracts.json or repo-files.json, which would mean the exporters are not deterministic or depend on the parent.",
   "links": [
     "scripts/docs-pin.mjs",
@@ -22,6 +22,14 @@
       "op": "create",
       "op_id": "0471d7d8909e401286f6254e46f91d45",
       "session_id": "c8eea21eea3644c89311c25d48789197"
+    },
+    {
+      "actor": "mcp:omp:joe@joe-mac-mini.local:326d7a1b53869a1b8140313f",
+      "at": "2026-11-23T13:46:35Z",
+      "client": "omp",
+      "op": "update",
+      "op_id": "ff527b1998144e91912a7a9f3b01d7dd",
+      "session_id": "207db25decce4101b2bc5c3976fe654d"
     }
   ]
 }
