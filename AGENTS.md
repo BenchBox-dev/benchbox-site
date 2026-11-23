@@ -248,7 +248,15 @@ versioned core bundle; it reads nothing else from core.
   manifest lists, `attestations.json`, and online that `certified_by` is a core
   trunk.yml push run on develop that succeeded for that commit; it fails closed
   on an API error and refuses `candidate`. It skips only the member schema
-  validation.
+  validation. Those checks prove that core certified the commit, not that core
+  built the directory, so `--from` also downloads core's unexpired bundles of
+  the commit and requires the directory's `manifest.json` to equal one of
+  theirs byte for byte; it records that bundle's run as `site_inputs_run`.
+  When every bundle of the commit has expired, `--from` refuses unless
+  `--expired-run <id>` names the site-inputs run the directory came from; that
+  run must be a successful develop site-inputs run that produced
+  `site-inputs-<core_sha>`, but the directory's bytes can no longer be
+  compared with it.
 
 ## Deploys
 
