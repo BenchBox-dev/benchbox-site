@@ -23,6 +23,15 @@
       "op": "create",
       "op_id": "08431c77ad8740a390122601da0bb42d",
       "session_id": "c8eea21eea3644c89311c25d48789197"
+    },
+    {
+      "actor": "mcp:omp:joe@joe-mac-mini.local:326d7a1b53869a1b8140313f",
+      "at": "2026-11-23T14:47:10Z",
+      "client": "omp",
+      "generation": "ec2505d681a24c3387bb8dd82454dd86",
+      "op": "take",
+      "op_id": "09196804486743069999a408ba0ac7a9",
+      "session_id": "207db25decce4101b2bc5c3976fe654d"
     }
   ]
 }
