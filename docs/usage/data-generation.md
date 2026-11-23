@@ -150,7 +150,7 @@ except RunTimeoutError as error:
 ```
 
 - Unset means no limit and `0` also means no limit. A negative or fractional value is rejected.
-- On the command line the limit exits with code 124 and keeps a partial result marked `timed_out`. If the command has not stopped 30 seconds after the limit, BenchBox writes that result and exits. `execution.timeout_seconds` in the config file applies when `--timeout` is omitted, and `--timeout` wins.
+- On the command line the limit exits with code 124 and keeps a partial result marked `timed_out`. If the command has not stopped 30 seconds after the limit, BenchBox writes that result, ends the child processes it started and exits a few seconds later. `execution.timeout_seconds` in the config file applies when `--timeout` is omitted, and `--timeout` wins.
 - A running `dbgen` or `dsdgen` is ended at the limit together with its process group; the error names the limit and the tool, for example `BenchBox stopped dbgen`. Generators that start no such program, such as the Python generators of the other benchmarks, are not interrupted: they finish, and the run stops at the next check.
 - `generate_data(timeout_seconds=...)` raises `RunTimeoutError` and never exits your process. When a TPC generator is stopped, `partial_result` is `None`; when generation finished after the limit, `partial_result` holds the generated paths. A call made inside an already bounded run uses that run's clock.
 - Data from a generator that was stopped part way is not reused. The generator writes `.benchbox-generation-in-progress` into the data directory before it starts and removes it when it finishes; while the file exists, BenchBox regenerates the data.
