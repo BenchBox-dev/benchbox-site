@@ -1,6 +1,9 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { readFileSync } from "node:fs";
+import { spawnSync } from "node:child_process";
+import { chmodSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
+import { tmpdir } from "node:os";
+import path from "node:path";
 import { parse } from "yaml";
 
 const workflow = parse(readFileSync(new URL("../.github/workflows/sync-next.yml", import.meta.url), "utf8"));
@@ -58,13 +61,27 @@ test("the issue lists the files the merge deletes lines from on next", () => {
   assert.ok(/BODY="\$\(printf '[^']*%s\\n\\n%s\\n\\n[^']*' "\$BEHIND" "\$OUTCOME" "\$DELETIONS"/.test(script));
 });
 
-test("a repository without a next branch exits quietly before fetching", () => {
-  const probe = "git ls-remote --exit-code origin refs/heads/next > /dev/null || exit 0";
-  assert.ok(script.includes(probe));
-  assert.ok(script.indexOf(probe) < script.indexOf("git fetch"));
-});
-
 test("the issue tells a person to merge with gh pr merge --merge and next keeps its text", () => {
   assert.ok(script.includes("`gh pr merge --merge`, not a squash"));
   assert.ok(script.includes("`next` keeps its text"));
+});
+
+test("a missing next ends the run quietly and a failed ls-remote fails it", (context) => {
+  const bin = mkdtempSync(path.join(tmpdir(), "sync-next-git-"));
+  context.after(() => rmSync(bin, { recursive: true, force: true }));
+  writeFileSync(path.join(bin, "git"), '#!/bin/sh\necho "git $*" >&2\nexit "$LS_REMOTE_STATUS"\n');
+  chmodSync(path.join(bin, "git"), 0o755);
+  const guard = `${script.slice(0, script.indexOf("git fetch"))}echo reached-fetch\n`;
+  const run = (status) =>
+    spawnSync("bash", ["-c", guard], { encoding: "utf8", env: { ...process.env, PATH: `${bin}${path.delimiter}${process.env.PATH}`, LS_REMOTE_STATUS: String(status) } });
+  const present = run(0);
+  assert.equal(present.status, 0);
+  assert.ok(present.stdout.includes("reached-fetch"));
+  const missing = run(2);
+  assert.equal(missing.status, 0);
+  assert.ok(!missing.stdout.includes("reached-fetch"));
+  const failed = run(128);
+  assert.equal(failed.status, 128);
+  assert.ok(!failed.stdout.includes("reached-fetch"));
+  assert.ok(failed.stdout.includes("::error::git ls-remote for next failed with status 128"));
 });
