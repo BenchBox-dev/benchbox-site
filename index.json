@@ -624,15 +624,10 @@
       "title": "Public-site visual regression reported every /results/ page changed for a PR that cannot affect rendering"
     },
     "release-pin-hardening-leftovers": {
-      "claim": {
-        "expires_at": "2026-11-24T14:47:10Z",
-        "generation": "ec2505d681a24c3387bb8dd82454dd86",
-        "renewals": 0,
-        "worker": "mcp:omp:joe@joe-mac-mini.local:326d7a1b53869a1b8140313f"
-      },
+      "claim": null,
       "needs": [],
       "priority": "low",
-      "status": "active",
+      "status": "done",
       "title": "Close the small verification gaps left in docs:pin and the next-branch workflows"
     },
     "release-pin-tooling": {
