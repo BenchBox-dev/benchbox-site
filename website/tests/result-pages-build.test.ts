@@ -149,3 +149,30 @@ describe("result permalink pages", () => {
     expect(() => renderReceiptPage("<html></html>", receipt, "https://benchbox.dev")).toThrow(/Explorer index.html has no/);
   });
 });
+
+describe("corpus labels on result permalink pages", () => {
+  const receipt = {
+    resultId: "x-1",
+    title: "t",
+    description: "d",
+    headline: "h",
+    rankingStatus: "Ranked",
+    derivedNotice: null,
+    sections: [],
+    citeLine: "c",
+    citation: null,
+    citationBlock: "b",
+    summaryHrefs: [],
+  };
+
+  it("lists each label in the plain-HTML receipt and escapes it", () => {
+    const html = renderReceiptMain({ ...receipt, corpusLabels: ["Derived from TPC-H, not an official TPC result", "Row counts <b>not</b> checked"] });
+    expect(html).toContain('<ul class="bb-static-corpus-labels"');
+    expect(html).toContain("<li>Derived from TPC-H, not an official TPC result</li>");
+    expect(html).toContain("<li>Row counts &lt;b&gt;not&lt;/b&gt; checked</li>");
+  });
+
+  it("renders the receipt of a result without labels exactly as before", () => {
+    expect(renderReceiptMain(receipt)).not.toContain("corpus-labels");
+  });
+});

@@ -60,6 +60,22 @@ const short = (value: string) => value.slice(0, 12);
   .result-summary__table table {
     min-width: 38rem;
   }
+  .result-summary__labels {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.25rem;
+    margin: 0.25rem 0 0;
+    padding: 0;
+    list-style: none;
+    font-weight: 400;
+    font-size: 0.8125rem;
+  }
+  .result-summary__labels li {
+    margin: 0;
+    padding: 0.125rem 0.375rem;
+    border: 1px solid currentColor;
+    border-radius: 0.25rem;
+  }
   .result-summary__snapshot dl {
     display: grid;
     grid-template-columns: max-content 1fr;

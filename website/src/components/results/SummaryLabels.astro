@@ -1,0 +1,13 @@
+---
+interface Props {
+  labels?: readonly string[];
+}
+
+const { labels } = Astro.props;
+---
+
+{labels && labels.length > 0 && (
+  <ul class="result-summary__labels" aria-label="Corpus labels" data-testid="summary-corpus-labels">
+    {labels.map((label) => <li>{label}</li>)}
+  </ul>
+)}
