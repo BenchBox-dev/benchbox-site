@@ -151,14 +151,18 @@ export async function sourceRun(bundle, commit, { expiredRun, env = process.env,
     if (expiredRun) throw new Error(`core's bundle of ${commit} has not expired; --expired-run is only for a commit whose bundles have all expired`);
     const local = readFileSync(path.join(bundle, "manifest.json"));
     const refusals = [];
+    const compared = [];
     for (const production of productions) {
       const id = production.workflow_run.id;
       const runErrors = producingRunErrors(await githubJson(`repos/${CORE_REPO}/actions/runs/${id}`, env));
       if (runErrors.length) refusals.push(...runErrors.map((error) => `run ${id}: ${error}`));
       else if (readManifest(production).equals(local)) return String(id);
+      else compared.push(id);
     }
-    const runs = productions.map((production) => production.workflow_run.id).join(", ");
-    throw new Error([`manifest.json is not byte for byte the manifest of core's bundle of ${commit} from run ${runs}`, ...refusals].join("; "));
+    const outcome = compared.length
+      ? `manifest.json is not byte for byte the manifest of core's bundle of ${commit} from run ${compared.join(", ")}`
+      : `no unexpired bundle of ${commit} comes from a successful develop site-inputs run`;
+    throw new Error([outcome, ...refusals].join("; "));
   }
   if (!expiredRun) {
     throw new Error(`core's bundles of ${commit} have expired, so the directory cannot be compared with them; name the site-inputs run it came from with --expired-run <id>`);

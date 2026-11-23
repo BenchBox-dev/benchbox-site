@@ -410,7 +410,10 @@ test("--from skips a bundle whose run is not a successful site-inputs run", asyn
   assert.equal(pin.site_inputs_run, "7002");
   assert.deepEqual(read, [7002]);
   stubApi({ productions: [production(COMMIT, 7001)], runs: { 7001: { ...SITE_INPUTS_RUN, conclusion: "failure" } } });
-  await assert.rejects(pinRelease("v1.2.3", { from: bundle, pinDir: newPinDir(), readManifest }), /run 7001: producing run concluded failure/);
+  await assert.rejects(
+    pinRelease("v1.2.3", { from: bundle, pinDir: newPinDir(), readManifest }),
+    /^Error: no unexpired bundle of d+ comes from a successful develop site-inputs run; run 7001: producing run concluded failure$/,
+  );
 });
 
 test("--from refuses a symlink inside a pinned member", async () => {
