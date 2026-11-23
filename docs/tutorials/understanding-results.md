@@ -74,6 +74,8 @@ verdict is `summary.validation`:
 
 A failed query carries an `ERROR` status and an error message instead of timing data.
 
+`passed` is a row-count check only for TPC-H, TPC-DS and SSB, and only where a reference exists. For every other benchmark it means the data loaded and the queries ran without error ([What PASSED means for each benchmark](../concepts/benchmark-methodology.md#what-passed-means-for-each-benchmark)).
+
 ## TPC Metrics
 
 For TPC-H/TPC-DS, BenchBox calculates Power@Size and Throughput@Size. At scale factor 1 and above a run that is not `--official` records `summary.tpc_metrics` as suppressed.

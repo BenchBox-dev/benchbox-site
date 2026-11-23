@@ -4,14 +4,14 @@
       "path": "DISCLAIMER.md",
       "kind": "file",
       "sources": [
-        "docs/concepts/benchmark-methodology.md:98"
+        "docs/concepts/benchmark-methodology.md:116"
       ]
     },
     {
       "path": "README.md",
       "kind": "file",
       "sources": [
-        "docs/concepts/benchmark-methodology.md:60"
+        "docs/concepts/benchmark-methodology.md:78"
       ]
     },
     {
@@ -25,7 +25,7 @@
       "path": "_sources/tpc-h/EULA.txt",
       "kind": "file",
       "sources": [
-        "docs/concepts/benchmark-methodology.md:98"
+        "docs/concepts/benchmark-methodology.md:116"
       ]
     },
     {

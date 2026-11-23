@@ -24,9 +24,22 @@ test first, each with a number or a named condition.
   line each.
 - **Short sentences.** One point per sentence. No semicolons joining clauses.
 - **Plain words.** Not "matrix", "cell", "qualified", "rounds", "candidate
-  mover", "pinned", "spill", "resident memory", "out-of-core", "SF10". Say
-  "runs", "written to disk", "peak memory", "scale factor 10". Define swap
-  once.
+  mover", "pinned", "resident memory", "out-of-core", "SF10". Say "runs",
+  "peak memory", "scale factor 10". "Spills to disk" is allowed once the
+  disk section has introduced it. Define swap once.
+- **No "lazy queries".** Explain eager code and `collect()` queries once, in
+  the introduction, with an example of each. After that write "`collect()`
+  queries". Explain "engine" in the same place. Keep these terms out of the
+  title, pull quote and TL;DR, which come before the explanation.
+- **Say why before what.** We tested because we wanted to know how 2.x
+  performs and what the upgrade takes. Do not present the test as a side
+  effect of something BenchBox does.
+- **Do not understate BenchBox.** Write "the four benchmarks we used" and
+  "the 181 queries we tested". BenchBox runs more benchmarks on Polars than
+  these four.
+- **One word per thing.** "Benchmark", not "suite". "Fails with an error",
+  not "raises". "Stacks", not "unions". Label each table column with the
+  engine it used.
 - **Headings** name the section's point. None begins with "What". None is in
   the first person (`STYLE_GUIDE.md`, Headings).
 - **No open questions that a search or a small test could answer.** Find the
@@ -60,27 +73,35 @@ test first, each with a number or a named condition.
 
 1. **Introduction.** Release dates; the "boring experience" quote; the engine
    default in three sentences; scope in one sentence.
-2. **Upgrade or wait.** Four bullets by starting point, each with a number or
+2. **Upgrade or wait.** Five bullets by starting point, each with a number or
    condition.
 3. **Breaking changes in 2.0.** Streaming default; row order with the guide's
-   warning and a `maintain_order` example; silent conversions now raise;
-   removed APIs; writes to disk by default; how to keep the in-memory engine.
-4. **Porting 181 queries: three fixes.** The three fixes; no query changed;
-   every suite passed the DuckDB comparison.
-5. **Speed by starting point.** One table of medians: 1.44 default, 1.44
+   warning and a `maintain_order` example; conversions that now fail;
+   removed APIs; how to keep the in-memory engine.
+4. **Memory is no longer a hard limit.** Its own section, because
+   it is the change that matters most for scheduled pipelines. On by default
+   at 80% of available memory, up to 64 GB of disk (2.0.0 release notes).
+   Covers sorting in 2.0, `group_by` and window functions in 2.1; joins are
+   merged but unreleased (Polars #30679). Our evidence: the 12-million-row
+   sort under a 200 MB limit (R11) and TPC-DS on 2.1. Two cautions: the
+   threshold is not a hard limit, and the disk files need room. Report what
+   Polars states and what we measured; do not predict fewer failures.
+5. **Benchmark updates required.** The three fixes; no query changed;
+   every benchmark passed the DuckDB check.
+6. **Speed by starting point.** One table of medians: 1.44 default, 1.44
    streaming, 2.0 default, 2.1 default. Then three short paragraphs: default
    settings (36% to 53%), already on streaming (14% to 29%), staying in
    memory (within about 8%).
-6. **Memory on a 16 GiB machine.** Peak memory in one sentence with one
+7. **Memory on a 16 GiB machine.** Peak memory in one sentence with one
    example. A four-row TPC-DS table. Subsection "One query explains the 2.1
    result": query 4 against the other 102 queries, its shape, the run on its
    own, the rewritten group-by and the two upstream reports.
-7. **Row order: test your own code.** Why benchmarks say little; a test the
+8. **Row order: test your own code.** Why benchmarks say little; a test the
    reader can run.
-8. **Test setup.** Five lines and three links.
-9. **Limits.** Five bullets.
-10. **Try it on your own workload.** Two commands.
-11. **Conclusions.** Three short paragraphs. No open questions.
+9. **Test setup.** Five lines and three links.
+10. **Limits.** Five bullets.
+11. **Try it on your own workload.** Two commands.
+12. **Conclusions.** Three short paragraphs. No open questions.
 
 ## Before publishing
 

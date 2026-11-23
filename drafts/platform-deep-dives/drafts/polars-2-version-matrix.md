@@ -12,143 +12,169 @@ meta_description: "Is Polars 2.x worth the upgrade? We ported 181 benchmark quer
 
 > You will get the most lift from Polars 2.x if you currently rely on defaults. 2.x now uses `streaming` by default instead of `in-memory`, and that change significantly improves performance in our tests.
 
-**TL;DR**: With default settings, Polars 2.x took 36% to 53% less time than 1.44 on three benchmarks, and porting our 181 queries took three small fixes. Much of the gain comes from the new default engine, so it is smaller if you already use the streaming engine, and we measured none on the in-memory engine. Before you upgrade, check any code that relies on row order, and test large group-bys on 2.1 if you run close to your memory limit.
+**TL;DR**: With default settings, Polars 2.x took 36% to 53% less time than 1.44 on three benchmarks, and porting the 181 queries we tested took three small fixes. Much of the gain comes from the new default engine, so it is smaller if you already use the streaming engine, and we measured none on the in-memory engine. Before you upgrade, check any code that relies on row order, and test large group-bys on 2.1 if you run close to your memory limit.
 
 ---
 
 ## Introduction
 
-Polars 2.0 came out on 2026-10-06 and 2.1 on 2026-10-25[^1]. The Polars team calls it a release about defaults: "We don't aim to make a big feature release of Polars 2.0. In fact we hope it to be a boring experience for you."[^2]
+Polars 2.0 came out on 2026-10-06 and 2.1 on 2026-10-25[^1]. The Polars team says the release changes defaults more than it adds features: "We don't aim to make a big feature release of Polars 2.0. In fact we hope it to be a boring experience for you."[^2]
 
-The default that matters most is the engine. A lazy query is one you build with `scan_*` or `.lazy()` and run with `collect()`. In 1.x, `collect()` ran it on the in-memory engine. In 2.x it runs on the streaming engine, which processes data in batches.
+We wanted to know how fast 2.x is and how much work the upgrade takes. So we ran four benchmarks on Polars 1.44, 2.0 and 2.1: TPC-H, TPC-DS, SSB and ClickBench. All tests read Parquet files on a laptop with 16 GiB of memory.
 
-BenchBox runs four benchmark suites as Polars queries, so we made the upgrade ourselves and measured it. Every figure here comes from lazy queries over Parquet files on one 16 GiB laptop.
+The biggest change is the engine. The engine is the part of Polars that runs a query, and Polars has two. The in-memory engine loads all the data a query needs at once. The streaming engine works through the data in batches.
+
+The engine you get depends on how you write your code:
+
+- **Eager code** runs each step straight away, for example `pl.read_parquet(...)` followed by `df.filter(...)`. It uses the in-memory engine.
+- **`collect()` queries** build a plan first, for example with `pl.scan_parquet(...)` or `df.lazy()`, and run when you call `collect()`. In 1.x they used the in-memory engine. In 2.x they use the streaming engine.
+
+All our tests are `collect()` queries.
 
 ## Upgrade or wait
 
-- **Lazy queries on default settings:** the largest gain. Our runs took 36% to 53% less time. Check any code that relies on row order first.
-- **Already passing `engine="streaming"`:** a smaller gain, 14% to 29%.
-- **Eager code, or the in-memory engine:** we measured no change in speed.
-- **Large group-bys close to your memory limit:** test on 2.1 before you move. One of our queries needed far more memory on 2.1 than on 2.0.
+- **You call `collect()` and do not set an engine:** the largest gain. Our tests took 36% to 53% less time. Check any code that relies on row order first.
+- **You already pass `engine="streaming"`:** a smaller gain, 14% to 29%.
+- **You keep the in-memory engine:** we measured no change in speed. Eager code uses this engine too, but we did not test eager code.
+- **You run large `group_by` queries close to your memory limit:** test on 2.1 before you move. One of our queries needed far more memory on 2.1 than on 2.0.
+- **Your pipelines sometimes run out of memory:** 2.x can use disk as overflow, and this is on by default. In 2.1 it covers sorting, `group_by` and window functions.
 
 ## Breaking changes in 2.0
 
-The migration guide lists every change[^3]. Four groups affect most code.
+The migration guide lists every change[^3]. These are the four main ones.
 
-**Lazy queries run on the streaming engine.** So does SQL run through `pl.sql(..., eager=True)`. Eager `DataFrame` operations still run in memory[^3].
+**`collect()` uses the streaming engine.** So does SQL that you run with `pl.sql(..., eager=True)`[^3].
 
-**Row order is no longer guaranteed through `join`, `group_by` and `unpivot`.** The guide warns: "This change may silently impact the results of your pipelines."[^3] Where order matters, sort explicitly or pass `maintain_order`:
+**Row order can change.** The streaming engine does not keep rows in their original order through `join`, `group_by` and `unpivot`. The guide warns: "This change may silently impact the results of your pipelines."[^3] If your code needs a particular order, sort the result or pass `maintain_order`:
 
 ```python
 left.join(right, on="k", how="left", maintain_order="left").collect()
 ```
 
-**Silent conversions now raise.** `is_in` no longer casts both sides to a common type, and horizontal `concat` requires equal heights. Casting a string to a date is replaced by `.str.to_date()`[^2].
+**Some conversions now fail with an error.** Polars used to convert types quietly in a few places. For example, `is_in` no longer converts both sides to a shared type. To turn a string into a date, you now call `.str.to_date()`[^2].
 
-**Deprecated APIs are gone.** Examples are `melt`, `with_row_count`, `LazyFrame.fetch` and the reader argument `rechunk=`[^3]. The error names the replacement[^2].
+**Old APIs are removed.** Examples are `melt`, `with_row_count`, `LazyFrame.fetch` and the `rechunk=` argument of the file readers[^3]. The error message tells you what to use instead[^2].
 
-Polars 2.0 also writes intermediate data to disk when memory runs short, and does so by default[^4].
-
-To keep the old engine after upgrading[^3]:
+To keep the in-memory engine after you upgrade[^3]:
 
 ```python
 pl.Config.set_engine_affinity("in-memory")   # whole process
 lf.collect(engine="in-memory")               # one query
 ```
 
-## Porting 181 queries: three fixes
+## Memory is no longer a hard limit
 
-Our four suites hold 181 queries. Running them on 2.0 took [three fixes](https://github.com/BenchBox-dev/BenchBox/pull/2771), all in shared helper code:
+Polars now spills to disk when memory runs out. A query that exceeds available memory can still finish, more slowly, instead of failing. This change matters most if you run Polars pipelines on a schedule, where an overnight run that outgrows memory fails with nobody watching.
 
-1. **Reader `rechunk=`** was removed from `scan_csv` and `scan_parquet`.
-2. **A CSV keyword was renamed** from `missing_utf8_is_empty_string=` to `empty_string_is_null=`, with its meaning inverted.
-3. **String-to-date casts** became `str.to_date()`.
+From 2.0, the streaming engine tracks how much memory it is using. When that passes 80% of the memory available, it moves part of its working data to disk and reads it back when needed[^4]. Inside a container, "available" means the container's limit. This is on by default, and Polars will use up to 64 GB of disk for it[^4].
 
-No query changed. Afterwards every suite passed our comparison against DuckDB results on both 2.x releases.
+So far disk spill covers these operations:
+
+- **In 2.0:** sorting[^4]
+- **In 2.1:** `group_by` and window functions[^5]
+- **Not yet released:** joins[^6]
+
+We forced it with a small test. We sorted 12 million rows while allowing Polars 200 MB of memory. Polars 2.0 finished the sort and wrote 1.12 GB to disk on the way. In our TPC-DS runs, 2.1 wrote 0.47 GiB to disk and finished every run.
+
+Two things to know before you rely on it:
+
+- **Polars can still go past the threshold.** One of our queries used 7.6 GiB with the limit set to 4 GB. The memory section below has the details.
+- **The disk files need room.** On our machine they went to `polars-<user>/spill` under the system temporary directory. You can change the two limits with `POLARS_OOC_MEMORY_BUDGET_MB` and `POLARS_OOC_DISK_BUDGET_MB`.
+
+## Benchmark updates required
+
+The four benchmarks have 181 queries between them. To run them on 2.0 we made [three fixes](https://github.com/BenchBox-dev/BenchBox/pull/2771):
+
+1. We stopped passing `rechunk=` to `scan_csv` and `scan_parquet`, because 2.0 removed it.
+2. We switched a CSV option from `missing_utf8_is_empty_string=` to `empty_string_is_null=`. The new option means the opposite, so we flipped its value.
+3. We replaced a conversion from string to date with `str.to_date()`.
+
+All three fixes were in code that the queries share. We did not change any query. After the fixes, every benchmark passed our check against DuckDB, which we use as a reference, on 2.0 and 2.1.
 
 ## Speed by starting point
 
-Each figure is the total time in seconds for one suite's queries at scale factor 10 (about 10 GB of raw data for TPC-H). It is the median of three runs.
+The table shows the total time, in seconds, to run all the queries in each benchmark. Each number is the median of three runs. The data is at scale factor 10, which for TPC-H is about 10 GB.
 
-| Benchmark | 1.44 default | 1.44 streaming | 2.0 default | 2.1 default |
+| Benchmark | 1.44, default (in-memory) | 1.44, streaming | 2.0, default (streaming) | 2.1, default (streaming) |
 |---|---|---|---|---|
 | TPC-H | 11.17 | 7.75 | 6.11 | 5.75 |
 | SSB | 5.18 | 4.19 | 3.28 | 3.32 |
 | ClickBench | 4.32 | 2.55 | 2.10 | 2.05 |
 
-**Default settings.** Moving from 1.44 to 2.x roughly halved the time on TPC-H and ClickBench and cut SSB by over a third. That is 1.6x to 2.1x faster.
+**If you use the defaults.** 2.x roughly halved the time for TPC-H and ClickBench, and cut SSB by over a third. That is 1.6x to 2.1x faster.
 
-**Already on streaming.** Much of that gain was available in 1.44. Passing `engine="streaming"` there took 19% to 41% less time than its default. From 1.44 streaming to 2.x streaming, the further saving was 14% to 29%.
+**If you already use streaming.** Much of that gain was already available in 1.44. Switching 1.44 to the streaming engine took 19% to 41% off the time. Moving from there to 2.x took off another 14% to 29%.
 
-**Staying in memory.** With `engine="in-memory"`, 2.0 and 2.1 were within about 8% of 1.44 on every suite. Three runs cannot separate a difference that small from noise. We timed lazy queries with the engine set, not eager code.
+**If you keep the in-memory engine.** 2.0 and 2.1 were within about 8% of 1.44 on every benchmark. With three runs, a difference that small could be noise.
 
-2.0 and 2.1 were within 9% of each other on these three suites.
+2.0 and 2.1 were within 9% of each other on these three benchmarks.
 
 ## Memory on a 16 GiB machine
 
-Peak memory on default settings was lower on 2.x in all three suites above. On SSB it fell from 5.1 GiB on 1.44 to 2.2 GiB on 2.0. Single readings moved by up to 1.9 GiB between repeat runs, so read this as a direction.
+With the defaults, 2.x used less memory than 1.44 on all three benchmarks above. On SSB, peak memory fell from 5.1 GiB to 2.2 GiB. These readings varied by up to 1.9 GiB between repeat runs, so treat them as rough.
 
-TPC-DS is the heaviest suite, and it shows the difference best:
+TPC-DS is the largest of the four benchmarks. It shows the difference most clearly:
 
 | TPC-DS at scale factor 10 | Result |
 |---|---|
-| 1.44 default | Did not finish: stopped once the machine was several GiB into swap |
-| 1.44 streaming | 57.21 s |
-| 2.0 default | 30.47 s, nothing written to disk |
-| 2.1 default | 34.08 s, 0.47 GiB written to disk |
+| 1.44, default (in-memory) | Did not finish. The machine ran out of memory and the run was stopped. |
+| 1.44, streaming | 57.21 s |
+| 2.0, default (streaming) | 30.47 s |
+| 2.1, default (streaming) | 34.08 s |
 
-Swap is the operating system moving memory to disk when RAM runs out.
+2.0 finished without using disk. 2.1 wrote 0.47 GiB of working data to disk, and the machine started to swap. Swap means the operating system moves memory to disk because RAM is full, which slows everything down.
 
 ### One query explains the 2.1 result
 
-2.1 took about 12% longer than 2.0 on TPC-DS, and the machine swapped during its runs. One query accounts for the difference:
+2.1 took about 12% longer than 2.0 on TPC-DS. One query out of 103 accounts for that:
 
 | Default engine, median of three runs | 2.0 | 2.1 |
 |---|---|---|
 | Query 4 | 4.67 s | 10.28 s |
 | The other 102 queries | 25.80 s | 23.80 s |
 
-Query 4 totals each customer's yearly spending across three sales channels. It unions three large group-by results, then reads that union six times.
-
-Run on its own, query 4 finished in 7 s on 2.0 with nothing written to disk. On 2.1 it used 7.6 GiB before a memory guard on our machine stopped it. That was with Polars' own memory budget set to 4 GB.
-
-Polars 2.1 rewrote the streaming group-by[^5]. Two open Polars reports describe higher memory use on 2.1 for the two patterns in this query: unions[^6] and results read by several consumers[^7]. Both match the query's shape. We did not trace the query inside Polars. More work on group-by memory has merged since 2.1 and is not yet in a release[^8].
-
 On the other 102 queries, 2.1 took 8% less time than 2.0.
+
+Query 4 adds up what each customer spent per year in three sales tables. It stacks the three results into one table, then uses that table six times.
+
+We ran query 4 by itself to check. On 2.0 it finished in 7 seconds and did not use disk. On 2.1 its memory grew to 7.6 GiB, and a safety limit on our machine stopped it. We had told Polars to use no more than 4 GB.
+
+Polars 2.1 has a new implementation of `group_by` for the streaming engine[^7]. Two open Polars bug reports describe memory problems with two things this query does. One is stacking tables with `pl.concat`, where the report measures four times the memory of 2.0[^8]. The other is using one result in several places[^9]. We did not confirm which of these affects query 4. Polars has changed how `group_by` uses memory since 2.1, but those changes are not in a release yet[^10].
 
 ## Row order: test your own code
 
-Our benchmarks say little about the row-order change. A benchmark query either sorts its output or has no defined order, and our checks compare unsorted results as sets.
+Polars does not raise an error when row order changes, so you have to look for it yourself. Read your code for places that depend on the order of rows after a `join` or `group_by`. Then run it on 2.x twice, once with the defaults and once with `engine="in-memory"`. Compare the two outputs without sorting them.
 
-Nothing raises when order changes, so read your code for places that depend on it. Then run the pipeline on 2.x twice, once on the default engine and once with `engine="in-memory"`, and compare the outputs without sorting them.
+Our benchmarks cannot make this check for you. Each query either sorts its output or does not promise any order.
 
 ## Test setup
 
-- **Hardware**: Apple M4, 10 cores, 16 GiB RAM, macOS 27.0.1
+- **Hardware**: Apple M4, 10 cores, 16 GiB of memory, macOS 27.0.1
 - **Software**: Python 3.12.15; Polars 1.44.2, 2.0.0 and 2.1.0; BenchBox at commit `82e76af81`
-- **Benchmarks**: TPC-H, TPC-DS, SSB and ClickBench at scale factor 10, read from Parquet
-- **Method**: 10 threads; one warm-up pass and one timed pass per query; three runs in shuffled order
-- **Checks**: results compared with DuckDB at a small scale; row counts compared at scale factor 10
+- **Benchmarks**: TPC-H, TPC-DS, SSB and ClickBench at scale factor 10, read from Parquet files
+- **Method**: 10 threads. Each query ran once to warm up and once for timing. We ran each benchmark three times, in random order.
+- **Checks**: at a small data size we compared query results with DuckDB. At scale factor 10 we compared row counts.
+- **TPC**: the TPC-H and TPC-DS figures are derived from those benchmarks. They do not comply with the TPC specifications, are not official TPC results, and must not be compared with official TPC results.
 
-We also ran three older 1.x releases. The [findings](https://github.com/BenchBox-dev/BenchBox/blob/3e09d4f43bbfb823acd82dc1402dd4db9663c634/_project/analysis/polars-version-matrix/findings.md) list every result with its range, the [methodology](https://github.com/BenchBox-dev/BenchBox/blob/3e09d4f43bbfb823acd82dc1402dd4db9663c634/_project/analysis/polars-version-matrix/methodology.md) gives the rules, and the [analysis JSON](https://github.com/BenchBox-dev/BenchBox/blob/3e09d4f43bbfb823acd82dc1402dd4db9663c634/_project/analysis/polars-version-matrix/polars-version-matrix-analysis.json) holds the numbers.
+We also ran three older 1.x releases. The [findings](https://github.com/BenchBox-dev/BenchBox/blob/3e09d4f43bbfb823acd82dc1402dd4db9663c634/_project/analysis/polars-version-matrix/findings.md) list every result. The [methodology](https://github.com/BenchBox-dev/BenchBox/blob/3e09d4f43bbfb823acd82dc1402dd4db9663c634/_project/analysis/polars-version-matrix/methodology.md) explains the rules. The [analysis JSON](https://github.com/BenchBox-dev/BenchBox/blob/3e09d4f43bbfb823acd82dc1402dd4db9663c634/_project/analysis/polars-version-matrix/polars-version-matrix-analysis.json) holds the numbers.
 
 ## Limits
 
-- **One machine, one data size.** With more memory, 1.44 may finish TPC-DS on its default engine and query 4 may run without swap on 2.1.
-- **Lazy analytical queries over Parquet.** We did not measure eager code, CSV input, cloud storage or writes.
-- **Three runs each.** We treat a difference under 10% as noise.
-- **Query 4 on its own was run once per release**, on a machine that was busy with other work.
-- **The 5x expectation.** Polars expects the streaming engine to be "easily 5x faster" in aggregate[^2]. We saw 1.6x to 2.1x on these suites.
+- **One machine and one data size.** With more memory, 1.44 may finish TPC-DS with its defaults, and query 4 may run normally on 2.1.
+- **Only `collect()` queries on Parquet files.** We did not test eager code, CSV files, cloud storage or writing data.
+- **Three runs each.** We treat any difference under 10% as noise.
+- **We ran query 4 by itself only once per release**, while the machine was busy with other work.
+- **Polars expects more.** The Polars team expects the streaming engine to be "easily 5x faster" overall[^2]. We measured 1.6x to 2.1x on these benchmarks.
 
 ## Try it on your own workload
 
-To see the effect of the engine alone, name it on the version you already run:
+You can try the streaming engine before you upgrade. On the version you run today, change one query to:
 
 ```python
 lf.collect(engine="streaming")
 ```
 
-Then install 2.x and compare the default against `engine="in-memory"`.
+Then install 2.x and compare its default with `engine="in-memory"`.
 
 To repeat one of our measurements, install the Polars version you want and run:
 
@@ -163,11 +189,11 @@ Change `--execution-engine` to `default` or `in-memory`, and `--benchmark` to `t
 
 ## Conclusions
 
-For lazy queries, the upgrade paid off in our tests. Default settings gave 36% to 53% less time, lower peak memory, and a TPC-DS run that fits in 16 GiB. The port took three mechanical fixes.
+If you call `collect()` with the defaults, the upgrade paid off in our tests. Queries took 36% to 53% less time and used less memory, and TPC-DS fit in 16 GiB. Porting took three small fixes.
 
-The gain depends on where you start. It is smaller if you already use the streaming engine, and we measured none on the in-memory engine. The row-order change needs a read of your code, because nothing raises.
+You gain less if you already use the streaming engine. We measured no gain on the in-memory engine. Check your code for places that depend on row order, because Polars will not warn you.
 
-2.0 and 2.1 were close on everything except one large group-by query, which needed far more memory on 2.1. If your workload has that shape and runs near your memory limit, test it on 2.1 first.
+2.0 and 2.1 performed alike, except for one large `group_by` query that needed far more memory on 2.1. If you run queries like that close to your memory limit, test them on 2.1 first.
 
 ---
 
@@ -176,11 +202,13 @@ The gain depends on where you start. It is smaller if you already use the stream
 [^1]: [polars release history](https://pypi.org/project/polars/#history) - PyPI, accessed November 2026
 [^2]: [Pre-release of Polars 2.0](https://pola.rs/posts/announcing-polars-2/) - Polars, published September 2, 2026, accessed November 2026
 [^3]: [Version 2.0 upgrade guide](https://docs.pola.rs/releases/upgrade/2/) - Polars documentation, accessed November 2026
-[^4]: [Polars 2.0.0 release notes](https://github.com/pola-rs/polars/releases/tag/py-2.0.0) - "Enable OOC by default with 80% of available RAM as threshold" (#29741), accessed November 2026
-[^5]: [Streaming OOC group-by with shuffles](https://github.com/pola-rs/polars/pull/29911) - Polars pull request #29911, merged October 21, 2026, accessed November 2026
-[^6]: [Semi-join before a union of per-partition scan_iceberg reads uses ~4x the memory of 2.0.0](https://github.com/pola-rs/polars/issues/30608) - Polars issue #30608, open, accessed November 21, 2026
-[^7]: [Streaming multiplexer spills a separate copy of each buffered morsel per output port](https://github.com/pola-rs/polars/issues/30981) - Polars issue #30981, open, accessed November 21, 2026
-[^8]: [Count pre-aggregates in memory when choosing the number of streaming group-by partitions](https://github.com/pola-rs/polars/pull/30405) - Polars pull request #30405, merged October 29, 2026, accessed November 2026
+[^4]: [Polars 2.0.0 release notes](https://github.com/pola-rs/polars/releases/tag/py-2.0.0) - "Enable OOC by default with 80% of available RAM as threshold" (#29741), "Set default OOC disk budget to 64 GB" (#29734) and "Add streaming (out-of-core) sort" (#29657), accessed November 2026
+[^5]: [Polars 2.1.0 release notes](https://github.com/pola-rs/polars/releases/tag/py-2.1.0) - "Streaming OOC group-by with shuffles" (#29911) and "Evaluate the streaming window node out of core" (#30282), accessed November 2026
+[^6]: [Out-of-core joins](https://github.com/pola-rs/polars/pull/30679) - Polars pull request #30679, merged November 10, 2026, not in a release on November 22, 2026
+[^7]: [Streaming OOC group-by with shuffles](https://github.com/pola-rs/polars/pull/29911) - Polars pull request #29911, merged October 21, 2026, accessed November 2026
+[^8]: [Semi-join before a union of per-partition scan_iceberg reads uses ~4x the memory of 2.0.0](https://github.com/pola-rs/polars/issues/30608) - Polars issue #30608, open, accessed November 21, 2026
+[^9]: [Streaming multiplexer spills a separate copy of each buffered morsel per output port](https://github.com/pola-rs/polars/issues/30981) - Polars issue #30981, open, accessed November 21, 2026
+[^10]: [Count pre-aggregates in memory when choosing the number of streaming group-by partitions](https://github.com/pola-rs/polars/pull/30405) - Polars pull request #30405, merged October 29, 2026, accessed November 2026
 
 ---
 
