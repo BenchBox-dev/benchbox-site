@@ -1,12 +1,14 @@
 #!/usr/bin/env node
 import { execFileSync } from "node:child_process";
-import { cpSync, copyFileSync, existsSync, mkdirSync, mkdtempSync, readdirSync, renameSync, rmSync, writeFileSync } from "node:fs";
+import { cpSync, copyFileSync, existsSync, lstatSync, mkdirSync, mkdtempSync, readFileSync, readdirSync, renameSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import path from "node:path";
 import { pathToFileURL } from "node:url";
+import { zstdDecompressSync } from "node:zlib";
 import { checkAttestations, memberDigest, membersFor, readJson } from "./bundle-lib.mjs";
 import { CORE_REPO, certificationErrors, githubJson } from "./bundle-verify.mjs";
-import { developProductions } from "./bundle-fetch.mjs";
+import { developProductions, producingRunErrors } from "./bundle-fetch.mjs";
+import { downloadArtifact } from "./github-download.mjs";
 
 export const PIN_DIR = path.resolve(import.meta.dirname, "..", "release-pin");
 export const PIN_MEMBERS = ["docs-data", "doc-contracts.json", "repo-files.json"];
@@ -71,8 +73,15 @@ export function memberErrors(root, manifest) {
   return errors;
 }
 
+function irregularEntries(root, relative) {
+  const stat = lstatSync(path.join(root, relative), { throwIfNoEntry: false });
+  if (!stat || stat.isFile()) return [];
+  if (stat.isDirectory()) return readdirSync(path.join(root, relative)).flatMap((name) => irregularEntries(root, `${relative}/${name}`));
+  return [relative];
+}
+
 export function directoryErrors(root, manifest) {
-  const errors = [];
+  const errors = PIN_MEMBERS.flatMap((member) => irregularEntries(root, member)).map((entry) => `${entry} is not a regular file or directory`);
   for (const field of ["core_sha", "parent_core_sha", "corpus_sha", "package_version", "certified_by"]) {
     if (!manifest[field]) errors.push(`manifest field ${field} is missing`);
   }
@@ -114,8 +123,57 @@ export async function certifiedErrors(manifest, env = process.env) {
   }
 }
 
+const byCreation = (a, b) => a.created_at.localeCompare(b.created_at) || a.workflow_run.id - b.workflow_run.id;
+
 export function earliestProduction(productions) {
-  return [...productions].sort((a, b) => a.created_at.localeCompare(b.created_at) || a.workflow_run.id - b.workflow_run.id)[0];
+  return [...productions].sort(byCreation)[0];
+}
+
+export function artifactManifest(production) {
+  const work = mkdtempSync(path.join(tmpdir(), "docs-pin-source-"));
+  try {
+    const download = path.join(work, "download");
+    downloadArtifact(CORE_REPO, String(production.workflow_run.id), production.name, download);
+    const archive = readdirSync(download).find((name) => name.endsWith(".tar.zst"));
+    if (!archive) throw new Error(`run ${production.workflow_run.id} artifact ${production.name} has no .tar.zst archive`);
+    const tarball = path.join(work, "bundle.tar");
+    writeFileSync(tarball, zstdDecompressSync(readFileSync(path.join(download, archive))));
+    execFileSync("tar", ["-xf", tarball, "-C", work, "site-inputs-bundle/manifest.json"]);
+    return readFileSync(path.join(work, "site-inputs-bundle", "manifest.json"));
+  } finally {
+    rmSync(work, { recursive: true, force: true });
+  }
+}
+
+export async function sourceRun(bundle, commit, { expiredRun, env = process.env, readManifest = artifactManifest } = {}) {
+  const productions = [...(await developProductions(commit, env))].sort(byCreation);
+  if (productions.length) {
+    if (expiredRun) throw new Error(`core's bundle of ${commit} has not expired; --expired-run is only for a commit whose bundles have all expired`);
+    const local = readFileSync(path.join(bundle, "manifest.json"));
+    const refusals = [];
+    const compared = [];
+    for (const production of productions) {
+      const id = production.workflow_run.id;
+      const runErrors = producingRunErrors(await githubJson(`repos/${CORE_REPO}/actions/runs/${id}`, env));
+      if (runErrors.length) refusals.push(...runErrors.map((error) => `run ${id}: ${error}`));
+      else if (readManifest(production).equals(local)) return String(id);
+      else compared.push(id);
+    }
+    const outcome = compared.length
+      ? `manifest.json is not byte for byte the manifest of core's bundle of ${commit} from run ${compared.join(", ")}`
+      : `no unexpired bundle of ${commit} comes from a successful develop site-inputs run`;
+    throw new Error([outcome, ...refusals].join("; "));
+  }
+  if (!expiredRun) {
+    throw new Error(`core's bundles of ${commit} have expired, so the directory cannot be compared with them; name the site-inputs run it came from with --expired-run <id>`);
+  }
+  if (!/^\d+$/.test(expiredRun)) throw new Error(`--expired-run ${expiredRun} is not a run id`);
+  const run = await githubJson(`repos/${CORE_REPO}/actions/runs/${expiredRun}`, env);
+  const errors = producingRunErrors(run).map((error) => `run ${expiredRun}: ${error}`);
+  const { artifacts } = await githubJson(`repos/${CORE_REPO}/actions/runs/${expiredRun}/artifacts`, env);
+  if (!artifacts.some((artifact) => artifact.name === `site-inputs-${commit}`)) errors.push(`run ${expiredRun} produced no bundle named site-inputs-${commit}`);
+  if (errors.length) throw new Error(errors.join("; "));
+  return expiredRun;
 }
 
 export async function fetchBundleDir(destination, commit, env = process.env) {
@@ -140,7 +198,7 @@ function swapDirectory(staged, target) {
   if (hadTarget) rmSync(backup, { recursive: true, force: true });
 }
 
-export async function pinRelease(tag, { from, pinDir = PIN_DIR, env = process.env, fetchBundle = fetchBundleDir } = {}) {
+export async function pinRelease(tag, { from, expiredRun, pinDir = PIN_DIR, env = process.env, fetchBundle = fetchBundleDir, readManifest = artifactManifest } = {}) {
   if (!TAG_PATTERN.test(tag)) throw new Error(`tag ${tag} is not of the form vX.Y.Z`);
   const { errors, commit } = await releaseCommit(tag, env);
   if (errors.length) throw new Error(errors.join("; "));
@@ -158,7 +216,8 @@ export async function pinRelease(tag, { from, pinDir = PIN_DIR, env = process.en
     problems.push(...memberErrors(bundle, manifest));
     if (from) problems.push(...directoryErrors(bundle, manifest), ...(await certifiedErrors(manifest, env)));
     if (problems.length) throw new Error(problems.join("; "));
-    const pin = from ? { tag, core_sha: commit } : { tag, core_sha: commit, site_inputs_run: readJson(path.join(bundle, ".fetched.json")).runId };
+    const run = from ? await sourceRun(bundle, commit, { expiredRun, env, readManifest }) : readJson(path.join(bundle, ".fetched.json")).runId;
+    const pin = { tag, core_sha: commit, site_inputs_run: run };
     writeFileSync(path.join(staged, "pin.json"), `${JSON.stringify(pin, null, 2)}\n`);
     copyFileSync(path.join(bundle, "manifest.json"), path.join(staged, "manifest.json"));
     for (const member of PIN_MEMBERS) cpSync(path.join(bundle, member), path.join(staged, member), { recursive: true });
@@ -231,10 +290,12 @@ export async function pendingStatus(pinDir = PIN_DIR, env = process.env) {
 }
 
 export function pinArguments(argv) {
-  const fromIndex = argv.indexOf("--from");
-  const from = fromIndex === -1 ? undefined : argv[fromIndex + 1];
-  const tag = argv.find((arg, index) => !arg.startsWith("--") && (fromIndex === -1 || index !== fromIndex + 1));
-  return { tag, from, valid: Boolean(tag) && (fromIndex === -1 || Boolean(from)) };
+  const valued = ["--from", "--expired-run"].map((flag) => argv.indexOf(flag));
+  const valueAt = (index) => (argv[index]?.startsWith("--") ? "" : (argv[index] ?? ""));
+  const [from, expiredRun] = valued.map((index) => (index === -1 ? undefined : valueAt(index + 1)));
+  const tag = argv.find((arg, index) => !arg.startsWith("--") && !valued.some((flag) => flag !== -1 && index === flag + 1));
+  const valid = Boolean(tag) && from !== "" && expiredRun !== "" && (expiredRun === undefined || from !== undefined);
+  return { tag, from, expiredRun, valid };
 }
 
 async function main(argv) {
@@ -251,12 +312,12 @@ async function main(argv) {
     console.log(`docs:pin OK${offline ? " (release not checked)" : ""}`);
     return 0;
   }
-  const { tag, from, valid } = pinArguments(argv);
+  const { tag, from, expiredRun, valid } = pinArguments(argv);
   if (!valid) {
-    console.error("docs:pin: usage: docs:pin vX.Y.Z [--from <bundle dir>] | --check [--offline] | --pending");
+    console.error("docs:pin: usage: docs:pin vX.Y.Z [--from <bundle dir> [--expired-run <run id>]] | --check [--offline] | --pending");
     return 1;
   }
-  const pin = await pinRelease(tag, { from });
+  const pin = await pinRelease(tag, { from, expiredRun });
   console.log(`docs:pin: pinned ${pin.tag} at ${pin.core_sha}`);
   return 0;
 }

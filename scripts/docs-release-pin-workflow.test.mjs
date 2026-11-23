@@ -90,6 +90,14 @@ const contexts = [
   ["release pull request from next into main", { "github.base_ref": "main", "github.ref": "refs/pull/9/merge" }, ""],
 ];
 
+test("the expression evaluator refuses operators it does not implement", () => {
+  const context = { "github.ref": "refs/heads/next" };
+  for (const source of ["${{ github.ref != 'refs/heads/next' }}", "${{ !github.ref }}", "${{ github.ref < 'z' }}"]) {
+    assert.throws(() => evaluate(source, context), /unrecognised characters/, source);
+  }
+  assert.equal(evaluate("${{ format('{0} != {1}!', github.ref, 'a b') }}", context), "refs/heads/next != a b!");
+});
+
 test("ci DOCS_INPUTS selects the develop bundle for next and the pin otherwise", () => {
   for (const [name, context, expected] of contexts) {
     assert.equal(evaluate(ci.env.DOCS_INPUTS, { ...context, "github.workspace": workspace }), expected, name);
