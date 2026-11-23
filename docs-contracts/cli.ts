@@ -1,6 +1,7 @@
 import path from "node:path";
 import { parseArgs } from "node:util";
-import { docsInputsRoot } from "../website/src/lib/site-inputs.ts";
+import { REPO_ROOT, docsInputsRoot } from "../website/src/lib/site-inputs.ts";
+import { basedOnNext, describeInputs, readManifest, runGit } from "./lib/inputs.ts";
 import { runChecks, type Mode } from "./lib/run.ts";
 
 const { values } = parseArgs({
@@ -17,10 +18,17 @@ if (mode !== "report" && mode !== "block") {
   process.exit(2);
 }
 
+const inputs = path.resolve(values.inputs ?? docsInputsRoot());
+const explicit = values.inputs !== undefined || Boolean(process.env.DOCS_INPUTS);
+const nextBased = !explicit && basedOnNext(runGit(REPO_ROOT));
+for (const line of describeInputs({ inputs, repoRoot: REPO_ROOT, explicit, nextBased, manifest: readManifest(inputs) })) {
+  console.log(`docs-contracts: ${line}`);
+}
+
 let outcome;
 try {
   outcome = runChecks({
-    inputs: path.resolve(values.inputs ?? docsInputsRoot()),
+    inputs,
     docs: values.docs === undefined ? undefined : path.resolve(values.docs),
     mode: mode as Mode,
   });
