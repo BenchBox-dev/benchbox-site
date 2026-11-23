@@ -63,12 +63,21 @@ export async function buildSnapshot({ sourceFile, outputFile, contractFile, assi
   try {
     conn.query(`ATTACH '${WORK}' AS target`);
     conn.query("USE target");
-    for (const column of columns) conn.query(`ALTER TABLE results ADD COLUMN ${column.name} ${column.type}`);
-    conn.query(
-      "UPDATE results SET corpus_class = 'none', corpus_lanes = '[]', corpus_labels = '[]'," +
-        ` comparison_identity = variant_id || ' (${DEFAULT_COMPARISON_VERSION})',` +
-        ` comparison_version = '${DEFAULT_COMPARISON_VERSION}', version_is_release = FALSE`,
-    );
+    const widenedAlready =
+      Number(
+        conn
+          .query("SELECT count(*) AS n FROM duckdb_columns() WHERE table_name = 'results' AND column_name = 'corpus_class'")
+          .toArray()[0]
+          .toJSON().n,
+      ) > 0;
+    if (!widenedAlready) {
+      for (const column of columns) conn.query(`ALTER TABLE results ADD COLUMN ${column.name} ${column.type}`);
+      conn.query(
+        "UPDATE results SET corpus_class = 'none', corpus_lanes = '[]', corpus_labels = '[]'," +
+          ` comparison_identity = variant_id || ' (${DEFAULT_COMPARISON_VERSION})',` +
+          ` comparison_version = '${DEFAULT_COMPARISON_VERSION}', version_is_release = FALSE`,
+      );
+    }
     const chosen = typeof assignments === "function" ? assignments(conn) : assignments;
     for (const [resultId, exampleId] of Object.entries(chosen)) {
       const example = examples.get(exampleId);
@@ -78,21 +87,23 @@ export async function buildSnapshot({ sourceFile, outputFile, contractFile, assi
       const updated = conn.query(`SELECT count(*) AS n FROM results WHERE result_id = ${quote(resultId)}`).toArray()[0].toJSON().n;
       if (Number(updated) !== 1) throw new Error(`result ${resultId} is not in the source snapshot`);
     }
-    const detail = conn.query("SELECT sql FROM duckdb_views() WHERE view_name = 'result_detail_metrics'").toArray()[0].toJSON().sql;
-    const widened = detail.replace(", e.os,", `, ${names.map((name) => `r.${name}`).join(", ")}, e.os,`);
-    if (widened === detail) throw new Error("result_detail_metrics has no environment columns to widen before");
-    conn.query("DROP VIEW result_detail_metrics");
-    conn.query(widened);
-    for (const table of ["result_lane_scores", "identity_medians"]) {
-      conn.query(tableSql(table, contract.tables[table]));
+    if (!widenedAlready) {
+      const detail = conn.query("SELECT sql FROM duckdb_views() WHERE view_name = 'result_detail_metrics'").toArray()[0].toJSON().sql;
+      const widened = detail.replace(", e.os,", `, ${names.map((name) => `r.${name}`).join(", ")}, e.os,`);
+      if (widened === detail) throw new Error("result_detail_metrics has no environment columns to widen before");
+      conn.query("DROP VIEW result_detail_metrics");
+      conn.query(widened);
+      for (const table of ["result_lane_scores", "identity_medians"]) {
+        conn.query(tableSql(table, contract.tables[table]));
+      }
+      const exampleTarget = new Map(Object.entries(chosen).map(([resultId, exampleId]) => [exampleId, resultId]));
+      for (const row of contract.rows.result_lane_scores) {
+        const resultId = exampleTarget.get(row.result_id);
+        if (resultId !== undefined) conn.query(insertSql("result_lane_scores", Object.keys(row), { ...row, result_id: resultId }));
+      }
+      for (const row of contract.rows.identity_medians) conn.query(insertSql("identity_medians", Object.keys(row), row));
+      conn.query(`UPDATE metadata SET read_model_version = ${contract.read_model_version}`);
     }
-    const exampleTarget = new Map(Object.entries(chosen).map(([resultId, exampleId]) => [exampleId, resultId]));
-    for (const row of contract.rows.result_lane_scores) {
-      const resultId = exampleTarget.get(row.result_id);
-      if (resultId !== undefined) conn.query(insertSql("result_lane_scores", Object.keys(row), { ...row, result_id: resultId }));
-    }
-    for (const row of contract.rows.identity_medians) conn.query(insertSql("identity_medians", Object.keys(row), row));
-    conn.query(`UPDATE metadata SET read_model_version = ${contract.read_model_version}`);
     const platforms = Object.fromEntries(
       Object.keys(chosen).map((resultId) => [
         resultId,

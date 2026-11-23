@@ -29,10 +29,15 @@ beforeEach(() => {
 
 describe("loadCorpusLabels", () => {
   it("reads nothing from a snapshot whose results table has no corpus columns", async () => {
-    mockedQueryRows.mockResolvedValueOnce([]);
+    mockedQueryRows.mockResolvedValueOnce([]).mockResolvedValueOnce([{ read_model_version: 20 }]);
     expect((await loadCorpusLabels()).size).toBe(0);
-    expect(mockedQueryRows).toHaveBeenCalledTimes(1);
+    expect(mockedQueryRows).toHaveBeenCalledTimes(2);
     expect(String(mockedQueryRows.mock.calls[0]![0])).toContain("duckdb_columns()");
+  });
+
+  it("refuses a read-model 21 snapshot that has none of the columns", async () => {
+    mockedQueryRows.mockResolvedValueOnce([]).mockResolvedValueOnce([{ read_model_version: 21 }]);
+    await expect(loadCorpusLabels()).rejects.toThrow(/none of the corpus label columns/);
   });
 
   it("parses the labels of every result when the columns are present", async () => {

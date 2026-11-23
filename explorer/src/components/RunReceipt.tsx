@@ -301,6 +301,7 @@ export function RunReceipt({
                   state={corpusLabels}
                   resultId={detail.result_id}
                   testId="receipt-corpus-labels"
+                  reportFailure
                 />,
               ),
             ]

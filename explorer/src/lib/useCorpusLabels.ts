@@ -8,10 +8,12 @@ export type CorpusLabelState =
   | { status: "failed"; labels: ReadonlyMap<string, CorpusLabels> };
 
 const NO_LABELS: ReadonlyMap<string, CorpusLabels> = new Map();
+const NOT_LOADED: CorpusLabelState = { status: "ready", labels: NO_LABELS };
 
-export function useCorpusLabels(): CorpusLabelState {
+export function useCorpusLabels(enabled = true): CorpusLabelState {
   const [state, setState] = useState<CorpusLabelState>({ status: "loading", labels: NO_LABELS });
   useEffect(() => {
+    if (!enabled) return undefined;
     let cancelled = false;
     loadCorpusLabels().then(
       (labels) => {
@@ -25,6 +27,6 @@ export function useCorpusLabels(): CorpusLabelState {
     return () => {
       cancelled = true;
     };
-  }, []);
-  return state;
+  }, [enabled]);
+  return enabled ? state : NOT_LOADED;
 }

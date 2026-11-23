@@ -78,7 +78,7 @@ export function ResultDetail({ resultId = "", source = "public" }: ResultDetailP
     direction: "asc",
   });
   const localResultState = useLocalResultState();
-  const corpusLabels = useCorpusLabels();
+  const corpusLabels = useCorpusLabels(source !== "local");
   const isLocal = source === "local";
   const detail = detailState?.detail ?? null;
   const primaryMetric = detailState?.primaryMetric ?? "display_geomean_ms";
@@ -354,7 +354,7 @@ export function ResultDetail({ resultId = "", source = "public" }: ResultDetailP
       />
 
       <section aria-label="Result summary" class="mb-8">
-        <CorpusLabelList state={corpusLabels} resultId={detail.result_id} testId="detail-corpus-labels" class="mb-3" />
+        <CorpusLabelList state={corpusLabels} resultId={detail.result_id} testId="detail-corpus-labels" class="mb-3" reportFailure />
         <div class="grid grid-cols-1 gap-3 sm:grid-cols-2 md:grid-cols-[repeat(auto-fit,minmax(12rem,1fr))]">
           {hasPrimaryMetric && (
             <ResultMetricCard

@@ -6,12 +6,15 @@ export function CorpusLabelList({
   resultId,
   testId = "corpus-labels",
   class: className = "",
+  reportFailure = false,
 }: {
   state: CorpusLabelState;
   resultId: string;
   testId?: string;
   class?: string;
+  reportFailure?: boolean;
 }) {
+  if (state.status === "failed" && !reportFailure) return null;
   if (state.status === "failed") {
     return (
       <p class={`text-xs text-[var(--bb-tone-warning-fg)] ${className}`} role="note" data-testid={`${testId}-failed`}>

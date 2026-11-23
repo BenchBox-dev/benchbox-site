@@ -3,6 +3,8 @@ import type { RoutableProps } from "preact-router";
 import { route } from "preact-router";
 import type { MetaLeaderboard as MetaLeaderboardData } from "@/types";
 import type { ResultRow } from "@/lib/duckdbQueries";
+import { CorpusLabelList } from "@/components/CorpusLabelList";
+import { useCorpusLabels, type CorpusLabelState } from "@/lib/useCorpusLabels";
 import { getMetaLeaderboardData, listResults } from "@/lib/duckdbQueries";
 import {
   BENCHMARK_LABELS,
@@ -30,6 +32,7 @@ export function Home(_: RoutableProps) {
   const recentResultsScrollerRef = useRef<HTMLDivElement>(null);
   useDocumentTitle("Overview · BenchBox");
   const [results, setResults] = useState<ResultRow[] | null>(null);
+  const corpusLabels = useCorpusLabels(results !== null);
   const [metaLeaderboard, setMetaLeaderboard] = useState<MetaLeaderboardData | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [resultsRetryToken, setResultsRetryToken] = useState(0);
@@ -189,6 +192,7 @@ export function Home(_: RoutableProps) {
                     entry={result}
                     showPower={showRecentPower}
                     showCost={showRecentCost}
+                    corpusLabels={corpusLabels}
                   />
                 ))}
               </tbody>
@@ -308,10 +312,12 @@ function RecentRow({
   entry,
   showPower,
   showCost,
+  corpusLabels,
 }: {
   entry: ResultRow;
   showPower: boolean;
   showCost: boolean;
+  corpusLabels: CorpusLabelState;
 }) {
   return (
     <tr class="hover:bg-[var(--bb-surface-data-muted)]">
@@ -332,6 +338,12 @@ function RecentRow({
           title={entry.power_score != null ? `Exact power score: ${fmtScoreExact(entry.power_score)}` : undefined}
         >
           {fmtScoreCompact(entry.power_score)}
+          <CorpusLabelList
+            state={corpusLabels}
+            resultId={entry.result_id}
+            testId={`recent-corpus-labels-${entry.result_id}`}
+            class="mt-1 whitespace-normal font-sans"
+          />
         </td>
       )}
       <td class="table-td font-mono">{fmtGeomean(entry.geomean_ms)}</td>
