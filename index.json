@@ -610,15 +610,10 @@
       "title": "Close the test gaps in the next-branch CI rules"
     },
     "pin-bundle-production-choice": {
-      "claim": {
-        "expires_at": "2026-11-24T14:18:09Z",
-        "generation": "1d1615e9e4414f16b12ca39c5796d45e",
-        "renewals": 0,
-        "worker": "mcp:omp:joe@joe-mac-mini.local:326d7a1b53869a1b8140313f"
-      },
+      "claim": null,
       "needs": [],
       "priority": "medium",
-      "status": "active",
+      "status": "done",
       "title": "Decide which production of a release commit's bundle the docs pin, and why their docs inputs differ"
     },
     "public-site-visual-regression-false-mismatch-20261014": {
