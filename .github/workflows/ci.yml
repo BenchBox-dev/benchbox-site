@@ -191,6 +191,44 @@ jobs:
             explorer/test-results
           retention-days: 7
 
+  read-model-labels:
+    name: Read model 21 labels
+    needs: bundle
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    env:
+      SITE_INPUTS: ${{ github.workspace }}/.site-inputs-read-model
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09
+      - uses: actions/setup-node@a0853c24544627f65ddf259abe73b1d18a591444
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+      - run: npm ci --ignore-scripts
+      - uses: actions/download-artifact@37930b1c2abaa49bbe596cd826c3c89aef350131
+        with:
+          name: site-inputs
+          path: .site-inputs
+      - run: npx playwright install --with-deps chromium
+      - name: Stage the read-model 21 inputs
+        run: npm run inputs:read-model -- --out "$SITE_INPUTS"
+      - run: npm run test:e2e:fixtures -w explorer
+      - run: npm run build
+      - name: Check the labels in the Explorer
+        run: npx playwright test --project=chromium --workers=1 --retries=0 e2e/read-model-21
+        working-directory: explorer
+      - name: Check the labels in the built site
+        run: npm run verify:corpus-labels -w website
+      - name: Upload failure artifacts
+        if: failure()
+        uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f
+        with:
+          name: read-model-labels-report
+          path: |
+            explorer/playwright-report
+            explorer/test-results
+          retention-days: 7
+
   audit:
     name: dependency audit
     runs-on: ubuntu-latest
@@ -230,7 +268,7 @@ jobs:
   ci:
     name: ci
     if: always()
-    needs: [bundle, checks, e2e, browser-acceptance, audit, bundle-schema]
+    needs: [bundle, checks, e2e, browser-acceptance, read-model-labels, audit, bundle-schema]
     runs-on: ubuntu-latest
     timeout-minutes: 2
     steps:

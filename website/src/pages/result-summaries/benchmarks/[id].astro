@@ -1,6 +1,7 @@
 ---
 import ResultSummary from "../../../layouts/ResultSummary.astro";
 import { loadResultsSummary, reasonCounts, SUMMARY_ROOT } from "../../../lib/results-summary.ts";
+import SummaryLabels from "../../../components/results/SummaryLabels.astro";
 
 export async function getStaticPaths() {
   const { benchmarks } = await loadResultsSummary();
@@ -48,7 +49,7 @@ const description = `${page.label} on BenchBox: ${page.resultCount} published ${
             {cohort.ranked.map((line) => (
               <tr>
                 <td>{line.rank ?? "—"}</td>
-                <th scope="row"><a href={line.receiptHref}>{line.platformLabel}</a></th>
+                <th scope="row"><a href={line.receiptHref}>{line.platformLabel}</a><SummaryLabels labels={line.corpusLabels} /></th>
                 <td>{line.version ?? "—"}</td>
                 <td>{line.runDate.slice(0, 10)}</td>
                 <td>{line.score}</td>
@@ -80,7 +81,7 @@ const description = `${page.label} on BenchBox: ${page.resultCount} published ${
               <tr>
                 <td>{line.scale}</td>
                 <td>{line.phase}</td>
-                <th scope="row"><a href={line.receiptHref}>{line.platformLabel}</a></th>
+                <th scope="row"><a href={line.receiptHref}>{line.platformLabel}</a><SummaryLabels labels={line.corpusLabels} /></th>
                 <td>{line.version ?? "—"}</td>
                 <td>{line.runDate.slice(0, 10)}</td>
                 <td>{line.score}</td>

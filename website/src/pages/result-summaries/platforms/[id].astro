@@ -1,6 +1,7 @@
 ---
 import ResultSummary from "../../../layouts/ResultSummary.astro";
 import { loadResultsSummary, reasonCounts, SUMMARY_ROOT } from "../../../lib/results-summary.ts";
+import SummaryLabels from "../../../components/results/SummaryLabels.astro";
 
 export async function getStaticPaths() {
   const { platforms } = await loadResultsSummary();
@@ -46,7 +47,7 @@ const description = `${page.label} on BenchBox: ${page.resultCount} published ${
       <tbody>
         {page.ranked.map((run) => (
           <tr>
-            <th scope="row"><a href={run.receiptHref}>{run.benchmarkLabel}</a></th>
+            <th scope="row"><a href={run.receiptHref}>{run.benchmarkLabel}</a><SummaryLabels labels={run.corpusLabels} /></th>
             <td>{run.scale}</td>
             <td>{run.phase}</td>
             <td>{run.version ?? "—"}</td>
@@ -76,7 +77,7 @@ const description = `${page.label} on BenchBox: ${page.resultCount} published ${
       <tbody>
         {page.excluded.map((run) => (
           <tr>
-            <th scope="row"><a href={run.receiptHref}>{run.benchmarkLabel}</a></th>
+            <th scope="row"><a href={run.receiptHref}>{run.benchmarkLabel}</a><SummaryLabels labels={run.corpusLabels} /></th>
             <td>{run.scale}</td>
             <td>{run.phase}</td>
             <td>{run.version ?? "—"}</td>

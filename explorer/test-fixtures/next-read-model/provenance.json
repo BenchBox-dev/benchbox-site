@@ -1,0 +1,7 @@
+{
+  "source_repository": "BenchBox-dev/BenchBox",
+  "source_path": "tests/fixtures/explorer_read_model/next_read_model_contract.json",
+  "core_commit": "327195efcc",
+  "read_model_version": 21,
+  "sha256": "bb3856668eea8deb51be2dad4b78868fc7da9ce9a858dfd47726685a05fbc097"
+}

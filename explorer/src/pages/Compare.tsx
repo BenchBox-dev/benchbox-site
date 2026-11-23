@@ -81,6 +81,8 @@ import { StatusBadge } from "@/components/StatusBadge";
 import { ProvenanceLegend } from "@/components/ProvenanceLegend";
 import { useDocumentTitle } from "@/lib/useDocumentTitle";
 import { DerivedResultsNotice, SubscaleBadge } from "@/components/SubscaleNotice";
+import { CompareCorpusLabels } from "@/components/CompareCorpusLabels";
+import { useCorpusLabels } from "@/lib/useCorpusLabels";
 import { DERIVED_POWER_NOTE, derivedTpcName, isDerivedPowerScore, isSubscaleTpc, subscaleCohortNote, subscaleTpcName } from "@/lib/subscale";
 import {
   planCompareIds,
@@ -163,6 +165,7 @@ export function Compare({ url }: CompareProps) {
   const focusChartId = isValidChartId(requestedChartToken) ? requestedChartToken : null;
   const [compareState, setCompareState] = useState<CompareState | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const corpusLabels = useCorpusLabels();
   const [loading, setLoading] = useState(true);
   const [compareRetryToken, setCompareRetryToken] = useState(0);
   const [baselineResultId, setBaselineResultId] = useUrlState(BASELINE_URL_KEY, "", stringSerde);
@@ -589,6 +592,7 @@ export function Compare({ url }: CompareProps) {
       )}
 
       <DerivedResultsNotice benchmark={derivedBenchmark} testId="compare-derived-results-notice" />
+      <CompareCorpusLabels results={results} state={corpusLabels} />
 
       {compareNotice && (
         <div

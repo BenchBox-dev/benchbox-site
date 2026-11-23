@@ -61,6 +61,8 @@ import { formatScaleFactor } from "@/lib/metricFormatters";
 import { clientHardwareTitle, isManagedCloudRun } from "@/lib/clientHardware";
 import { platformVersionDisplay } from "@/lib/versionLabel";
 import { RunIdentityLabel } from "@/components/DataTable";
+import { CorpusLabelList } from "@/components/CorpusLabelList";
+import { useCorpusLabels, type CorpusLabelState } from "@/lib/useCorpusLabels";
 import { formatSelectedCount } from "@/lib/copyFormatters";
 import { groupCohortRows, limitCohortGroups, type CohortGroupBy } from "@/lib/queryFilters";
 
@@ -1066,6 +1068,7 @@ function ListTable({
     direction: "asc",
   });
   const [visibleLimit, setVisibleLimit] = useState(TABLE_RENDER_LIMIT);
+  const corpusLabels = useCorpusLabels();
   const benchmarkResults = results.filter((r) => canonicalBenchmarkSlug(r.benchmark) === canonicalBenchmarkSlug(benchmark));
 
   const byCohort = benchmarkResults.filter((r) => {
@@ -1298,6 +1301,7 @@ function ListTable({
                   compareRow={compareEligibilityByResultId.get(r.result_id)}
                   compareEligibilityReady={compareEligibilityReady}
                   compareEligibilityStatusId={compareEligibilityStatusId}
+                  corpusLabels={corpusLabels}
                   selectedIds={selectedIds}
                   onSelectionChange={onSelectionChange}
                   selectionAtCap={selectionAtCap}
@@ -1324,6 +1328,7 @@ function ListTable({
                         compareRow={compareEligibilityByResultId.get(r.result_id)}
                         compareEligibilityReady={compareEligibilityReady}
                         compareEligibilityStatusId={compareEligibilityStatusId}
+                        corpusLabels={corpusLabels}
                         selectedIds={selectedIds}
                         onSelectionChange={onSelectionChange}
                         selectionAtCap={selectionAtCap}
@@ -1387,6 +1392,7 @@ function BenchmarkRow({
   compareRow,
   compareEligibilityReady,
   compareEligibilityStatusId,
+  corpusLabels,
   selectedIds,
   onSelectionChange,
   selectionAtCap,
@@ -1397,6 +1403,7 @@ function BenchmarkRow({
   compareRow: PlatformRow | undefined;
   compareEligibilityReady: boolean;
   compareEligibilityStatusId: string;
+  corpusLabels: CorpusLabelState;
   selectedIds: Set<string>;
   onSelectionChange: (next: Set<string>) => void;
   selectionAtCap: boolean;
@@ -1460,6 +1467,12 @@ function BenchmarkRow({
             {complianceLabel(entry.compliance_class)}
           </span>
         )}
+        <CorpusLabelList
+          state={corpusLabels}
+          resultId={entry.result_id}
+          testId={`benchmark-list-corpus-labels-${entry.result_id}`}
+          class="mt-1"
+        />
         <ListCompareDisabledReason id={reasonId} copy={disabledCopy} />
       </td>
       <td class="table-td">SF {entry.scale_factor}</td>
