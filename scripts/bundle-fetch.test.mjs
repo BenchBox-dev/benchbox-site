@@ -8,7 +8,7 @@ import {
   MAX_PRODUCING_RUN_WAIT_MS,
 } from "./bundle-fetch.mjs";
 import { readFileSync } from "node:fs";
-import { downloadWithRetry as downloadArtifactWithRetry, isRetryableDownloadError, DOWNLOAD_RETRY_INTERVALS_MS } from "./github-download.mjs";
+import { withRetry as downloadArtifactWithRetry, isRetryableDownloadError, RETRY_INTERVALS_MS } from "./github-download.mjs";
 
 const RUN = {
   id: 38607974569,
@@ -294,8 +294,8 @@ test("wait budget is below the actual deploy workflow timeout", () => {
   const workflow = readFileSync(new URL("../.github/workflows/deploy.yml", import.meta.url), "utf8");
   const timeoutMinutes = Number(workflow.match(/timeout-minutes:\s*(\d+)/)[1]);
   assert.equal(MAX_PRODUCING_RUN_WAIT_MS, 600000);
-  assert.deepEqual(DOWNLOAD_RETRY_INTERVALS_MS, [5000, 15000]);
-  assert.ok(MAX_PRODUCING_RUN_WAIT_MS + DOWNLOAD_RETRY_INTERVALS_MS.reduce((a, b) => a + b, 0) < timeoutMinutes * 60000);
+  assert.deepEqual(RETRY_INTERVALS_MS, [5000, 15000]);
+  assert.ok(MAX_PRODUCING_RUN_WAIT_MS + RETRY_INTERVALS_MS.reduce((a, b) => a + b, 0) < timeoutMinutes * 60000);
 });
 
 const sha = (letter) => letter.repeat(40);

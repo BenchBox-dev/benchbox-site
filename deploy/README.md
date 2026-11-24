@@ -264,12 +264,26 @@ success closure. Error text cannot set it. Unmarked failures always report.
 This matches the core bundle reporter's `expected_rejection` input; it does
 not bypass any deploy gate.
 
-## Download retries
+## Retries
 
 Bundle and receipt downloads share three attempts, with delays of 5 and 15
 seconds. Only HTTP 5xx and network failures retry. Each attempt starts with an
 empty temporary download directory; digest, provenance and deploy gates remain
 outside the retry boundary. Retry delays add at most 20 seconds.
+
+The `gh` calls behind the failure reports and success closures above retry
+with the same delays. In `deploy/relay-cli.ts` only a GitHub GraphQL "Something
+went wrong" error, HTTP 5xx or a network failure in `gh`'s error output
+retries. The inline `site-deploy-failed` report retries any failure of its
+`gh issue list`, `gh issue comment` and `gh label create` calls, but creates
+the issue in a single attempt, so a retry cannot open a duplicate issue.
+
+`actions/deploy-pages` runs twice at most. Right after the upload, the Actions
+runtime's artifact list can still lack the new `github-pages` artifact, and
+the action then fails with `No artifacts named "github-pages"` before it
+creates a Pages deployment. When the first attempt fails, the job waits 10
+seconds and runs the action again; the job fails only when the retry fails
+too.
 
 ## Other workflows
 
@@ -301,8 +315,9 @@ not publish it. Recognise it by all of these:
 
 - The `resolve, build and gate` job passed and the artifact has the same size
   and file count as the last good deploy.
-- The `deploy, probe and record` job failed inside the `Deploy to GitHub Pages`
-  step. Typical logs are `Current status: syncing_files` until `Timeout
+- The `deploy, probe and record` job failed inside the `Retry the deploy to
+  GitHub Pages` step after the first `Deploy to GitHub Pages` attempt also
+  failed. Typical logs are `Current status: syncing_files` until `Timeout
   reached, aborting!` after the 10-minute `actions/deploy-pages` timeout, or
   `Deployment cancelled.` a few seconds after the deployment was created.
 - The probe, receipt and rollback steps were skipped. No probe ran, so no
