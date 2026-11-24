@@ -1628,7 +1628,7 @@ Resolve the Azure Synapse Serverless SQL Pool scanned-data rate for an Azure reg
 
 Pricing lookups use packaged tables rather than live vendor catalogs. Every price and billing-quantity resolver returns `PriceResolution`; consumers must inspect fallback status before publishing amounts. A selected bucket is a table policy, not independent proof of a location's current vendor rate.
 
-The packaged compute estimates exclude enterprise/reserved/commitment discounts, storage and network/data-transfer charges. In `pricing_data.yaml`, each price table must carry provenance keys `source`, `retrieved`, `upstream_published`, `method` and `verified_regions`; the latter is a list. Each byte-priced table must also declare its billing unit. These schema requirements preserve provenance and divisor checks, not price certification.
+The packaged compute estimates exclude enterprise/reserved/commitment discounts, storage and network/data-transfer charges. In `pricing_data.yaml`, each price table must carry provenance keys `source` (the vendor pricing URL or API endpoint), `retrieved` (the retrieval date), `upstream_published`, `method` and `verified_regions` (a list), readable via `get_table_provenance`. Each byte-priced table must also declare its billing unit. These tables carry selected derived list-price values rather than vendor catalog mirrors: BenchBox accepts residual redistribution risk for these derived values and does not declare vendor redistribution cleared. These schema requirements preserve provenance and divisor checks, not price certification.
 
 ### PriceResolution
 
