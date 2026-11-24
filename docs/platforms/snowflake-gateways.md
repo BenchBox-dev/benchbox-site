@@ -46,9 +46,9 @@ benchbox run --platform snowflake --benchmark tpch --scale 0.01 --phases power \
 | `gateway_host` | (required) | Bare gateway host name or address; a value with credentials (`user:password@`), a scheme or a path is rejected |
 | `gateway_port` | connector default | Gateway port (1-65535) |
 | `gateway_protocol` | `https` | `https` or `http` |
-| `gateway_ca_bundle` | (none) | CA bundle file for a private-CA gateway, on connector 4.x and earlier. The connector reads it from the process environment, so `REQUESTS_CA_BUNDLE` must name the same file before BenchBox starts; otherwise construction fails. BenchBox never changes the environment |
-| `gateway_ocsp_fail_open` | (connector default) | Passed to the connector only when set; see OCSP below |
-| `allow_insecure_gateway` | false | Sets the connector's `insecure_mode`, which turns off the OCSP revocation check on connector 4.x and earlier; 5.0 and later ignore it. Certificate and host name verification still apply |
+| `gateway_ca_bundle` | (none) | CA bundle file for a private-CA gateway. On connector 5.x BenchBox passes it as `extra_root_store_path`. On connector 4.x and earlier the connector reads it from the process environment, so `REQUESTS_CA_BUNDLE` must name the same file before BenchBox starts; otherwise construction fails. BenchBox never changes the environment |
+| `gateway_ocsp_fail_open` | (connector default) | Revocation check mode, `true` or `false`. Passed to the connector only when set; see Revocation checking below |
+| `allow_insecure_gateway` | false | Turns off certificate revocation checking only. Certificate and host name verification still apply, so a self-signed or untrusted gateway still fails |
 
 Gateway options are accepted only with a gateway other than `native`. A bare `--platform-option gateway_host=...`
 with the native gateway is an error, not a silent no-op.
@@ -58,19 +58,25 @@ log a warning. Gateway options are not available through MCP.
 
 ## Transport security
 
-- **TLS.** `https` is the default and certificates are verified. `allow_insecure_gateway` turns off only the OCSP
-  revocation check (`insecure_mode`, ignored from connector 5.0); it does not make the connector accept a self-signed
-  or untrusted certificate.
-- **Private CA.** On snowflake-connector-python 4.x and earlier, set `gateway_ca_bundle` to the CA file and export
-  `REQUESTS_CA_BUNDLE` with the same path before BenchBox starts. The connector reads the bundle from the process
-  environment; BenchBox never changes the environment and fails construction if the two disagree. Connector 5.0 and
-  later do not read `REQUESTS_CA_BUNDLE`, and BenchBox does not yet pass the bundle to them another way.
-- **OCSP.** Revocation checking depends on the installed snowflake-connector-python. Up to 4.7, OCSP checking is on
-  and fails open; `gateway_ocsp_fail_open=false` makes it fail closed. In 4.8, checking is off unless `ocsp_fail_open`
-  is set; either value turns it on, `true` failing open and `false` failing closed. On 4.x and earlier,
-  `allow_insecure_gateway` turns OCSP off even when `gateway_ocsp_fail_open` is set. From 5.0 the connector checks
-  revocation with certificate revocation lists, off by default, and ignores both options. BenchBox passes
-  `gateway_ocsp_fail_open` to the connector only when you set it.
+- **TLS.** `https` is the default and certificates are verified. `allow_insecure_gateway` turns off only certificate
+  revocation checking. It does not turn off certificate or host name verification, so a self-signed or untrusted
+  gateway certificate still fails the connection. It requires `BENCHBOX_ALLOW_INSECURE_GATEWAY=1`.
+- **Private CA.** On snowflake-connector-python 5.x, set `gateway_ca_bundle` to the CA file; BenchBox passes it to the
+  connector as `extra_root_store_path` and `REQUESTS_CA_BUNDLE` is not needed. On 4.x and earlier, set
+  `gateway_ca_bundle` and also export `REQUESTS_CA_BUNDLE` with the same path before BenchBox starts. The connector
+  reads the bundle from the process environment there; BenchBox never changes the environment and fails construction
+  if the two disagree.
+- **Revocation checking.** What BenchBox passes depends on the installed snowflake-connector-python.
+  - **5.x.** The connector checks revocation with certificate revocation lists (`crl_check_mode`), and its default is
+    `DISABLED`. `allow_insecure_gateway` sets `DISABLED`. Otherwise `gateway_ocsp_fail_open=true` sets `ADVISORY` and
+    `false` sets `ENABLED`. When neither option is set, BenchBox passes nothing and the connector default applies.
+    `allow_insecure_gateway` wins when both options are set.
+  - **4.x and earlier.** `gateway_ocsp_fail_open` is passed as `ocsp_fail_open`, only when you set it.
+    `allow_insecure_gateway` is passed as `disable_ocsp_checks` where the installed connector supports that
+    parameter, and as `insecure_mode` otherwise; either turns OCSP off even when `gateway_ocsp_fail_open` is set.
+    Without these options, up to 4.7 OCSP checking is on and fails open, and `gateway_ocsp_fail_open=false` makes it
+    fail closed. In 4.8, checking is off unless `ocsp_fail_open` is set; either value turns it on, `true` failing open
+    and `false` failing closed.
 - **Plain HTTP.** `http` to a loopback host needs no opt-in because the traffic never leaves the machine. Any other
   `http` endpoint needs the environment opt-in above.
 - **Credentials.** A host with embedded credentials (`user:password@`), a scheme or a path is rejected without being
