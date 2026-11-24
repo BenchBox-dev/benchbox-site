@@ -6,6 +6,7 @@ import { join } from "node:path";
 import { spawnSync } from "node:child_process";
 import { fileURLToPath } from "node:url";
 import { parse } from "yaml";
+import { execGhClient } from "../relay-cli.ts";
 
 const root = fileURLToPath(new URL("../../", import.meta.url));
 const workflow = parse(readFileSync(join(root, ".github/workflows/deploy.yml"), "utf8"));
@@ -13,6 +14,11 @@ const workflow = parse(readFileSync(join(root, ".github/workflows/deploy.yml"), 
 const stub = `#!/usr/bin/env node
 const fs = require('node:fs');
 const args = process.argv.slice(2);
+if (process.env.GH_FLAKY && fs.existsSync(process.env.GH_FLAKY)) {
+  fs.rmSync(process.env.GH_FLAKY);
+  process.stderr.write('GraphQL: Something went wrong while executing your query. Please include \`ABCD\` in your report.\\n');
+  process.exit(1);
+}
 const state = JSON.parse(fs.readFileSync(process.env.GH_STATE, 'utf8'));
 state.calls.push(args);
 const option = (name) => args[args.indexOf(name) + 1];
@@ -189,4 +195,48 @@ test("a superseded resolve skips the build steps, the artifact uploads, the stop
 test("a superseded run neither reports a failure nor closes a core relay issue", () => {
   assert.equal(workflow.jobs["report-failure"].if, "failure()");
   assert.match(workflow.jobs["report-success"].if, /needs.deploy.result == 'success'/);
+});
+
+test("a transient gh failure is retried by the relay client and the site-deploy-failed report, a permanent one is not", async () => {
+  const dir = mkdtempSync(join(tmpdir(), "site-retry-"));
+  const saved = { PATH: process.env.PATH, GH_STATE: process.env.GH_STATE, GH_FLAKY: process.env.GH_FLAKY, FAIL_LABEL: process.env.FAIL_LABEL };
+  try {
+    writeFileSync(join(dir, "gh"), stub);
+    chmodSync(join(dir, "gh"), 0o755);
+    writeFileSync(join(dir, "sleep"), "#!/bin/sh\nexit 0\n");
+    chmodSync(join(dir, "sleep"), 0o755);
+    const statePath = join(dir, "state.json");
+    const flaky = join(dir, "flaky");
+    const reset = () => writeFileSync(statePath, JSON.stringify({ calls: [], issues: [{ number: 7, label: "site-deploy-failed", body: "x", comments: [], open: true }] }));
+    const read = () => JSON.parse(readFileSync(statePath, "utf8"));
+    Object.assign(process.env, { PATH: `${dir}:${saved.PATH}`, GH_STATE: statePath, GH_FLAKY: flaky });
+
+    reset();
+    writeFileSync(flaky, "");
+    const slept: number[] = [];
+    const client = execGhClient({ GH_TOKEN: "stub" }, { sleep: (ms) => slept.push(ms), log: () => {} });
+    await client.closeIssue("BenchBox-dev/benchbox-site", 7, "closing");
+    assert.deepEqual(slept, [5000]);
+    assert.equal(read().issues[0].open, false);
+
+    process.env.FAIL_LABEL = "true";
+    await assert.rejects(client.createLabelIfMissing("BenchBox-dev/benchbox-site", "site-deploy-failed", "B60205", "HTTP 503"));
+    assert.deepEqual(slept, [5000]);
+    delete process.env.FAIL_LABEL;
+
+    reset();
+    writeFileSync(flaky, "");
+    const local = workflow.jobs["report-failure"].steps.find((step: { run?: string }) => step.run?.includes("site-deploy-failed"));
+    const env = { ...process.env, REPO: "BenchBox-dev/benchbox-site", RUN_URL: "https://example.test/runs/9", EVENT: "push", CORE_SHA: "core111", EXPECTED_REJECTION: "" };
+    const reported = spawnSync("bash", ["-c", local.run], { env, encoding: "utf8" });
+    assert.equal(reported.status, 0, reported.stderr);
+    assert.match(reported.stderr, /Something went wrong/);
+    assert.match(read().issues[0].comments[0].body, /https:\/\/example.test\/runs\/9/);
+  } finally {
+    for (const [key, value] of Object.entries(saved)) {
+      if (value === undefined) delete process.env[key];
+      else process.env[key] = value;
+    }
+    rmSync(dir, { recursive: true, force: true });
+  }
 });

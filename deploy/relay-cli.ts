@@ -1,16 +1,20 @@
 import { execFileSync } from "node:child_process";
 import { pathToFileURL } from "node:url";
 import { type GhClient, reportRelayFailure, closeRelayOnSuccess, closeSiteIssuesOnSuccess } from "./lib/relay.ts";
+import { isRetryableGhError, withRetry } from "../scripts/github-download.mjs";
 
-export function execGhClient(env: Record<string, string | undefined> = process.env): GhClient {
+export function execGhClient(env: Record<string, string | undefined> = process.env, retry: { sleep?: (ms: number) => void; log?: (line: string) => void } = {}): GhClient {
   const token = env.GH_TOKEN || env.GITHUB_TOKEN;
-  const execGh = (args: string[]): string => {
-    return execFileSync("gh", args, {
-      encoding: "utf8",
-      env: { ...process.env, ...(token ? { GH_TOKEN: token } : {}) },
-      stdio: ["ignore", "pipe", "pipe"],
-    });
-  };
+  const execGh = (args: string[]): string =>
+    withRetry(
+      () =>
+        execFileSync("gh", args, {
+          encoding: "utf8",
+          env: { ...process.env, ...(token ? { GH_TOKEN: token } : {}) },
+          stdio: ["ignore", "pipe", "pipe"],
+        }),
+      { what: `gh ${args.slice(0, 2).join(" ")}`, retryable: isRetryableGhError, ...retry },
+    );
 
   return {
     async listOpenIssues(repo: string, label: string) {
