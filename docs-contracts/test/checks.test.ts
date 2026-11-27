@@ -8,7 +8,7 @@ import { pythonPatternToJs } from "../checks/pages.ts";
 import { resolveInvocation } from "../checks/commands.ts";
 import { runChecks, type Mode } from "../lib/run.ts";
 import type { Contracts } from "../lib/types.ts";
-import { RELEASE_PATTERN, VERSION, buildContracts, buildPages, writeBundle } from "./fixture.ts";
+import { RELEASE_PATTERN, VERSION, buildContracts, buildPages, previousExecution, writeBundle } from "./fixture.ts";
 
 const CLI = path.resolve(import.meta.dirname, "..", "cli.ts");
 
@@ -48,7 +48,10 @@ const SEEDS: Seed[] = [
   { name: "platform option boolean rejected", check: "platform-option-examples", page: "usage/options.md", pages: (p) => replace(p, "usage/options.md", "read_only=true", "read_only=maybe") },
   { name: "unknown platform option", check: "platform-option-examples", page: "usage/options.md", pages: (p) => replace(p, "usage/options.md", "threads=4", "thread_count=4") },
   { name: "deprecated platform option spelling", check: "platform-option-examples", page: "platforms/snowflake.md", pages: (p) => replace(p, "platforms/snowflake.md", "warehouse=WH", "old_mode=x") },
-  { name: "deployment option replaced by selector", check: "platform-option-examples", page: "platforms/snowflake.md", contracts: (c) => (c.platform_options.platforms.snowflake.deployment_mode = { value_kind: "string", choices: null, default: null, aliases: [] }), pages: (p) => replace(p, "platforms/snowflake.md", "warehouse=WH", "deployment_mode=x") },
+  { name: "deployment option replaced by selector", check: "platform-option-examples", page: "platforms/snowflake.md", contracts: (c) => {
+    c.execution = previousExecution(c.execution);
+    c.platform_options.platforms.snowflake.deployment_mode = { value_kind: "string", choices: null, default: null, aliases: [] };
+  }, pages: (p) => replace(p, "platforms/snowflake.md", "warehouse=WH", "deployment_mode=x") },
   { name: "option that no platform accepts", check: "platform-option-examples", page: "usage/options.md", pages: (p) => replace(p, "usage/options.md", "`--platform-option memory_limit=2GB`", "`--platform-option vanished_option=2GB`") },
   { name: "help catalog example rejected", check: "platform-option-examples", page: "cli help catalog run/examples", contracts: (c) => (c.cli.help_catalog.command_examples.run.examples = ["benchbox run --platform duckdb --platform-option threads=lots"]) },
   { name: "quickstart unknown command", check: "quickstart-commands", page: "usage/getting-started.md", pages: (p) => replace(p, "usage/getting-started.md", "benchbox profile", "benchbox profiles") },
@@ -90,6 +93,11 @@ describe("seeded documentation drift fails with the page and the violated invari
 
   it("leaves a clean fixture with no violation", () => {
     assert.deepEqual(run({}), { blocking: [], reported: [], notes: [] });
+  });
+
+  it("leaves a clean fixture with the previous execution shape with no violation", () => {
+    const outcome = run({ contracts: (c) => (c.execution = previousExecution(c.execution)) });
+    assert.deepEqual(outcome, { blocking: [], reported: [], notes: [] });
   });
 });
 

@@ -18,6 +18,17 @@ function option(kind: string, defaultValue: unknown = null, choices: string[] | 
   return { value_kind: kind, choices, default: defaultValue, aliases };
 }
 
+export function previousExecution(execution: Contracts["execution"]): Contracts["execution"] {
+  if (!("removed_options" in execution)) return execution;
+  const { removed_in: _removedIn, removed_options: removed, deployment_selector_platforms: selectors, compute, ...rest } = execution;
+  return {
+    ...rest,
+    deprecated_option_aliases: removed.map((entry) => ({ platform: entry.platform, key: entry.key, target: entry.replacement, removed_in: "9.9.9" })),
+    deployment_alias_keys: Object.fromEntries(selectors.map((platform) => [platform, ["deployment_mode"]])),
+    compute: Object.fromEntries(Object.entries(compute).map(([platform, keys]) => [platform, { resource_aliases: keys.native_resource_keys, size_aliases: keys.native_size_keys }])),
+  };
+}
+
 export function buildContracts(): Contracts {
   const platformOptions: Contracts["platform_options"]["platforms"] = {
     duckdb: { threads: option("integer"), memory_limit: option("string"), read_only: option("boolean", false), mode: option("string", "fast", ["fast", "safe"]) },
@@ -69,12 +80,13 @@ export function buildContracts(): Contracts {
     },
     platform_manifest: { entries: [{ key: "duckdb" }, { key: "snowflake" }], aliases: { duck: "duckdb" } },
     execution: {
-      deprecated_option_aliases: [{ platform: "snowflake", key: "old_mode", target: "mode", removed_in: "9.9.9" }],
-      deployment_alias_keys: { snowflake: ["deployment_mode"] },
+      removed_in: "9.9.9",
+      removed_options: [{ platform: "snowflake", key: "old_mode", replacement: "mode" }],
+      deployment_selector_platforms: ["snowflake"],
       engines,
       compute_resource_option: "compute_resource",
       compute_size_option: "compute_size",
-      compute: { snowflake: { resource_aliases: ["warehouse"], size_aliases: [] } },
+      compute: { snowflake: { native_resource_keys: ["warehouse"], native_size_keys: [] } },
     },
     platform_options: { platforms: platformOptions, alias_index: { snowflake: { wh: "warehouse" } } },
     tuning: { aliases: {}, platforms: { duckdb: { applied_types: ["sort"], has_catalog_introspector: true, can_reach_applied_verified: true } } },

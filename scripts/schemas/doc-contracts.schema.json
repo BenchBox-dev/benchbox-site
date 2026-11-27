@@ -24,6 +24,161 @@
     "path_privacy"
   ],
   "$defs": {
+    "executionRemovedOptions": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "default_engine",
+        "engine_classes",
+        "reserved_option_keys",
+        "removed_in",
+        "removed_options",
+        "deployment_selector_platforms",
+        "engines",
+        "compute_resource_option",
+        "compute_size_option",
+        "compute"
+      ],
+      "properties": {
+        "default_engine": {"type": "string"},
+        "engine_classes": {"$ref": "#/$defs/strings"},
+        "reserved_option_keys": {"$ref": "#/$defs/sortedStrings"},
+        "removed_in": {"type": "string"},
+        "removed_options": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["platform", "key", "replacement"],
+            "properties": {
+              "platform": {"type": "string"},
+              "key": {"type": "string"},
+              "replacement": {"type": "string"}
+            }
+          }
+        },
+        "deployment_selector_platforms": {"$ref": "#/$defs/sortedStrings"},
+        "engines": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["declared", "selectable"],
+            "properties": {
+              "declared": {
+                "type": "object",
+                "additionalProperties": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": ["class"],
+                  "properties": {"class": {"type": "string"}}
+                }
+              },
+              "selectable": {"$ref": "#/$defs/sortedStrings"}
+            }
+          }
+        },
+        "compute_resource_option": {"type": "string"},
+        "compute_size_option": {"type": "string"},
+        "compute": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["resource_kind", "native_resource_keys", "native_size_keys", "size_choices"],
+            "properties": {
+              "resource_kind": {
+                "oneOf": [
+                  {"type": "null"},
+                  {"type": "string"},
+                  {"type": "object", "additionalProperties": {"type": "string"}}
+                ]
+              },
+              "native_resource_keys": {"$ref": "#/$defs/sortedStrings"},
+              "native_size_keys": {"$ref": "#/$defs/sortedStrings"},
+              "size_choices": {"$ref": "#/$defs/sortedStrings"}
+            }
+          }
+        }
+      }
+    },
+    "executionDeprecatedAliases": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "default_engine",
+        "engine_classes",
+        "reserved_option_keys",
+        "deprecated_option_aliases",
+        "deployment_alias_keys",
+        "engines",
+        "compute_resource_option",
+        "compute_size_option",
+        "compute"
+      ],
+      "properties": {
+        "default_engine": {"type": "string"},
+        "engine_classes": {"$ref": "#/$defs/strings"},
+        "reserved_option_keys": {"$ref": "#/$defs/sortedStrings"},
+        "deprecated_option_aliases": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["platform", "key", "target", "removed_in"],
+            "properties": {
+              "platform": {"type": "string"},
+              "key": {"type": "string"},
+              "target": {"type": "string"},
+              "removed_in": {"type": "string"}
+            }
+          }
+        },
+        "deployment_alias_keys": {"type": "object", "additionalProperties": {"$ref": "#/$defs/sortedStrings"}},
+        "engines": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["declared", "selectable"],
+            "properties": {
+              "declared": {
+                "type": "object",
+                "additionalProperties": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": ["class"],
+                  "properties": {"class": {"type": "string"}}
+                }
+              },
+              "selectable": {"$ref": "#/$defs/sortedStrings"}
+            }
+          }
+        },
+        "compute_resource_option": {"type": "string"},
+        "compute_size_option": {"type": "string"},
+        "compute": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["resource_kind", "resource_aliases", "size_aliases", "size_choices"],
+            "properties": {
+              "resource_kind": {
+                "oneOf": [
+                  {"type": "null"},
+                  {"type": "string"},
+                  {"type": "object", "additionalProperties": {"type": "string"}}
+                ]
+              },
+              "resource_aliases": {"$ref": "#/$defs/sortedStrings"},
+              "size_aliases": {"$ref": "#/$defs/sortedStrings"},
+              "size_choices": {"$ref": "#/$defs/sortedStrings"}
+            }
+          }
+        }
+      }
+    },
     "strings": {"type": "array", "items": {"type": "string"}},
     "sortedStrings": {"type": "array", "items": {"type": "string"}, "uniqueItems": true},
     "count": {"type": "integer", "minimum": 0},
@@ -247,83 +402,7 @@
         }
       }
     },
-    "execution": {
-      "type": "object",
-      "additionalProperties": false,
-      "required": [
-        "default_engine",
-        "engine_classes",
-        "reserved_option_keys",
-        "deprecated_option_aliases",
-        "deployment_alias_keys",
-        "engines",
-        "compute_resource_option",
-        "compute_size_option",
-        "compute"
-      ],
-      "properties": {
-        "default_engine": {"type": "string"},
-        "engine_classes": {"$ref": "#/$defs/strings"},
-        "reserved_option_keys": {"$ref": "#/$defs/sortedStrings"},
-        "deprecated_option_aliases": {
-          "type": "array",
-          "items": {
-            "type": "object",
-            "additionalProperties": false,
-            "required": ["platform", "key", "target", "removed_in"],
-            "properties": {
-              "platform": {"type": "string"},
-              "key": {"type": "string"},
-              "target": {"type": "string"},
-              "removed_in": {"type": "string"}
-            }
-          }
-        },
-        "deployment_alias_keys": {"type": "object", "additionalProperties": {"$ref": "#/$defs/sortedStrings"}},
-        "engines": {
-          "type": "object",
-          "additionalProperties": {
-            "type": "object",
-            "additionalProperties": false,
-            "required": ["declared", "selectable"],
-            "properties": {
-              "declared": {
-                "type": "object",
-                "additionalProperties": {
-                  "type": "object",
-                  "additionalProperties": false,
-                  "required": ["class"],
-                  "properties": {"class": {"type": "string"}}
-                }
-              },
-              "selectable": {"$ref": "#/$defs/sortedStrings"}
-            }
-          }
-        },
-        "compute_resource_option": {"type": "string"},
-        "compute_size_option": {"type": "string"},
-        "compute": {
-          "type": "object",
-          "additionalProperties": {
-            "type": "object",
-            "additionalProperties": false,
-            "required": ["resource_kind", "resource_aliases", "size_aliases", "size_choices"],
-            "properties": {
-              "resource_kind": {
-                "oneOf": [
-                  {"type": "null"},
-                  {"type": "string"},
-                  {"type": "object", "additionalProperties": {"type": "string"}}
-                ]
-              },
-              "resource_aliases": {"$ref": "#/$defs/sortedStrings"},
-              "size_aliases": {"$ref": "#/$defs/sortedStrings"},
-              "size_choices": {"$ref": "#/$defs/sortedStrings"}
-            }
-          }
-        }
-      }
-    },
+    "execution": {"oneOf": [{"$ref": "#/$defs/executionRemovedOptions"}, {"$ref": "#/$defs/executionDeprecatedAliases"}]},
     "platform_options": {
       "type": "object",
       "additionalProperties": false,
