@@ -4,6 +4,25 @@ export type Violation = { check: string; page: string; invariant: string };
 
 export type Counts = Record<string, number>;
 
+type ExecutionCommon = {
+  engines: Record<string, { declared: Record<string, { class: string }>; selectable: string[] }>;
+  compute_resource_option: string;
+  compute_size_option: string;
+};
+
+export type ExecutionContract =
+  | (ExecutionCommon & {
+      removed_in: string;
+      removed_options: { platform: string; key: string; replacement: string }[];
+      deployment_selector_platforms: string[];
+      compute: Record<string, { native_resource_keys: string[]; native_size_keys: string[] }>;
+    })
+  | (ExecutionCommon & {
+      deprecated_option_aliases: { platform: string; key: string; target: string; removed_in: string }[];
+      deployment_alias_keys: Record<string, string[]>;
+      compute: Record<string, { resource_aliases: string[]; size_aliases: string[] }>;
+    });
+
 export type Contracts = {
   result_schema_version: string;
   package: {
@@ -48,14 +67,7 @@ export type Contracts = {
     entries: Record<string, { category: string; support_status: string; supports_sql: boolean; supports_dataframe: boolean }>;
   };
   platform_manifest: { entries: { key: string }[]; aliases: Record<string, string> };
-  execution: {
-    deprecated_option_aliases: { platform: string; key: string; target: string; removed_in: string }[];
-    deployment_alias_keys: Record<string, string[]>;
-    engines: Record<string, { declared: Record<string, { class: string }>; selectable: string[] }>;
-    compute_resource_option: string;
-    compute_size_option: string;
-    compute: Record<string, { resource_aliases: string[]; size_aliases: string[] }>;
-  };
+  execution: ExecutionContract;
   platform_options: {
     platforms: Record<string, Record<string, { value_kind: string; choices: string[] | null; default: unknown; aliases: string[] }>>;
     alias_index: Record<string, Record<string, string>>;
