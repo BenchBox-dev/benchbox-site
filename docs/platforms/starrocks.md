@@ -211,7 +211,7 @@ The adapter automatically applies session-level optimizations when running bench
 StarRocks lacks several SQL features that the Write Primitives and Transaction Primitives benchmarks exercise. BenchBox reports these operations as skipped, with the reason, instead of failing the run:
 
 - **Write Primitives** - bulk loads from a client-side file (StarRocks loads files through Stream Load or Broker Load), `RETURNING` clauses, and `MERGE`.
-- **Transaction Primitives** - `SAVEPOINT`, temporary tables, and operations that need `UPDATE`, `DELETE` or `TRUNCATE` inside an explicit transaction, a second statement against the same table, or reading a table written earlier in the transaction.
+- **Transaction Primitives** - `SAVEPOINT`, temporary tables, `WITH` before `INSERT`, and operations that need `TRUNCATE` inside an explicit transaction, a second statement that changes the same table, or reading a table written earlier in the transaction. On StarRocks 4.1.8, one `UPDATE` or `DELETE` per Primary Key table works inside an explicit transaction.
 
 > [!NOTE]
 > H2O-DB Q9 runs with `percentile_approx`, so its result is approximate and not directly comparable with platforms that compute the exact percentile.
