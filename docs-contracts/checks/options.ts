@@ -1,5 +1,5 @@
 import { fencedBlocks, shellWords, stripFences } from "../lib/markdown.ts";
-import type { Context, Contracts, Violation } from "../lib/types.ts";
+import type { Context, Contracts, ExecutionContract, Violation } from "../lib/types.ts";
 
 const INLINE = /`([^`\n]*--platform-option[^`\n]*)`/g;
 const PLACEHOLDER = /[<>{}]|\.\.\./;
@@ -101,7 +101,27 @@ function parsesAs(spec: Spec, raw: string): { ok: true; value: unknown } | { ok:
   return { ok: true, value };
 }
 
+export function executionOptionView(execution: ExecutionContract) {
+  if ("removed_options" in execution) {
+    return {
+      selectorPlatforms: new Set(execution.deployment_selector_platforms),
+      deploymentKeys: (_platform: string): string[] => [],
+      removedKeys: (platform: string): string[] => execution.removed_options.filter((entry) => entry.platform === platform).map((entry) => entry.key),
+      computeKeys: (platform: string): string[] => [...(execution.compute[platform]?.native_resource_keys ?? []), ...(execution.compute[platform]?.native_size_keys ?? [])],
+      computeAliases: (_platform: string): string[] => [],
+    };
+  }
+  return {
+    selectorPlatforms: new Set(Object.keys(execution.deployment_alias_keys)),
+    deploymentKeys: (platform: string): string[] => execution.deployment_alias_keys[platform] ?? [],
+    removedKeys: (platform: string): string[] => execution.deprecated_option_aliases.filter((entry) => entry.platform === platform).map((entry) => entry.key),
+    computeKeys: (platform: string): string[] => [...(execution.compute[platform]?.resource_aliases ?? []), ...(execution.compute[platform]?.size_aliases ?? [])],
+    computeAliases: (platform: string): string[] => [...(execution.compute[platform]?.resource_aliases ?? []), ...(execution.compute[platform]?.size_aliases ?? [])],
+  };
+}
+
 export function optionResolver(contracts: Contracts) {
+  const execution = executionOptionView(contracts.execution);
   const manifestAliases = contracts.platform_manifest.aliases;
   const normalize = (name: string): string => {
     const lowered = name.toLowerCase();
@@ -112,7 +132,7 @@ export function optionResolver(contracts: Contracts) {
     if (!key.includes(":")) return [key, null];
     const [base, ...rest] = key.split(":");
     const resolved = normalize(base);
-    if (resolved in contracts.execution.deployment_alias_keys) return [resolved, rest.join(":")];
+    if (execution.selectorPlatforms.has(resolved)) return [resolved, rest.join(":")];
     return [key, null];
   };
 
@@ -121,10 +141,9 @@ export function optionResolver(contracts: Contracts) {
     const specs = contracts.platform_options.platforms[platform];
     if (specs === undefined || Object.keys(specs).length === 0) return `platform '${platform}' does not accept platform-specific options`;
     const aliasIndex = contracts.platform_options.alias_index[platform] ?? {};
-    const deployment = contracts.execution.deployment_alias_keys[platform] ?? [];
-    const legacy = contracts.execution.deprecated_option_aliases.filter((entry) => entry.platform === platform).map((entry) => entry.key);
-    const compute = contracts.execution.compute[platform];
-    const computeAliases = new Set([...(compute?.resource_aliases ?? []), ...(compute?.size_aliases ?? [])]);
+    const deployment = execution.deploymentKeys(platform);
+    const legacy = execution.removedKeys(platform);
+    const computeAliases = new Set(execution.computeAliases(platform));
     const seen = new Map<string, unknown>();
     for (const [typed, rawValue] of pairs) {
       const lowered = typed.toLowerCase();

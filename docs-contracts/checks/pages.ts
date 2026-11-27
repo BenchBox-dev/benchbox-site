@@ -1,5 +1,6 @@
 import { sorted } from "../lib/markdown.ts";
 import { page, type Context, type Contracts, type Violation } from "../lib/types.ts";
+import { executionOptionView } from "./options.ts";
 
 const GUIDE_PLATFORMS: [string, string][] = [
   ["snowflake", "snowflake"],
@@ -136,8 +137,7 @@ export function pageViolations(ctx: Context): Violation[] {
       fail("compute-resource-guides", path, `contracts hold no option specs for ${platform}`);
       continue;
     }
-    const declaration = contracts.execution.compute[platform];
-    const computeKeys = new Set([contracts.execution.compute_resource_option, contracts.execution.compute_size_option, ...(declaration?.resource_aliases ?? []), ...(declaration?.size_aliases ?? [])]);
+    const computeKeys = new Set([contracts.execution.compute_resource_option, contracts.execution.compute_size_option, ...executionOptionView(contracts.execution).computeKeys(platform)]);
     if (platform === "fabric_dw") for (const key of ["database", "warehouse"]) computeKeys.add(key);
     const accepted = new Set(Object.keys(specs));
     for (const spec of Object.values(specs)) for (const alias of spec.aliases) accepted.add(alias);
