@@ -62,6 +62,14 @@
         }
       ]
     },
+    "benchmark_rankings": {
+      "added_columns": [
+        {"name": "cohort_key", "type": "VARCHAR", "nullable": false, "description": "Same value as identity_medians.cohort_key for the run's cohort."},
+        {"name": "lane", "type": "VARCHAR", "nullable": true, "description": "Lane the run ranks in for this cohort; null when the rule places the run in no lane."},
+        {"name": "tuning_mode", "type": "VARCHAR", "nullable": false, "description": "Tuning mode of the run as the run rows carry it, for example notuning or tuned; a result with no recorded tuning mode is published as notuning."},
+        {"name": "comparison_version", "type": "VARCHAR", "nullable": false, "description": "Comparison version of the run; with cohort_key, lane, variant_id and tuning_mode it joins the run row to its median row."}
+      ]
+    },
     "result_lane_scores": {
       "primary_key": ["result_id", "lane"],
       "columns": [
@@ -72,12 +80,13 @@
       ]
     },
     "identity_medians": {
-      "primary_key": ["cohort_key", "lane", "variant_id", "comparison_version"],
+      "primary_key": ["cohort_key", "lane", "variant_id", "tuning_mode", "comparison_version"],
       "columns": [
         {"name": "cohort_key", "type": "VARCHAR", "nullable": false, "description": "Benchmark, scale factor and phase of the cohort."},
         {"name": "lane", "type": "VARCHAR", "nullable": false, "description": "Lane the median ranks in."},
         {"name": "platform_id", "type": "VARCHAR", "nullable": false, "description": "Platform of the identity."},
         {"name": "variant_id", "type": "VARCHAR", "nullable": false, "description": "Execution variant of the identity."},
+        {"name": "tuning_mode", "type": "VARCHAR", "nullable": false, "description": "Tuning mode of the runs behind the median, for example notuning or tuned; a result with no recorded tuning mode is published as notuning."},
         {"name": "comparison_version", "type": "VARCHAR", "nullable": false, "description": "Comparison version of the identity."},
         {"name": "version_is_release", "type": "BOOLEAN", "nullable": false, "description": "Whether the comparison version is a release."},
         {"name": "run_count", "type": "INTEGER", "nullable": false, "description": "Number of runs behind the median."},
@@ -150,6 +159,7 @@
         "lane": "power_only",
         "platform_id": "example-engine",
         "variant_id": "example-engine",
+        "tuning_mode": "notuning",
         "comparison_version": "1.2.0",
         "version_is_release": true,
         "run_count": 3,
@@ -162,6 +172,20 @@
         "lane": "power_only",
         "platform_id": "example-engine",
         "variant_id": "example-engine",
+        "tuning_mode": "tuned",
+        "comparison_version": "1.2.0",
+        "version_is_release": true,
+        "run_count": 2,
+        "median_score": 1400.0,
+        "spread": 0.02,
+        "is_leaderboard_version": true
+      },
+      {
+        "cohort_key": "tpch/sf1/power",
+        "lane": "power_only",
+        "platform_id": "example-engine",
+        "variant_id": "example-engine",
+        "tuning_mode": "notuning",
         "comparison_version": "1.3.0.dev4",
         "version_is_release": false,
         "run_count": 1,

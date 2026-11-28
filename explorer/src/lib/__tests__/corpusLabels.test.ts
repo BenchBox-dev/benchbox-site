@@ -37,12 +37,27 @@ describe("next read-model contract fixture", () => {
     expect(contract.read_model_version).toBe(21);
   });
 
-  it("is the unmodified copy of the core file named in its provenance", () => {
+  it("is the copy its provenance hashes, with the amendment it names", () => {
     const provenance = JSON.parse(readFileSync(resolve(FIXTURE_DIR, "provenance.json"), "utf8")) as { sha256: string; core_commit: string };
     expect(createHash("sha256").update(readFileSync(resolve(FIXTURE_DIR, "next_read_model_contract.json"))).digest("hex")).toBe(
       provenance.sha256,
     );
     expect(provenance.core_commit).toMatch(/^[0-9a-f]{10,40}$/);
+  });
+
+  it("keeps tuned and untuned medians apart", () => {
+    const tables = (JSON.parse(readFileSync(resolve(FIXTURE_DIR, "next_read_model_contract.json"), "utf8")) as {
+      tables: Record<string, { primary_key?: string[]; columns?: FixtureColumn[]; added_columns?: FixtureColumn[] }>;
+      rows: { identity_medians: Record<string, unknown>[] };
+    });
+    const medians = tables.tables.identity_medians!;
+    expect(medians.primary_key).toEqual(["cohort_key", "lane", "variant_id", "tuning_mode", "comparison_version"]);
+    const definition = (columns: FixtureColumn[] | undefined) => columns?.find((column) => column.name === "tuning_mode");
+    expect(definition(medians.columns)).toMatchObject({ type: "VARCHAR", nullable: false });
+    expect(definition(tables.tables.benchmark_rankings!.added_columns)).toMatchObject({ type: "VARCHAR", nullable: false });
+    const keys = tables.rows.identity_medians.map((row) => [row.cohort_key, row.lane, row.variant_id, row.tuning_mode, row.comparison_version].join("|"));
+    expect(new Set(keys).size).toBe(keys.length);
+    expect(new Set(tables.rows.identity_medians.map((row) => row.tuning_mode))).toEqual(new Set(["notuning", "tuned"]));
   });
 
   it("adds every column the site reads", () => {
