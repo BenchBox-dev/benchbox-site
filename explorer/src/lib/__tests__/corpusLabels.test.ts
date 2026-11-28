@@ -37,12 +37,31 @@ describe("next read-model contract fixture", () => {
     expect(contract.read_model_version).toBe(21);
   });
 
-  it("is the unmodified copy of the core file named in its provenance", () => {
+  it("is the copy its provenance hashes, with the amendment it names", () => {
     const provenance = JSON.parse(readFileSync(resolve(FIXTURE_DIR, "provenance.json"), "utf8")) as { sha256: string; core_commit: string };
     expect(createHash("sha256").update(readFileSync(resolve(FIXTURE_DIR, "next_read_model_contract.json"))).digest("hex")).toBe(
       provenance.sha256,
     );
     expect(provenance.core_commit).toMatch(/^[0-9a-f]{10,40}$/);
+  });
+
+  it("keys identity medians by tuning mode", () => {
+    const fixture = JSON.parse(readFileSync(resolve(FIXTURE_DIR, "next_read_model_contract.json"), "utf8")) as {
+      tables: { identity_medians: { primary_key: string[]; columns: (FixtureColumn & { type: string; nullable: boolean })[] } };
+      rows: { identity_medians: Record<string, unknown>[]; benchmark_rankings: Record<string, unknown>[] };
+    };
+    const medians = fixture.tables.identity_medians;
+    expect(medians.primary_key).toEqual(["cohort_key", "lane", "variant_id", "tuning_mode", "comparison_version"]);
+    const names = medians.columns.map((column) => column.name);
+    expect(names[names.indexOf("variant_id") + 1]).toBe("tuning_mode");
+    expect(medians.columns.find((column) => column.name === "tuning_mode")).toMatchObject({ type: "VARCHAR", nullable: false });
+    const key = (row: Record<string, unknown>) => medians.primary_key.map((column) => String(row[column])).join("|");
+    const keys = fixture.rows.identity_medians.map(key);
+    expect(new Set(keys).size).toBe(keys.length);
+    for (const row of fixture.rows.benchmark_rankings) {
+      expect(typeof row.tuning_mode).toBe("string");
+      expect(keys).toContain(key(row));
+    }
   });
 
   it("adds every column the site reads", () => {
@@ -64,7 +83,7 @@ describe("next read-model contract fixture", () => {
 describe("corpusLabelTexts", () => {
   it("lists the derived wording, the class in words, the row-count label and the iteration label in order", () => {
     expect(corpusLabelTexts(parseCorpusLabels(exampleRow("example-pre-release")))).toEqual([
-      "Derived from TPC-H, not an official TPC result",
+      "Derived from TPC-H. These results do not comply with the TPC-H Specification and must not be compared with official TPC-H results.",
       "Power test only",
       "Row counts not checked",
       "Single iteration",
@@ -73,11 +92,11 @@ describe("corpusLabelTexts", () => {
 
   it("leaves out the labels a result does not carry", () => {
     expect(corpusLabelTexts(parseCorpusLabels(exampleRow("example-ranked-release")))).toEqual([
-      "Derived from TPC-H, not an official TPC result",
+      "Derived from TPC-H. These results do not comply with the TPC-H Specification and must not be compared with official TPC-H results.",
       "Power test only",
     ]);
     expect(corpusLabelTexts(parseCorpusLabels(exampleRow("example-version-not-recorded")))).toEqual([
-      "Derived from TPC-DS, not an official TPC result",
+      "Derived from TPC-DS. These results do not comply with the TPC-DS Specification and must not be compared with official TPC-DS results.",
       "Partial run: not every required phase ran",
       "Row counts not checked",
     ]);

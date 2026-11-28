@@ -15,11 +15,11 @@ if (!existsSync(assignmentsFile)) {
 }
 const assignments = JSON.parse(readFileSync(assignmentsFile, "utf8"));
 
-const DERIVED = "Derived from TPC-H, not an official TPC result";
+const DERIVED = "Derived from TPC-H. These results do not comply with the TPC-H Specification and must not be compared with official TPC-H results.";
 const CLASS_POWER_ONLY = "Power test only";
 const ROW_COUNTS = "Row counts not checked";
 const ITERATION = "Single iteration";
-const DERIVED_DS = "Derived from TPC-DS, not an official TPC result";
+const DERIVED_DS = "Derived from TPC-DS. These results do not comply with the TPC-DS Specification and must not be compared with official TPC-DS results.";
 const CLASS_PARTIAL = "Partial run: not every required phase ran";
 
 const EXPECTED = {
